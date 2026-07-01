@@ -3,223 +3,1350 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hola Chatbot | Ibagué</title>
-    
+    <title>Hola Chatbot — Tu ciudad, a un mensaje de distancia</title>
+    <meta name="description" content="Hola Chatbot conecta a los ciudadanos de Ibagué con su ciudad en segundos por WhatsApp. Rutas, eventos, normas y trámites sin instalar nada.">
+
+    <!-- Google Fonts: Climate Crisis + Work Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Climate+Crisis&family=Work+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Climate+Crisis&family=Work+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
-        /* Colorimetría Oficial [cite: 884, 887, 890, 892] */
         :root {
-            --purpura-principal: #3D3A86;
-            --purpura-secundario: #8C3F71;
-            --gris-neutro: #96989A;
-            --blanco-puro: #FEFEFE;
+            --purple-primary: #3D3A86;
+            --purple-secondary: #8C3F71;
+            --neutral-gray: #96989A;
+            --pure-white: #FEFEFE;
+            --dark-bg: #1a1938;
+            --light-purple-bg: #f4f4fa;
+            --gradient-hero: linear-gradient(135deg, #3D3A86 0%, #8C3F71 100%);
+            --shadow-soft: 0 10px 40px rgba(61, 58, 134, 0.15);
+            --shadow-hard: 0 20px 60px rgba(61, 58, 134, 0.25);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
         }
 
         body {
             font-family: 'Work Sans', sans-serif;
-            background-color: var(--blanco-puro);
-            color: var(--gris-neutro);
-            margin: 0;
-            padding: 0;
+            background-color: var(--pure-white);
+            color: var(--dark-bg);
             line-height: 1.6;
             overflow-x: hidden;
         }
 
-        /* Jerarquía Tipográfica [cite: 893, 905] */
-        h1, h2, .logo-font {
-            font-family: 'Climate Crisis', sans-serif;
-            color: var(--purpura-principal);
-            text-transform: uppercase;
-            margin-bottom: 1rem;
-        }
-
-        h3 {
-            font-weight: 600;
-            color: var(--purpura-principal);
-            margin-bottom: 0.5rem;
-            font-size: 1.5rem;
-        }
-
-        p {
-            font-size: 16px;
+        /* Typography */
+        h1, h2, h3, .logo-text {
+            font-family: 'Climate Crisis', cursive;
             font-weight: 400;
-            margin-bottom: 1.5rem;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
         }
 
-        /* Componentes UI */
-        .btn {
-            display: inline-block;
-            background-color: var(--purpura-principal);
-            color: var(--blanco-puro);
-            padding: 15px 30px;
-            border-radius: 50px;
-            text-decoration: none;
+        h1 { font-size: clamp(40px, 6vw, 72px); }
+        h2 { font-size: clamp(32px, 4vw, 48px); }
+        h3 { font-size: clamp(24px, 3vw, 36px); }
+
+        .subtitle {
+            font-family: 'Work Sans', sans-serif;
             font-weight: 600;
-            font-size: 18px;
-            transition: background-color 0.3s ease;
+            font-size: clamp(18px, 2vw, 24px);
+            color: var(--purple-primary);
         }
 
-        .btn:hover {
-            background-color: var(--purpura-secundario);
+        .body-text {
+            font-family: 'Work Sans', sans-serif;
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--neutral-gray);
         }
-        
-        .btn-outline {
-            background-color: transparent;
-            color: var(--purpura-principal);
-            border: 2px solid var(--purpura-principal);
-            padding: 10px 20px;
+
+        .small-text {
+            font-family: 'Work Sans', sans-serif;
+            font-weight: 400;
             font-size: 14px;
+            color: var(--neutral-gray);
         }
 
-        .btn-outline:hover {
-            background-color: var(--purpura-principal);
-            color: var(--blanco-puro);
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(254, 254, 254, 0.92);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(61, 58, 134, 0.08);
+            transition: all 0.3s ease;
         }
 
-        /* Estructura de Secciones */
-        header {
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 12px 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 5%;
-            background-color: var(--blanco-puro);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            position: sticky;
-            top: 0;
-            z-index: 100;
         }
 
         .logo {
-            font-size: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
             text-decoration: none;
+        }
+
+        .logo-img {
+            height: 44px;
+            width: auto;
+            object-fit: contain;
         }
 
         .nav-links {
             display: flex;
-            gap: 15px;
+            gap: 32px;
+            align-items: center;
+            list-style: none;
         }
 
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark-bg);
+            font-weight: 500;
+            font-size: 15px;
+            transition: color 0.2s;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--purple-primary);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--purple-secondary);
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-family: 'Work Sans', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--gradient-hero);
+            color: var(--pure-white);
+            box-shadow: 0 4px 20px rgba(61, 58, 134, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(61, 58, 134, 0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--purple-secondary);
+            border: 2px solid var(--purple-secondary);
+        }
+
+        .btn-outline:hover {
+            background: var(--purple-secondary);
+            color: var(--pure-white);
+            transform: translateY(-2px);
+        }
+
+        .btn-whatsapp {
+            background: #25D366;
+            color: white;
+            box-shadow: 0 4px 20px rgba(37, 211, 102, 0.3);
+        }
+
+        .btn-whatsapp:hover {
+            background: #128C7E;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(37, 211, 102, 0.4);
+        }
+
+        .btn-large {
+            padding: 16px 32px;
+            font-size: 16px;
+        }
+
+        /* Mobile Menu */
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 8px;
+        }
+
+        .menu-toggle span {
+            display: block;
+            width: 24px;
+            height: 2px;
+            background: var(--purple-primary);
+            transition: all 0.3s;
+        }
+
+        /* Hero Section */
         .hero {
-            padding: 80px 5%;
-            text-align: center;
-            max-width: 800px;
+            min-height: 100vh;
+            background: var(--gradient-hero);
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            padding-top: 80px;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 800px;
+            height: 800px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 50%;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -10%;
+            width: 600px;
+            height: 600px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+            animation: float 25s infinite ease-in-out reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.05); }
+            66% { transform: translate(-20px, 20px) scale(0.95); }
+        }
+
+        .hero-container {
+            max-width: 1200px;
             margin: 0 auto;
+            padding: 60px 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-content {
+            color: var(--pure-white);
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 24px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .hero-badge .dot {
+            width: 8px;
+            height: 8px;
+            background: #25D366;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
 
         .hero h1 {
-            font-size: 48px;
-            line-height: 1.1;
+            margin-bottom: 20px;
+            text-transform: uppercase;
         }
 
-        .grid-section {
-            padding: 60px 5%;
-            background-color: #f9f9fa;
+        .hero p {
+            font-size: 18px;
+            line-height: 1.7;
+            opacity: 0.95;
+            margin-bottom: 32px;
+            max-width: 480px;
+            font-weight: 400;
         }
 
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-            max-width: 1200px;
-            margin: 40px auto 0;
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
         }
 
-        .card {
-            background: var(--blanco-puro);
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-            border-top: 4px solid var(--purpura-secundario);
+        .hero-visual {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
-        footer {
-            background-color: var(--purpura-principal);
-            color: var(--blanco-puro);
-            text-align: center;
-            padding: 40px 5%;
+        .phone-mockup {
+            width: 320px;
+            height: 640px;
+            background: var(--pure-white);
+            border-radius: 40px;
+            box-shadow: var(--shadow-hard), 0 0 0 12px rgba(255,255,255,0.1);
+            overflow: hidden;
+            position: relative;
+            transform: perspective(1000px) rotateY(-15deg) rotateX(5deg);
+            transition: transform 0.5s ease;
+            animation: phoneFloat 6s ease-in-out infinite;
         }
 
-        footer p, footer a {
-            color: var(--blanco-puro);
-            opacity: 0.8;
+        @keyframes phoneFloat {
+            0%, 100% { transform: perspective(1000px) rotateY(-15deg) rotateX(5deg) translateY(0); }
+            50% { transform: perspective(1000px) rotateY(-15deg) rotateX(5deg) translateY(-15px); }
+        }
+
+        .phone-header {
+            background: #f0f0f0;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .phone-avatar {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-hero);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
             font-size: 14px;
+            overflow: hidden;
+        }
+
+        .phone-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .phone-info h4 {
+            font-size: 14px;
+            color: var(--dark-bg);
+            margin: 0;
+            font-family: 'Work Sans', sans-serif;
+        }
+
+        .phone-info span {
+            font-size: 12px;
+            color: #25D366;
+        }
+
+        .phone-chat {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: #e5ddd5;
+            height: calc(100% - 72px);
+            overflow-y: auto;
+        }
+
+        .chat-bubble {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.4;
+            animation: messageSlide 0.5s ease forwards;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        .chat-bubble.user {
+            align-self: flex-end;
+            background: #dcf8c6;
+            color: var(--dark-bg);
+            border-bottom-right-radius: 4px;
+            animation-delay: 0.5s;
+        }
+
+        .chat-bubble.bot {
+            align-self: flex-start;
+            background: var(--pure-white);
+            color: var(--dark-bg);
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            animation-delay: 1.2s;
+        }
+
+        .chat-bubble.bot:nth-of-type(3) { animation-delay: 2s; }
+
+        @keyframes messageSlide {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .chat-time {
+            font-size: 10px;
+            color: var(--neutral-gray);
+            margin-top: 4px;
+            text-align: right;
+        }
+
+        /* Pain Points */
+        .pain-points {
+            padding: 100px 24px;
+            background: var(--light-purple-bg);
+        }
+
+        .section-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-header h2 {
+            color: var(--purple-primary);
+            margin-bottom: 16px;
+        }
+
+        .pain-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 24px;
+        }
+
+        .pain-card {
+            background: var(--pure-white);
+            padding: 32px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-soft);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(61, 58, 134, 0.08);
+        }
+
+        .pain-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hard);
+            border-color: rgba(61, 58, 134, 0.2);
+        }
+
+        .pain-icon {
+            font-size: 40px;
+            margin-bottom: 16px;
+        }
+
+        .pain-card h3 {
+            font-family: 'Work Sans', sans-serif;
+            font-weight: 600;
+            font-size: 20px;
+            color: var(--purple-primary);
+            margin-bottom: 8px;
+        }
+
+        .pain-card p {
+            color: var(--neutral-gray);
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        /* Features */
+        .features {
+            padding: 100px 24px;
+            background: var(--pure-white);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 32px;
+            margin-top: 60px;
+        }
+
+        .feature-card {
+            padding: 40px;
+            border-radius: 24px;
+            background: linear-gradient(145deg, #ffffff, #f8f8fc);
+            border: 1px solid rgba(61, 58, 134, 0.06);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--gradient-hero);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-hard);
+        }
+
+        .feature-icon {
+            width: 56px;
+            height: 56px;
+            background: var(--gradient-hero);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            font-family: 'Work Sans', sans-serif;
+            font-weight: 600;
+            font-size: 22px;
+            color: var(--purple-primary);
+            margin-bottom: 12px;
+        }
+
+        .feature-card p {
+            color: var(--neutral-gray);
+            font-size: 15px;
+            line-height: 1.7;
+        }
+
+        /* How it Works */
+        .how-it-works {
+            padding: 100px 24px;
+            background: var(--gradient-hero);
+            color: var(--pure-white);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .how-it-works h2 {
+            text-align: center;
+            margin-bottom: 60px;
+            color: var(--pure-white);
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 40px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .step {
+            text-align: center;
+            position: relative;
+        }
+
+        .step-number {
+            width: 64px;
+            height: 64px;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Climate Crisis', cursive;
+            font-size: 28px;
+            margin: 0 auto 24px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .step h3 {
+            font-family: 'Work Sans', sans-serif;
+            font-weight: 600;
+            font-size: 22px;
+            margin-bottom: 12px;
+        }
+
+        .step p {
+            opacity: 0.9;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        /* Trust Badges */
+        .trust {
+            padding: 80px 24px;
+            background: var(--light-purple-bg);
+        }
+
+        .trust-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 32px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .trust-item {
+            text-align: center;
+            padding: 24px;
+        }
+
+        .trust-item .number {
+            font-family: 'Climate Crisis', cursive;
+            font-size: 36px;
+            color: var(--purple-primary);
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .trust-item p {
+            font-weight: 600;
+            color: var(--dark-bg);
+            font-size: 15px;
+        }
+
+        /* Investor & Sponsor Sections */
+        .audience-sections {
+            padding: 100px 24px;
+            background: var(--pure-white);
+        }
+
+        .audience-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .audience-card {
+            padding: 48px;
+            border-radius: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .audience-card.investors {
+            background: linear-gradient(135deg, #3D3A86 0%, #2a275e 100%);
+            color: var(--pure-white);
+        }
+
+        .audience-card.sponsors {
+            background: linear-gradient(135deg, #8C3F71 0%, #6b3056 100%);
+            color: var(--pure-white);
+        }
+
+        .audience-card h3 {
+            font-family: 'Work Sans', sans-serif;
+            font-weight: 700;
+            font-size: 24px;
+            margin-bottom: 16px;
+        }
+
+        .audience-card p {
+            opacity: 0.9;
+            margin-bottom: 24px;
+            line-height: 1.7;
+            font-size: 15px;
+        }
+
+        .audience-card .btn {
+            background: var(--pure-white);
+            color: var(--purple-primary);
+        }
+
+        .audience-card.sponsors .btn {
+            color: var(--purple-secondary);
+        }
+
+        .audience-card .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        /* FAQ */
+        .faq {
+            padding: 100px 24px;
+            background: var(--light-purple-bg);
+        }
+
+        .faq-list {
+            max-width: 800px;
+            margin: 60px auto 0;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .faq-item {
+            background: var(--pure-white);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid rgba(61, 58, 134, 0.06);
+        }
+
+        .faq-question {
+            width: 100%;
+            padding: 24px;
+            background: none;
+            border: none;
+            text-align: left;
+            font-family: 'Work Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            color: var(--purple-primary);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s;
+        }
+
+        .faq-question:hover {
+            background: rgba(61, 58, 134, 0.02);
+        }
+
+        .faq-question .icon {
+            font-size: 20px;
+            transition: transform 0.3s;
+            color: var(--purple-secondary);
+        }
+
+        .faq-item.active .faq-question .icon {
+            transform: rotate(45deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+            padding: 0 24px;
+            color: var(--neutral-gray);
+            line-height: 1.7;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 300px;
+            padding: 0 24px 24px;
+        }
+
+        /* Final CTA */
+        .final-cta {
+            padding: 100px 24px;
+            background: var(--gradient-hero);
+            text-align: center;
+            color: var(--pure-white);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .final-cta h2 {
+            margin-bottom: 20px;
+            font-size: clamp(32px, 5vw, 56px);
+        }
+
+        .final-cta p {
+            font-size: 18px;
+            opacity: 0.95;
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Floating WhatsApp Button */
+        .float-whatsapp {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 60px;
+            height: 60px;
+            background: #25D366;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 28px;
+            text-decoration: none;
+            box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+            z-index: 999;
+            transition: all 0.3s ease;
+            animation: floatWhatsApp 3s ease-in-out infinite;
+        }
+
+        @keyframes floatWhatsApp {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .float-whatsapp:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 30px rgba(37, 211, 102, 0.5);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--dark-bg);
+            color: var(--pure-white);
+            padding: 60px 24px 24px;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-brand .logo-img {
+            height: 50px;
+            margin-bottom: 16px;
+            filter: brightness(0) invert(1);
+        }
+
+        .footer-brand p {
+            opacity: 0.7;
+            font-size: 14px;
+            line-height: 1.7;
+            max-width: 300px;
+        }
+
+        .footer-links h4 {
+            font-family: 'Work Sans', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: var(--pure-white);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 24px;
+            text-align: center;
+            font-size: 13px;
+            opacity: 0.5;
         }
 
         /* Responsive */
-        @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 32px;
+        @media (max-width: 900px) {
+            .hero-container {
+                grid-template-columns: 1fr;
+                text-align: center;
             }
-            header {
-                flex-direction: column;
-                gap: 15px;
+
+            .hero p {
+                margin-left: auto;
+                margin-right: auto;
             }
+
+            .hero-buttons {
+                justify-content: center;
+            }
+
+            .phone-mockup {
+                width: 280px;
+                height: 560px;
+                transform: none;
+                animation: phoneFloatMobile 6s ease-in-out infinite;
+            }
+
+            @keyframes phoneFloatMobile {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-10px); }
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .nav-buttons {
+                display: none;
+            }
+
+            .menu-toggle {
+                display: flex;
+            }
+
+            .audience-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .footer-brand p {
+                margin: 0 auto;
+            }
+
+            .footer-brand .logo-img {
+                margin: 0 auto 16px;
+            }
+        }
+
+        /* Scroll Reveal */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <a href="#" class="logo logo-font">HOLA IBAGUÉ [cite: 876]</a>
-        <div class="nav-links">
-            <a href="#inversionistas" class="btn btn-outline">Inversionistas [cite: 124]</a>
-            <a href="#sponsors" class="btn btn-outline">Patrocinadores [cite: 123]</a>
-        </div>
-    </header>
+    <!-- Navigation -->
+    <nav id="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo">
+                <img src="hola-chatbot-main-logo.png" alt="Hola Chatbot" class="logo-img">
+            </a>
 
-    <section class="hero">
-        <h3>Tu ciudad, a un mensaje de distancia. [cite: 193]</h3>
-        <h1>Tu ciudad, respondida al instante, por WhatsApp. [cite: 23]</h1>
-        <p>Hola Chatbot conecta a los ciudadanos de Ibagué con la información que necesitan cada día, directamente en WhatsApp y sin instalar nada. [cite: 187]</p>
-        
-        <a href="https://wa.me/573102588085" class="btn" target="_blank">Iniciar Chat en WhatsApp</a>
+            <ul class="nav-links">
+                <li><a href="#inicio">Inicio</a></li>
+                <li><a href="#funciones">Funciones</a></li>
+                <li><a href="#como-funciona">Cómo funciona</a></li>
+                <li><a href="#faq">FAQ</a></li>
+            </ul>
+
+            <div class="nav-buttons">
+                <a href="#inversionistas" class="btn btn-outline">Inversionistas</a>
+                <a href="#patrocinadores" class="btn btn-primary">Patrocinadores</a>
+            </div>
+
+            <button class="menu-toggle" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="inicio">
+        <div class="hero-container">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <span class="dot"></span>
+                    Disponible 24/7 en Ibagué
+                </div>
+                <h1>Tu ciudad, respondida al instante, por WhatsApp</h1>
+                <p>¿Qué ruta de bus necesitas hoy? ¿Hay ley seca? ¿Qué eventos hay esta noche? Escribe <strong>"Hola Ibagué"</strong> y resuelve tus dudas en segundos. Sin instalar nada. Sin filas. Sin llamadas.</p>
+                <div class="hero-buttons">
+                    <a href="https://wa.me/573102588085?text=Hola%20Ibagué" class="btn btn-whatsapp btn-large" target="_blank" rel="noopener">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                        Chatear en WhatsApp
+                    </a>
+                    <a href="#funciones" class="btn btn-outline btn-large" style="color: white; border-color: rgba(255,255,255,0.5);">Ver funciones</a>
+                </div>
+            </div>
+
+            <div class="hero-visual">
+                <div class="phone-mockup">
+                    <div class="phone-header">
+                        <div class="phone-avatar">
+                            <img src="hola-chatbot-main-logo.png" alt="Hola" style="width:100%;height:100%;object-fit:cover;">
+                        </div>
+                        <div class="phone-info">
+                            <h4>Hola Ibagué</h4>
+                            <span>● En línea</span>
+                        </div>
+                    </div>
+                    <div class="phone-chat">
+                        <div class="chat-bubble user">
+                            Del Salado al Multicentro
+                            <div class="chat-time">10:42 a.m.</div>
+                        </div>
+                        <div class="chat-bubble bot">
+                            ¡Hola! 🚌 La ruta <strong>12</strong> te deja en Multicentro. Sale cada 15 min por la carrera 5ta. ¡Buen viaje!
+                            <div class="chat-time">10:42 a.m.</div>
+                        </div>
+                        <div class="chat-bubble user">
+                            ¿Y si hay ley seca hoy?
+                            <div class="chat-time">10:43 a.m.</div>
+                        </div>
+                        <div class="chat-bubble bot">
+                            Hoy <strong>no aplica</strong> ley seca en Ibagué. Puedes comprar bebidas con normalidad. 🍻
+                            <div class="chat-time">10:43 a.m.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
 
-    <section class="grid-section">
-        <div style="text-align: center;">
-            <h2>TODO EN UN SOLO CANAL [cite: 39]</h2>
-            <p>Resuelve dudas rápidas de movilidad, eventos o trámites. [cite: 46]</p>
-        </div>
-        
-        <div class="grid-container">
-            <div class="card">
-                <h3>Rutas y Transporte</h3>
-                <p>¿No sabes qué ruta de bus tomar? [cite: 33] Consulta rutas de bus origen-destino al instante. [cite: 74]</p>
+    <!-- Pain Points -->
+    <section class="pain-points" id="dolores">
+        <div class="section-container">
+            <div class="section-header reveal">
+                <h2>¿Te ha pasado?</h2>
+                <p class="body-text" style="max-width: 600px; margin: 0 auto;">Los ciudadanos de Ibagué enfrentan estas dudas todos los días. Hola Chatbot las resuelve al instante.</p>
             </div>
-            <div class="card">
-                <h3>Normativa Diaria</h3>
-                <p>Entérate si hay pico y placa o ley seca del día [cite: 75] en cuestión de segundos.</p>
-            </div>
-            <div class="card">
-                <h3>Eventos y Cultura</h3>
-                <p>Descubre eventos generales, segmentados y filtrados [cite: 89] para que no te pierdas de nada en la ciudad.</p>
-            </div>
-            <div class="card">
-                <h3>Trámites Públicos</h3>
-                <p>Consulta el directorio y horarios de entidades públicas [cite: 76] sin hacer filas ni llamadas.</p>
+
+            <div class="pain-grid">
+                <div class="pain-card reveal">
+                    <div class="pain-icon">🚌</div>
+                    <h3>Se te pasó el último bus</h3>
+                    <p>No sabes qué ruta tomar ni a qué hora pasa. La información está dispersa o desactualizada.</p>
+                </div>
+                <div class="pain-card reveal">
+                    <div class="pain-icon">📵</div>
+                    <h3>¿Hoy hay ley seca?</h3>
+                    <p>Llamas a tres líneas diferentes y nadie te responde con claridad. Necesitas saberlo ya.</p>
+                </div>
+                <div class="pain-card reveal">
+                    <div class="pain-icon">🎉</div>
+                    <h3>Te enteraste tarde del evento</h3>
+                    <p>La agenda cultural de Ibagué no llega a ti. Te pierdes conciertos, ferias y planes gratis.</p>
+                </div>
+                <div class="pain-card reveal">
+                    <div class="pain-icon">🏢</div>
+                    <h3>No encuentras la entidad pública</h3>
+                    <p>¿Dónde queda esa oficina? ¿Atienden hoy? La información en internet es confusa o inexistente.</p>
+                </div>
             </div>
         </div>
     </section>
 
-    <section class="hero">
-        <h2>TU COPILOTO URBANO [cite: 144]</h2>
-        <p>Funciona de manera ágil y conversacional[cite: 138]. Solo guarda el número <strong>+57 310 258 8085</strong>, escribe tu pregunta de forma natural y recibe respuestas verificadas contra fuentes oficiales antes de enviarse. [cite: 40]</p>
-        <br>
-        <h2>DESCUBRE IBAGUÉ Y AHORRA</h2>
-        <p>Apoya el comercio local. Recibe de manera pasiva promociones cercanas a tu ubicación [cite: 93] y encuentra restaurantes, farmacias u hoteles al instante. [cite: 93]</p>
+    <!-- Features -->
+    <section class="features" id="funciones">
+        <div class="section-container">
+            <div class="section-header reveal">
+                <h2>Todo lo que necesitas, en un solo chat</h2>
+                <p class="body-text" style="max-width: 600px; margin: 0 auto;">Hola Chatbot es tu copiloto urbano. Responde en menos de 2 segundos y siempre con información verificada.</p>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card reveal">
+                    <div class="feature-icon">🚌</div>
+                    <h3>Rutas de transporte</h3>
+                    <p>Consulta qué bus tomar desde tu origen hasta tu destino. Rutas verificadas del SETP/TransMusical de Ibagué.</p>
+                </div>
+                <div class="feature-card reveal">
+                    <div class="feature-icon">🎭</div>
+                    <h3>Eventos y cultura</h3>
+                    <p>Descubre qué hay hoy: conciertos, ferias, teatro, cine y planes familiares filtrados por zona y precio.</p>
+                </div>
+                <div class="feature-card reveal">
+                    <div class="feature-icon">📋</div>
+                    <h3>Pico y placa / Ley seca</h3>
+                    <p>Consulta las restricciones vehiculares y normativas del día. Información cruzada con fuentes oficiales.</p>
+                </div>
+                <div class="feature-card reveal">
+                    <div class="feature-icon">🏛️</div>
+                    <h3>Trámites y entidades</h3>
+                    <p>Ubicación, horarios y requisitos de entidades públicas. Te decimos qué llevar y cómo llegar.</p>
+                </div>
+                <div class="feature-card reveal">
+                    <div class="feature-icon">📍</div>
+                    <h3>Ubicación en tiempo real</h3>
+                    <p>Te enviamos la ubicación exacta del lugar que buscas directamente en el chat. Sin salir de WhatsApp.</p>
+                </div>
+                <div class="feature-card reveal">
+                    <div class="feature-icon">🛍️</div>
+                    <h3>Promociones locales</h3>
+                    <p>Recibe descuentos y ofertas de comercios aliados cercanos a ti. Apoya lo local y ahorra.</p>
+                </div>
+            </div>
+        </div>
     </section>
 
+    <!-- How it Works -->
+    <section class="how-it-works" id="como-funciona">
+        <div class="section-container">
+            <h2 class="reveal">Así de fácil</h2>
+            <div class="steps">
+                <div class="step reveal">
+                    <div class="step-number">1</div>
+                    <h3>Escribe "Hola Ibagué"</h3>
+                    <p>Abre WhatsApp y envía el mensaje de activación. No necesitas descargar apps ni registrarte.</p>
+                </div>
+                <div class="step reveal">
+                    <div class="step-number">2</div>
+                    <h3>Pregunta lo que necesites</h3>
+                    <p>Usa tu lenguaje natural. "Parce, ¿qué hay pa' hacer hoy?" o "¿Cómo me voy pa'l centro?"</p>
+                </div>
+                <div class="step reveal">
+                    <div class="step-number">3</div>
+                    <h3>Recibe tu respuesta</h3>
+                    <p>En menos de 2 segundos recibes información verificada, fragmentada y fácil de leer en el chat.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trust -->
+    <section class="trust">
+        <div class="trust-grid reveal">
+            <div class="trust-item">
+                <span class="number">&lt;2s</span>
+                <p>Tiempo de respuesta promedio</p>
+            </div>
+            <div class="trust-item">
+                <span class="number">24/7</span>
+                <p>Disponibilidad permanente</p>
+            </div>
+            <div class="trust-item">
+                <span class="number">0</span>
+                <p>Apps que instalar</p>
+            </div>
+            <div class="trust-item">
+                <span class="number">100%</span>
+                <p>Información verificada con fuentes oficiales</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Investor & Sponsor Sections -->
+    <section class="audience-sections">
+        <div class="audience-grid">
+            <div class="audience-card investors reveal" id="inversionistas">
+                <h3>¿Eres inversionista?</h3>
+                <p>Hola Chatbot es una plataforma CityTech validada en Ibagué con MVP probado bajo estrés el 30 de junio de 2026. Modelo de ingresos mixto, arquitectura replicable y roadmap claro hacia Santa Marta, Neiva y Armenia.</p>
+                <a href="mailto:contacto@holachatbot.co" class="btn">Contactar al equipo</a>
+            </div>
+            <div class="audience-card sponsors reveal" id="patrocinadores">
+                <h3>¿Tienes un comercio local?</h3>
+                <p>Conecta con vecinos cercanos que ya te buscan. Visibilidad segmentada por geografía, costo accesible y panel de métricas simple. Sé parte del ecosistema que Ibagué ya está usando.</p>
+                <a href="https://wa.me/573102588085?text=Hola,%20quiero%20ser%20patrocinador" class="btn" target="_blank" rel="noopener">Convertirme en aliado</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="faq" id="faq">
+        <div class="section-container">
+            <div class="section-header reveal">
+                <h2>Preguntas frecuentes</h2>
+                <p class="body-text" style="max-width: 600px; margin: 0 auto;">Todo lo que necesitas saber para empezar a usar Hola Chatbot hoy mismo.</p>
+            </div>
+
+            <div class="faq-list">
+                <div class="faq-item reveal">
+                    <button class="faq-question" onclick="toggleFaq(this)">
+                        ¿Cuánto cuesta usar Hola Chatbot?
+                        <span class="icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        Hola Chatbot es completamente gratuito para ciudadanos. No hay costos ocultos, suscripciones ni límites de consultas. Lo sostenemos con patrocinadores locales y alianzas institucionales.
+                    </div>
+                </div>
+                <div class="faq-item reveal">
+                    <button class="faq-question" onclick="toggleFaq(this)">
+                        ¿Necesito instalar una app?
+                        <span class="icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        No. Funciona directamente en WhatsApp, la app que ya usas a diario. Solo guarda el número +57 310 2588085 y escribe "Hola Ibagué".
+                    </div>
+                </div>
+                <div class="faq-item reveal">
+                    <button class="faq-question" onclick="toggleFaq(this)">
+                        ¿La información es confiable?
+                        <span class="icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        Sí. Cruzamos datos con fuentes oficiales como la Alcaldía de Ibagué, SETP, IDEAM y entidades locales antes de responderte. Si un dato cambia, lo actualizamos.
+                    </div>
+                </div>
+                <div class="faq-item reveal">
+                    <button class="faq-question" onclick="toggleFaq(this)">
+                        ¿En qué ciudades funciona?
+                        <span class="icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        Actualmente operamos en Ibagué, Tolima. Nuestra arquitectura está diseñada para replicarse en Santa Marta, Neiva y Armenia en las siguientes fases de escalamiento.
+                    </div>
+                </div>
+                <div class="faq-item reveal">
+                    <button class="faq-question" onclick="toggleFaq(this)">
+                        ¿Puedo recibir promociones de comercios?
+                        <span class="icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        Sí. Si lo deseas, el bot te enviará promociones de comercios aliados cercanos a tu ubicación. Puedes pedir que te las pause en cualquier momento.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="final-cta">
+        <div class="section-container">
+            <h2 class="reveal">Tu ciudad está a un mensaje de distancia</h2>
+            <p class="reveal">Únete a los ciudadanos de Ibagué que ya resuelven sus dudas sin filas, sin llamadas y sin instalar nada. Estamos en WhatsApp, 24/7.</p>
+            <a href="https://wa.me/573102588085?text=Hola%20Ibagué" class="btn btn-whatsapp btn-large reveal" target="_blank" rel="noopener" style="font-size: 18px; padding: 20px 40px;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                Escribir por WhatsApp
+            </a>
+        </div>
+    </section>
+
+    <!-- Floating WhatsApp -->
+    <a href="https://wa.me/573102588085?text=Hola%20Ibagué" class="float-whatsapp" target="_blank" rel="noopener" aria-label="Chatear en WhatsApp">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+    </a>
+
+    <!-- Footer -->
     <footer>
-        <h2 style="color: #FEFEFE; margin-bottom: 5px;">HOLA IBAGUÉ</h2>
-        <p>Hola Chatbot conecta a los ciudadanos de Ibagué con su ciudad, en segundos, por WhatsApp. [cite: 191]</p>
-        <p>Asistente ciudadano por WhatsApp, disponible 24/7. [cite: 159] MVP validado en pruebas de estrés. [cite: 69]</p>
-        <div style="margin-top: 20px;">
-            <small>Modelo de negocio basado en sponsors, alianzas institucionales y capital semilla. [cite: 165]</small>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <img src="hola-chatbot-main-logo.png" alt="Hola Chatbot" class="logo-img">
+                <p>Asistente ciudadano por WhatsApp que responde en segundos preguntas cotidianas sobre movilidad, eventos, trámites y normas locales de Ibagué.</p>
+            </div>
+            <div class="footer-links">
+                <h4>Producto</h4>
+                <ul>
+                    <li><a href="#funciones">Funciones</a></li>
+                    <li><a href="#como-funciona">Cómo funciona</a></li>
+                    <li><a href="#faq">Preguntas frecuentes</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Aliados</h4>
+                <ul>
+                    <li><a href="#inversionistas">Inversionistas</a></li>
+                    <li><a href="#patrocinadores">Patrocinadores</a></li>
+                    <li><a href="https://wa.me/573102588085" target="_blank">Contacto</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            © 2026 Hola Chatbot — Ibagué, Colombia. Todos los derechos reservados.
         </div>
     </footer>
 
+    <script>
+        // Scroll Reveal
+        const reveals = document.querySelectorAll('.reveal');
+        const revealOnScroll = () => {
+            reveals.forEach(el => {
+                const windowHeight = window.innerHeight;
+                const elementTop = el.getBoundingClientRect().top;
+                const elementVisible = 100;
+                if (elementTop < windowHeight - elementVisible) {
+                    el.classList.add('active');
+                }
+            });
+        };
+        window.addEventListener('scroll', revealOnScroll);
+        revealOnScroll();
+
+        // FAQ Toggle
+        function toggleFaq(button) {
+            const item = button.parentElement;
+            const isActive = item.classList.contains('active');
+            document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
+            if (!isActive) item.classList.add('active');
+        }
+
+        // Navbar scroll effect
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.style.boxShadow = '0 4px 20px rgba(61, 58, 134, 0.1)';
+            } else {
+                navbar.style.boxShadow = 'none';
+            }
+        });
+
+        // Mobile menu (simple alert for now, can be expanded)
+        function toggleMenu() {
+            alert('Menú móvil: usa los enlaces del sitio para navegar.');
+        }
+    </script>
 </body>
 </html>
