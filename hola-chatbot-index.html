@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hola Chatbot | Ibagué</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Climate+Crisis&family=Work+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Colorimetría Oficial [cite: 884, 887, 890, 892] */
+        :root {
+            --purpura-principal: #3D3A86;
+            --purpura-secundario: #8C3F71;
+            --gris-neutro: #96989A;
+            --blanco-puro: #FEFEFE;
+        }
+
+        body {
+            font-family: 'Work Sans', sans-serif;
+            background-color: var(--blanco-puro);
+            color: var(--gris-neutro);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Jerarquía Tipográfica [cite: 893, 905] */
+        h1, h2, .logo-font {
+            font-family: 'Climate Crisis', sans-serif;
+            color: var(--purpura-principal);
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        h3 {
+            font-weight: 600;
+            color: var(--purpura-principal);
+            margin-bottom: 0.5rem;
+            font-size: 1.5rem;
+        }
+
+        p {
+            font-size: 16px;
+            font-weight: 400;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Componentes UI */
+        .btn {
+            display: inline-block;
+            background-color: var(--purpura-principal);
+            color: var(--blanco-puro);
+            padding: 15px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 18px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: var(--purpura-secundario);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            color: var(--purpura-principal);
+            border: 2px solid var(--purpura-principal);
+            padding: 10px 20px;
+            font-size: 14px;
+        }
+
+        .btn-outline:hover {
+            background-color: var(--purpura-principal);
+            color: var(--blanco-puro);
+        }
+
+        /* Estructura de Secciones */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 5%;
+            background-color: var(--blanco-puro);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 24px;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .hero {
+            padding: 80px 5%;
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            line-height: 1.1;
+        }
+
+        .grid-section {
+            padding: 60px 5%;
+            background-color: #f9f9fa;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 40px auto 0;
+        }
+
+        .card {
+            background: var(--blanco-puro);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            border-top: 4px solid var(--purpura-secundario);
+        }
+
+        footer {
+            background-color: var(--purpura-principal);
+            color: var(--blanco-puro);
+            text-align: center;
+            padding: 40px 5%;
+        }
+
+        footer p, footer a {
+            color: var(--blanco-puro);
+            opacity: 0.8;
+            font-size: 14px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 32px;
+            }
+            header {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="#" class="logo logo-font">HOLA IBAGUÉ [cite: 876]</a>
+        <div class="nav-links">
+            <a href="#inversionistas" class="btn btn-outline">Inversionistas [cite: 124]</a>
+            <a href="#sponsors" class="btn btn-outline">Patrocinadores [cite: 123]</a>
+        </div>
+    </header>
+
+    <section class="hero">
+        <h3>Tu ciudad, a un mensaje de distancia. [cite: 193]</h3>
+        <h1>Tu ciudad, respondida al instante, por WhatsApp. [cite: 23]</h1>
+        <p>Hola Chatbot conecta a los ciudadanos de Ibagué con la información que necesitan cada día, directamente en WhatsApp y sin instalar nada. [cite: 187]</p>
+        
+        <a href="https://wa.me/573102588085" class="btn" target="_blank">Iniciar Chat en WhatsApp</a>
+    </section>
+
+    <section class="grid-section">
+        <div style="text-align: center;">
+            <h2>TODO EN UN SOLO CANAL [cite: 39]</h2>
+            <p>Resuelve dudas rápidas de movilidad, eventos o trámites. [cite: 46]</p>
+        </div>
+        
+        <div class="grid-container">
+            <div class="card">
+                <h3>Rutas y Transporte</h3>
+                <p>¿No sabes qué ruta de bus tomar? [cite: 33] Consulta rutas de bus origen-destino al instante. [cite: 74]</p>
+            </div>
+            <div class="card">
+                <h3>Normativa Diaria</h3>
+                <p>Entérate si hay pico y placa o ley seca del día [cite: 75] en cuestión de segundos.</p>
+            </div>
+            <div class="card">
+                <h3>Eventos y Cultura</h3>
+                <p>Descubre eventos generales, segmentados y filtrados [cite: 89] para que no te pierdas de nada en la ciudad.</p>
+            </div>
+            <div class="card">
+                <h3>Trámites Públicos</h3>
+                <p>Consulta el directorio y horarios de entidades públicas [cite: 76] sin hacer filas ni llamadas.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="hero">
+        <h2>TU COPILOTO URBANO [cite: 144]</h2>
+        <p>Funciona de manera ágil y conversacional[cite: 138]. Solo guarda el número <strong>+57 310 258 8085</strong>, escribe tu pregunta de forma natural y recibe respuestas verificadas contra fuentes oficiales antes de enviarse. [cite: 40]</p>
+        <br>
+        <h2>DESCUBRE IBAGUÉ Y AHORRA</h2>
+        <p>Apoya el comercio local. Recibe de manera pasiva promociones cercanas a tu ubicación [cite: 93] y encuentra restaurantes, farmacias u hoteles al instante. [cite: 93]</p>
+    </section>
+
+    <footer>
+        <h2 style="color: #FEFEFE; margin-bottom: 5px;">HOLA IBAGUÉ</h2>
+        <p>Hola Chatbot conecta a los ciudadanos de Ibagué con su ciudad, en segundos, por WhatsApp. [cite: 191]</p>
+        <p>Asistente ciudadano por WhatsApp, disponible 24/7. [cite: 159] MVP validado en pruebas de estrés. [cite: 69]</p>
+        <div style="margin-top: 20px;">
+            <small>Modelo de negocio basado en sponsors, alianzas institucionales y capital semilla. [cite: 165]</small>
+        </div>
+    </footer>
+
+</body>
+</html>
