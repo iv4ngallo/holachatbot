@@ -1,0 +1,1515 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hola Chatbot — Invierte en el Futuro de las Ciudades Inteligentes</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Climate+Crisis&family=Work+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --purple-primary: #3D3A86;
+            --purple-secondary: #8C3F71;
+            --gray-neutral: #96989A;
+            --white-pure: #FEFEFE;
+            --dark-bg: #1a1940;
+            --gradient-hero: linear-gradient(135deg, #3D3A86 0%, #8C3F71 50%, #3D3A86 100%);
+            --gradient-card: linear-gradient(145deg, rgba(61,58,134,0.1) 0%, rgba(140,63,113,0.05) 100%);
+            --shadow-glow: 0 0 40px rgba(61,58,134,0.3);
+            --shadow-card: 0 20px 60px rgba(0,0,0,0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Work Sans', sans-serif;
+            background: var(--white-pure);
+            color: var(--dark-bg);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* ===== ANIMATED BACKGROUND ===== */
+        .bg-mesh {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: 
+                radial-gradient(ellipse at 20% 20%, rgba(61,58,134,0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(140,63,113,0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(61,58,134,0.04) 0%, transparent 70%);
+            animation: meshMove 20s ease-in-out infinite;
+        }
+
+        @keyframes meshMove {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.05); }
+            66% { transform: translate(-20px, 20px) scale(0.95); }
+        }
+
+        /* ===== FLOATING PARTICLES ===== */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: var(--purple-primary);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: floatUp linear infinite;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.3; }
+            90% { opacity: 0.3; }
+            100% { transform: translateY(-10vh) rotate(720deg); opacity: 0; }
+        }
+
+        /* ===== NAVIGATION ===== */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1.5rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(20px);
+            background: rgba(254,254,254,0.85);
+            border-bottom: 1px solid rgba(61,58,134,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .logo {
+            font-family: 'Climate Crisis', cursive;
+            font-size: 1.8rem;
+            color: var(--purple-primary);
+            text-decoration: none;
+            letter-spacing: -1px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark-bg);
+            font-weight: 500;
+            font-size: 0.95rem;
+            position: relative;
+            transition: color 0.3s;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--purple-secondary);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--purple-primary);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-cta {
+            background: var(--purple-primary);
+            color: var(--white-pure) !important;
+            padding: 0.6rem 1.8rem;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(61,58,134,0.3);
+        }
+
+        .nav-cta:hover {
+            background: var(--purple-secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(140,63,113,0.4);
+        }
+
+        .nav-cta::after { display: none !important; }
+
+        /* ===== HERO SECTION ===== */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 8rem 5% 4rem;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(61,58,134,0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: pulse 6s ease-in-out infinite;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -10%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(140,63,113,0.12) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: pulse 8s ease-in-out infinite reverse;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 1; }
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-text h1 {
+            font-family: 'Climate Crisis', cursive;
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            line-height: 1.1;
+            color: var(--purple-primary);
+            margin-bottom: 1.5rem;
+            animation: fadeInUp 1s ease;
+        }
+
+        .hero-text h1 span {
+            color: var(--purple-secondary);
+            display: block;
+        }
+
+        .hero-text .subtitle {
+            font-size: 1.25rem;
+            color: var(--gray-neutral);
+            margin-bottom: 2rem;
+            font-weight: 400;
+            max-width: 500px;
+            animation: fadeInUp 1s ease 0.2s both;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 2.5rem;
+            margin-bottom: 2.5rem;
+            animation: fadeInUp 1s ease 0.4s both;
+        }
+
+        .stat-item {
+            text-align: left;
+        }
+
+        .stat-number {
+            font-family: 'Climate Crisis', cursive;
+            font-size: 2.5rem;
+            color: var(--purple-primary);
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--gray-neutral);
+            font-weight: 500;
+            margin-top: 0.3rem;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            animation: fadeInUp 1s ease 0.6s both;
+        }
+
+        .btn-primary {
+            background: var(--purple-primary);
+            color: var(--white-pure);
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 30px rgba(61,58,134,0.35);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary:hover {
+            background: var(--purple-secondary);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(140,63,113,0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--purple-primary);
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            border: 2px solid var(--purple-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-secondary:hover {
+            background: var(--purple-primary);
+            color: var(--white-pure);
+            transform: translateY(-3px);
+        }
+
+        /* ===== PHONE MOCKUP ===== */
+        .phone-mockup {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            animation: floatPhone 6s ease-in-out infinite;
+        }
+
+        @keyframes floatPhone {
+            0%, 100% { transform: translateY(0) rotate(-2deg); }
+            50% { transform: translateY(-20px) rotate(2deg); }
+        }
+
+        .phone {
+            width: 280px;
+            height: 560px;
+            background: #1a1a2e;
+            border-radius: 40px;
+            padding: 12px;
+            box-shadow: 
+                0 50px 100px rgba(61,58,134,0.3),
+                0 0 0 1px rgba(255,255,255,0.1) inset;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .phone::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 30px;
+            background: #1a1a2e;
+            border-radius: 0 0 20px 20px;
+            z-index: 10;
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, #f0f0f5 0%, #e8e8f0 100%);
+            border-radius: 32px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .chat-header {
+            background: var(--purple-primary);
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: white;
+        }
+
+        .chat-avatar {
+            width: 40px;
+            height: 40px;
+            background: var(--purple-secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .chat-info h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .chat-info p {
+            font-size: 0.7rem;
+            opacity: 0.8;
+        }
+
+        .chat-body {
+            flex: 1;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            overflow: hidden;
+        }
+
+        .message {
+            max-width: 85%;
+            padding: 0.75rem 1rem;
+            border-radius: 18px;
+            font-size: 0.8rem;
+            line-height: 1.4;
+            animation: messagePop 0.5s ease both;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background: var(--purple-primary);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.bot {
+            align-self: flex-start;
+            background: white;
+            color: var(--dark-bg);
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .message.bot strong {
+            color: var(--purple-primary);
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 0.75rem 1rem;
+            background: white;
+            border-radius: 18px;
+            align-self: flex-start;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--gray-neutral);
+            border-radius: 50%;
+            animation: typingBounce 1.4s ease-in-out infinite;
+        }
+
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typingBounce {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-6px); }
+        }
+
+        @keyframes messagePop {
+            0% { opacity: 0; transform: scale(0.8) translateY(10px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        /* ===== SECTION STYLES ===== */
+        section {
+            padding: 6rem 5%;
+            position: relative;
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto 4rem;
+        }
+
+        .section-tag {
+            display: inline-block;
+            background: rgba(61,58,134,0.1);
+            color: var(--purple-primary);
+            padding: 0.4rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .section-header h2 {
+            font-family: 'Climate Crisis', cursive;
+            font-size: clamp(2rem, 4vw, 3rem);
+            color: var(--purple-primary);
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .section-header p {
+            font-size: 1.1rem;
+            color: var(--gray-neutral);
+            line-height: 1.7;
+        }
+
+        /* ===== PROBLEM / SOLUTION ===== */
+        .problem-solution {
+            background: linear-gradient(180deg, var(--white-pure) 0%, rgba(61,58,134,0.03) 100%);
+        }
+
+        .ps-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .ps-card {
+            background: var(--white-pure);
+            padding: 3rem;
+            border-radius: 24px;
+            box-shadow: var(--shadow-card);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .ps-card:hover {
+            transform: translateY(-8px);
+        }
+
+        .ps-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+        }
+
+        .ps-card.problem::before {
+            background: linear-gradient(90deg, var(--gray-neutral), #ccc);
+        }
+
+        .ps-card.solution::before {
+            background: linear-gradient(90deg, var(--purple-primary), var(--purple-secondary));
+        }
+
+        .ps-card h3 {
+            font-family: 'Climate Crisis', cursive;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .ps-card.problem h3 { color: var(--gray-neutral); }
+        .ps-card.solution h3 { color: var(--purple-primary); }
+
+        .ps-card ul {
+            list-style: none;
+        }
+
+        .ps-card ul li {
+            padding: 0.6rem 0;
+            padding-left: 1.8rem;
+            position: relative;
+            color: #444;
+            font-size: 0.95rem;
+        }
+
+        .ps-card ul li::before {
+            content: '✕';
+            position: absolute;
+            left: 0;
+            color: var(--gray-neutral);
+            font-weight: 700;
+        }
+
+        .ps-card.solution ul li::before {
+            content: '✓';
+            color: var(--purple-primary);
+        }
+
+        /* ===== INVESTOR TYPES ===== */
+        .investors {
+            background: var(--dark-bg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .investors::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse at 30% 20%, rgba(61,58,134,0.3) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 80%, rgba(140,63,113,0.2) 0%, transparent 50%);
+        }
+
+        .investors .section-header h2,
+        .investors .section-header p {
+            color: var(--white-pure);
+        }
+
+        .investors .section-tag {
+            background: rgba(255,255,255,0.1);
+            color: var(--white-pure);
+        }
+
+        .investor-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .investor-card {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 24px;
+            padding: 3rem 2rem;
+            text-align: center;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .investor-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, rgba(61,58,134,0.2) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .investor-card:hover::before {
+            opacity: 1;
+        }
+
+        .investor-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(140,63,113,0.4);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+        }
+
+        .investor-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--purple-primary), var(--purple-secondary));
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .investor-card h3 {
+            font-family: 'Climate Crisis', cursive;
+            font-size: 1.4rem;
+            color: var(--white-pure);
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .investor-card p {
+            color: rgba(255,255,255,0.7);
+            font-size: 0.95rem;
+            line-height: 1.7;
+            position: relative;
+            z-index: 1;
+        }
+
+        .investor-benefits {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+            z-index: 1;
+        }
+
+        .investor-benefits span {
+            display: inline-block;
+            background: rgba(61,58,134,0.3);
+            color: var(--white-pure);
+            padding: 0.3rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            margin: 0.2rem;
+            font-weight: 500;
+        }
+
+        /* ===== ROADMAP ===== */
+        .roadmap {
+            background: var(--white-pure);
+        }
+
+        .timeline {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 3px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--purple-primary), var(--purple-secondary));
+            border-radius: 3px;
+        }
+
+        .timeline-item {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            margin-bottom: 4rem;
+            position: relative;
+        }
+
+        .timeline-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            transform: translateX(-50%);
+            width: 24px;
+            height: 24px;
+            background: var(--white-pure);
+            border: 4px solid var(--purple-primary);
+            border-radius: 50%;
+            z-index: 2;
+            box-shadow: 0 0 0 6px rgba(61,58,134,0.1);
+        }
+
+        .timeline-item.active .timeline-dot {
+            background: var(--purple-primary);
+            animation: pulseDot 2s ease-in-out infinite;
+        }
+
+        @keyframes pulseDot {
+            0%, 100% { box-shadow: 0 0 0 6px rgba(61,58,134,0.1); }
+            50% { box-shadow: 0 0 0 12px rgba(61,58,134,0.2); }
+        }
+
+        .timeline-content {
+            background: var(--white-pure);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow-card);
+            border: 1px solid rgba(61,58,134,0.08);
+        }
+
+        .timeline-content h4 {
+            font-family: 'Climate Crisis', cursive;
+            font-size: 1.2rem;
+            color: var(--purple-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-content .phase-tag {
+            display: inline-block;
+            background: rgba(140,63,113,0.1);
+            color: var(--purple-secondary);
+            padding: 0.2rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .timeline-content p {
+            color: #555;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .timeline-item:nth-child(odd) .timeline-content {
+            grid-column: 1;
+            text-align: right;
+        }
+
+        .timeline-item:nth-child(even) .timeline-content {
+            grid-column: 2;
+        }
+
+        /* ===== METRICS / STATS BAR ===== */
+        .metrics-bar {
+            background: linear-gradient(135deg, var(--purple-primary), var(--purple-secondary));
+            padding: 4rem 5%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metrics-bar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+            max-width: 1100px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .metric-box {
+            text-align: center;
+            color: var(--white-pure);
+        }
+
+        .metric-box .number {
+            font-family: 'Climate Crisis', cursive;
+            font-size: 3rem;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-box .label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        /* ===== RISK MATRIX VISUAL ===== */
+        .risk-section {
+            background: linear-gradient(180deg, rgba(61,58,134,0.03) 0%, var(--white-pure) 100%);
+        }
+
+        .risk-visual {
+            max-width: 900px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+        }
+
+        .risk-card {
+            background: var(--white-pure);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow-card);
+            border-left: 5px solid;
+            transition: transform 0.3s;
+        }
+
+        .risk-card:hover {
+            transform: translateX(8px);
+        }
+
+        .risk-card.critical { border-left-color: #e74c3c; }
+        .risk-card.high { border-left-color: #e67e22; }
+        .risk-card.medium { border-left-color: #f39c12; }
+        .risk-card.low { border-left-color: #27ae60; }
+
+        .risk-card h4 {
+            font-family: 'Climate Crisis', cursive;
+            font-size: 1.1rem;
+            color: var(--purple-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .risk-card .risk-level {
+            display: inline-block;
+            padding: 0.2rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        .risk-card.critical .risk-level { background: rgba(231,76,60,0.1); color: #e74c3c; }
+        .risk-card.high .risk-level { background: rgba(230,126,34,0.1); color: #e67e22; }
+        .risk-card.medium .risk-level { background: rgba(243,156,18,0.1); color: #f39c12; }
+        .risk-card.low .risk-level { background: rgba(39,174,96,0.1); color: #27ae60; }
+
+        .risk-card p {
+            color: #555;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* ===== CTA SECTION ===== */
+        .cta-section {
+            background: var(--dark-bg);
+            text-align: center;
+            padding: 6rem 5%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -20%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(61,58,134,0.3) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .cta-section::after {
+            content: '';
+            position: absolute;
+            bottom: -50%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(140,63,113,0.2) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .cta-content {
+            position: relative;
+            z-index: 1;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .cta-content h2 {
+            font-family: 'Climate Crisis', cursive;
+            font-size: clamp(2rem, 4vw, 3rem);
+            color: var(--white-pure);
+            margin-bottom: 1.5rem;
+        }
+
+        .cta-content p {
+            color: rgba(255,255,255,0.7);
+            font-size: 1.1rem;
+            margin-bottom: 2.5rem;
+            line-height: 1.7;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-glow {
+            background: linear-gradient(135deg, var(--purple-primary), var(--purple-secondary));
+            color: var(--white-pure);
+            padding: 1.2rem 3rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 40px rgba(61,58,134,0.5);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-glow:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 60px rgba(140,63,113,0.6);
+        }
+
+        .btn-outline-light {
+            background: transparent;
+            color: var(--white-pure);
+            padding: 1.2rem 3rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            border: 2px solid rgba(255,255,255,0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-light:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: var(--white-pure);
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            background: #0f0f2a;
+            padding: 3rem 5%;
+            text-align: center;
+            color: rgba(255,255,255,0.5);
+            font-size: 0.9rem;
+        }
+
+        footer .logo {
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s ease;
+        }
+
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-text .subtitle {
+                margin: 0 auto 2rem;
+            }
+
+            .hero-stats {
+                justify-content: center;
+            }
+
+            .hero-buttons {
+                justify-content: center;
+            }
+
+            .phone-mockup {
+                order: -1;
+            }
+
+            .investor-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .ps-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .timeline::before {
+                left: 20px;
+            }
+
+            .timeline-item {
+                grid-template-columns: 1fr;
+                padding-left: 50px;
+            }
+
+            .timeline-dot {
+                left: 20px;
+            }
+
+            .timeline-item:nth-child(odd) .timeline-content,
+            .timeline-item:nth-child(even) .timeline-content {
+                grid-column: 1;
+                text-align: left;
+            }
+
+            .risk-visual {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero {
+                padding-top: 6rem;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 1.5rem;
+            }
+
+            .metric-box .number {
+                font-size: 2rem;
+            }
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--white-pure);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, var(--purple-primary), var(--purple-secondary));
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--purple-secondary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-mesh"></div>
+    <div class="particles" id="particles"></div>
+
+    <!-- Navigation -->
+    <nav id="navbar">
+        <a href="#" class="logo" style="display:flex;align-items:center;gap:0.5rem;text-decoration:none;">
+    <img src="hola-chatbot-main-logo.png" alt="Hola Chatbot" style="height:42px;width:auto;filter:drop-shadow(0 2px 4px rgba(61,58,134,0.2));">
+</a>
+        <ul class="nav-links">
+            <li><a href="#oportunidad">Oportunidad</a></li>
+            <li><a href="#inversionistas">Para Inversionistas</a></li>
+            <li><a href="#roadmap">Roadmap</a></li>
+            <li><a href="#riesgos">Riesgos</a></li>
+            <li><a href="#contacto" class="nav-cta">Quiero Invertir</a></li>
+        </ul>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1>TU CIUDAD <span>EN TU BOLSILLO</span></h1>
+                <p class="subtitle">La primera plataforma conversacional de información urbana en Colombia, diseñada para escalar a nivel nacional. Disponible 24/7 en WhatsApp.</p>
+
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">24/7</div>
+                        <div class="stat-label">Disponibilidad</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">4+</div>
+                        <div class="stat-label">Ciudades Target</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">0</div>
+                        <div class="stat-label">Apps a instalar</div>
+                    </div>
+                </div>
+
+                <div class="hero-buttons">
+                    <a href="#inversionistas" class="btn-primary">📊 Ver Oportunidad de Inversión</a>
+                    <a href="#roadmap" class="btn-secondary">🗺️ Ver Roadmap</a>
+                </div>
+            </div>
+
+            <div class="phone-mockup">
+                <div class="phone">
+                    <div class="phone-screen">
+                        <div class="chat-header">
+                            <div class="chat-avatar">H</div>
+                            <div class="chat-info">
+                                <h4>Hola Chatbot</h4>
+                                <p>en línea</p>
+                            </div>
+                        </div>
+                        <div class="chat-body">
+                            <div class="message user" style="animation-delay: 0.5s;">¿Qué ruta de bus necesito de El Salado a Multicentro?</div>
+                            <div class="message bot" style="animation-delay: 1.5s;"><strong>🚌 Ruta recomendada:</strong><br>Tomar la ruta 12 desde El Salado. Tiempo estimado: 25 min. ¿Necesitas el horario?</div>
+                            <div class="message user" style="animation-delay: 2.5s;">¿Hay eventos esta noche?</div>
+                            <div class="message bot" style="animation-delay: 3.5s;"><strong>🎉 Eventos hoy:</strong><br>• Festival de Jazz - Parque Murillo Toro<br>• Feria gastronómica - Centro<br>¿Te envío la ubicación?</div>
+                            <div class="typing-indicator" style="animation-delay: 4.5s;">
+                                <div class="typing-dot"></div>
+                                <div class="typing-dot"></div>
+                                <div class="typing-dot"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Problem / Solution -->
+    <section class="problem-solution" id="oportunidad">
+        <div class="section-header animate-on-scroll">
+            <span class="section-tag">Oportunidad de Mercado</span>
+            <h2>El Problema y Nuestra Solución</h2>
+            <p>Millones de ciudadanos en Colombia enfrentan diariamente barreras para acceder a información urbana esencial. Hola Chatbot resuelve esto de forma masiva.</p>
+        </div>
+
+        <div class="ps-grid">
+            <div class="ps-card problem animate-on-scroll">
+                <h3>❌ El Problema</h3>
+                <ul>
+                    <li>Desconocimiento de rutas de transporte público efectivas</li>
+                    <li>Dificultad para saber qué eventos están disponibles en la ciudad</li>
+                    <li>Información dispersa sobre atención de entidades públicas</li>
+                    <li>Desactualización o ausencia de canales digitales amigables</li>
+                    <li>Poco aprovechamiento de WhatsApp para gestión ciudadana</li>
+                    <li>Chatbots previos con alcance restringido y experiencia limitada</li>
+                </ul>
+            </div>
+            <div class="ps-card solution animate-on-scroll">
+                <h3>✅ Nuestra Solución</h3>
+                <ul>
+                    <li>Respuestas inmediatas en lenguaje natural vía WhatsApp</li>
+                    <li>Información actualizada sobre eventos, rutas y trámites</li>
+                    <li>Acceso 24/7 sin necesidad de instalar aplicaciones</li>
+                    <li>Experiencia conversacional contextual y personalizada</li>
+                    <li>Integración con CRM para captación de leads comerciales</li>
+                    <li>Modelo replicable a múltiples ciudades con infraestructura compartida</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Metrics Bar -->
+    <section class="metrics-bar">
+        <div class="metrics-grid">
+            <div class="metric-box">
+                <div class="number">100%</div>
+                <div class="label">Cobertura WhatsApp</div>
+            </div>
+            <div class="metric-box">
+                <div class="number">4</div>
+                <div class="label">Ciudades en Roadmap</div>
+            </div>
+            <div class="metric-box">
+                <div class="number">3</div>
+                <div class="label">Fuentes de Ingreso</div>
+            </div>
+            <div class="metric-box">
+                <div class="number">&lt;2s</div>
+                <div class="label">Tiempo de Respuesta</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Investor Types -->
+    <section class="investors" id="inversionistas">
+        <div class="section-header animate-on-scroll">
+            <span class="section-tag">Modelo de Negocio</span>
+            <h2>Tres Perfiles de Inversión</h2>
+            <p>Hola Chatbot ofrece oportunidades de retorno adaptadas a distintos perfiles de inversión, desde patrocinadores locales hasta fondos de capital semilla.</p>
+        </div>
+
+        <div class="investor-cards">
+            <div class="investor-card animate-on-scroll">
+                <div class="investor-icon">🏪</div>
+                <h3>Sponsors & Aliados Comerciales</h3>
+                <p>Comercios locales, restaurantes, centros comerciales y marcas que buscan visibilidad directa en las respuestas del chatbot. Pago por visibilidad en resultados o secciones destacadas.</p>
+                <div class="investor-benefits">
+                    <span>Visibilidad Hipertargeting</span>
+                    <span>ROI Medible</span>
+                    <span>Bajo Costo de Adquisición</span>
+                    <span>Leads Cualificados</span>
+                </div>
+            </div>
+
+            <div class="investor-card animate-on-scroll">
+                <div class="investor-icon">🏛️</div>
+                <h3>Alianzas Institucionales</h3>
+                <p>Entidades de turismo, desarrollo económico, alcaldías y organismos gubernamentales que buscan modernizar la atención ciudadana y promover el desarrollo local.</p>
+                <div class="investor-benefits">
+                    <span>Impacto Social</span>
+                    <span>Transparencia</span>
+                    <span>Datos Ciudadanos</span>
+                    <span>Modernización GovTech</span>
+                </div>
+            </div>
+
+            <div class="investor-card animate-on-scroll">
+                <div class="investor-icon">🚀</div>
+                <h3>Capital Semilla & Inversionistas</h3>
+                <p>Fondos de inversión, angel investors y venture capital interesados en una propuesta de valor escalable y replicable a nivel nacional con modelo de negocio validado.</p>
+                <div class="investor-benefits">
+                    <span>Escalabilidad Nacional</span>
+                    <span>Modelo SaaS</span>
+                    <span>Multi-Ciudad</span>
+                    <span>Alto Potencial de Retorno</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Roadmap -->
+    <section class="roadmap" id="roadmap">
+        <div class="section-header animate-on-scroll">
+            <span class="section-tag">Plan de Ejecución</span>
+            <h2>Roadmap de Crecimiento</h2>
+            <p>Un plan de 5 meses para validar, lanzar y escalar Hola Chatbot desde Ibagué hacia el resto de Colombia.</p>
+        </div>
+
+        <div class="timeline">
+            <div class="timeline-item active animate-on-scroll">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <span class="phase-tag">Fase 1 — Mes 1</span>
+                    <h4>MVP en Ibagué</h4>
+                    <p>Contenido curado manualmente. WhatsApp conectado con webhook básico. Integración inicial con Weygo CRM. Rutas de bus más consultadas, eventos destacados, información de 5 entidades públicas, pico y placa, ley seca y 3 comercios aliados.</p>
+                </div>
+            </div>
+
+            <div class="timeline-item animate-on-scroll">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <span class="phase-tag">Fase 2 — Mes 2-3</span>
+                    <h4>Beta & Automatización</h4>
+                    <p>Automatización de consultas frecuentes con NLP local. Panel de administración para sponsors. Recolección de feedback ciudadano. Optimización de tiempos de respuesta y experiencia conversacional.</p>
+                </div>
+            </div>
+
+            <div class="timeline-item animate-on-scroll">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <span class="phase-tag">Fase 3 — Mes 4-5</span>
+                    <h4>Lanzamiento Oficial</h4>
+                    <p>Alianzas con la Alcaldía de Ibagué y entes turísticos. Campaña de promoción local masiva. Integración con fuentes oficiales automáticas. Modelo de ingresos por sponsors activado.</p>
+                </div>
+            </div>
+
+            <div class="timeline-item animate-on-scroll">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <span class="phase-tag">Fase 4 — Mes 6+</span>
+                    <h4>Escalamiento Nacional</h4>
+                    <p>Replicación en Santa Marta (turismo), Neiva (servicios) y Armenia (cultura). Cada ciudad mantiene identidad visual local pero comparte infraestructura tecnológica y lógica de negocio.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Risk Section -->
+    <section class="risk-section" id="riesgos">
+        <div class="section-header animate-on-scroll">
+            <span class="section-tag">Gestión de Riesgos</span>
+            <h2>Riesgos Identificados y Mitigados</h2>
+            <p>Basado en el análisis de más de 10 casos de chatbots municipales en Latinoamérica, hemos diseñado estrategias de mitigación proactivas.</p>
+        </div>
+
+        <div class="risk-visual">
+            <div class="risk-card critical animate-on-scroll">
+                <span class="risk-level">Crítico — Alta Probabilidad</span>
+                <h4>🌐 Dependencia de APIs</h4>
+                <p>Infraestructura redundante en la nube con autoescalado. Caché local para respuestas básicas. Monitoreo 24/7 con alertas y fallback humano.</p>
+            </div>
+
+            <div class="risk-card critical animate-on-scroll">
+                <span class="risk-level">Crítico — Alta Probabilidad</span>
+                <h4>👥 Baja Adopción Ciudadana</h4>
+                <p>WhatsApp-first para minimizar barreras. Campañas pedagógicas con entidades aliadas. Incentivos iniciales con promociones locales y gamificación.</p>
+            </div>
+
+            <div class="risk-card high animate-on-scroll">
+                <span class="risk-level">Alto — Media Probabilidad</span>
+                <h4>📊 Información Desactualizada</h4>
+                <p>Integraciones automáticas con fuentes oficiales. Panel administrativo para actualizaciones diarias. Roles definidos para mantenimiento de contenido.</p>
+            </div>
+
+            <div class="risk-card medium animate-on-scroll">
+                <span class="risk-level">Medio — Media Probabilidad</span>
+                <h4>🤖 NLP Insuficiente</h4>
+                <p>Entrenamiento continuo con dataset de preguntas reales. Uso de variaciones lingüísticas locales (barrios, modismos). Opción clara para escalar a agente humano.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section" id="contacto">
+        <div class="cta-content">
+            <h2>¿LISTO PARA INVERTIR EN EL FUTURO DE LAS CIUDADES?</h2>
+            <p>Hola Chatbot combina tecnología conversacional de vanguardia con un modelo de negocio validado y replicable. Únete a nosotros para transformar la relación entre ciudadanos y sus ciudades.</p>
+            <div class="cta-buttons">
+                <a href="mailto:inversionistas@holachatbot.co" class="btn-glow">📧 Contactar al Equipo</a>
+                <a href="#" class="btn-outline-light" onclick="alert('Pitch Deck disponible próximamente'); return false;">📑 Descargar Pitch Deck</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div style="margin-bottom:1rem;">
+    <img src="hola-chatbot-main-logo.png" alt="Hola Chatbot" style="height:50px;width:auto;filter:brightness(0) invert(1) opacity(0.7);">
+</div>
+        <p>© 2026 Hola Chatbot | Para consultas sobre inversión, contacta al equipo de desarrollo</p>
+    </footer>
+
+    <script>
+        // Particle System
+        const particlesContainer = document.getElementById('particles');
+        const particleCount = 30;
+
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDuration = (Math.random() * 15 + 10) + 's';
+            particle.style.animationDelay = (Math.random() * 10) + 's';
+            particle.style.width = (Math.random() * 4 + 2) + 'px';
+            particle.style.height = particle.style.width;
+            particlesContainer.appendChild(particle);
+        }
+
+        // Scroll Animation Observer
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.animate-on-scroll').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Navbar scroll effect
+        const navbar = document.getElementById('navbar');
+        let lastScroll = 0;
+
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+
+            if (currentScroll > 100) {
+                navbar.style.boxShadow = '0 4px 30px rgba(0,0,0,0.1)';
+                navbar.style.padding = '1rem 5%';
+            } else {
+                navbar.style.boxShadow = 'none';
+                navbar.style.padding = '1.5rem 5%';
+            }
+
+            lastScroll = currentScroll;
+        });
+
+        // Smooth scroll for nav links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Counter animation for metrics
+        const animateCounters = () => {
+            const counters = document.querySelectorAll('.metric-box .number');
+            counters.forEach(counter => {
+                const target = counter.innerText;
+                if (target.includes('%')) {
+                    counter.innerText = '0%';
+                    setTimeout(() => {
+                        counter.innerText = target;
+                    }, 500);
+                }
+            });
+        };
+
+        const metricsObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateCounters();
+                    metricsObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        const metricsBar = document.querySelector('.metrics-bar');
+        if (metricsBar) metricsObserver.observe(metricsBar);
+    </script>
+</body>
+</html>
