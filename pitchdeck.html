@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hola Chatbot — Pitchdeck</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Climate+Crisis&family=Work+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --purple-main: #3D3A86;
+            --purple-sec: #8C3F71;
+            --gray-neutral: #96989A;
+            --white-pure: #FEFEFE;
+            --dark-overlay: rgba(61, 58, 134, 0.92);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Work Sans', sans-serif;
+            background: var(--white-pure);
+            color: var(--gray-neutral);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .display-font {
+            font-family: 'Climate Crisis', cursive;
+            letter-spacing: 1.5px;
+        }
+
+        /* Slide Container */
+        .deck-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem 6rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.8s;
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Backgrounds */
+        .bg-gradient {
+            background: linear-gradient(135deg, var(--purple-main) 0%, #1a1847 100%);
+            color: var(--white-pure);
+        }
+
+        .bg-white {
+            background: var(--white-pure);
+            color: var(--gray-neutral);
+        }
+
+        .bg-light {
+            background: linear-gradient(180deg, var(--white-pure) 0%, #f5f5f7 100%);
+            color: var(--gray-neutral);
+        }
+
+        /* Animations */
+        .anim-fade-up {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+
+        .active .anim-fade-up {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .anim-delay-1 { transition-delay: 0.15s; }
+        .anim-delay-2 { transition-delay: 0.3s; }
+        .anim-delay-3 { transition-delay: 0.45s; }
+        .anim-delay-4 { transition-delay: 0.6s; }
+        .anim-delay-5 { transition-delay: 0.75s; }
+
+        .anim-scale {
+            opacity: 0;
+            transform: scale(0.9);
+            transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+        }
+
+        .active .anim-scale {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .anim-slide-left {
+            opacity: 0;
+            transform: translateX(-60px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+
+        .active .anim-slide-left {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .anim-slide-right {
+            opacity: 0;
+            transform: translateX(60px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+
+        .active .anim-slide-right {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* Logo Header */
+        .logo-header {
+            position: absolute;
+            top: 2rem;
+            left: 3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            z-index: 10;
+        }
+
+        .logo-header img {
+            height: 48px;
+            width: auto;
+            display: block;
+        }
+
+        .logo-text {
+            font-family: 'Climate Crisis', cursive;
+            font-size: 1.5rem;
+            letter-spacing: 2px;
+            color: var(--purple-main);
+        }
+
+        .bg-gradient .logo-text {
+            color: var(--white-pure);
+        }
+
+        .logo-sub {
+            font-size: 0.65rem;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--purple-sec);
+            margin-top: -4px;
+        }
+
+        .bg-gradient .logo-sub {
+            color: rgba(254, 254, 254, 0.7);
+        }
+
+        /* Slide Counter */
+        .slide-counter {
+            position: absolute;
+            bottom: 2rem;
+            right: 3rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            color: var(--gray-neutral);
+            z-index: 10;
+        }
+
+        .bg-gradient .slide-counter {
+            color: rgba(254, 254, 254, 0.5);
+        }
+
+        /* Tagline Footer */
+        .tagline-footer {
+            position: absolute;
+            bottom: 2rem;
+            left: 3rem;
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--gray-neutral);
+            z-index: 10;
+        }
+
+        .bg-gradient .tagline-footer {
+            color: rgba(254, 254, 254, 0.5);
+        }
+
+        /* Navigation */
+        .nav-arrows {
+            position: fixed;
+            right: 3rem;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 2px solid var(--purple-main);
+            background: transparent;
+            color: var(--purple-main);
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: var(--purple-main);
+            color: var(--white-pure);
+            transform: scale(1.1);
+        }
+
+        .bg-gradient ~ .nav-arrows .nav-btn,
+        .slide.bg-gradient ~ .nav-arrows .nav-btn {
+            border-color: rgba(254, 254, 254, 0.4);
+            color: var(--white-pure);
+        }
+
+        .bg-gradient ~ .nav-arrows .nav-btn:hover,
+        .slide.bg-gradient ~ .nav-arrows .nav-btn:hover {
+            background: var(--white-pure);
+            color: var(--purple-main);
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--purple-main), var(--purple-sec));
+            transition: width 0.5s ease;
+            z-index: 100;
+        }
+
+        /* Slide Dots */
+        .slide-dots {
+            position: fixed;
+            left: 3rem;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            z-index: 100;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--gray-neutral);
+            opacity: 0.3;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dot.active {
+            opacity: 1;
+            background: var(--purple-main);
+            transform: scale(1.4);
+        }
+
+        .bg-gradient .dot {
+            background: var(--white-pure);
+        }
+
+        .bg-gradient .dot.active {
+            background: var(--white-pure);
+        }
+
+        /* Typography */
+        .hero-title {
+            font-family: 'Climate Crisis', cursive;
+            font-size: clamp(3rem, 6vw, 5.5rem);
+            line-height: 1.05;
+            letter-spacing: 2px;
+            color: var(--purple-main);
+            text-align: center;
+            max-width: 900px;
+        }
+
+        .bg-gradient .hero-title {
+            color: var(--white-pure);
+        }
+
+        .section-title {
+            font-family: 'Climate Crisis', cursive;
+            font-size: clamp(2.2rem, 4vw, 3.5rem);
+            line-height: 1.1;
+            letter-spacing: 1.5px;
+            color: var(--purple-main);
+            margin-bottom: 1rem;
+        }
+
+        .bg-gradient .section-title {
+            color: var(--white-pure);
+        }
+
+        .subtitle {
+            font-size: clamp(1rem, 1.5vw, 1.25rem);
+            font-weight: 400;
+            line-height: 1.6;
+            max-width: 700px;
+            text-align: center;
+        }
+
+        .body-text {
+            font-size: 1rem;
+            line-height: 1.7;
+            font-weight: 400;
+            max-width: 600px;
+        }
+
+        .stat-number {
+            font-family: 'Climate Crisis', cursive;
+            font-size: clamp(3rem, 5vw, 4.5rem);
+            color: var(--purple-main);
+            line-height: 1;
+        }
+
+        .bg-gradient .stat-number {
+            color: var(--white-pure);
+        }
+
+        .accent-text {
+            color: var(--purple-sec);
+            font-weight: 600;
+        }
+
+        .bg-gradient .accent-text {
+            color: #e8a4c8;
+        }
+
+        /* Cards */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            width: 100%;
+            max-width: 1100px;
+            margin-top: 2rem;
+        }
+
+        .card {
+            background: var(--white-pure);
+            border: 1px solid rgba(150, 152, 154, 0.2);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(61, 58, 134, 0.1);
+        }
+
+        .card-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-family: 'Climate Crisis', cursive;
+            font-size: 1.5rem;
+            color: var(--purple-main);
+            margin-bottom: 0.5rem;
+            letter-spacing: 1px;
+        }
+
+        .card-text {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: var(--gray-neutral);
+        }
+
+        /* Steps */
+        .steps-row {
+            display: flex;
+            gap: 3rem;
+            justify-content: center;
+            align-items: flex-start;
+            max-width: 1000px;
+            width: 100%;
+            margin-top: 2rem;
+        }
+
+        .step {
+            flex: 1;
+            text-align: center;
+            max-width: 280px;
+        }
+
+        .step-number {
+            font-family: 'Climate Crisis', cursive;
+            font-size: 4rem;
+            color: var(--purple-sec);
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .step-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--purple-main);
+            margin-bottom: 0.5rem;
+        }
+
+        .step-desc {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: var(--gray-neutral);
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            gap: 3rem;
+            justify-content: center;
+            margin-top: 3rem;
+            padding: 1.5rem 3rem;
+            border: 1px solid rgba(150, 152, 154, 0.3);
+            border-radius: 12px;
+            background: rgba(254, 254, 254, 0.8);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--gray-neutral);
+            margin-top: 0.5rem;
+        }
+
+        /* Pillars */
+        .pillars {
+            display: flex;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .pillar {
+            text-align: center;
+            padding: 1.5rem 2rem;
+            border: 1px solid rgba(254, 254, 254, 0.2);
+            border-radius: 12px;
+            background: rgba(254, 254, 254, 0.05);
+        }
+
+        .pillar-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .pillar-title {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .pillar-desc {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        /* List Items */
+        .feature-list {
+            list-style: none;
+            max-width: 700px;
+            width: 100%;
+        }
+
+        .feature-list li {
+            padding: 1rem 0;
+            padding-left: 2rem;
+            position: relative;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            border-bottom: 1px solid rgba(150, 152, 154, 0.15);
+        }
+
+        .feature-list li::before {
+            content: "›";
+            position: absolute;
+            left: 0;
+            color: var(--purple-sec);
+            font-size: 1.5rem;
+            line-height: 1;
+            font-weight: 700;
+        }
+
+        .bg-gradient .feature-list li {
+            border-bottom-color: rgba(254, 254, 254, 0.15);
+        }
+
+        /* Quote */
+        .quote-box {
+            max-width: 700px;
+            padding: 2rem;
+            border-left: 4px solid var(--purple-sec);
+            background: rgba(61, 58, 134, 0.05);
+            border-radius: 0 12px 12px 0;
+            margin-top: 2rem;
+            font-style: italic;
+            font-size: 1.05rem;
+            line-height: 1.7;
+        }
+
+        .bg-gradient .quote-box {
+            background: rgba(254, 254, 254, 0.08);
+            border-left-color: var(--purple-sec);
+        }
+
+        /* Image containers */
+        .img-container {
+            max-width: 800px;
+            width: 100%;
+            margin-top: 2rem;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(61, 58, 134, 0.15);
+        }
+
+        .img-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* Two Column */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            max-width: 1000px;
+            width: 100%;
+            align-items: center;
+        }
+
+        /* CTA Button */
+        .cta-btn {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            background: var(--purple-sec);
+            color: var(--white-pure);
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            letter-spacing: 1px;
+            margin-top: 1.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(140, 63, 113, 0.4);
+        }
+
+        .bg-gradient .cta-btn {
+            background: var(--white-pure);
+            color: var(--purple-main);
+        }
+
+        .bg-gradient .cta-btn:hover {
+            box-shadow: 0 10px 30px rgba(254, 254, 254, 0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .slide {
+                padding: 2rem;
+            }
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+            .steps-row {
+                flex-direction: column;
+                align-items: center;
+            }
+            .two-col {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            .stats-bar {
+                flex-wrap: wrap;
+                gap: 1.5rem;
+            }
+            .nav-arrows {
+                right: 1rem;
+            }
+            .slide-dots {
+                display: none;
+            }
+            .logo-header img {
+                height: 36px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="deck-container">
+
+        <!-- SLIDE 1: PORTADA -->
+        <div class="slide bg-gradient active" data-index="0">
+            <div class="logo-header anim-fade-up">
+                <img src="hola-chatbot-logo-white.png" alt="Hola Chatbot Logo">
+            </div>
+            <div style="text-align: center; max-width: 900px;">
+                <h1 class="hero-title anim-fade-up anim-delay-1">Tu ciudad, respondida al instante, por WhatsApp</h1>
+                <p class="subtitle anim-fade-up anim-delay-2" style="margin-top: 1.5rem; opacity: 0.9;">
+                    La infraestructura conversacional de las ciudades colombianas
+                </p>
+                <div class="anim-fade-up anim-delay-3" style="margin-top: 3rem; display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap;">
+                    <span style="font-size: 0.85rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; opacity: 0.7;">MVP Validado Junio 2026</span>
+                    <span style="font-size: 0.85rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; opacity: 0.7;">CityTech / GovTech</span>
+                    <span style="font-size: 0.85rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; opacity: 0.7;">Escalable Nacional</span>
+                </div>
+                <div class="anim-fade-up anim-delay-4" style="margin-top: 3rem;">
+                    <span class="cta-btn">Ronda Semilla · Patrocinadores · Alianzas</span>
+                </div>
+            </div>
+            <div class="tagline-footer">Tu ciudad, a un mensaje de distancia</div>
+            <div class="slide-counter">01 / 14</div>
+        </div>
+
+        <!-- SLIDE 2: LA OPORTUNIDAD -->
+        <div class="slide bg-white" data-index="1">
+            <div class="logo-header anim-fade-up">
+                <img src="hola-chatbot-main-logo.png" alt="Hola Chatbot Logo">
+            </div>
+            <h2 class="section-title anim-fade-up" style="text-align: center;">La información urbana está rota</h2>
+            <p class="subtitle anim-fade-up anim-delay-1" style="margin-bottom: 2rem;">Cuatro dolores cotidianos que millones de colombianos enfrentan sin una solución centralizada</p>
+            <div class="card-grid">
+                <div class="card anim-fade-up anim-delay-1">
+                    <div class="card-icon">🚌</div>
+                    <div class="card-title">Transporte</div>
+                    <div class="card-text">Se le pasa el último bus. No sabe qué ruta tomar ni a qué hora pasa. La información está dispersa o desactualizada.</div>
+                </div>
+                <div class="card anim-fade-up anim-delay-2">
+                    <div class="card-icon">📵</div>
+                    <div class="card-title">Normativa</div>
+                    <div class="card-text">¿Hoy hay ley seca? Llama a tres líneas y nadie responde con claridad. Necesita saberlo ya.</div>
+                </div>
+                <div class="card anim-fade-up anim-delay-3">
+                    <div class="card-icon">🎉</div>
+                    <div class="card-title">Cultura</div>
+                    <div class="card-text">La agenda cultural no llega. Se pierde conciertos, ferias y planes gratis por falta de un canal centralizado.</div>
+                </div>
+                <div class="card anim-fade-up anim-delay-4">
+                    <div class="card-icon">🏢</div>
+                    <div class="card-title">Trámites</div>
+                    <div class="card-text">¿Dónde queda esa entidad? ¿Atienden hoy? La información en internet es confusa o inexistente.</div>
+                </div>
+            </div>
+            <div class="anim-fade-up anim-delay-5" style="margin-top: 2.5rem; text-align: center;">
+                <span class="accent-text" style="font-size: 1.1rem; font-weight: 600;">92,2% de penetración de WhatsApp en Colombia.</span>
+                <span style="color: var(--gray-neutral);"> La gente ya está en el canal. La ciudad no.</span>
+            </div>
+            <div class="tagline-footer">Tu ciudad, a un mensaje de distancia</div>
+            <div class="slide-counter">02 / 14</div>
+        </div>
+
+        <!-- SLIDE 3: LA SOLUCIÓN -->
+        <div class="slide bg-gradient" data-index="2">
+            <div class="logo-header anim-fade-up">
+                <img src="hola-chatbot-main-logo.png" alt="Hola Chatbot Logo">
+            </div>
+            <div class="two-col" style="max-width: 1100px;">
+                <div class="anim-slide-left">
+                    <h2 class="section-title" style="font-size: clamp(2.5rem, 4vw, 4rem);">Un asistente ciudadano en la app que ya usas</h2>
+                    <p style="font-size: 1.1rem; line-height: 1.7; margin-top: 1rem; opacity: 0.9;">
+                        Hola Chatbot responde en <span style="font-weight: 700;">menos de 2 segundos</span> preguntas sobre rutas, eventos, normas y trámites de Ibagué. Sin instalar nada. Sin filas. Sin llamadas.
+                    </p>
+                    <div class="pillars" style="margin-top: 2rem; flex-wrap: wrap;">
+                        <div class="pillar">
+                            <div class="pillar-icon">⚡</div>
+                            <div class="pillar-title">Inmediato</div>
+                            <div class="pillar-desc">24/7 al instante</div>
+                        </div>
+                        <div class="pillar">
+                            <div class="pillar-icon">✅</div>
+                            <div class="pillar-title">Verificado</div>
+                            <div class="pillar-desc">Fuentes oficiales</div>
+                        </div>
+                        <div class="pillar">
+                            <div class="pillar-icon">🔄</div>
+                            <div class="pillar-title">Escalable</div>
+                            <div class="pillar-desc">Replicable en ciudades</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="anim-slide-right" style="display: flex; justify-content: center;">
+                    <div style="background: rgba(254, 254, 254, 0.1); border-radius: 24px; padding: 2rem; max-width: 320px; border: 1px solid rgba(254, 254, 254, 0.15);">
+                        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                            <div style="background: rgba(254, 254, 254, 0.15); padding: 0.75rem 1rem; border-radius: 16px 16px 16px 4px; font-size: 0.9rem; align-self: flex-start; max-width: 85%;">
+                                ¿Qué bus me lleva del Salado al Multicentro?
+                            </div>
+                            <div style="background: var(--purple-sec); padding: 0.75rem 1rem; border-radius: 16px 16px 4px 16px; font-size: 0.9rem; align-self: flex-end; max-width: 85%;">
+                                ¡Hola! 🚌 La ruta <strong>12</strong> te deja en Multicentro. Sale cada 15 min por la carrera 5ta. ¡Buen viaje!
+                            </div>
+                            <div style="background: rgba(254, 254, 254, 0.15); padding: 0.75rem 1rem; border-radius: 16px 16px 16px 4px; font-size: 0.9rem; align-self: flex-start; max-width: 85%;">
+                                ¿Y si hay ley seca hoy?
+                            </div>
+                            <div style="background: var(--purple-sec); padding: 0.75rem 1rem; border-radius: 16px 16px 4px 16px; font-size: 0.9rem; align-self: flex-end; max-width: 85%;">
+                                Hoy <strong>no aplica</strong> ley seca en Ibagué. Puedes comprar bebidas con normalidad. 🍻
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tagline-footer">Tu ciudad, a un mensaje de distancia</div>
+            <div class="slide-counter">03 / 14</div>
+        </div>
+
+        <!-- SLIDE 4: CÓMO FUNCIONA -->
+        <div class="slide bg-light" data-index="3">
+            <div class="logo-header anim-fade-up">
+                <img src="hola-chatbot-main-logo.png" alt="Hola Chatbot Logo">
+            </div>
+            <h2 class="section-title anim-fade-up" style="text-align: center;">Así de fácil</h2>
+            <p class="subtitle anim-fade-up anim-delay-1">Tres pasos. Cero fricción. Toda la ciudad en tu chat.</p>
+            <div class="steps-row">
+                <div class="step anim-fade-up anim-delay-1">
+                    <div class="step-number">01</div>
+                    <div class="step-title">Escribe "Hola Ibagué"</div>
+                    <div class="step-desc">Abre WhatsApp y envía el mensaje de activación. No necesitas descargar apps ni registrarte.</div>
+                </div>
+                <div class="step anim-fade-up anim-delay-2">
+                    <div class="step-number">02</div>
+                    <div class="step-title">Pregunta lo que necesites</div>
+                    <div class="step-desc">Usa tu lenguaje natural. "Parce, ¿qué hay pa' hacer hoy?" o "¿Cómo me voy pa'l centro?"</div>
+                </div>
+                <div class="step anim-fade-up anim-delay-3">
+                    <div class="step-number">03</div>
+                    <div class="step-title">Recibe tu respuesta</div>
+                    <div class="step-desc">En menos de 2 segundos recibes información verificada, fragmentada y fácil de leer en el chat.</div>
+                </div>
+            </div>
+            <div class="stats-bar anim-fade-up anim-delay-4">
+                <div class="stat-item">
+                    <div class="stat-number">&lt;2s</div>
+                    <div class="stat-label">Tiempo de respuesta</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Disponibilidad</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">0</div>
+                    <div class="stat-label">Apps por instalar</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">Info verificada</div>
+                </div>
+            </div>
+            <div class="tagline-footer">Tu ciudad, a un mensaje de distancia</div>
+            <div class="slide-counter">04 / 14</div>
+        </div>
+
+        <!-- SLIDE 5: PRODUCTO EN ACCIÓN -->
+        <div class="slide bg-white" data-index="4">
+            <div class="logo-header anim-fade-up">
+                <img src="hola-chatbot-main-logo.png" alt="Hola Chatbot Logo">
+            </div>
+            <h2 class="section-title anim-fade-up" style="text-align: center;">¿Qué puede resolver hoy?</h2>
+            <p class="subtitle anim-fade-up anim-delay-1">Cinco módulos operativos validados en el MVP</p>
+            <div class="card-grid" style="max-width: 1000px;">
+                <div class="card anim-fade-up anim-delay-1" style="border-top: 4px solid var(--purple-main);">
+                    <div class="card-icon">🚌</div>
+                    <div class="card-title">Rutas de Transporte</div>
+                    <div class="card-text">"¿Qué bus me lleva del Salado al Multicentro?" → Ruta 12, cada 15 min. Datos del SETP/TransMusical verificados.</div>
+                </div>
+                <div class="card anim-fade-up anim-delay-2" style="border-top: 4px solid var(--purple-sec);">
+                    <div class="card-icon">🎭</div>
+                    <div class="card-title">Eventos y Cultura</div>
+                    <div class="card-text">"¿Qué hay este fin de semana?" → Conciertos, ferias, teatro y cine filtrados por zona, fecha y precio.</div>
+                </div>
+                <div class="card anim-fade-up anim-delay-3" style="border-top: 4px solid var(--purple-main);">
+                    <div class="card-icon">📋</div>
+                    <div class="card-title">Pico y Placa / Ley Seca</div>
+                    <div class="card-text">Restricciones vehiculares según placa y decreto vigente. Información cruzada con fuentes oficiales.</div>
+                </div>
+                <div class="card anim-fade-up anim-delay-4" style="border-top: 4px solid var(--purple-sec);">
+                    <div class="card-icon">🏛️</div>
+                    <div class="card-title">Trámites y Entidades</div>
+                    <div class="card-text">Ubicación, horarios y requisitos. Te decimos qué llevar y enviamos el pin de ubicación directo al chat.</div>
+                </div>
+                <div class="card anim-fade-up anim-delay-5" style="border-top: 4px solid var(--purple-main); grid-column: span 2;">
+                    <div class="card-icon">🛍️</div>
+                    <div class="card-title">Promociones Locales</div>
+                    <div class="card-text">Descuentos y ofertas de comercios aliados cercanos a tu ubicación. Apoya lo local y ahorra. Sin spam: tú controlas qué recibir.</div>
+                </div>
+            </div>
+            <div class="tagline-footer">Tu ciudad, a un mensaje de distancia</div>
+            <div class="slide-counter">05 / 14</div>
+        </div>
+
+        <!-- SLIDE 6: MODELO DE NEGOCIO -->
+        <div class="slide bg-gradient" data-index="5">
+            <div class="logo-header anim-fade-up">
+                <img src="hola-chatbot-main-logo.png" alt="Hola Chatbot Logo">
+            </div>
+            <h2 class="section-title anim-fade-up" style="text-align: center;">Sostenibilidad con impacto</h2>
+            <p class="subtitle anim-fade-up anim-delay-1" style="opacity: 0.85;">Tres fuentes de ingreso que diversifican riesgo desde el día uno</p>
+            <div class="card-grid" style="max-width: 1000px; margin-top: 2.5rem;">
+                <div class="card anim-fade-up anim-delay-1" style="background: rgba(254, 254, 254, 0.95); color: var(--gray-neutral);">
+                    <div class="card-icon" style="color: var(--purple-main); font-size: 2.5rem;">🤝</div>
+                    <div class="card-title" style="color: var(--purple-main);">Patrocinadores Locales</div>
+                    <div class="card-text">Branding sutil en categorías (ej: "Rutas presentadas por [Marca]"). Alcance orgánico, no intrusivo. Bancos, telecomunicaciones, retail.</div>
+                </div>
+                <div class="card anim-fade-up anim-delay-2" style="background: rgba(254, 254, 254, 0.95); color: var(--gray-neutral);">
+                    <div class="card-icon" style="color: var(--purple-sec); font-size: 2.5rem;">🏛️</div>
+                    <div class="card-title" style="color: var(--purple-main);">Alianzas Institucionales</div>
+                    <div class="card-text">Convenios con Alcaldías y entes de turismo. Outsourcing de canal digital. Licenciamiento SaaS por ciudad.</div>
+                </div>
+                <div class="card anim-fade-up anim-delay-3" style="background: rgba(254, 254, 254, 0.95); color: var(--gray-neutral);">
+                    <div class="card-icon" style="color: var(--purple-main); font-size: 2.5rem;">💰</div>
+                    <div class="card-title" style="color: var(--purple-main);">Capital Semilla</div>
+                    <div class="card-text">Inversión early-stage para validar modelo en Ibagué y preparar primera réplica. GovTech / CityTech con retorno escalable.</div>
+                </div>
+            </div>
+            <div class="anim-fade-up anim-delay-4" style="margin-top: 2.5rem; text-align: center; font-size: 1.1rem; font-weight: 500; opacity: 0.9;">
+                Ingresos mixtos desde el inicio. Sin depender de un solo ciclo político ni de una sola fuente.
+            </div>
+            <div class="tagline-footer">Tu ciudad, a un mensaje de distancia</div>
+            <div class="slide-counter">06 / 14</div>
+        </div>
+
+        <!-- SLIDE 7: VENTAJA COMPETITIVA -->
+        <div class="slide bg-gradient" data-index="6">
+            <div class="logo-header anim-fade-up">
+                <img src="hola-chatbot-main-logo.png" alt="Hola Chatbot Logo">
+            </div>
+            <h2 class="section-title anim-fade-up" style="text-align: center;">¿Por qué nosotros?</h2>
+            <p class="subtitle anim-fade-up anim-delay-1" style="opacity: 0.85; margin-bottom: 2rem;">Cinco diferenciadores que construyen un foso defensivo</p>
+            <ul class="feature-list anim-fade-up anim-delay-2">
+                <li><span style="font-weight: 600; color: var(--white-pure);">Todo en un solo canal:</span> Movilidad, eventos, normas, trámites, turismo y comercio. No más apps fragmentadas.</li>
+                <li><span style="font-weight: 600; color: var(--white-pure);">Cero fricción:</span> No requiere instalación. Aprovecha WhatsApp (92,2% de penetración en Colombia).</li>
+                <li><span style="font-weight: 600; color: var(--white-pure);">Lenguaje local:</span> Adaptado a cómo habla la gente de Ibagué. NLP entrenado con modismos regionales.</li>
+                <li><span style="font-weight: 600; color: var(--white-pure);">Verificación doble:</span> Respuestas cruzadas con fuentes oficiales antes de enviarse. Si un dato cambia, corregimos.</li>
+                <li><span style="font-weight: 600; color: var(--white-pure);">Arquitectura replicable:</span> Pensada desde el origen para escalar. Cambiar de ciudad = cargar un nuevo perfil de datos.</li>
+            </ul>
+            <div class="tagline-footer">Tu ciudad, a un mensaje de distancia</div>
+            <div class="slide-counter">07 / 14</div>
+        </div>
+
+        <!-- SLIDE 8: TRACCIÓN Y VALIDACIÓN -->
+        <div class="slide bg-white" data-index="7">
+            <div class="logo-header anim-fade-up">
+                <img src="hola-chatbot-main-logo.png" alt="Hola Chatbot Logo">
+            </div>
+            <h2 class="section-title anim-fade-up" style="text-align: center;">MVP validado bajo estrés</h2>
+            <p class="subtitle anim-fade-up anim-delay-1">Resultados cuantificables de la fase de pruebas</p>
+            <div style="display: flex; gap: 3rem; justify-content: center; margin-top: 2.5rem; flex-wrap: wrap; max-width: 1000px;">
+                <div class="anim-fade-up anim-delay-1" style="text-align: center;">
+                    <div class="stat-number">30 JUN<br>2026</div>
+                    <div class="stat-label">Pruebas de estrés completadas</div>
+                </div>
+                <div class="anim-fade-up anim-delay-2" style="text-align: center;">
+                    <div class="stat-number">&gt;80%</div>
+                    <div class="stat-label">Tasa de respuestas acertadas</div>
+                </div>
+                <div class="anim-fade-up anim-delay-3" style="text-align: center;">
+                    <div class="stat-number">100+</div>
+                    <div class="stat-label">Interacciones reales de usuarios</div>
+                </div>
+                <div class="anim-fade-up anim-delay-4" style="text-align: center;">
+                    <div class="stat-number">0</div>
+                    <div class="stat-label">Downtime crítico en carga</div>
+                </div>
+            </div>
+            <div class="quote-box anim-fade-up anim-delay-5">
+                "La fase de pruebas de estrés confirmó la capacidad de respuesta, la identidad regionalizada y la seguridad del sistema antes de escalar. El MVP demostró que la información de la ciudad puede estar siempre a un mensaje de distancia."
+            </div>
+            <div class="tagline-footer">Tu ciudad, a un mensaje de distancia</div>
+            <div class="slide-counter">08 / 14</div>
+        </div>
+
+        <!-- SLIDE 9: MERCADO Y ESCALABILIDAD -->
+        <div class="slide bg-light" data-index="8">
+            <div class="logo-header anim-fade-up">
+                <img src="hola-chatbot-main-logo.png" alt="Hola Chatbot Logo">
+            </div>
+            <h2 class="section-title anim-fade-up" style="text-align: center;">De Ibagué a Colombia</h2>
+            <p class="subtitle anim-fade-up anim-delay-1">Una plataforma replicable para ciudades intermedias</p>
+            <div class="card-grid" style="max-width: 900px; margin-top: 2rem;">
+                <div class="card anim-fade-up anim-delay-1" style="border-left: 4px solid var(--purple-main);">
+                    <div style="font-family: 'Climate Crisis', cursive; font-size: 1.8rem; color: var(--purple-main); margin-bottom: 0.5rem;">FASE 1 · MVP</div>
+                    <div class="card-text"><strong>Ibagué, Tolima.</strong> Validación de modelo, captura de patrocinadores locales, ajuste de NLP regional.</div>
+                </div>
+                <div class="card anim-fade-up anim-delay-2" style="border-left: 4px solid var(--purple-sec);">
+                    <div style="font-family: 'Climate Crisis', cursive; font-size: 1.8rem; color: var(--purple-sec); margin-bottom: 0.5rem;">FASE 2 · BETA</div>
+                    <div class="card-text">Automatización de consultas frecuentes + panel administrativo para sponsors. Feedback loop activo.</div>
+                </div>
+                <div class="card anim-fade-up anim-delay-3" style="border-left: 4px solid var(--purple-main);">
+                    <div style="font-family: 'Climate Crisis', cursive; font-size: 1.8rem; color: var(--purple-main); margin-bottom: 0.5rem;">FASE 3 · LANZAMIENTO</div>
+                    <div class="card-text">Alianzas con Alcaldía y entes turísticos. Promoción masiva. Meta: &gt;10.000 usuarios y 2 sponsors activos.</div>
+                </div>
+                <div class="card anim-fade-up anim-delay-4" style="border-left: 4px solid var(--purple-sec);">
+                    <div style="font-family: 'Climate Crisis', cursive; font-size: 1.8rem; color: var(--purple-sec); margin-bottom: 0.5rem;">FASE 4 · ESCALAMIENTO</div>
+                    <div class="card-text"><strong>Santa Marta</strong> (turismo), <strong>Neiva</strong> (eventos), <strong>Armenia</strong> (cultura). Más de 15 ciudades intermedias con la misma brecha.</div>
+                </div>
+            </div>
+            <div class="tagline-footer">Tu ciudad, a un mensaje de distancia</div>
+            <div class="slide-counter">09 / 14</div>
+        </div>
+
+        <!-- SLIDE 10: ROADMAP VISUAL -->
+        <div class="slide bg-white" data-index="9">
+            <div class="logo-header anim-fade-up">
+                <img src="hola-chatbot-main-logo.png" alt="Hola Chatbot Logo">
+            </div>
+            <h2 class="section-title anim-fade-up" style="text-align: center;">Ruta de crecimiento</h2>
+            <p class="subtitle anim-fade-up anim-delay-1">Cada ciudad nueva = carga de datos locales, no desarrollo desde cero</p>
+            <div class="img-container anim-scale anim-delay-2">
+                <img src="roadmap_hola_chatbot.png" alt="Roadmap de Expansión Hola Chatbot" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div style="display: none; height: 300px; background: linear-gradient(90deg, var(--purple-main), var(--purple-sec)); align-items: center; justify-content: center; color: white; font-family: 'Climate Crisis', cursive; font-size: 2rem; letter-spacing: 2px;">
+                    ROADMAP: IBAGUÉ → SANTA MARTA → NEIVA → ARMENIA
+                </div>
+            </div>
+            <div class="tagline-footer">Tu ciudad, a un mensaje de distancia</div>
+            <div class="slide-counter">10 / 14</div>
+        </div>
+
+        <!-- SLIDE 11: PÚBLICOS OBJETIVO -->
+        <div class="slide bg-light" data-index="10">
+            <div class="logo-header anim-fade-up">
+                <img src="hola-chatbot-main-logo.png" alt="Hola Chatbot Logo">
+            </div>
+            <h2 class="section-title anim-fade-up" style="text-align: center;">¿Quién paga y quién usa?</h2>
+            <p class="subtitle anim-fade-up anim-delay-1">Cuatro perfiles que alimentan el ecosistema</p>
+            <div class="card-grid" style="max-width: 1000px;">
+                <div class="card anim-fade-up anim-delay-1" style="border-top: 4px solid var(--purple-main);">
+                    <div style="font-family: 'Climate Crisis', cursive; font-size: 1.3rem; color: var(--purple-main); margin-bottom: 0.5rem;">ICP A · CIUDADANO</div>
+                    <div class="card-text">Usuario gratuito que genera tracción, datos de comportamiento y boca en boca. Ya está en WhatsApp. No quiere instalar nada.</div>
+                </div>
+                <div class="card anim-fade-up anim-delay-2" style="border-top: 4px solid var(--purple-sec);">
+                    <div style="font-family: 'Climate Crisis', cursive; font-size: 1.3rem; color: var(--purple-sec); margin-bottom: 0.5rem;">ICP B · COMERCIO LOCAL</div>
+                    <div class="card-text">Restaurantes, bares, hoteles. Pagan por visibilidad segmentada por cercanía geográfica. Costo accesible vs. publicidad tradicional.</div>
+                </div>
+                <div class="card anim-fade-up anim-delay-3" style="border-top: 4px solid var(--purple-main);">
+                    <div style="font-family: 'Climate Crisis', cursive; font-size: 1.3rem; color: var(--purple-main); margin-bottom: 0.5rem;">ICP C · ENTES PÚBLICOS</div>
+                    <div class="card-text">Alcaldías, secretarías de TIC, turismo. Pagan por descongestionar atención presencial y mejorar percepción ciudadana.</div>
+                </div>
+                <div class="card anim-fade-up anim-delay-4" style="border-top: 4px solid var(--purple-sec);">
+                    <div style="font-family: 'Climate Crisis', cursive; font-size: 1.3rem; color: var(--purple-sec); margin-bottom: 0.5rem;">ICP D · INVERSIONISTAS</div>
+                    <div class="card-text">Ángeles y fondos early-stage en CityTech/GovTech. Buscan validación temprana, ingresos diversificados y potencial de escala.</div>
+                </div>
+            </div>
+            <div class="tagline-footer">Tu ciudad, a un mensaje de distancia</div>
+            <div class="slide-counter">11 / 14</div>
+        </div>
+
+        <!-- SLIDE 12: MODELO DE INGRESOS VISUAL -->
+        <div class="slide bg-white" data-index="11">
+            <div class="logo-header anim-fade-up">
+                <img src="hola-chatbot-main-logo.png" alt="Hola Chatbot Logo">
+            </div>
+            <h2 class="section-title anim-fade-up" style="text-align: center;">Ingresos diversificados desde el día uno</h2>
+            <p class="subtitle anim-fade-up anim-delay-1">No apostamos a un solo modelo</p>
+            <div class="img-container anim-scale anim-delay-2">
+                <img src="modelo_ingresos_hola_chatbot.png" alt="Modelo de Ingresos Mixtos" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div style="display: none; height: 300px; background: linear-gradient(135deg, var(--purple-main), var(--purple-sec)); align-items: center; justify-content: center; color: white; font-family: 'Climate Crisis', cursive; font-size: 2rem; letter-spacing: 2px;">
+                    MODELO DE INGRESOS: PATROCINIOS + ALIANZAS + CAPITAL SEMILLA
+                </div>
+            </div>
+            <div class="tagline-footer">Tu ciudad, a un mensaje de distancia</div>
+            <div class="slide-counter">12 / 14</div>
+        </div>
+
+        <!-- SLIDE 13: EL EQUIPO -->
+        <div class="slide bg-gradient" data-index="12">
+            <div class="logo-header anim-fade-up">
+                <img src="hola-chatbot-main-logo.png" alt="Hola Chatbot Logo">
+            </div>
+            <h2 class="section-title anim-fade-up" style="text-align: center;">Quiénes somos</h2>
+            <p class="subtitle anim-fade-up anim-delay-1" style="opacity: 0.85;">Un equipo multidisciplinario con visión de ciudad y ejecución tecnológica</p>
+            <div class="card-grid" style="max-width: 800px; margin-top: 2rem;">
+                <div class="card anim-fade-up anim-delay-1" style="background: rgba(254, 254, 254, 0.95); text-align: center;">
+                    <div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--purple-main), var(--purple-sec)); margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; color: white; font-family: 'Climate Crisis', cursive; font-size: 2rem;">CEO</div>
+                    <div style="font-family: 'Climate Crisis', cursive; font-size: 1.5rem; color: var(--purple-main);">Fundador & CEO</div>
+                    <div class="card-text">Visión estratégica, relaciones institucionales y roadmap de producto.</div>
+                </div>
+                <div class="card anim-fade-up anim-delay-2" style="background: rgba(254, 254, 254, 0.95); text-align: center;">
+                    <div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--purple-sec), var(--purple-main)); margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; color: white; font-family: 'Climate Crisis', cursive; font-size: 2rem;">CTO</div>
+                    <div style="font-family: 'Climate Crisis', cursive; font-size: 1.5rem; color: var(--purple-main);">CTO & IA</div>
+                    <div class="card-text">Arquitectura conversacional, NLP en español e integración de APIs.</div>
+                </div>
+                <div class="card anim-fade-up anim-delay-3" style="background: rgba(254, 254, 254, 0.95); text-align: center;">
+                    <div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--purple-main), var(--purple-sec)); margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; color: white; font-family: 'Climate Crisis', cursive; font-size: 2rem;">COO</div>
+                    <div style="font-family: 'Climate Crisis', cursive; font-size: 1.5rem; color: var(--purple-main);">COO & Operaciones</div>
+                    <div class="card-text">Validación de datos, relación con comercios y coordinación de contenido.</div>
+                </div>
+                <div class="card anim-fade-up anim-delay-4" style="background: rgba(254, 254, 254, 0.95); text-align: center;">
+                    <div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--purple-sec), var(--purple-main)); margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; color: white; font-family: 'Climate Crisis', cursive; font-size: 2rem;">CC</div>
+                    <div style="font-family: 'Climate Crisis', cursive; font-size: 1.5rem; color: var(--purple-main);">Chief City Officer</div>
+                    <div class="card-text">Relaciones con Alcaldía, SETP y entidades. Mapeo de trámites y normativas.</div>
+                </div>
+            </div>
+            <div class="tagline-footer">Tu ciudad, a un mensaje de distancia</div>
+            <div class="slide-counter">13 / 14</div>
+        </div>
+
+        <!-- SLIDE 14: THE ASK / CIERRE -->
+        <div class="slide bg-gradient" data-index="13">
+            <div class="logo-header anim-fade-up">
+                <img src="hola-chatbot-main-logo.png" alt="Hola Chatbot Logo">
+            </div>
+            <div style="text-align: center; max-width: 800px;">
+                <h1 class="hero-title anim-fade-up anim-delay-1">Tu ciudad, a un mensaje de distancia</h1>
+                <p class="subtitle anim-fade-up anim-delay-2" style="margin-top: 2rem; font-size: 1.15rem; line-height: 1.8; opacity: 0.9;">
+                    Buscamos <span style="font-weight: 700;">capital semilla y patrocinadores estratégicos</span> para sostener el MVP en Ibagué y financiar la primera réplica en Santa Marta.
+                </p>
+                <div class="anim-fade-up anim-delay-3" style="margin-top: 2.5rem; background: rgba(254, 254, 254, 0.08); border: 1px solid rgba(254, 254, 254, 0.15); border-radius: 16px; padding: 2rem; text-align: left;">
+                    <div style="font-family: 'Climate Crisis', cursive; font-size: 1.5rem; color: var(--white-pure); margin-bottom: 1rem; letter-spacing: 1px;">USO DE FONDOS</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.95rem; line-height: 1.6;">
+                        <div>👥 Equipo de desarrollo e IA</div>
+                        <div>☁️ Infraestructura cloud y APIs</div>
+                        <div>💬 Licencias WhatsApp Business</div>
+                        <div>📢 Marketing local y difusión</div>
+                    </div>
+                </div>
+                <div class="anim-fade-up anim-delay-4" style="margin-top: 2.5rem;">
+                    <span class="cta-btn">Hablemos · Contactar al equipo</span>
+                </div>
+                <div class="anim-fade-up anim-delay-5" style="margin-top: 2rem; font-size: 0.85rem; opacity: 0.6; letter-spacing: 1px;">
+                    © 2026 Hola Chatbot · Ibagué, Colombia · CityTech / GovTech
+                </div>
+            </div>
+            <div class="tagline-footer">Tu ciudad, a un mensaje de distancia</div>
+            <div class="slide-counter">14 / 14</div>
+        </div>
+
+    </div>
+
+    <!-- Navigation UI -->
+    <div class="nav-arrows">
+        <button class="nav-btn" id="prevBtn" aria-label="Anterior">‹</button>
+        <button class="nav-btn" id="nextBtn" aria-label="Siguiente">›</button>
+    </div>
+
+    <div class="slide-dots" id="slideDots"></div>
+
+    <div class="progress-bar" id="progressBar"></div>
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        let currentSlide = 0;
+
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const progressBar = document.getElementById('progressBar');
+        const dotsContainer = document.getElementById('slideDots');
+
+        // Create dots
+        slides.forEach((_, i) => {
+            const dot = document.createElement('div');
+            dot.className = 'dot' + (i === 0 ? ' active' : '');
+            dot.addEventListener('click', () => goToSlide(i));
+            dotsContainer.appendChild(dot);
+        });
+
+        const dots = document.querySelectorAll('.dot');
+
+        function updateSlide() {
+            slides.forEach((slide, i) => {
+                slide.classList.toggle('active', i === currentSlide);
+            });
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === currentSlide);
+            });
+            progressBar.style.width = ((currentSlide + 1) / totalSlides * 100) + '%';
+
+            const activeSlide = slides[currentSlide];
+            if (activeSlide.classList.contains('bg-gradient')) {
+                document.querySelectorAll('.nav-btn').forEach(btn => {
+                    btn.style.borderColor = 'rgba(254, 254, 254, 0.4)';
+                    btn.style.color = '#FEFEFE';
+                });
+            } else {
+                document.querySelectorAll('.nav-btn').forEach(btn => {
+                    btn.style.borderColor = '#3D3A86';
+                    btn.style.color = '#3D3A86';
+                });
+            }
+        }
+
+        function goToSlide(index) {
+            if (index >= 0 && index < totalSlides) {
+                currentSlide = index;
+                updateSlide();
+            }
+        }
+
+        function nextSlide() {
+            goToSlide(currentSlide + 1);
+        }
+
+        function prevSlide() {
+            goToSlide(currentSlide - 1);
+        }
+
+        prevBtn.addEventListener('click', prevSlide);
+        nextBtn.addEventListener('click', nextSlide);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+                e.preventDefault();
+                nextSlide();
+            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                e.preventDefault();
+                prevSlide();
+            } else if (e.key === 'Home') {
+                e.preventDefault();
+                goToSlide(0);
+            } else if (e.key === 'End') {
+                e.preventDefault();
+                goToSlide(totalSlides - 1);
+            }
+        });
+
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        document.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            const diff = touchStartX - touchEndX;
+            if (Math.abs(diff) > 50) {
+                if (diff > 0) nextSlide();
+                else prevSlide();
+            }
+        }, { passive: true });
+
+        let wheelTimeout;
+        document.addEventListener('wheel', (e) => {
+            clearTimeout(wheelTimeout);
+            wheelTimeout = setTimeout(() => {
+                if (e.deltaY > 0) nextSlide();
+                else prevSlide();
+            }, 150);
+        }, { passive: true });
+
+        updateSlide();
+    </script>
+
+</body>
+</html>
