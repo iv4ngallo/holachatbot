@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Organic (Beta Version)</title>
+<link rel="stylesheet" href="../suite/suite.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
@@ -782,6 +783,7 @@ button:active:not(:disabled){transform:scale(.93)}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
+<script src="../suite/suite.js"></script>
 <script>
 (function(){
 "use strict";
@@ -2536,5 +2538,6 @@ renderAll();
 iniciarAuth();
 })();
 </script>
+<script>Suite.init({ app: 'organic', fit: '.app' });</script>
 </body>
 </html>
