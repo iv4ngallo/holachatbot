@@ -153,6 +153,11 @@ body.sky #hint{display:none}
 #ixShip svg{display:block}
 #ixLas{height:3px;margin-top:-1px;transform-origin:0 50%;background:linear-gradient(90deg,#fff 0,#FF6B6B 18%,#FF3B3B 100%);box-shadow:0 0 8px #FF3B3B,0 0 20px rgba(255,59,59,.8)}
 #idx.lz{transition:none!important}
+#idx .rw .it span{min-width:0}
+#idx .it .bd{margin-left:auto;flex:none;font:700 9px/1 var(--cond);letter-spacing:.14em;text-transform:uppercase;font-style:italic;padding:3px 5px;border:1px solid;white-space:nowrap}
+#idx .it .bd.on{color:var(--y);border-color:rgba(255,199,0,.65)}
+#idx .it .bd.off{color:var(--dim);border-color:rgba(120,155,255,.3)}
+#idx .rw .it:hover .bd,#idx .rw .it:focus-visible .bd{color:#02081f;border-color:#02081f}
 #idx{z-index:8}
 .skn{position:fixed;left:0;top:0;z-index:6;pointer-events:none;opacity:0;font:700 11px/1 var(--cond);letter-spacing:.22em;text-transform:uppercase;font-style:italic;color:#2EF2FF;text-shadow:0 0 8px rgba(46,242,255,.8),0 0 2px #02081f;white-space:nowrap}
 .skn.pk{color:#FF8FCB;text-shadow:0 0 8px rgba(255,95,184,.85),0 0 2px #02081f;font-size:10px}
@@ -717,7 +722,7 @@ function buildIndex(){
   done[n.id]=1;var gg=GR[n.group],ks=kidsOf(n.id).filter(function(m){return !done[m.id]});
   if(n.id==='__x')ks=[];
   var h='<div class="rw" data-d="'+d+'" style="--c:'+gg.c+'">'+(ks.length?'<button type="button" class="cr'+(idxShut[n.id]?'':' op')+'" data-t="'+esc(n.id)+'" aria-label="Expandir o contraer"></button>':'<span class="cr0"></span>')
-   +'<button type="button" class="it'+(n.body==='sun'?' sn':'')+'" data-id="'+esc(n.id)+'"><i></i><span>'+esc(n.name)+'</span>'+'</button></div>';
+   +'<button type="button" class="it'+(n.body==='sun'?' sn':'')+'" data-id="'+esc(n.id)+'"><i></i><span>'+esc(n.name)+'</span>'+(n.url?'<b class="bd on" title="Tiene enlace definido">Enlace</b>':'<b class="bd off" title="Sin enlace definido">Sin enlace</b>')+'</button></div>';
   if(ks.length&&!idxShut[n.id])h+='<div class="nest">'+list(ks,n.id)+'</div>';
   else if(ks.length)ks.forEach(function(m){hide(m,0)});
   return h;
