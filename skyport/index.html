@@ -825,7 +825,7 @@ function showCard(id,keep){
  if(n.subs&&n.subs.length)h+='<h5>Incluye</h5><div class="chips">'+n.subs.map(function(s){return '<span>'+esc(s)+'</span>'}).join('')+'</div>';
  var pn=n.parent&&byId(n.parent);if(pn)h+='<h5>Pertenece a</h5><div class="chips"><button type="button" data-go="'+esc(pn.id)+'">'+esc(pn.name)+'</button></div>';
  if(rels.length)h+='<h5>Relacionado con</h5><div class="chips">'+rels.slice(0,10).map(function(m){return '<button type="button" data-go="'+esc(m.id)+'">'+esc(m.name)+'</button>'}).join('')+(rels.length>10?'<span>+'+(rels.length-10)+'</span>':'')+'</div>';
- h+='<div class="act">'+(n.url?'<a class="go" href="'+esc(n.url)+'" target="'+(MOB?'_self':'_blank')+'" rel="noopener">Lanzar <b>&rarr;</b></a>':'<button type="button" class="go off" data-edit>Asignar enlace</button>')+'<button type="button" class="ed" data-edit aria-label="Editar nodo">&#9998;</button></div></div>';
+ h+='<div class="act">'+(n.url?'<a class="go" href="'+esc(n.url)+'" target="'+'_self'+'" rel="noopener">Lanzar <b>&rarr;</b></a>':'<button type="button" class="go off" data-edit>Asignar enlace</button>')+'<button type="button" class="ed" data-edit aria-label="Editar nodo">&#9998;</button></div></div>';
  card.innerHTML=h;card.classList.toggle('min',cardMin);card.style.setProperty('--c',g.c);card.classList.toggle('on',!cardHidden);cTab.textContent='Ficha · '+n.name;cTab.classList.toggle('on',cardHidden);
 }
 function hideCard(){card.classList.remove('on');cTab.classList.remove('on');leadL.setAttribute('opacity',0);leadC.setAttribute('opacity',0)}
