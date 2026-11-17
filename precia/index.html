@@ -478,6 +478,8 @@ fieldset.seleccion legend { font-weight: 600; padding: 0 6px; font-size: 14px; }
 .acciones { display: flex; flex-wrap: wrap; gap: 8px; }
 .acciones .btn.primario { flex: 1 1 180px; }
 .vacio-listas[hidden], #seccion-lista[hidden], #barra-comparar[hidden] { display: none !important; }
+/* Lista cerrada: se ocultan filtros, vista, ítems y Modo Comprar; el resumen solo aparece cuando está cerrada. */
+#seccion-lista .filtros[hidden], #seccion-lista .vista-bar[hidden], #items[hidden], #resumen-cerrada[hidden], #switch-comprar[hidden], #banner-cerrada[hidden], #form-agregar[hidden] { display: none !important; }
 .vacio-listas { display: grid; justify-items: center; gap: 12px; text-align: center; padding: 44px 20px 40px; }
 .vacio-listas h2 { margin: 0; font-size: 24px; text-wrap: balance; }
 .vacio-listas p { margin: 0; max-width: 46ch; color: var(--ink-2); text-wrap: pretty; }
