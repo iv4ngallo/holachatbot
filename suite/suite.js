@@ -1,4 +1,4 @@
-/* Hola Chatbot · menú de la suite (PrecIA, AgendIA, Organic, Hábitos Atómicos) y acceso compartido con Supabase.
+/* Hola Apps · menú de la suite (PrecIA, AgendIA, Organic, Hábitos Atómicos) y acceso compartido con Supabase.
    Uso:  Suite.init({ app:'habitos', gate:true, onUser:function(user, sb){}, onLogout:function(){} })
    Sin gate solo se muestra el menú superior (PrecIA y Organic ya traen su propio acceso). */
 (function () {
@@ -39,12 +39,12 @@
     var bar = document.createElement('div');
     bar.className = 'suite-bar';
     bar.setAttribute('role', 'navigation');
-    bar.setAttribute('aria-label', 'Herramientas de Hola Chatbot');
+    bar.setAttribute('aria-label', 'Herramientas de Hola Apps');
     bar.innerHTML =
       '<button class="suite-btn" type="button" id="suite-abrir" aria-haspopup="true" aria-expanded="false" aria-controls="suite-pop" aria-label="Herramientas">' +
         svg('<circle cx="5" cy="5" r="1.6"/><circle cx="12" cy="5" r="1.6"/><circle cx="19" cy="5" r="1.6"/><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/><circle cx="5" cy="19" r="1.6"/><circle cx="12" cy="19" r="1.6"/><circle cx="19" cy="19" r="1.6"/>', ' fill="currentColor" stroke="none"') +
       '</button>' +
-      '<span class="suite-marca">Hola Chatbot</span>' + (actual ? '<span class="suite-actual">· ' + actual.nombre + '</span>' : '') +
+      '<span class="suite-marca">Hola Apps</span>' + (actual ? '<span class="suite-actual">· ' + actual.nombre + '</span>' : '') +
       '<span class="suite-sp"></span>' +
       '<span class="suite-user" id="suite-user" hidden><span class="suite-mail" id="suite-mail"></span><button class="suite-btn" type="button" id="suite-salir">Cerrar sesión</button></span>' +
       '<div class="suite-pop" id="suite-pop" role="menu" hidden>' +
@@ -88,7 +88,7 @@
     d.className = 'suite-auth'; d.id = 'suite-auth'; d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true'); d.setAttribute('aria-labelledby', 'sa-titulo');
     d.innerHTML =
       '<form class="suite-card" id="sa-form" novalidate>' +
-        '<h1>Hola Chatbot</h1><h2 id="sa-titulo">Iniciar sesión</h2><p class="suite-ayuda" id="sa-ayuda"></p>' +
+        '<h1>Hola Apps</h1><h2 id="sa-titulo">Iniciar sesión</h2><p class="suite-ayuda" id="sa-ayuda"></p>' +
         '<input id="sa-nombre" type="text" autocomplete="name" placeholder="Nombre (opcional)" aria-label="Nombre" hidden>' +
         '<input id="sa-correo" type="email" autocomplete="email" inputmode="email" placeholder="Correo" aria-label="Correo">' +
         '<input id="sa-clave" type="password" autocomplete="current-password" placeholder="Contraseña" aria-label="Contraseña">' +
