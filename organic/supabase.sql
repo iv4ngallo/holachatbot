@@ -1,7 +1,45 @@
--- Organic · datos por usuario (Supabase)
--- Usa el mismo proyecto y las mismas cuentas que PrecIA (tabla perfiles y trigger ya creados con precia/supabase.sql).
--- Pégalo completo en Supabase → SQL Editor → New query → Run. Es seguro ejecutarlo más de una vez.
+-- Organic · usuarios y datos por usuario (Supabase)
+-- Para un proyecto de Supabase propio de Organic. Pégalo completo en SQL Editor → New query → Run.
+-- Es seguro ejecutarlo más de una vez.
 
+-- 1) Perfiles: una fila por usuario registrado. Un solo rol: 'user'.
+create table if not exists public.perfiles (
+  id        uuid primary key references auth.users (id) on delete cascade,
+  email     text,
+  nombre    text,
+  rol       text not null default 'user' check (rol = 'user'),
+  creado_en timestamptz not null default now()
+);
+
+create or replace function public.crear_perfil()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  insert into public.perfiles (id, email, nombre)
+  values (new.id, new.email, nullif(trim(new.raw_user_meta_data ->> 'nombre'), ''))
+  on conflict (id) do nothing;
+  return new;
+end;
+$$;
+
+drop trigger if exists al_crear_usuario on auth.users;
+create trigger al_crear_usuario
+  after insert on auth.users
+  for each row execute function public.crear_perfil();
+
+alter table public.perfiles enable row level security;
+drop policy if exists "perfil: leer el propio"   on public.perfiles;
+drop policy if exists "perfil: editar el propio" on public.perfiles;
+create policy "perfil: leer el propio"   on public.perfiles
+  for select to authenticated using ((select auth.uid()) = id);
+create policy "perfil: editar el propio" on public.perfiles
+  for update to authenticated
+  using ((select auth.uid()) = id) with check ((select auth.uid()) = id);
+
+-- 2) Datos de Organic.
 -- Una fila por seed (tipo 'seed') y una fila 'meta' por usuario (workspaces y orden).
 create table if not exists public.organic_docs (
   user_id    uuid not null references auth.users (id) on delete cascade,
