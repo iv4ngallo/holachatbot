@@ -5,10 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>PrecIA - (Versión Beta)</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<style>/* Igual que en el artefacto de Claude: un elemento con el atributo hidden nunca se muestra. */[hidden]:not([hidden=until-found i]){display:none!important}</style>
 <link rel="icon" type="image/svg+xml" href="favicon.svg?v=1">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=1">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=1">
-<link rel="stylesheet" href="../suite/suite.css?v=2">
+<link rel="stylesheet" href="../suite/suite.css?v=4">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Climate+Crisis&family=Work+Sans:wght@400;500;600;700&display=swap">
@@ -478,8 +479,6 @@ fieldset.seleccion legend { font-weight: 600; padding: 0 6px; font-size: 14px; }
 .acciones { display: flex; flex-wrap: wrap; gap: 8px; }
 .acciones .btn.primario { flex: 1 1 180px; }
 .vacio-listas[hidden], #seccion-lista[hidden], #barra-comparar[hidden] { display: none !important; }
-/* Lista cerrada: se ocultan filtros, vista, ítems y Modo Comprar; el resumen solo aparece cuando está cerrada. */
-#seccion-lista .filtros[hidden], #seccion-lista .vista-bar[hidden], #items[hidden], #resumen-cerrada[hidden], #switch-comprar[hidden], #banner-cerrada[hidden], #form-agregar[hidden] { display: none !important; }
 .vacio-listas { display: grid; justify-items: center; gap: 12px; text-align: center; padding: 44px 20px 40px; }
 .vacio-listas h2 { margin: 0; font-size: 24px; text-wrap: balance; }
 .vacio-listas p { margin: 0; max-width: 46ch; color: var(--ink-2); text-wrap: pretty; }
@@ -3606,6 +3605,7 @@ function renderLista() {
   if (txtMes.textContent && txtMes.textContent !== mesNuevo) rebotar($('#mes-chip'), 'cambio');
   txtMes.textContent = mesNuevo;
   $('#sw-cerrada').setAttribute('aria-checked', String(!!lista.cerrada));
+  $('#sw-txt').textContent = lista.cerrada ? 'Lista cerrada' : 'Lista abierta';
   $('#seccion-lista').classList.toggle('lista-cerrada', !!lista.cerrada);
   $('#form-agregar').hidden = !!lista.cerrada; $('#bloque-agregar').hidden = !!lista.cerrada;
   $('#btn-renombrar').disabled = !!lista.cerrada;
