@@ -3445,6 +3445,8 @@ function renderTodo() {
 // Comparación de precios y «Obtener precios»: bloqueadas por ahora (dependen de servicios que aún no están conectados).
 // Para habilitarlas de nuevo, cambia esta constante a false.
 const PRECIOS_BLOQUEADOS = true;
+// «Escanear factura»: bloqueado por ahora. Para habilitarlo, cambia esta constante a false.
+const FACTURA_BLOQUEADA = true;
 // Premium (simulado): desbloquea el comparador al activar un plan, salvo que PRECIOS_BLOQUEADOS esté activo.
 const CLAVE_PREMIUM = 'precia.premium.v1';
 let premium = null;
@@ -4576,6 +4578,7 @@ const nombreFac = (nombre, t) => { const c = buscarCatDe(nombre, t); return c &&
 const kb = (b) => (b >= 1048576 ? (b / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(b / 1024)) + ' KB');
 
 function abrirFactura(origen) {
+  if (FACTURA_BLOQUEADA) return;
   Object.assign(fac, { fase: 'subir', archivos: [], aviso: '', tienda: null, fecha: null, total: null, items: [], error: '', origen: origen || $('#btn-factura') });
   fac.destino = 'nueva'; fac.comprados = true;
   renderFactura();
@@ -4755,6 +4758,7 @@ function confirmarFactura() {
 function eventosFactura() {
   const cuerpo = $('#fac-cuerpo'), pie = $('#fac-pie');
   $('#btn-factura .ico-factura').innerHTML = svgTabler('receipt');
+  if (FACTURA_BLOQUEADA) { const bf = $('#btn-factura'); bf.disabled = true; bf.title = 'Próximamente'; bf.setAttribute('aria-label', 'Escanear factura: próximamente'); }
   $('#btn-factura').addEventListener('click', (e) => abrirFactura(e.currentTarget));
   cuerpo.addEventListener('change', (e) => {
     const el = e.target;
