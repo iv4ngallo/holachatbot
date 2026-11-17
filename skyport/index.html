@@ -15,9 +15,20 @@ html,body{margin:0;height:100%;background:var(--ink);color:var(--w);font-family:
 button{font:inherit;color:inherit;cursor:pointer}
 a{color:inherit;text-decoration:none}
 body::before{content:"";position:fixed;inset:0;background:linear-gradient(180deg,#01040F 0%,#061246 40%,#0F2E9C 78%,#2455FF 100%);z-index:0}
-#bOut{display:none;color:#FF8A8A;border-color:rgba(255,59,59,.5)}
-html.authed #bOut{display:inline-flex}
-#bOut:hover{background:rgba(255,59,59,.22);color:#fff}
+#uRow{display:none}
+html.authed #uRow{display:flex}
+#bOut{all:unset;box-sizing:border-box;cursor:pointer;width:30px;height:30px;flex:none;display:inline-flex;align-items:center;justify-content:center;color:#FF8A8A;border:1px solid rgba(255,59,59,.5)}
+#bOut:hover,#bOut:focus-visible{background:rgba(255,59,59,.22);color:#fff;outline:none}
+.mw{position:relative}
+#mnu{right:20px;top:calc(60px + var(--sat));z-index:12;width:252px;display:flex;flex-direction:column;gap:6px;padding:8px;border:1px solid var(--line);border-top:2px solid var(--r);background:rgba(3,10,40,.9);backdrop-filter:blur(12px);transition:opacity .22s ease,transform .22s ease!important}
+#mnu:not(.open){opacity:0;pointer-events:none;visibility:hidden;transform:translateY(-8px)!important}
+#mnu .chip{width:100%;height:40px;justify-content:flex-start}
+#mnu .chip svg{flex:none}
+#uRow{align-items:center;gap:8px;padding:5px 5px 5px 10px;border:1px solid var(--line);background:rgba(4,14,52,.7);color:#D7E1FF}
+#uRow svg{flex:none;color:var(--dim)}
+#uMail{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:500 13px/1 var(--sans)}
+#bMenu svg{color:var(--r)}
+#bHome{width:36px;padding:0;justify-content:center}
 #gForm{display:none;margin:0}
 html.gated #gForm{display:block}
 html.gated #go{display:none}
@@ -337,8 +348,9 @@ label.f textarea{min-height:76px;resize:vertical}
  #aur .a2,#aur .g1{display:none}
  #cdn{right:12px;top:calc(56px + var(--sat));padding:5px 9px}
  #cdT{font-size:17px;min-width:48px}
- #bIdx,#bSky,#bOut{width:34px;padding:0;justify-content:center}
- #bIdx .tx,#bSky .tx,#bOut .tx{display:none}
+ #bMenu,#bSky,#bHome{width:34px;padding:0;justify-content:center}
+ #bMenu .tx,#bSky .tx{display:none}
+ #mnu{right:12px;top:calc(54px + var(--sat))}
  #pl{left:12px;right:12px;width:auto;bottom:calc(12px + var(--sab))}
  #cTab{top:auto;bottom:calc(76px + var(--sab));right:12px}
  #card{left:0!important;top:auto!important;bottom:calc(76px + var(--sab));right:0;margin:0 12px;width:auto;max-width:none;transform:none!important;max-height:56vh;overflow:auto}
@@ -388,13 +400,16 @@ label.f textarea{min-height:76px;resize:vertical}
  <div class="brand"><span class="hz"></span><div><h1>TEGC <b>//</b> HUB</h1><small>Sky Port · Mapa maestro de proyectos</small></div></div>
  <div class="stat" aria-live="polite"><span>Nodos<b id="cN">0</b></span><span>Vínculos<b id="cL">0</b></span><span><span class="rd">&#9679;</span> En vivo</span></div>
  <div class="tools">
-  <button class="chip" id="bIdx" type="button" aria-label="Índice"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 6h2v2H4zM9 6h11v2H9zM4 11h2v2H4zM9 11h11v2H9zM4 16h2v2H4zM9 16h11v2H9z" fill="currentColor"/></svg><span class="tx">Índice</span></button>
+  <button class="chip" id="bMenu" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="mnu" aria-label="Menú" title="Menú"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 6h16v2H4zM4 11h16v2H4zM4 16h16v2H4z" fill="currentColor"/></svg><span class="tx">Menú</span></button>
   <button class="chip" id="bSky" type="button" aria-pressed="false" aria-label="Deploy Skycraft" title="Deploy Skycraft (S)"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 2l3 8 7 5-1 2-6-2-1 5 2 2v1h-8v-1l2-2-1-5-6 2-1-2 7-5z" fill="currentColor"/></svg><span class="tx">Deploy Skycraft</span></button>
-  <button class="chip" id="bHome" type="button">Vista general</button>
-  <button class="chip y" id="bAdm" type="button">Administrar</button>
-  <button class="chip" id="bOut" type="button" aria-label="Cerrar sesión" title="Cerrar sesión"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M5 3h8v2H7v14h6v2H5zM16 7l5 5-5 5-1.4-1.4L17.2 13H9v-2h8.2l-2.6-2.6z" fill="currentColor"/></svg><span class="tx">Cerrar sesión</span></button>
+  <button class="chip" id="bHome" type="button" aria-label="Vista general" title="Vista general"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M1.5 12S5.5 5 12 5s10.5 7 10.5 7-4 7-10.5 7S1.5 12 1.5 12z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3.2" fill="currentColor"/></svg></button>
  </div>
 </header>
+<div id="mnu" class="hud" role="menu" aria-label="Menú principal">
+  <button class="chip" id="bIdx" type="button" aria-label="Índice" role="menuitem"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 6h2v2H4zM9 6h11v2H9zM4 11h2v2H4zM9 11h11v2H9zM4 16h2v2H4zM9 16h11v2H9z" fill="currentColor"/></svg><span class="tx">Índice</span></button>
+  <button class="chip y" id="bAdm" type="button" role="menuitem"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M3 7h9M16 7h5M3 17h5M12 17h9" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="14" cy="7" r="2.3" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="10" cy="17" r="2.3" fill="none" stroke="currentColor" stroke-width="2"/></svg><span class="tx">Administrar</span></button>
+  <div id="uRow" role="group" aria-label="Usuario"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="12" cy="8" r="4" fill="currentColor"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7z" fill="currentColor"/></svg><span id="uMail">Usuario</span><button id="bOut" type="button" aria-label="Cerrar sesión" title="Cerrar sesión"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M5 3h8v2H7v14h6v2H5zM16 7l5 5-5 5-1.4-1.4L17.2 13H9v-2h8.2l-2.6-2.6z" fill="currentColor"/></svg></button></div>
+</div>
 <div id="coord" class="hud" aria-hidden="true"></div>
 
 <aside id="idx" class="hud open" aria-label="Índice de proyectos"><header><span>Índice de nodos</span><span class="hr"><span id="cI">00</span><button type="button" id="idxT" aria-label="Expandir todos" title="Expandir todos"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path class="u" d="M3 6l5-4 5 4M3 14l5-4 5 4" fill="none" stroke="currentColor" stroke-width="1.6"/><path class="d" d="M3 2l5 4 5-4M3 10l5 4 5-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button><button type="button" id="idxX" aria-label="Cerrar índice">&#10005;</button></span></header><div class="lst" id="lst"></div></aside>
@@ -523,6 +538,7 @@ var splashGo=null;
  }
  function begin(){
   root.classList.remove('gated');root.classList.add('authed');
+  sb.auth.getSession().then(function(r){var u=r.data&&r.data.session&&r.data.session.user,m=$('#uMail');if(u&&m)m.textContent=u.email||'Usuario'});
   if(started)return;started=true;
   dbRef={
    set:function(obj){return sb.from('hub_state').upsert({id:'main',data:obj,updated_at:new Date().toISOString()}).then(function(r){if(r.error)throw r.error})},
@@ -761,7 +777,7 @@ $('#lst').addEventListener('click',function(e){var tg=e.target.closest('[data-t]
 $('#lst').addEventListener('pointerover',function(e){var b=e.target.closest('.it');hover=b?b.getAttribute('data-id'):null});
 $('#lst').addEventListener('pointerleave',function(){hover=null});
 $('#bHome').addEventListener('click',function(){if(live)goHome()});
-function idxApply(on,fx){var a=$('#idx');if(fx){var bb=$('#bIdx');bb.classList.remove('gl');void bb.offsetWidth;bb.classList.add('gl')}a.classList.toggle('open',on);a.setAttribute('aria-hidden',on?'false':'true');var b=$('#bIdx');b.classList.toggle('on',on);b.setAttribute('aria-expanded',on?'true':'false')}
+function idxApply(on,fx){var a=$('#idx');if(fx){var bb=$('#bMenu');bb.classList.remove('gl');void bb.offsetWidth;bb.classList.add('gl')}a.classList.toggle('open',on);a.setAttribute('aria-hidden',on?'false':'true');var b=$('#bIdx');b.classList.toggle('on',on);b.setAttribute('aria-expanded',on?'true':'false')}
 var ixBusy=false,ixShip=null,ixLas=null;
 function ixTween(ms,fn){return new Promise(function(res){var t0=performance.now();(function f(n){var p=Math.min(1,(n-t0)/ms);fn(p);if(p<1)requestAnimationFrame(f);else res()})(t0)})}
 function ixIO(p){return p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2}
@@ -770,10 +786,10 @@ function ixFly(x0,y0,x1,y1,s0,s1,o0,o1,ms){var a=Math.atan2(y1-y0,x1-x0)*180/Mat
 function idxSet(on,fx){
  if(!fx||!live||rm){idxApply(on,fx);return}
  if(ixBusy)return;ixBusy=true;
- var a=$('#idx'),bb=$('#bIdx'),br=bb.getBoundingClientRect(),bx=br.left+br.width/2,by=br.top+br.height/2;
+ var a=$('#idx'),bb=$('#bMenu'),br=bb.getBoundingClientRect(),bx=br.left+br.width/2,by=br.top+br.height/2;
  if(!ixShip){ixShip=document.createElement('div');ixShip.id='ixShip';ixShip.innerHTML='<svg viewBox="0 0 34 34" width="34" height="34"><path d="M17 2l5 12 10 8-2 3-9-3-1 7 3 3v1H11v-1l3-3-1-7-9 3-2-3 10-8z" fill="#FF3B3B"/><path d="M17 6l2.5 9h-5z" fill="#fff"/></svg>';document.body.appendChild(ixShip);ixLas=document.createElement('div');ixLas.id='ixLas';document.body.appendChild(ixLas)}
  ixShip.style.display='block';ixSet(ixShip,bx,by,0,.3,0);
- if(on){a.classList.add('lz');a.style.clipPath='inset(0 0 100% 0)';idxApply(true,true)}else{bb.classList.remove('gl');void bb.offsetWidth;bb.classList.add('gl');bb.classList.remove('on');bb.setAttribute('aria-expanded','false')}
+ if(on){a.classList.add('lz');a.style.clipPath='inset(0 0 100% 0)';idxApply(true,true)}else{bb.classList.remove('gl');void bb.offsetWidth;bb.classList.add('gl');$('#bIdx').classList.remove('on');$('#bIdx').setAttribute('aria-expanded','false')}
  var r=a.getBoundingClientRect(),hx=Math.min(innerWidth-26,r.right+36),hy=Math.max(74,r.top-8),cx=r.left+r.width*.5,fin=function(){ixLas.style.opacity=0;ixLas.style.display='none'};
  ixFly(bx,by,hx,hy,.3,1,0,1,750).then(function(){
   ixLas.style.display='block';
@@ -790,8 +806,14 @@ function idxSet(on,fx){
 $('#bIdx').addEventListener('click',function(){idxSet(!$('#idx').classList.contains('open'),true)});
 $('#idxT').addEventListener('click',function(){var ps=parentsList().filter(function(n){return n.id!==sunId}),any=ps.some(function(n){return !idxShut[n.id]});ps.forEach(function(n){idxShut[n.id]=any?1:0});S.nodes.forEach(function(n){if(n.body==='asteroid'&&n.parent)idxShut['belt:'+n.parent]=any?1:0});buildIndex()});
 $('#idxX').addEventListener('click',function(){idxSet(false,true)});
-$('#bIdx').addEventListener('animationend',function(e){if(e.animationName==='chipgl')this.classList.remove('gl')});
+$('#bMenu').addEventListener('animationend',function(e){if(e.animationName==='chipgl')this.classList.remove('gl')});
 idxSet(!MOB);
+var mnu=$('#mnu'),bMenu=$('#bMenu');
+function mnuSet(on){mnu.classList.toggle('open',on);bMenu.classList.toggle('on',on);bMenu.setAttribute('aria-expanded',on?'true':'false')}
+bMenu.addEventListener('click',function(e){e.stopPropagation();mnuSet(!mnu.classList.contains('open'))});
+mnu.addEventListener('click',function(e){if(e.target.closest('#bIdx,#bAdm,#bOut'))mnuSet(false)});
+document.addEventListener('click',function(e){if(mnu.classList.contains('open')&&!e.target.closest('#mnu,#bMenu'))mnuSet(false)});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&mnu.classList.contains('open')){e.stopPropagation();mnuSet(false)}},true);
 
 /* ---------- tarjeta ---------- */
 var cardHidden=false,cardMin=true,cTab=$('#cTab'),card=$('#card'),leadL=$('#lead line'),leadC=$('#lead circle');
