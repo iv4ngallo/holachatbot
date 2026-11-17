@@ -7,7 +7,7 @@
 <link rel="icon" type="image/svg+xml" href="favicon.svg?v=1">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=1">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=1">
-<link rel="stylesheet" href="../suite/suite.css?v=4">
+<link rel="stylesheet" href="../suite/suite.css?v=5">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
@@ -741,11 +741,7 @@ button:active:not(:disabled){transform:scale(.93)}
 </div>
 
 <div class="menu" id="menu" role="menu" hidden>
-  <div class="tiny menuuser" id="menuuser"></div>
   <div class="syncst" id="syncst" role="status" data-st="local">Solo en este dispositivo</div>
-  <button class="mi" role="menuitem" data-a="export">Exportar datos</button>
-  <button class="mi" role="menuitem" data-a="import">Importar datos</button>
-  <button class="mi" role="menuitem" data-a="logout">Cerrar sesión</button>
   <div class="label">Posición del toolbox</div>
   <div class="seg"><button class="ghost" data-a="dock-left" id="btn-dl">Izquierda</button><button class="ghost" data-a="dock-right" id="btn-dr">Derecha</button></div>
 </div>
@@ -786,7 +782,7 @@ button:active:not(:disabled){transform:scale(.93)}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
-<script src="../suite/suite.js?v=2"></script>
+<script src="../suite/suite.js?v=5"></script>
 <script>
 (function(){
 "use strict";
@@ -2432,7 +2428,7 @@ function authShow(mode){
 }
 function authHide(){$("#auth").classList.remove("on")}
 function authFail(msg,focus){var e=$("#au-err");e.textContent=msg;e.hidden=false;if(focus)focus.focus()}
-function pintarUsuario(){var u=Auth.user;$("#menuuser").textContent=u&&u.email?u.email:""}
+function pintarUsuario(){if(window.Suite)Suite.setUser(Auth.user,Auth.sb)}
 function resetS(){S={v:3,workspaces:[],seeds:[],ui:{dock:"left",ws:null,sel:null,filter:"pendientes",q:""}};picked={};dmode=false}
 function entrarUsuario(u){
   if(!u)return;
@@ -2450,6 +2446,7 @@ function salirUsuario(){
   Auth.user=null;stopSync();KEY="organic.v2.invitado";SYNCKEY="organic.sync.invitado";
   resetS();load();closeMenu();renderAll();pintarUsuario();authShow("login");
 }
+window.OrganicApp={exportar:function(){showExport()},importar:function(){showImport()},salir:function(){cerrarSesion()}};
 function cerrarSesion(){
   var done=function(){salirUsuario()};
   if(!Auth.sb){done();return}
@@ -2541,6 +2538,12 @@ renderAll();
 iniciarAuth();
 })();
 </script>
-<script>Suite.init({ app: 'organic', fit: '.app' });</script>
+<script>
+Suite.init({ app: 'organic', fit: '.app', onSignOut: function () { OrganicApp.salir(); } });
+Suite.addMenuItems([
+  { label: 'Exportar datos', onClick: function () { OrganicApp.exportar(); } },
+  { label: 'Importar datos', onClick: function () { OrganicApp.importar(); } }
+]);
+</script>
 </body>
 </html>

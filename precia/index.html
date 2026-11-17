@@ -9,7 +9,7 @@
 <link rel="icon" type="image/svg+xml" href="favicon.svg?v=1">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=1">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=1">
-<link rel="stylesheet" href="../suite/suite.css?v=4">
+<link rel="stylesheet" href="../suite/suite.css?v=5">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Climate+Crisis&family=Work+Sans:wght@400;500;600;700&display=swap">
@@ -1129,6 +1129,8 @@ dialog.dlg-grande.dlg-io[open] { grid-template-rows: auto minmax(0, 1fr) auto; }
 .rc-mover { justify-self: start; margin-top: 4px; }
 /* ===== Menú de usuario ===== */
 .usuario { position: relative; align-self: flex-start; margin-left: auto; }
+/* El menú de usuario ahora vive en la barra de Hola Apps. */
+#usuario { display: none !important; }
 .mu-btn { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 4px 10px 4px 4px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; font: inherit; transition: border-color 180ms, box-shadow 180ms, transform 180ms; }
 .mu-btn:hover, .mu-btn[aria-expanded="true"] { border-color: var(--brand); box-shadow: 0 0 0 4px var(--brand-soft); }
 .mu-btn:focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
@@ -2091,7 +2093,7 @@ dialog.dlg-land[open] { animation: dlgEntra 320ms cubic-bezier(.2,.8,.2,1); }
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
-<script src="../suite/suite.js?v=2"></script>
+<script src="../suite/suite.js?v=5"></script>
 <script>
 (() => {
 'use strict';
@@ -6142,17 +6144,17 @@ function iniciarLanding() {
   // Entrar/salir son idempotentes: los eventos de Supabase pueden repetirse (por ejemplo, al volver a la pestaña).
   function entrar(session, animado) {
     if (!session || !session.user) return;
-    if (usuario && usuario.id === session.user.id) { usuario = session.user; pintarUsuario(); return; }
+    if (usuario && usuario.id === session.user.id) { usuario = session.user; pintarUsuario(); if (window.Suite) Suite.setUser(usuario, sb); return; }
     if (recuperando) return;
     usuario = session.user;
     const id = usuario.id;
-    usarUsuario(id); pintarUsuario();
+    usarUsuario(id); pintarUsuario(); if (window.Suite) Suite.setUser(usuario, sb);
     setTimeout(() => { if (usuario && usuario.id === id) nubeIniciar(sb, id); }, 0);
     if (!L.hidden) ocultar(animado);
   }
   function salir() {
     if (!usuario) return;
-    usuario = null; usarUsuario(null); pintarUsuario(); mostrar();
+    usuario = null; usarUsuario(null); pintarUsuario(); if (window.Suite) Suite.setUser(null); mostrar();
   }
   if (sb) {
     // Dentro del callback no se llama a Supabase directamente: se difiere con setTimeout.
@@ -6197,4 +6199,10 @@ iniciarDatos();
 iniciarLanding();
 })();
 </script>
-<script>Suite.init({ app: 'precia' });</script>
+<script>
+Suite.init({ app: 'precia', onSignOut: function () { document.getElementById('mu-salir').click(); } });
+Suite.addMenuItems([
+  { label: 'Exportar datos', onClick: function () { document.getElementById('mu-exportar').click(); } },
+  { label: 'Importar datos', onClick: function () { document.getElementById('mu-importar').click(); } }
+]);
+</script>

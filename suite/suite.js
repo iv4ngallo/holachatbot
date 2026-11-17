@@ -1,6 +1,8 @@
 /* Hola Apps · menú de la suite (PrecIA, AgendIA, Organic, Hábitos Atómicos) y acceso compartido con Supabase.
    Uso:  Suite.init({ app:'habitos', gate:true, onUser:function(user, sb){}, onLogout:function(){} })
-   Sin gate solo se muestra el menú superior (PrecIA y Organic ya traen su propio acceso). */
+   Sin gate solo se muestra el menú superior (PrecIA y Organic ya traen su propio acceso); esas apps avisan
+   el usuario con Suite.setUser(user, sb) y la salida con Suite.setUser(null).
+   Suite.addMenuItems([{ label, onClick }]) agrega opciones propias de la app al menú de usuario. */
 (function () {
   'use strict';
   var ICONS = {
@@ -46,7 +48,19 @@
       '</button>' +
       '<span class="suite-marca">Hola Apps</span>' + (actual ? '<span class="suite-actual">· ' + actual.nombre + '</span>' : '') +
       '<span class="suite-sp"></span>' +
-      '<span class="suite-user" id="suite-user" hidden><span class="suite-mail" id="suite-mail"></span><button class="suite-btn" type="button" id="suite-salir">Cerrar sesión</button></span>' +
+      '<span class="suite-user" id="suite-user" hidden>' +
+        '<button class="suite-av-btn" type="button" id="suite-av-btn" aria-haspopup="true" aria-expanded="false" aria-controls="suite-um" aria-label="Menú de usuario"><span class="suite-av" id="suite-av-mini"></span><span class="suite-mail" id="suite-mail"></span></button>' +
+      '</span>' +
+      '<div class="suite-um" id="suite-um" role="menu" hidden>' +
+        '<div class="suite-um-quien"><button type="button" class="suite-av suite-av-grande" id="suite-av-grande" title="Cambiar avatar" aria-label="Cambiar avatar"></button><div class="suite-um-txt"><strong id="suite-um-nombre"></strong><small id="suite-um-correo"></small></div></div>' +
+        '<button type="button" class="suite-um-op" role="menuitem" id="suite-av-cambiar">Cambiar avatar</button>' +
+        '<button type="button" class="suite-um-op" role="menuitem" id="suite-av-quitar" hidden>Quitar avatar</button>' +
+        '<div id="suite-um-extra"></div>' +
+        '<div class="suite-um-sep" role="separator"></div>' +
+        '<button type="button" class="suite-um-op suite-um-salir" role="menuitem" id="suite-salir">Cerrar sesión</button>' +
+        '<p class="suite-um-msg" id="suite-um-msg" role="status" hidden></p>' +
+        '<input type="file" id="suite-av-file" accept="image/png,image/jpeg,image/webp" hidden>' +
+      '</div>' +
       '<div class="suite-pop" id="suite-pop" role="menu" hidden>' +
         APPS.map(function (a) {
           return '<a class="suite-app" role="menuitem" href="' + new URL('../' + a.id + '/', location.href).pathname + '"' + (a.id === app ? ' aria-current="page"' : '') + '>' +
@@ -63,14 +77,106 @@
     });
     document.addEventListener('click', function (e) { if (!pop.hidden && !e.target.closest('.suite-pop') && !e.target.closest('#suite-abrir')) cerrar(false); });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !pop.hidden) { e.stopPropagation(); cerrar(true); } }, true);
-    $('#suite-salir').addEventListener('click', function () { Suite.signOut(); });
+    montarMenuUsuario();
+    pintarUsuario();
     var fit = Suite.opts.fit;
     if (fit) { var st = document.createElement('style'); st.textContent = 'body.suite-on ' + fit + '{height:calc(100% - 44px) !important}'; document.head.appendChild(st); }
+  }
+  /* ---------- menú de usuario y avatar ---------- */
+  var extras = [];
+  function nombreDe(u) { var m = (u && u.user_metadata) || {}; return m.nombre || (u && u.email ? u.email.split('@')[0] : 'Usuario'); }
+  function avatarDe(u) { var m = (u && u.user_metadata) || {}; return typeof m.avatar_url === 'string' && /^https:\/\//.test(m.avatar_url) ? m.avatar_url : ''; }
+  function pintarAvatar(el, u) {
+    if (!el) return;
+    var url = avatarDe(u), ini = nombreDe(u).trim().charAt(0).toUpperCase() || 'U';
+    el.textContent = '';
+    if (url) { var img = document.createElement('img'); img.src = url; img.alt = ''; img.onerror = function () { el.textContent = ini; }; el.appendChild(img); }
+    else el.textContent = ini;
   }
   function pintarUsuario() {
     var u = Suite.user, box = $('#suite-user');
     if (!box) return;
-    box.hidden = !u; $('#suite-mail').textContent = u && u.email ? u.email : '';
+    box.hidden = !u;
+    if (!u) { cerrarMenu(false); return; }
+    $('#suite-mail').textContent = nombreDe(u);
+    $('#suite-um-nombre').textContent = nombreDe(u); $('#suite-um-correo').textContent = u.email || '';
+    pintarAvatar($('#suite-av-mini'), u); pintarAvatar($('#suite-av-grande'), u);
+    $('#suite-av-quitar').hidden = !avatarDe(u);
+  }
+  function pintarExtras() {
+    var box = $('#suite-um-extra'); if (!box) return;
+    box.innerHTML = '';
+    extras.forEach(function (it) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'suite-um-op'; b.setAttribute('role', 'menuitem'); b.textContent = it.label;
+      b.addEventListener('click', function () { cerrarMenu(false); it.onClick(); });
+      box.appendChild(b);
+    });
+  }
+  Suite.addMenuItems = function (items) { extras = extras.concat(items || []); pintarExtras(); };
+  Suite.setUser = function (u, sb) { if (sb) Suite.sb = sb; Suite.user = u || null; pintarUsuario(); };
+  var opsMenu = function () { return [].slice.call(document.querySelectorAll('#suite-um .suite-um-op')).filter(function (b) { return !b.hidden; }); };
+  function abrirMenu(foco) { var m = $('#suite-um'); if (!m) return; m.hidden = false; $('#suite-av-btn').setAttribute('aria-expanded', 'true'); msg(''); if (foco) { var o = opsMenu()[0]; if (o) o.focus(); } }
+  function cerrarMenu(devolver) { var m = $('#suite-um'); if (!m || m.hidden) return; m.hidden = true; $('#suite-av-btn').setAttribute('aria-expanded', 'false'); if (devolver) $('#suite-av-btn').focus(); }
+  function msg(t, error) { var p = $('#suite-um-msg'); if (!p) return; p.textContent = t; p.hidden = !t; p.classList.toggle('error', !!error); }
+  function montarMenuUsuario() {
+    var btn = $('#suite-av-btn'), m = $('#suite-um'), file = $('#suite-av-file');
+    btn.addEventListener('click', function () { if (m.hidden) abrirMenu(false); else cerrarMenu(false); });
+    btn.addEventListener('keydown', function (e) { if (e.key === 'ArrowDown') { e.preventDefault(); abrirMenu(true); } });
+    m.addEventListener('keydown', function (e) {
+      var ops = opsMenu(), i = ops.indexOf(document.activeElement);
+      if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); cerrarMenu(true); }
+      else if (e.key === 'ArrowDown') { e.preventDefault(); ops[(i + 1) % ops.length].focus(); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); ops[(i - 1 + ops.length) % ops.length].focus(); }
+      else if (e.key === 'Tab') cerrarMenu(false);
+    });
+    document.addEventListener('click', function (e) { if (!m.hidden && !e.target.closest('#suite-um') && !e.target.closest('#suite-av-btn')) cerrarMenu(false); });
+    var elegir = function () { file.value = ''; file.click(); };
+    $('#suite-av-cambiar').addEventListener('click', elegir);
+    $('#suite-av-grande').addEventListener('click', elegir);
+    file.addEventListener('change', function () { if (file.files && file.files[0]) subirAvatar(file.files[0]); });
+    $('#suite-av-quitar').addEventListener('click', function () { guardarAvatar('', 'Avatar quitado.'); });
+    $('#suite-salir').addEventListener('click', function () { cerrarMenu(false); Suite.signOut(); });
+    pintarExtras();
+  }
+  /* Recorta al centro y reduce a 256×256 JPEG para que pese poco. */
+  function reducir(f) {
+    return new Promise(function (ok, mal) {
+      var url = URL.createObjectURL(f), img = new Image();
+      img.onload = function () {
+        var s = Math.min(img.naturalWidth, img.naturalHeight), c = document.createElement('canvas'); c.width = c.height = 256;
+        var x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, 256, 256);
+        x.drawImage(img, (img.naturalWidth - s) / 2, (img.naturalHeight - s) / 2, s, s, 0, 0, 256, 256);
+        URL.revokeObjectURL(url);
+        c.toBlob(function (b) { if (b) ok(b); else mal(new Error('canvas')); }, 'image/jpeg', 0.86);
+      };
+      img.onerror = function () { URL.revokeObjectURL(url); mal(new Error('imagen')); };
+      img.src = url;
+    });
+  }
+  var rutaEnBucket = function (url) { var k = '/storage/v1/object/public/avatars/'; var i = (url || '').indexOf(k); return i < 0 ? '' : decodeURIComponent(url.slice(i + k.length).split('?')[0]); };
+  function guardarAvatar(nueva, okMsg) {
+    var sb = Suite.sb, u = Suite.user; if (!sb || !u) return Promise.resolve();
+    var vieja = rutaEnBucket(avatarDe(u));
+    msg('Guardando…');
+    return sb.auth.updateUser({ data: { avatar_url: nueva } }).then(function (r) {
+      if (r.error) throw r.error;
+      Suite.user = r.data.user; pintarUsuario(); msg(okMsg);
+      if (vieja && vieja.indexOf(u.id + '/') === 0) sb.storage.from('avatars').remove([vieja]).catch(function () {});
+    }).catch(function (e) { console.warn('Hola Apps: no se pudo guardar el avatar', e); msg('No se pudo guardar el avatar. Inténtalo de nuevo.', true); });
+  }
+  function subirAvatar(f) {
+    var sb = Suite.sb, u = Suite.user; if (!sb || !u) return;
+    if (!/^image\/(png|jpeg|webp)$/.test(f.type)) { msg('Usa una imagen JPG, PNG o WebP.', true); return; }
+    if (f.size > 10 * 1024 * 1024) { msg('La imagen pesa más de 10 MB.', true); return; }
+    msg('Subiendo…');
+    reducir(f).then(function (blob) {
+      var ruta = u.id + '/avatar-' + Date.now() + '.jpg';
+      return sb.storage.from('avatars').upload(ruta, blob, { contentType: 'image/jpeg', cacheControl: '31536000', upsert: false }).then(function (r) {
+        if (r.error) throw r.error;
+        var pub = sb.storage.from('avatars').getPublicUrl(ruta).data.publicUrl;
+        return guardarAvatar(pub, 'Avatar actualizado.');
+      });
+    }).catch(function (e) { console.warn('Hola Apps: no se pudo subir el avatar', e); msg('No se pudo subir la imagen. Inténtalo de nuevo.', true); });
   }
 
   /* ---------- acceso ---------- */
@@ -166,6 +272,7 @@
     mostrar('login');
   }
   Suite.signOut = function () {
+    if (!Suite.opts.gate) { if (Suite.opts.onSignOut) Suite.opts.onSignOut(); else if (Suite.sb) Suite.sb.auth.signOut({ scope: 'local' }).catch(function () {}); return; }
     var fin = function () { salir(); };
     if (!Suite.sb) { fin(); return; }
     Promise.resolve(Suite.sb.auth.signOut({ scope: 'local' })).catch(function () {}).then(fin);
