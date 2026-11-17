@@ -48,6 +48,7 @@
       '</button>' +
       '<span class="suite-marca">Hola Apps</span>' + (actual ? '<span class="suite-actual">· ' + actual.nombre + '</span>' : '') +
       '<span class="suite-sp"></span>' +
+      '<a class="suite-btn suite-sky" href="/skyport/" title="Ir a Sky Port"><span class="suite-sky-dot" aria-hidden="true"></span>Sky Port</a>' +
       '<span class="suite-user" id="suite-user" hidden>' +
         '<button class="suite-av-btn" type="button" id="suite-av-btn" aria-haspopup="true" aria-expanded="false" aria-controls="suite-um" aria-label="Menú de usuario"><span class="suite-av" id="suite-av-mini"></span><span class="suite-mail" id="suite-mail"></span></button>' +
       '</span>' +
