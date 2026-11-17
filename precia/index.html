@@ -2583,12 +2583,6 @@ const CATALOGO_COMPRAS = [
 ];
 const EJEMPLO_COMPRAS = ['camisetas', 'jeans', 'tenis', 'vasos-cristal', 'vajilla', 'cojines', 'lampara', 'sabanas', 'toallas', 'audifonos'];
 
-const LISTA_INICIAL = [
-  ['arroz', 'Arroz', 2, 'kg', 'despensa'], ['leche', 'Leche entera', 4, 'L', 'lacteos'], ['huevos', 'Huevos', 30, 'und', 'lacteos'],
-  ['aceite', 'Aceite vegetal', 1, 'L', 'despensa'], ['cafe', 'Café molido', 500, 'g', 'despensa'], ['banano', 'Bananos', 6, 'und', 'frutas'],
-  ['frijol', 'Fríjol', 1, 'kg', 'despensa'], ['panela', 'Panela', 2, 'und', 'despensa'],
-];
-
 /* =========================================================
    UTILIDADES
    ========================================================= */
@@ -2874,12 +2868,12 @@ function guardar() {
   nubeProgramar();
 }
 function estadoInicial() {
-  const id = uid();
+  // Cuenta nueva: sin listas. La pantalla vacía ofrece crear una lista vacía o una de ejemplo.
   return {
-    activa: id,
+    activa: null,
     ciudad: 'Ibagué',
     ejemploVisto: false,
-    listas: [{ id, nombre: 'Mercado de la semana', tipo: 'mercado', mes: mesActual(), cerrada: false, ejemplo: true, items: LISTA_INICIAL.map(([key, nombre, cantidad, unidad, cat]) => ({ id: uid(), key, nombre, cantidad, unidad, cat, comprado: false })) }],
+    listas: [],
     cats: catsPredeterminadas(),
     catsBaseV: 3,
     colapsadas: [],
