@@ -15,19 +15,23 @@ html,body{margin:0;height:100%;background:var(--ink);color:var(--w);font-family:
 button{font:inherit;color:inherit;cursor:pointer}
 a{color:inherit;text-decoration:none}
 body::before{content:"";position:fixed;inset:0;background:linear-gradient(180deg,#01040F 0%,#061246 40%,#0F2E9C 78%,#2455FF 100%);z-index:0}
-#gate{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:20px;background:radial-gradient(90% 70% at 50% 40%,#0D2A8C 0%,#061246 45%,#020718 100%)}
-html.gated #gate{display:flex}
-html.gated body>*:not(#gate):not(script){visibility:hidden}
-#gate form{width:min(400px,100%);border:1px solid var(--line);border-top:3px solid var(--y);background:rgba(3,10,40,.85);padding:26px 24px 22px}
-#gate h2{margin:0 0 4px;font:900 34px/1 var(--cond);letter-spacing:.04em;text-transform:uppercase;font-style:italic}
-#gate p{margin:0 0 18px;font:600 11px/1.3 var(--cond);letter-spacing:.24em;text-transform:uppercase;color:var(--dim)}
-#gate label{display:block;margin:0 0 5px;font:700 10px/1 var(--cond);letter-spacing:.24em;text-transform:uppercase;color:var(--dim)}
-#gate input{box-sizing:border-box;width:100%;margin:0 0 14px;padding:11px 12px;background:#020A28;color:#fff;border:1px solid var(--line);font:500 15px var(--sans);outline:none}
-#gate input:focus{border-color:var(--y)}
-#gate button{all:unset;box-sizing:border-box;width:100%;height:48px;display:flex;align-items:center;justify-content:center;background:var(--y);color:#02081f;font:800 16px/1 var(--cond);letter-spacing:.28em;text-transform:uppercase;font-style:italic;cursor:pointer;clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,14px 100%,0 calc(100% - 14px))}
-#gate button:hover,#gate button:focus-visible{background:#fff}
-#gate button[disabled]{opacity:.5;pointer-events:none}
-#gate .er{min-height:18px;margin:12px 0 0;font:600 12px/1.3 var(--cond);letter-spacing:.12em;text-transform:uppercase;color:var(--r)}
+#gForm{display:none;margin:0}
+html.gated #gForm{display:block}
+html.gated #go{display:none}
+html.gated .log{height:58px}
+#gForm .gr{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+#gForm input{box-sizing:border-box;width:100%;height:44px;padding:0 12px;background:rgba(2,10,40,.85);color:#fff;border:1px solid var(--line);font:500 15px var(--sans);outline:none;border-radius:0}
+#gForm input::placeholder{color:#6F83BD;letter-spacing:.08em;text-transform:uppercase;font:600 12px var(--cond)}
+#gForm input:focus{border-color:var(--y)}
+#gBt{all:unset;box-sizing:border-box;width:100%;height:58px;display:flex;align-items:center;justify-content:center;background:var(--y);color:#02081f;font:800 20px/1 var(--cond);letter-spacing:.3em;text-transform:uppercase;font-style:italic;cursor:pointer;clip-path:polygon(0 0,calc(100% - 18px) 0,100% 18px,100% 100%,18px 100%,0 calc(100% - 18px))}
+#gBt:hover,#gBt:focus-visible{background:#fff}
+#gBt:active{background:var(--r);color:#fff}
+#gBt[disabled]{opacity:.5;pointer-events:none}
+#gForm .er{min-height:16px;margin:8px 0 0;font:600 11px/1.3 var(--cond);letter-spacing:.14em;text-transform:uppercase;color:var(--r);text-align:center}
+#splash:not(.ready) #gForm{opacity:.3;pointer-events:none}
+#gForm{animation:spi .8s cubic-bezier(.2,.7,.2,1) 2.1s backwards}
+@media(max-width:560px){#gForm .gr{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){#gForm{animation:none!important}}
 #cdn{right:20px;top:calc(70px + var(--sat));display:flex;align-items:center;gap:10px;padding:6px 12px;border:1px solid var(--line);border-right:2px solid var(--y);background:rgba(3,10,40,.7);backdrop-filter:blur(8px);pointer-events:none;z-index:6}
 #cdn .cdp{width:7px;height:7px;background:var(--y);transform:rotate(45deg);flex:none;animation:cdp 2.4s ease-in-out infinite}
 @keyframes cdp{0%,100%{opacity:.5}50%{opacity:1;box-shadow:0 0 8px var(--y)}}
@@ -419,12 +423,12 @@ label.f textarea{min-height:76px;resize:vertical}
   <div class="log" id="log"></div>
   <div class="pb"><i id="pbi"></i></div>
   <div class="pct"><span id="pst">Iniciando</span><span id="ppc">000%</span></div>
+  <form id="gForm" autocomplete="on"><div class="gr"><input id="gEm" type="email" name="email" autocomplete="username" placeholder="Correo" aria-label="Correo" required><input id="gPw" type="password" name="password" autocomplete="current-password" placeholder="Contraseña" aria-label="Contraseña" required></div><button id="gBt" type="submit">Ingresar</button><div class="er" id="gEr" role="alert"></div></form>
   <button id="go" type="button">Viajar al Sky Port</button>
   <div class="sn">Viaje al núcleo de TEGC Sky Port · mundo 3D y audio ambiental</div>
  </div>
 </div>
 <div id="cdn" class="hud" aria-live="off"><span class="cdp"></span><div class="cdx"><div id="cdL">Próximo fenómeno natural</div><div id="cdK">&nbsp;</div></div><b id="cdT">--:--</b></div>
-<div id="gate" role="dialog" aria-label="Iniciar sesión"><form id="gForm" autocomplete="on"><h2>TEGC Sky Port</h2><p>Acceso privado</p><label for="gEm">Correo</label><input id="gEm" type="email" name="email" autocomplete="username" required><label for="gPw">Contraseña</label><input id="gPw" type="password" name="password" autocomplete="current-password" required><button id="gBt" type="submit">Ingresar</button><div class="er" id="gEr" role="alert"></div></form></div>
 <div id="flash"></div>
 <div id="toast" role="status"></div>
 
@@ -545,6 +549,7 @@ function setSync(m){syncMode=m;var el=$('#adm .sync');if(!el)return;var T={db:['
 })();
 
 /* ---------- acceso privado (Supabase, opcional) ---------- */
+var splashGo=null;
 (function(){
  var cfg=window.SKYPORT_CFG;
  if(!cfg||!cfg.url||!cfg.anon)return;
@@ -580,7 +585,7 @@ function setSync(m){syncMode=m;var el=$('#adm .sync');if(!el)return;var T={db:['
   sb.auth.signInWithPassword({email:$('#gEm').value.trim(),password:$('#gPw').value}).then(function(r){
    gBt.disabled=false;
    if(r.error){gEr.textContent='Correo o contraseña incorrectos';return}
-   $('#gPw').value='';begin();
+   $('#gPw').value='';begin();if(splashGo)splashGo();
   },function(){gBt.disabled=false;gEr.textContent='No hay conexión con el servicio. Intenta de nuevo.'});
  });
  sb.auth.getSession().then(function(r){if(r.data&&r.data.session)begin()});
@@ -1333,8 +1338,9 @@ var LOG=['Inicializando núcleo TEGC','Cargando vectores de proyecto','Sincroniz
   pb.style.width=(pe*100)+'%';pc.textContent=('00'+Math.round(pe*100)).slice(-3)+'%';
   var want=Math.min(LOG.length,Math.floor(pe*LOG.length)+(p>=1?1:0));
   while(shown<want){var d=document.createElement('div');d.textContent=LOG[shown++];lg.appendChild(d);lg.scrollTop=lg.scrollHeight}
-  if(p<1)requestAnimationFrame(step);else{ps.textContent='Listo';sp.classList.add('ready');$('#go').focus({preventScroll:true})}
+  if(p<1)requestAnimationFrame(step);else{ps.textContent='Listo';sp.classList.add('ready');(document.documentElement.classList.contains('gated')?$('#gEm'):$('#go')).focus({preventScroll:true})}
  })();
+ splashGo=null;
  var armed=false,core=$('#core'),dot=$('#dot'),dbl=$('#dotbl'),sIn=sp.querySelector('.sp-in'),sH=sp.querySelector('h2');
  function placeCore(){if(armed||sp.style.display==='none')return;var r=dot.getBoundingClientRect(),b=dbl.getBoundingClientRect(),s=sIn.getBoundingClientRect(),F=parseFloat(getComputedStyle(sH).fontSize)||120;
   sIn.style.setProperty('--F',F+'px');core.style.left=(r.left+r.width/2-s.left)+'px';core.style.top=(b.bottom-F*.075-s.top)+'px'}
@@ -1352,8 +1358,9 @@ var LOG=['Inicializando núcleo TEGC','Cargando vectores de proyecto','Sincroniz
   setTimeout(function(){sp.style.display='none';fl.classList.remove('go')},1600);
   if(userPaused){wanted=false;plS.textContent='En pausa · tú lo pausaste'}else play();
  }
+ splashGo=activate;
  $('#go').addEventListener('click',activate);
- addEventListener('keydown',function(e){if((e.key==='Enter'||e.key===' ')&&sp.style.display!=='none'&&sp.classList.contains('ready')){e.preventDefault();activate()}});
+ addEventListener('keydown',function(e){if((e.key==='Enter'||e.key===' ')&&sp.style.display!=='none'&&sp.classList.contains('ready')&&!document.documentElement.classList.contains('gated')){e.preventDefault();activate()}});
 })();
 
 /* ---------- administración (CRUD) ---------- */
