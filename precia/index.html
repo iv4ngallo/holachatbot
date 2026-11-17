@@ -1716,7 +1716,6 @@ dialog.dlg-land[open] { animation: dlgEntra 320ms cubic-bezier(.2,.8,.2,1); }
         </div>
       </div>
       <div class="cats" id="items" aria-label="Productos de la lista por categoría"></div>
-      <p class="nota-ejemplo" id="nota-ejemplo" hidden><svg class="i" aria-hidden="true" style="width:16px;height:16px"><use href="#i-info"/></svg>Esta es una lista de ejemplo. Edítala o crea una propia.</p>
       <p class="aviso-local" id="aviso-local" hidden>Este navegador no permite guardar datos. Tus cambios se perderán al recargar.</p>
       </section>
     </div>
@@ -3622,14 +3621,13 @@ function renderLista() {
     setTimeout(() => { const [x, y] = centro($('#barra')); estallido(x, y, { n: 40, dist: 140, dur: 1100, gravedad: 90 }); anunciar('¡Lista completa! Compraste todo.'); }, 350);
   }
   ui.pctPrevio = pct; ui.listaPrevia = lista.id;
-  $('#nota-ejemplo').hidden = !lista.ejemplo;
   renderTotalPrecios();
 
   const cerr = !!lista.cerrada;
   $('#switch-comprar').hidden = cerr;
   ['.filtros', '.vista-bar', '#items'].forEach((sel) => { const e = $('#seccion-lista ' + sel); if (e) e.hidden = cerr; });
   $('#resumen-cerrada').hidden = !cerr;
-  if (cerr) { $('#nota-ejemplo').hidden = true; renderResumenCerrada(lista); return; }
+  if (cerr) { renderResumenCerrada(lista); return; }
 
   document.querySelectorAll('#vista-toggle button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.vista === estado.vista)));
   const q = norm(ui.busqueda);
