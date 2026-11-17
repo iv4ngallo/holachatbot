@@ -454,69 +454,22 @@ var GR={core:{n:'Núcleo',c:'#FFFFFF',h:0xffffff},ing:{n:'Business',c:'#FFC700',
 var STS={'Activo':'#FFFFFF','En desarrollo':'#FFC700','Pendiente':'#FF3B3B','Provisional':'#6F83BD'};
 var AR='https://claude.ai/artifact/';
 function N(id,name,group,kind,desc,status,url,feat,subs,rel){return{id:id,name:name,group:group,kind:kind,desc:desc,status:status,url:url||'',feat:!!feat,subs:subs||[],rel:rel||[]}}
-var LDESC='Línea de negocio del TEGC - BGS. Completa la descripción y asigna el enlace desde Administrar.';
-var PROV='Línea provisional del HUB. Ajusta el nombre y la descripción desde el panel de administración.';
-var BD={lineas:'system',tegc:'sun',hub:'galaxy',shifter:'planet',presup:'planet',apps:'system',dojo:'system',praes:'planet',undead:'planet',seishin:'planet',organic:'planet',precia:'planet',agendia:'planet',holachatbot:'planet',habitos:'planet',xnoleet:'star',ivan:'star','w-tegc':'station','w-dojo':'station','w-xno':'station'};
-var PD={praes:'dojo',undead:'dojo',seishin:'dojo',organic:'apps',precia:'apps',agendia:'apps',holachatbot:'apps',habitos:'apps',presup:'apps','w-tegc':'tegc','w-dojo':'dojo','w-xno':'xnoleet'};
-PD.hub='tegc';PD.dojo='tegc';PD.shifter='tegc';PD.apps='tegc';PD.lineas='tegc';['02','03','04','05','06','07','08','10','11','12','13','14'].forEach(function(x){PD['l'+x]='lineas';BD['l'+x]='planet'});
+var BD={};
+var PD={};
 var BODIES={sun:'Sol',giant:'Planeta con anillos',planet:'Planeta',asteroid:'Asteroide (cinturón)',star:'Estrella',galaxy:'Galaxia',system:'Sistema solar anexo',station:'Estación espacial'};
 var SKY={name:'Sky Port',url:'audio/sky-port.mp3'};
 function autoBody(n){if(BD[n.id])return BD[n.id];if(/^l\d\d$/.test(n.id))return 'planet';return n.group==='core'?'sun':n.group==='id'?'star':n.group==='web'?'station':'planet'}
-function byd9(id){var r=null;defaults().nodes.forEach(function(x){if(x.id===id)r=x});return r}
-function fixLines(nodes){var ids=['lineas','l02','l03','l04','l05','l06','l07','l08','l10','l11','l12','l13','l14'],ex=[],rest=nodes.filter(function(n){return ids.indexOf(n.id)<0});ids.forEach(function(i){nodes.forEach(function(n){if(n.id===i)ex.push(n)})});var pos=rest.length;rest.forEach(function(n,i){if(n.id==='presup')pos=i+1});Array.prototype.splice.apply(rest,[pos,0].concat(ex));return rest}
-function fixOrder(nodes){var ids=['organic','holachatbot','precia','agendia','habitos','presup'],ex=[],rest=nodes.filter(function(n){return ids.indexOf(n.id)<0});ids.forEach(function(i){nodes.forEach(function(n){if(n.id===i)ex.push(n)})});var pos=0;rest.forEach(function(n,i){if(n.id==='apps')pos=i+1});if(!pos)pos=rest.length;Array.prototype.splice.apply(rest,[pos,0].concat(ex));return rest}
+function fixLines(nodes){return nodes}
+function fixOrder(nodes){return nodes}
 function defaults(){var d=defaults0();d.nodes=fixLines(fixOrder(d.nodes));d.nodes.forEach(function(n){n.body=autoBody(n);n.parent=PD[n.id]||''});return d}
 function defaults0(){return{v:10,rev:0,tracks:[{name:SKY.name,url:SKY.url}],nodes:[
- N('tegc','TEGC Sky Port','core','Núcleo del HUB','Centro de mando que conecta los proyectos personales, profesionales y comerciales de TEGC.','Activo','',true,[],['xnoleet','ivan','w-tegc']),
- N('hub','TEGC - BGS','ing','Galaxia · Business GTM Strategy','Estrategia de negocio y GTM de TEGC Sky Port. Se relaciona con Dôjo, Shifter, Apps y Líneas de negocio.','En desarrollo',AR+'HTvZTA4byZ3uyxAoL5TGag',true,[],['dojo','shifter','apps','lineas']),
- N('dojo','Dôjo · Universo Præstantia','ing','Sistema solar anexo · Sol: Universo Præstantia','Pequeño sistema planetario de Dôjo. Su sol es Universo Præstantia (menú cinematográfico) y tres planetas orbitan a su alrededor, uno por cada serie del universo.','En desarrollo',AR+'R2SXaEVe9V4AKVtNKBHC4Q',true,['Præstantia','Undead Society','Seishin'],[]),
- N('praes','Præstantia','ing','Serie · Planeta de Universo Præstantia','Era Præs. El origen: el experimento ATP del «soldado perfecto» y la primera IA del universo.','En desarrollo',AR+'H23bhwgkT2w5KKT9j6oA9s',false,[],['dojo']),
- N('undead','Undead Society','ing','Serie · Planeta de Universo Præstantia','Tras el segundo brote. Un reality show de contención de brotes, con Etherline y la Iglesia de la Expiación.','En desarrollo',AR+'UHWFSYgoVQgyBQ9tNEgXBu',false,[],['dojo']),
- N('seishin','Seishin','ing','Serie · Planeta de Universo Præstantia','Proyección futura. Vestigios biorobóticos, redes de IA y hegemonías posthumanas.','En desarrollo',AR+'HzCsxsHKCaVU5L7eiHGWbs',false,[],['dojo']),
- N('shifter','Shifter','ing','Línea 02 · Destacada','Línea de ingresos propia dentro del HUB, documentada junto al portafolio de proyectos.','En desarrollo',AR+'1jkZmEhH7DvNwd24BhSzXe',true,[],[]),
- N('presup','Presupuesto personal','ing','Línea 03 · Destacada','Control del presupuesto personal que respalda la estrategia de ingresos.','Activo',AR+'PppGsuqoX8Y11fTXMkNzg5',true,[],[]),
- N('apps','Apps','ing','Sistema solar anexo · Línea 04','Familia de aplicaciones propias del HUB. Su sol es Apps y cuatro planetas orbitan a su alrededor: Organic, PrecIA, AgendIA y Hola Chatbot.','En desarrollo','',true,['Organic','PrecIA','AgendIA','Hola Chatbot','Hábitos Atómicos'],[]),
- N('organic','Organic','ing','App · Planeta de Apps','Primera app de la familia Apps.','En desarrollo','',false,[],['apps']),
- N('precia','PrecIA','ing','App · Planeta de Apps','App de la familia Apps. Se conectará con AgendIA y Hola Chatbot.','En desarrollo','',false,[],['apps','agendia','holachatbot']),
- N('habitos','Hábitos Atómicos','ing','App · Planeta de Apps','App de la familia Apps enfocada en construir hábitos.','En desarrollo','',false,[],['apps']),
- N('agendia','AgendIA','ing','App · Planeta de Apps','App de la familia Apps. Se conectará con PrecIA y Hola Chatbot.','En desarrollo','',false,[],['apps','holachatbot']),
- N('holachatbot','Hola Chatbot','ing','App · Planeta de Apps','App de la familia Apps. Se conectará con PrecIA y AgendIA.','En desarrollo','',false,[],['apps']),
- N('lineas','Líneas de negocio','ing','Sistema solar anexo · Líneas 02 a 14','Sistema anexo dentro del TEGC - BGS. Reúne las líneas de negocio 02 a 14 como planetas que orbitan a su alrededor.','En desarrollo','',true,[],[]),
- N('l02','Línea 02 · Redes: contenido de niños y ciencia','ing','Línea 02 · Planeta de Líneas de negocio',LDESC,'Pendiente','',false,[],[]),
- N('l03','Línea 03 · Encendedores y personalizables','ing','Línea 03 · Planeta de Líneas de negocio',LDESC,'Pendiente','',false,[],['shifter']),
- N('l04','Línea 04 · Artículos de pole dance','ing','Línea 04 · Planeta de Líneas de negocio',LDESC,'Pendiente','',false,[],[]),
- N('l05','Línea 05 · Juguetería y bebés','ing','Línea 05 · Planeta de Líneas de negocio',LDESC,'Pendiente','',false,[],[]),
- N('l06','Línea 06 · Charlas y Mentorías','ing','Línea 06 · Planeta de Líneas de negocio',LDESC,'Pendiente','',false,[],[]),
- N('l07','Línea 07 · Grupo Diseño UI/UX en Facebook','ing','Línea 07 · Planeta de Líneas de negocio',LDESC,'Pendiente','',false,[],[]),
- N('l08','Línea 08 · Arte digital en vectores, xNoleet','ing','Línea 08 · Planeta de Líneas de negocio',LDESC,'Pendiente','',false,[],[]),
- N('l10','Línea 10 · Chatter','ing','Línea 10 · Planeta de Líneas de negocio',LDESC,'Pendiente','',false,[],[]),
- N('l11','Línea 11 · Dulcería','ing','Línea 11 · Planeta de Líneas de negocio',LDESC,'Pendiente','',false,[],[]),
- N('l12','Línea 12 · Portafolio de Diseño','ing','Línea 12 · Planeta de Líneas de negocio',LDESC,'Pendiente','',false,[],['ivan']),
- N('l13','Línea 13 · Sistema de Estrategia GTM','ing','Línea 13 · Planeta de Líneas de negocio',LDESC,'Pendiente','',false,[],['apps']),
- N('l14','Línea 14 · Comentario de historias virales','ing','Línea 14 · Planeta de Líneas de negocio',LDESC,'Pendiente','',false,[],[]),
- N('xnoleet','xNoleet portafolio','id','Identidad profesional','Portafolio profesional de xNoleet, relacionado con el TEGC - BGS.','En desarrollo','',true,[],[]),
- N('ivan','Iván Gallo','id','Identidad profesional','Perfil profesional de Iván Gallo, consultor estratégico y gerente de proyectos, relacionado con las Apps.','Activo',AR+'HJezxFXrJ88nhXpAZuSmxJ',true,[],['apps']),
- N('w-tegc','Website · TEGC','web','Website','Sitio web principal de TEGC.','Pendiente','',false,[],['tegc']),
- N('w-dojo','Website · Dôjo','web','Website','Sitio web de Dôjo con el menú cinematográfico del Universo Præstantia.','En desarrollo',AR+'R2SXaEVe9V4AKVtNKBHC4Q',false,[],['dojo']),
- N('w-xno','Website · xNoleet portafolio','web','Website','Sitio web del portafolio de xNoleet.','Pendiente','',false,[],['xnoleet'])
+ N('tegc','Sky Port','core','Núcleo','Inicia sesión y carga tus datos desde Administrar.','Activo','',true,[],[])
 ]}}
 var LSK='tegc-hub-v1';
 function sane(d){
  if(!d||!Array.isArray(d.nodes)||!d.nodes.length)return null;
  var ids={};var nodes=[];
  d.nodes.forEach(function(n){if(!n||!n.id||ids[n.id])return;ids[n.id]=1;nodes.push({id:String(n.id).slice(0,60),name:String(n.name||'Sin nombre').slice(0,90),group:GR[n.group]?n.group:'ing',kind:String(n.kind||'').slice(0,80),desc:String(n.desc||'').slice(0,600),status:STS[n.status]?n.status:'Provisional',url:/^https?:\/\//i.test(n.url||'')?String(n.url).slice(0,500):'',body:BODIES[n.body]?n.body:autoBody(n),parent:String(n.parent||'').slice(0,60),feat:!!n.feat,subs:(Array.isArray(n.subs)?n.subs:[]).map(function(s){return String(s).slice(0,40)}).slice(0,12),rel:(Array.isArray(n.rel)?n.rel:[]).map(String)})});
- if((+d.v||1)<3){defaults().nodes.forEach(function(df){if(PD[df.id]&&!ids[df.id]){ids[df.id]=1;nodes.push(df)}});nodes.forEach(function(n){if(n.id==='apps')n.body='system';if(n.id==='dojo'){n.body='system';if(n.url===AR+'H23bhwgkT2w5KKT9j6oA9s')n.url=AR+'R2SXaEVe9V4AKVtNKBHC4Q'}if(PD[n.id]&&!n.parent)n.parent=PD[n.id]})}
- if((+d.v||1)<4){nodes.forEach(function(n){if(BD[n.id])n.body=BD[n.id];if(PD[n.id])n.parent=PD[n.id];if(n.id==='hub')n.rel=(n.rel||[]).filter(function(r){return PD[r]!=='hub'})})}
- if((+d.v||1)<5){nodes.forEach(function(n){if(n.id==='hub'&&n.name==='HUB Estrategia Ingresos Personales')n.name='TEGC - BGS'})}
- if((+d.v||1)<6){nodes.forEach(function(n){if(n.id==='presup')n.parent='apps'});nodes=fixOrder(nodes)}
- if((+d.v||1)<7){var DF=defaults().nodes,byd={};DF.forEach(function(x){byd[x.id]=x});
-  nodes=nodes.filter(function(n){return !(n.id==='l09'&&n.status==='Provisional')});
-  nodes.forEach(function(n){var df=byd[n.id];if(/^l\d\d$/.test(n.id)&&df){if(n.status==='Provisional'&&n.desc===PROV){n.name=df.name;n.kind=df.kind;n.desc=df.desc;n.status=df.status;n.rel=df.rel.slice()}n.body='planet';n.parent='lineas'}if(n.id==='hub'&&/^Estrategia central de ingresos/.test(n.desc)){n.desc=byd.hub.desc;n.kind=byd.hub.kind}});
-  var have={};nodes.forEach(function(n){have[n.id]=1});DF.forEach(function(df){if((df.id==='lineas'||/^l\d\d$/.test(df.id))&&!have[df.id]){nodes.push(df);have[df.id]=1}});
-  nodes=fixLines(nodes)}
- if((+d.v||1)<8){var HR=['dojo','shifter','apps','lineas'];nodes.forEach(function(n){if(n.id==='tegc'&&n.name==='TEGC')n.name='TEGC Sky Port';if(n.id==='hub'){n.parent='tegc';n.rel=HR.slice()}else n.rel=(n.rel||[]).filter(function(r){return r!=='hub'||HR.indexOf(n.id)>-1})})}
- if((+d.v||1)<9){var OLD='HUB TEGC Business '+'GTM Strategy';nodes.forEach(function(n){if(['dojo','shifter','apps','lineas'].indexOf(n.id)>-1)n.parent='tegc';if(n.id==='hub'){if(n.name===OLD)n.name='TEGC - BGS';if(/^Galaxia central del HUB TEGC/.test(n.desc)){n.desc=byd9('hub').desc;n.kind=byd9('hub').kind}}[['name'],['kind'],['desc']].forEach(function(k){if(typeof n[k[0]]==='string')n[k[0]]=n[k[0]].split(OLD).join('TEGC - BGS')})})}
- if((+d.v||1)<10){var hh=null;defaults().nodes.forEach(function(x){if(x.id==='habitos')hh=x});if(hh&&!ids.habitos){ids.habitos=1;nodes.push(hh)}nodes.forEach(function(n){if(n.id==='habitos')n.parent='apps';if(n.id==='apps'&&n.subs.indexOf('Hábitos Atómicos')<0)n.subs=n.subs.concat(['Hábitos Atómicos'])});nodes=fixOrder(nodes)}
  var tr=(Array.isArray(d.tracks)?d.tracks:[]).filter(function(t){return t&&t.url}).map(function(t){return{name:String(t.name||'Pista').slice(0,60),url:String(t.url).slice(0,300)}}).slice(0,30);
  if(!tr.some(function(x){return x.url===SKY.url}))tr.unshift({name:SKY.name,url:SKY.url});
  return{v:10,rev:+d.rev||0,tracks:tr,nodes:nodes};
@@ -646,7 +599,7 @@ function bandTex(col,seed){var c=document.createElement('canvas');c.width=256;c.
  for(y=0;y<128;y+=4){var cc=clampC(col.clone().multiplyScalar(.5+R()*.65));x.fillStyle='#'+cc.getHexString();x.fillRect(0,y,256,4)}
  for(i=0;i<28;i++){x.fillStyle='rgba(255,255,255,'+(R()*.13).toFixed(3)+')';x.beginPath();x.ellipse(R()*256,R()*128,6+R()*24,2+R()*5,0,0,6.283);x.fill()}
  return new THREE.CanvasTexture(c)}
-var SERIES={praes:0x00B4FF,undead:0xFF3B3B,seishin:0xFFCC00,organic:0x5CE6A8,precia:0x4C7BFF,agendia:0xFFC700,holachatbot:0xFF3B3B,habitos:0xB58CFF};
+function hid(x){var h=5381,i;for(i=0;i<x.length;i++)h=((h<<5)+h+x.charCodeAt(i))>>>0;return h.toString(36)}var SERIES={'4hgctc':0x00B4FF,'93iat2':0xFF3B3B,'12or8mw':0xFFCC00,'wncnyg':0x5CE6A8,'5xunzt':0x4C7BFF,'alnz8u':0xFFC700,'i71uxa':0xFF3B3B,'e3rs4v':0xB58CFF};
 var FD={sun:13,giant:7,planet:4.6,asteroid:3.2,star:5.5,galaxy:9,system:7.6,station:3.4};
 function bodyVisual(o){
  var n=o.n,b=o.body,col=o.col,g=new THREE.Group(),sz=o.size,R=rnd(Math.floor(hsh(n.id)*99999)+7),i;
@@ -706,7 +659,7 @@ function rebuild(){
  list.forEach(function(pr){
   var n=pr.n,par=pr.par,b=n.body,gg=GR[n.group],h1=hsh(n.id),h2=hsh(n.id+'x');
   var pb=par?byId(par).body:'',hk=S.nodes.some(function(m){return m.parent===n.id});
-  var colHex=SERIES[n.id]!=null&&par?SERIES[n.id]:gg.h;
+  var colHex=SERIES[hid(n.id)]!=null&&par?SERIES[hid(n.id)]:gg.h;
   var o={n:n,idx:idx++,body:b,col:new THREE.Color(colHex),par:par,depth:pr.d,pos:new THREE.Vector3(),q:new THREE.Quaternion(),r:0,w:0,ph:0,g:0,s:1,vis:par?0:1,vt:1};
   if(b==='sun'){o.r=0}
   else if(par&&b==='asteroid'){var a0=ai++;o.r=pb==='galaxy'?OBJ[par].size*1.3+.3+(a0%3)*.45:1.8+(a0%3)*.4;o.ph=a0/Math.max(1,nA)*6.283;o.w=.011}
@@ -1394,7 +1347,7 @@ function admRender(){
     +'<label class="f f1">Incluye (separado por comas)<input id="fB" value="'+esc((cur.subs||[]).join(', '))+'"></label>'
     +'<label class="f"><span style="display:flex;align-items:center;gap:8px;margin-top:6px"><input type="checkbox" id="fF" style="width:auto;margin:0"'+(cur.feat?' checked':'')+'> Destacado</span></label></div>'
     +'<div class="f1" style="margin-top:14px"><label class="f">Vínculos con otros nodos</label><div class="rels">'+(rels||'<span class="note">Aún no hay otros nodos.</span>')+'</div></div>'
-    +'<div class="btns"><button class="btn p" type="button" data-a="save">'+(admDraft?'Crear nodo':'Guardar cambios')+'</button>'+(admDraft?'':'<button class="btn d" type="button" data-a="del">Eliminar</button>')+'<button class="btn" type="button" data-a="reset">Restablecer valores</button></div>'
+    +'<div class="btns"><button class="btn p" type="button" data-a="save">'+(admDraft?'Crear nodo':'Guardar cambios')+'</button>'+(admDraft?'':'<button class="btn d" type="button" data-a="del">Eliminar</button>')+'</div>'
     +'<p class="note">Cada cambio actualiza el mapa de inmediato. El primer nodo de Ingresos es el centro del grupo.</p></div>';
   }else h+='<div class="frm"><p class="note">No hay nodos. Crea el primero.</p></div>';
   h+='</div>';
