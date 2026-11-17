@@ -1762,7 +1762,7 @@ dialog.dlg-land[open] { animation: dlgEntra 320ms cubic-bezier(.2,.8,.2,1); }
       <div id="cmp-resultado" class="solo-mercado" aria-live="polite"></div>
       </div>
       <div class="cmp-overlay" id="cmp-overlay" role="note">
-        <div class="cmp-overlay-card"><span class="cmp-overlay-ico" aria-hidden="true"><svg class="i"><use href="#i-lock"/></svg></span><strong>Bloqueado</strong><span>Disponible con Premium</span></div>
+        <div class="cmp-overlay-card"><span class="cmp-overlay-ico" aria-hidden="true"><svg class="i"><use href="#i-lock"/></svg></span><strong>Bloqueado</strong><span>Próximamente</span></div>
       </div>
       </div>
     </div>
@@ -3443,13 +3443,16 @@ function renderTodo() {
   $('#comparador').hidden = false;
   renderTabs(); renderLista(); renderComparadorSeleccion(); renderBarra(); pintarFormCat(); aplicarModoPanel(); renderBtnInsights();
 }
-// Premium (simulado): bloquea el comparador hasta activar un plan.
+// Comparación de precios y «Obtener precios»: bloqueadas por ahora (dependen de servicios que aún no están conectados).
+// Para habilitarlas de nuevo, cambia esta constante a false.
+const PRECIOS_BLOQUEADOS = true;
+// Premium (simulado): desbloquea el comparador al activar un plan, salvo que PRECIOS_BLOQUEADOS esté activo.
 const CLAVE_PREMIUM = 'precia.premium.v1';
 let premium = null;
 try { const r = JSON.parse(localStorage.getItem(CLAVE_PREMIUM) || 'null'); if (r && (r.plan === 'mensual' || r.plan === 'anual')) premium = r; } catch { premium = null; }
 function pintarPremium(animar) {
   const zona = $('#cmp-zona'); if (!zona) return;
-  const activo = !!premium;
+  const activo = !!premium && !PRECIOS_BLOQUEADOS;
   zona.dataset.bloqueado = String(!activo);
   const cont = $('#cmp-contenido'); if (activo) cont.removeAttribute('inert'); else cont.setAttribute('inert', '');
   const comp = esCompras();
@@ -3606,7 +3609,7 @@ function renderLista() {
   $('#seccion-lista').classList.toggle('lista-cerrada', !!lista.cerrada);
   $('#form-agregar').hidden = !!lista.cerrada; $('#bloque-agregar').hidden = !!lista.cerrada;
   $('#btn-renombrar').disabled = !!lista.cerrada;
-  $('#btn-precios').disabled = !!lista.cerrada; $('#btn-precios').title = lista.cerrada ? 'Abre la lista para obtener precios' : 'Propone el precio más bajo encontrado en internet para cada ítem de esta lista';
+  $('#btn-precios').disabled = PRECIOS_BLOQUEADOS || !!lista.cerrada; $('#btn-precios').title = PRECIOS_BLOQUEADOS ? 'Próximamente' : lista.cerrada ? 'Abre la lista para obtener precios' : 'Propone el precio más bajo encontrado en internet para cada ítem de esta lista';
   $('#btn-renombrar').title = lista.cerrada ? 'Abre la lista para editarla' : '';
   renderBanner(lista);
   const total = lista.items.length; const comprados = lista.items.filter((i) => i.comprado).length; const pend = total - comprados;
@@ -3912,7 +3915,7 @@ function renderComparadorSeleccion() {
 }
 
 async function comparar() {
-  if (esCompras()) return;
+  if (PRECIOS_BLOQUEADOS || esCompras()) return;
   const items = itemsAComparar();
   if (!items.length) return;
   const ciudad = CIUDADES.find((c) => c.ciudad === estado.ciudad) || CIUDADES[0];
@@ -4435,6 +4438,7 @@ function ofertasDelItem(item) {
   return salida.sort((a, b) => (a.costo - b.costo) || (a.fecha < b.fecha ? 1 : a.fecha > b.fecha ? -1 : 0));
 }
 async function obtenerPrecios(boton) {
+  if (PRECIOS_BLOQUEADOS) return;
   if (!editable()) { avisarCerrada(); return; }
   const lista = listaActiva(); if (!lista.items.length) { anunciar('Agrega ítems a la lista para obtener sus precios.'); return; }
   Object.assign(prc, { fase: 'buscando', filas: [], boton, listaId: lista.id, aviso: '', error: '', pedidos: 0 });
@@ -5570,7 +5574,7 @@ function iniciar() {
     const d = $('#dlg-planes'); const pie = d.querySelector('.pl-pie');
     $('#pl-cta').disabled = true; d.querySelectorAll('.pl-plan').forEach((b) => { b.disabled = true; });
     pie.classList.add('exito'); $('#pl-msg').textContent = `Bienvenido a Premium. Plan ${plan} activado (vista previa, sin cobro).`;
-    guardarPremium(plan); anunciar('Premium activado. El comparador quedó desbloqueado.');
+    guardarPremium(plan); anunciar(PRECIOS_BLOQUEADOS ? 'Premium activado.' : 'Premium activado. El comparador quedó desbloqueado.');
     const fin = () => { cerrarDlg(d); pintarPremium(true); pie.classList.remove('exito'); $('#pl-cta').disabled = false; d.querySelectorAll('.pl-plan').forEach((b) => { b.disabled = false; }); };
     if (reduce()) { fin(); return; }
     fiesta();
