@@ -1469,22 +1469,43 @@ dialog.dlg-land[open] { animation: dlgEntra 320ms cubic-bezier(.2,.8,.2,1); }
       <button class="dl-x" type="button" data-cerrar aria-label="Cerrar"><svg class="i" aria-hidden="true"><use href="#i-close"/></svg></button>
       <p class="dl-eye">PrecIA</p>
       <h2 id="dl-titulo">Iniciar sesión</h2>
-      <p class="dl-ayuda">Esta es una demo: puedes entrar con cualquier correo y contraseña.</p>
+      <p class="dl-ayuda">Entra con tu correo y contraseña para ver tus listas en cualquier dispositivo.</p>
       <label class="dl-campo"><span>Correo</span><input id="dl-correo" type="email" autocomplete="email" inputmode="email" placeholder="tucorreo@ejemplo.com"></label>
       <label class="dl-campo"><span>Contraseña</span><input id="dl-clave" type="password" autocomplete="current-password" placeholder="Tu contraseña"></label>
       <p class="dl-error" id="dl-error" role="alert" hidden></p>
+      <p class="dl-ayuda" id="dl-info" role="status" hidden></p>
       <button class="l-btn l-primario l-grande dl-entrar" type="submit" id="dl-entrar">Entrar</button>
       <p class="dl-pie">¿No tienes cuenta? <button class="dl-link" type="button" id="dl-crear">Regístrate</button></p>
+      <p class="dl-pie"><button class="dl-link" type="button" id="dl-olvide">Olvidé mi contraseña</button></p>
     </form>
   </dialog>
 
-  <dialog id="dlg-demo" class="dlg-land dlg-aviso" aria-labelledby="dd-titulo">
-    <div class="dd-cuerpo">
-      <span class="dd-ico" aria-hidden="true"><svg class="i"><use href="#i-lock"/></svg></span>
-      <h2 id="dd-titulo">No disponible</h2>
-      <p>Demo cerrada. Por ahora no estamos creando cuentas nuevas.</p>
-      <button class="l-btn l-primario l-grande" type="button" data-cerrar>Entendido</button>
-    </div>
+  <dialog id="dlg-registro" class="dlg-land" aria-labelledby="dr-titulo">
+    <form id="dr-form" novalidate>
+      <button class="dl-x" type="button" data-cerrar aria-label="Cerrar"><svg class="i" aria-hidden="true"><use href="#i-close"/></svg></button>
+      <p class="dl-eye">PrecIA</p>
+      <h2 id="dr-titulo">Crear cuenta</h2>
+      <p class="dl-ayuda">Tus listas quedan guardadas en tu cuenta y solo tú las ves.</p>
+      <label class="dl-campo"><span>Nombre (opcional)</span><input id="dr-nombre" type="text" autocomplete="name" placeholder="¿Cómo te llamas?"></label>
+      <label class="dl-campo"><span>Correo</span><input id="dr-correo" type="email" autocomplete="email" inputmode="email" placeholder="tucorreo@ejemplo.com"></label>
+      <label class="dl-campo"><span>Contraseña (mínimo 8 caracteres)</span><input id="dr-clave" type="password" autocomplete="new-password" placeholder="Crea una contraseña"></label>
+      <p class="dl-error" id="dr-error" role="alert" hidden></p>
+      <p class="dl-ayuda" id="dr-info" role="status" hidden></p>
+      <button class="l-btn l-primario l-grande dl-entrar" type="submit" id="dr-crear">Crear cuenta</button>
+      <p class="dl-pie">¿Ya tienes cuenta? <button class="dl-link" type="button" id="dr-ya">Inicia sesión</button></p>
+    </form>
+  </dialog>
+
+  <dialog id="dlg-nueva" class="dlg-land" aria-labelledby="dn-titulo">
+    <form id="dn-form" novalidate>
+      <button class="dl-x" type="button" data-cerrar aria-label="Cerrar"><svg class="i" aria-hidden="true"><use href="#i-close"/></svg></button>
+      <p class="dl-eye">PrecIA</p>
+      <h2 id="dn-titulo">Nueva contraseña</h2>
+      <p class="dl-ayuda">Escribe la contraseña nueva para tu cuenta.</p>
+      <label class="dl-campo"><span>Contraseña (mínimo 8 caracteres)</span><input id="dn-clave" type="password" autocomplete="new-password" placeholder="Nueva contraseña"></label>
+      <p class="dl-error" id="dn-error" role="alert" hidden></p>
+      <button class="l-btn l-primario l-grande dl-entrar" type="submit" id="dn-guardar">Guardar contraseña</button>
+    </form>
   </dialog>
 </div>
 
@@ -2064,6 +2085,8 @@ dialog.dlg-land[open] { animation: dlgEntra 320ms cubic-bezier(.2,.8,.2,1); }
 <div id="fiesta" popover="manual" aria-hidden="true"><canvas id="fiesta-cv"></canvas></div>
 <div id="vivo" class="sr-only" aria-live="polite"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
 <script>
 (() => {
 'use strict';
@@ -2810,7 +2833,7 @@ function construirComparacion(items, respuesta) {
 /* =========================================================
    ALMACENAMIENTO LOCAL (listas por persona en este navegador)
    ========================================================= */
-const CLAVE = 'precia.listas.v1';
+let CLAVE = 'precia.listas.v1.invitado'; // se cambia a precia.listas.v1.<id de usuario> al iniciar sesión
 let almacenamientoOk = true;
 function cargar() {
   try {
@@ -2864,12 +2887,12 @@ function estadoInicial() {
   };
 }
 
-const _local0 = cargar();
-let estado = _local0 || estadoInicial();
+const _local0 = null; // los datos se cargan al iniciar sesión (usarUsuario)
+let estado = estadoInicial();
 
 /* =========================================================
-   SINCRONIZACIÓN EN LA NUBE (db): un solo usuario, todos los dispositivos.
-   Colección «mis»: doc «meta» (todo menos las listas + orden) y un doc «l_<id>» por lista.
+   SINCRONIZACIÓN EN LA NUBE (Supabase): cada usuario ve solo sus listas, en todos sus dispositivos.
+   Tabla precia_docs: doc «meta» (todo menos las listas + orden) y un doc «l_<id>» por lista.
    localStorage queda como caché sin conexión.
    ========================================================= */
 const NUBE_COL = 'mis';
@@ -2941,13 +2964,45 @@ function nubeRecibir(snap) {
   try { localStorage.setItem(CLAVE, JSON.stringify(estado)); } catch (e) { /* ignorar */ }
   renderTodo();
 }
-async function nubeIniciar() {
-  try {
-    const db = window.claude && typeof window.claude.use === 'function' ? await window.claude.use('db') : null;
-    if (!db) return;
-    nube.col = db.collection(NUBE_COL);
-    nube.col.onSnapshot(nubeRecibir, (e) => console.warn('PrecIA: sincronización detenida', e));
-  } catch (e) { /* sin nube: se queda en local */ }
+function nubeDetener() {
+  clearTimeout(nube.timer); clearTimeout(nube.rt);
+  try { if (nube.canal && nube.sb) nube.sb.removeChannel(nube.canal); } catch (e) { /* ignorar */ }
+  Object.assign(nube, { col: null, canal: null, sb: null, rt: null, listo: false, ultimo: new Map(), timer: null, escribiendo: false, pendiente: false, sucio: false, fallos: 0, local: false });
+}
+// Cambia a los datos del usuario (o a un estado vacío al cerrar sesión). Nunca se mezclan datos de dos cuentas.
+function usarUsuario(id) {
+  nubeDetener();
+  CLAVE = 'precia.listas.v1.' + (id || 'invitado');
+  const local = id ? cargar() : null;
+  estado = local || estadoInicial();
+  nube.local = !!local && local.listas.some((l) => !l.ejemplo);
+  renderTodo();
+}
+async function nubeIniciar(sb, id) {
+  const tabla = () => sb.from('precia_docs');
+  const col = {
+    doc: (doc) => ({
+      set: async (data) => { const r = await tabla().upsert({ user_id: id, doc_id: doc, data, updated_at: new Date().toISOString() }); if (r.error) throw r.error; },
+      delete: async () => { const r = await tabla().delete().eq('user_id', id).eq('doc_id', doc); if (r.error) throw r.error; },
+    }),
+  };
+  nube.sb = sb; nube.col = col;
+  const leer = async () => {
+    const r = await tabla().select('doc_id,data').eq('user_id', id);
+    if (r.error) throw r.error;
+    if (nube.col !== col) return; // se cerró la sesión mientras se leía
+    nubeRecibir({ docs: r.data.map((d) => ({ id: d.doc_id, exists: true, data: () => d.data })), metadata: { fromCache: false, hasPendingWrites: false } });
+  };
+  nube.canal = sb.channel('precia-docs-' + id)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'precia_docs', filter: 'user_id=eq.' + id }, () => {
+      clearTimeout(nube.rt);
+      nube.rt = setTimeout(() => { if (nube.col === col) leer().catch((e) => console.warn('PrecIA: no se pudo leer la nube', e)); }, 300);
+    })
+    .subscribe();
+  for (let intento = 0; intento < 4 && nube.col === col; intento++) {
+    try { await leer(); return; }
+    catch (e) { console.warn('PrecIA: sin conexión con la nube, se reintenta', e); await new Promise((ok) => setTimeout(ok, 4000 * (intento + 1))); }
+  }
 }
 const ui = {
   filtro: 'todos', busqueda: '', recien: null, ordenTabla: { col: 'cat', dir: 1 }, tachar: null, pctPrevio: null, pendPrevio: null, bumpQty: null,
@@ -5722,7 +5777,6 @@ function iniciar() {
   h1.innerHTML = [...txt].map((ch, i) => `<span class="letra" aria-hidden="true" style="--i:${i}">${esc(ch)}</span>`).join('');
 
   renderTodo();
-  nubeIniciar();
   moverFiltro(); moverSeg($('#vista-toggle'));
   renderResultado();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { moverFiltro(); moverSeg($('#vista-toggle')); });
@@ -5860,19 +5914,35 @@ function iniciarDatos() {
   });
 }
 
-/* ===== Landing: presentación, orbita 3D y sesión simulada ===== */
+/* ===== Landing: presentación, orbita 3D y sesión (Supabase) ===== */
 function iniciarLanding() {
   const L = $('#landing');
   if (!L) return;
-  const CLAVE_SES = 'precia.sesion.v1';
-  let sesMem = null; // respaldo en memoria si el almacenamiento no está disponible
-  const leerSes = () => { try { return localStorage.getItem(CLAVE_SES) || sessionStorage.getItem(CLAVE_SES) || sesMem; } catch (e) { return sesMem; } };
-  const guardarSes = (v) => { sesMem = v || null; try { if (v) localStorage.setItem(CLAVE_SES, v); else { localStorage.removeItem(CLAVE_SES); sessionStorage.removeItem(CLAVE_SES); } } catch (e) {} };
+  const cfg = window.PRECIA_CFG || {};
+  const sb = (window.supabase && window.supabase.createClient && cfg.url && cfg.anon)
+    ? window.supabase.createClient(cfg.url, cfg.anon, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } }) : null;
+  const SIN_SERVICIO = 'No se pudo cargar el servicio de acceso. Recarga la página.';
+  const CLAVE_SB = cfg.url ? 'sb-' + new URL(cfg.url).hostname.split('.')[0] + '-auth-token' : '';
+  const hayPista = () => { try { return !!CLAVE_SB && !!localStorage.getItem(CLAVE_SB); } catch (e) { return false; } };
+  let usuario = null;
+  let recuperando = /(^|[#&?])type=recovery/.test(location.hash + location.search);
+  const recuperando0 = recuperando;
   function pintarUsuario() {
-    const c = leerSes(); const mail = c && c.includes('@') ? c : '';
-    const nom = mail ? mail.split('@')[0] : 'Usuario demo';
-    $('#mu-nombre').textContent = nom; $('#mu-correo').textContent = mail; $('#mu-ini').textContent = nom.charAt(0) || 'U';
+    const mail = usuario ? usuario.email || '' : '';
+    const nom = (usuario && usuario.user_metadata && usuario.user_metadata.nombre) || (mail ? mail.split('@')[0] : 'Usuario');
+    $('#mu-nombre').textContent = nom; $('#mu-correo').textContent = mail; $('#mu-ini').textContent = nom.charAt(0).toUpperCase() || 'U';
   }
+  const msgError = (e) => {
+    const c = (e && e.code) || '', m = String((e && e.message) || '').toLowerCase();
+    if (c === 'invalid_credentials') return 'Correo o contraseña incorrectos.';
+    if (c === 'email_not_confirmed') return 'Confirma tu correo: te enviamos un enlace de verificación.';
+    if (c === 'user_already_exists' || c === 'email_exists') return 'Ya existe una cuenta con ese correo. Inicia sesión.';
+    if (c === 'weak_password') return 'La contraseña es muy débil. Usa al menos 8 caracteres, con letras y números.';
+    if (c === 'same_password') return 'La contraseña nueva debe ser distinta de la anterior.';
+    if (c === 'over_email_send_rate_limit' || c === 'over_request_rate_limit') return 'Demasiados intentos. Espera unos minutos e inténtalo de nuevo.';
+    if (/fetch|network/.test(m)) return 'No hay conexión con el servicio. Revisa tu internet.';
+    return 'No se pudo completar la acción. Inténtalo de nuevo.';
+  };
   const reducido = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const otros = () => [...document.body.children].filter((el) => el !== L && !/^(SCRIPT|STYLE|LINK|SVG)$/i.test(el.tagName) && el.id !== 'fiesta');
 
@@ -5980,29 +6050,112 @@ function iniciarLanding() {
     bloqueoRueda = now + 800; ir(idx + (e.deltaY > 0 ? 1 : -1));
   }, { passive: true });
 
-  /* Diálogos y sesión simulada */
-  const dlgLogin = $('#dlg-login'), dlgDemo = $('#dlg-demo'), form = $('#dl-form'), correo = $('#dl-correo'), clave = $('#dl-clave'), err = $('#dl-error'), entrarBtn = $('#dl-entrar');
-  const abrirLogin = () => { err.hidden = true; correo.removeAttribute('aria-invalid'); clave.removeAttribute('aria-invalid'); dlgLogin.showModal(); correo.focus(); };
-  const abrirDemo = () => { if (dlgLogin.open) dlgLogin.close(); dlgDemo.showModal(); };
+  /* Diálogos y sesión (Supabase) */
+  const dlgLogin = $('#dlg-login'), dlgReg = $('#dlg-registro'), dlgNueva = $('#dlg-nueva');
+  const form = $('#dl-form'), correo = $('#dl-correo'), clave = $('#dl-clave'), err = $('#dl-error'), info = $('#dl-info'), entrarBtn = $('#dl-entrar');
+  const rForm = $('#dr-form'), rNombre = $('#dr-nombre'), rCorreo = $('#dr-correo'), rClave = $('#dr-clave'), rErr = $('#dr-error'), rInfo = $('#dr-info'), rBtn = $('#dr-crear');
+  const nForm = $('#dn-form'), nClave = $('#dn-clave'), nErr = $('#dn-error'), nBtn = $('#dn-guardar');
+  const okMail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
+  const marcar = (el, mal) => { if (mal) el.setAttribute('aria-invalid', 'true'); else el.removeAttribute('aria-invalid'); };
+  const falla = (el, msg, foco) => { el.textContent = msg; el.hidden = false; if (foco) foco.focus(); };
+  const abrirLogin = () => { if (dlgReg.open) dlgReg.close(); err.hidden = true; info.hidden = true; marcar(correo, false); marcar(clave, false); dlgLogin.showModal(); correo.focus(); };
+  const abrirRegistro = () => { if (dlgLogin.open) dlgLogin.close(); rErr.hidden = true; rInfo.hidden = true; marcar(rCorreo, false); marcar(rClave, false); dlgReg.showModal(); rNombre.focus(); };
+  const abrirNueva = () => { if (L.hidden) mostrar(); nErr.hidden = true; if (!dlgNueva.open) dlgNueva.showModal(); nClave.focus(); };
   $('#l-login').addEventListener('click', abrirLogin);
-  $('#l-registro').addEventListener('click', abrirDemo);
+  $('#l-registro').addEventListener('click', abrirRegistro);
   L.querySelectorAll('[data-l-login]').forEach((b) => b.addEventListener('click', abrirLogin));
-  L.querySelectorAll('[data-l-registro]').forEach((b) => b.addEventListener('click', abrirDemo));
-  $('#dl-crear').addEventListener('click', abrirDemo);
+  L.querySelectorAll('[data-l-registro]').forEach((b) => b.addEventListener('click', abrirRegistro));
+  $('#dl-crear').addEventListener('click', abrirRegistro);
+  $('#dr-ya').addEventListener('click', abrirLogin);
   L.querySelectorAll('dialog [data-cerrar]').forEach((b) => b.addEventListener('click', () => b.closest('dialog').close()));
   L.querySelectorAll('dialog.dlg-land').forEach((d) => d.addEventListener('click', (e) => { if (e.target === d) d.close(); }));
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const okCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(correo.value.trim());
-    const okClave = clave.value.length > 0;
-    correo.toggleAttribute('aria-invalid', !okCorreo); clave.toggleAttribute('aria-invalid', !okClave);
-    if (!okCorreo || !okClave) {
-      err.textContent = !okCorreo ? 'Escribe un correo válido, por ejemplo tucorreo@ejemplo.com.' : 'Escribe una contraseña.';
-      err.hidden = false; (okCorreo ? clave : correo).focus(); return;
-    }
+  // Si se cierra el aviso de nueva contraseña sin guardar, se descarta la sesión temporal de recuperación.
+  dlgNueva.addEventListener('close', () => { if (recuperando) { recuperando = false; if (sb) sb.auth.signOut({ scope: 'local' }).catch(() => {}); } });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault(); info.hidden = true;
+    const mail = correo.value.trim();
+    const okC = okMail(mail), okK = clave.value.length > 0;
+    marcar(correo, !okC); marcar(clave, !okK);
+    if (!okC || !okK) { falla(err, !okC ? 'Escribe un correo válido, por ejemplo tucorreo@ejemplo.com.' : 'Escribe tu contraseña.', okC ? clave : correo); return; }
+    if (!sb) { falla(err, SIN_SERVICIO); return; }
     err.hidden = true; entrarBtn.disabled = true; entrarBtn.textContent = 'Entrando…';
-    setTimeout(() => { entrarBtn.disabled = false; entrarBtn.textContent = 'Entrar'; guardarSes(correo.value.trim()); pintarUsuario(); form.reset(); dlgLogin.close(); ocultar(true); }, 700);
+    try {
+      const r = await sb.auth.signInWithPassword({ email: mail, password: clave.value });
+      if (r.error) { falla(err, msgError(r.error), clave); return; }
+      recuperando = false; form.reset(); dlgLogin.close(); entrar(r.data.session, true);
+    } catch (x) { falla(err, msgError(x)); }
+    finally { entrarBtn.disabled = false; entrarBtn.textContent = 'Entrar'; }
   });
+
+  $('#dl-olvide').addEventListener('click', async () => {
+    const mail = correo.value.trim();
+    info.hidden = true;
+    if (!okMail(mail)) { marcar(correo, true); falla(err, 'Escribe tu correo arriba y vuelve a pulsar «Olvidé mi contraseña».', correo); return; }
+    if (!sb) { falla(err, SIN_SERVICIO); return; }
+    marcar(correo, false); err.hidden = true;
+    try {
+      const r = await sb.auth.resetPasswordForEmail(mail, { redirectTo: location.origin + location.pathname });
+      if (r.error) { falla(err, msgError(r.error)); return; }
+      info.textContent = 'Si el correo está registrado, te enviamos un enlace para crear una contraseña nueva.'; info.hidden = false;
+    } catch (x) { falla(err, msgError(x)); }
+  });
+
+  rForm.addEventListener('submit', async (e) => {
+    e.preventDefault(); rInfo.hidden = true;
+    const mail = rCorreo.value.trim(), pw = rClave.value;
+    const okC = okMail(mail), okK = pw.length >= 8;
+    marcar(rCorreo, !okC); marcar(rClave, !okK);
+    if (!okC || !okK) { falla(rErr, !okC ? 'Escribe un correo válido, por ejemplo tucorreo@ejemplo.com.' : 'La contraseña debe tener al menos 8 caracteres.', okC ? rClave : rCorreo); return; }
+    if (!sb) { falla(rErr, SIN_SERVICIO); return; }
+    rErr.hidden = true; rBtn.disabled = true; rBtn.textContent = 'Creando…';
+    try {
+      const r = await sb.auth.signUp({ email: mail, password: pw, options: { data: { nombre: rNombre.value.trim() }, emailRedirectTo: location.origin + location.pathname } });
+      if (r.error) { falla(rErr, msgError(r.error)); return; }
+      if (r.data.session) { recuperando = false; rForm.reset(); dlgReg.close(); entrar(r.data.session, true); }
+      else { rForm.reset(); rInfo.textContent = 'Cuenta creada. Te enviamos un correo para confirmarla: ábrelo y luego inicia sesión.'; rInfo.hidden = false; }
+    } catch (x) { falla(rErr, msgError(x)); }
+    finally { rBtn.disabled = false; rBtn.textContent = 'Crear cuenta'; }
+  });
+
+  nForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (nClave.value.length < 8) { marcar(nClave, true); falla(nErr, 'La contraseña debe tener al menos 8 caracteres.', nClave); return; }
+    marcar(nClave, false); nErr.hidden = true; nBtn.disabled = true;
+    try {
+      const r = await sb.auth.updateUser({ password: nClave.value });
+      if (r.error) { falla(nErr, msgError(r.error)); return; }
+      recuperando = false; nForm.reset(); dlgNueva.close();
+      const s = await sb.auth.getSession();
+      if (s.data && s.data.session) entrar(s.data.session, true);
+    } catch (x) { falla(nErr, msgError(x)); }
+    finally { nBtn.disabled = false; }
+  });
+
+  // Entrar/salir son idempotentes: los eventos de Supabase pueden repetirse (por ejemplo, al volver a la pestaña).
+  function entrar(session, animado) {
+    if (!session || !session.user) return;
+    if (usuario && usuario.id === session.user.id) { usuario = session.user; pintarUsuario(); return; }
+    if (recuperando) return;
+    usuario = session.user;
+    const id = usuario.id;
+    usarUsuario(id); pintarUsuario();
+    setTimeout(() => { if (usuario && usuario.id === id) nubeIniciar(sb, id); }, 0);
+    if (!L.hidden) ocultar(animado);
+  }
+  function salir() {
+    if (!usuario) return;
+    usuario = null; usarUsuario(null); pintarUsuario(); mostrar();
+  }
+  if (sb) {
+    // Dentro del callback no se llama a Supabase directamente: se difiere con setTimeout.
+    sb.auth.onAuthStateChange((ev, session) => {
+      if (ev === 'PASSWORD_RECOVERY') { recuperando = true; setTimeout(abrirNueva, 0); return; }
+      if (ev === 'SIGNED_OUT') { setTimeout(salir, 0); return; }
+      if (session) setTimeout(() => entrar(session, ev === 'SIGNED_IN'), 0);
+      else if (ev === 'INITIAL_SESSION' && L.hidden) setTimeout(mostrar, 0);
+    });
+  }
 
   function ocultar(animado) {
     const fin = () => {
@@ -6025,11 +6178,11 @@ function iniciarLanding() {
   }
 
   /* Cerrar sesión desde el menú de usuario */
-  $('#mu-salir').addEventListener('click', () => { if (window.cerrarMenuUsuario) window.cerrarMenuUsuario(false); guardarSes(null); mostrar(); });
+  $('#mu-salir').addEventListener('click', async () => { if (window.cerrarMenuUsuario) window.cerrarMenuUsuario(false); try { if (sb) await sb.auth.signOut({ scope: 'local' }); } catch (e) { /* ignorar */ } salir(); });
   pintarUsuario();
 
   ir(0, false);
-  if (leerSes()) { L.hidden = true; } else { L.hidden = false; document.body.classList.add('con-landing'); otros().forEach((el) => el.setAttribute('inert', '')); arrancar(); }
+  if (sb && hayPista() && !recuperando0) { L.hidden = true; } else { L.hidden = false; document.body.classList.add('con-landing'); otros().forEach((el) => el.setAttribute('inert', '')); arrancar(); }
 }
 
 iniciar();
