@@ -15,6 +15,19 @@ html,body{margin:0;height:100%;background:var(--ink);color:var(--w);font-family:
 button{font:inherit;color:inherit;cursor:pointer}
 a{color:inherit;text-decoration:none}
 body::before{content:"";position:fixed;inset:0;background:linear-gradient(180deg,#01040F 0%,#061246 40%,#0F2E9C 78%,#2455FF 100%);z-index:0}
+#gate{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:20px;background:radial-gradient(90% 70% at 50% 40%,#0D2A8C 0%,#061246 45%,#020718 100%)}
+html.gated #gate{display:flex}
+html.gated body>*:not(#gate):not(script){visibility:hidden}
+#gate form{width:min(400px,100%);border:1px solid var(--line);border-top:3px solid var(--y);background:rgba(3,10,40,.85);padding:26px 24px 22px}
+#gate h2{margin:0 0 4px;font:900 34px/1 var(--cond);letter-spacing:.04em;text-transform:uppercase;font-style:italic}
+#gate p{margin:0 0 18px;font:600 11px/1.3 var(--cond);letter-spacing:.24em;text-transform:uppercase;color:var(--dim)}
+#gate label{display:block;margin:0 0 5px;font:700 10px/1 var(--cond);letter-spacing:.24em;text-transform:uppercase;color:var(--dim)}
+#gate input{box-sizing:border-box;width:100%;margin:0 0 14px;padding:11px 12px;background:#020A28;color:#fff;border:1px solid var(--line);font:500 15px var(--sans);outline:none}
+#gate input:focus{border-color:var(--y)}
+#gate button{all:unset;box-sizing:border-box;width:100%;height:48px;display:flex;align-items:center;justify-content:center;background:var(--y);color:#02081f;font:800 16px/1 var(--cond);letter-spacing:.28em;text-transform:uppercase;font-style:italic;cursor:pointer;clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,14px 100%,0 calc(100% - 14px))}
+#gate button:hover,#gate button:focus-visible{background:#fff}
+#gate button[disabled]{opacity:.5;pointer-events:none}
+#gate .er{min-height:18px;margin:12px 0 0;font:600 12px/1.3 var(--cond);letter-spacing:.12em;text-transform:uppercase;color:var(--r)}
 #cdn{right:20px;top:calc(70px + var(--sat));display:flex;align-items:center;gap:10px;padding:6px 12px;border:1px solid var(--line);border-right:2px solid var(--y);background:rgba(3,10,40,.7);backdrop-filter:blur(8px);pointer-events:none;z-index:6}
 #cdn .cdp{width:7px;height:7px;background:var(--y);transform:rotate(45deg);flex:none;animation:cdp 2.4s ease-in-out infinite}
 @keyframes cdp{0%,100%{opacity:.5}50%{opacity:1;box-shadow:0 0 8px var(--y)}}
@@ -350,6 +363,10 @@ label.f textarea{min-height:76px;resize:vertical}
 }
 @media (prefers-reduced-motion:reduce){.sp-in h2,.hzb,.pb i,.sp-in>*,#splash #go{animation:none!important}}
 </style>
+<meta name="robots" content="noindex,nofollow">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script>if(window.SKYPORT_CFG&&window.SKYPORT_CFG.url)document.documentElement.classList.add("gated")</script>
 </head>
 <body>
 <canvas id="sky" aria-hidden="true"></canvas>
@@ -407,6 +424,7 @@ label.f textarea{min-height:76px;resize:vertical}
  </div>
 </div>
 <div id="cdn" class="hud" aria-live="off"><span class="cdp"></span><div class="cdx"><div id="cdL">Próximo fenómeno natural</div><div id="cdK">&nbsp;</div></div><b id="cdT">--:--</b></div>
+<div id="gate" role="dialog" aria-label="Iniciar sesión"><form id="gForm" autocomplete="on"><h2>TEGC Sky Port</h2><p>Acceso privado</p><label for="gEm">Correo</label><input id="gEm" type="email" name="email" autocomplete="username" required><label for="gPw">Contraseña</label><input id="gPw" type="password" name="password" autocomplete="current-password" required><button id="gBt" type="submit">Ingresar</button><div class="er" id="gEr" role="alert"></div></form></div>
 <div id="flash"></div>
 <div id="toast" role="status"></div>
 
@@ -524,6 +542,49 @@ function setSync(m){syncMode=m;var el=$('#adm .sync');if(!el)return;var T={db:['
    S=d;lsSave();rebuild();if(admOn)admRender();
   },function(){dbRef=null;setSync('local')});
  }catch(e){}
+})();
+
+/* ---------- acceso privado (Supabase, opcional) ---------- */
+(function(){
+ var cfg=window.SKYPORT_CFG;
+ if(!cfg||!cfg.url||!cfg.anon)return;
+ var root=document.documentElement,gForm=$('#gForm'),gEr=$('#gEr'),gBt=$('#gBt'),sb=null,started=false;
+ root.classList.add('gated');
+ if(!window.supabase||!window.supabase.createClient){gEr.textContent='No se pudo cargar el servicio de acceso. Recarga la página.';return}
+ sb=window.supabase.createClient(cfg.url,cfg.anon,{auth:{persistSession:true,autoRefreshToken:true}});
+ window.__skyLogout=function(){return sb.auth.signOut()};
+ function onSnap(sn){
+  if(!sn.exists){persist();return}
+  var d=sane(JSON.parse(JSON.stringify(sn.data())));if(!d||d.rev===S.rev)return;
+  S=d;lsSave();rebuild();if(admOn)admRender();
+ }
+ function begin(){
+  root.classList.remove('gated');
+  if(started)return;started=true;
+  dbRef={
+   set:function(obj){return sb.from('hub_state').upsert({id:'main',data:obj,updated_at:new Date().toISOString()}).then(function(r){if(r.error)throw r.error})},
+   onSnapshot:function(cb,err){
+    var go=function(){sb.from('hub_state').select('data').eq('id','main').maybeSingle().then(function(r){
+     if(r.error){err&&err(r.error);return}
+     var d=r.data&&r.data.data;cb({exists:!!d,metadata:{hasPendingWrites:false},data:function(){return d}})
+    },function(e){err&&err(e)})};
+    go();document.addEventListener('visibilitychange',function(){if(!document.hidden&&!writing)go()});
+   }
+  };
+  setSync('db');
+  dbRef.onSnapshot(onSnap,function(){setSync('ro')});
+ }
+ function lock(){root.classList.add('gated');started=false;dbRef=null;try{localStorage.removeItem(LSK)}catch(e){}}
+ gForm.addEventListener('submit',function(e){
+  e.preventDefault();gEr.textContent='';gBt.disabled=true;
+  sb.auth.signInWithPassword({email:$('#gEm').value.trim(),password:$('#gPw').value}).then(function(r){
+   gBt.disabled=false;
+   if(r.error){gEr.textContent='Correo o contraseña incorrectos';return}
+   $('#gPw').value='';begin();
+  },function(){gBt.disabled=false;gEr.textContent='No hay conexión con el servicio. Intenta de nuevo.'});
+ });
+ sb.auth.getSession().then(function(r){if(r.data&&r.data.session)begin()});
+ sb.auth.onAuthStateChange(function(ev){if(ev==='SIGNED_OUT')lock()});
 })();
 
 /* ---------- toast ---------- */
@@ -1330,7 +1391,7 @@ function admRender(){
    +S.tracks.map(function(t,i){return '<div class="trk"><input data-tn="'+i+'" value="'+esc(t.name)+'" placeholder="Nombre"><input data-tu="'+i+'" value="'+esc(t.url)+'" placeholder="audio/pista.mp3"><button class="btn d" type="button" data-td="'+i+'">Quitar</button></div>'}).join('')
    +'<div class="btns"><button class="btn" type="button" data-a="tadd">+ Agregar pista</button><button class="btn p" type="button" data-a="tsave">Guardar pistas</button></div></div>';
  }else{
-  h+='<div class="pane one on"><p class="note" style="margin:0 0 10px">Copia este JSON como respaldo o pega uno nuevo para reemplazar todo el mapa.</p><textarea id="fJ" style="height:42vh;font-family:ui-monospace,monospace;font-size:12px">'+esc(JSON.stringify(S,null,1))+'</textarea><div class="btns"><button class="btn" type="button" data-a="copy">Copiar</button><button class="btn" type="button" data-a="export">Exportar JSON</button><button class="btn p" type="button" data-a="import">Importar JSON</button></div></div>';
+  h+='<div class="pane one on"><p class="note" style="margin:0 0 10px">Copia este JSON como respaldo o pega uno nuevo para reemplazar todo el mapa.</p><textarea id="fJ" style="height:42vh;font-family:ui-monospace,monospace;font-size:12px">'+esc(JSON.stringify(S,null,1))+'</textarea><div class="btns"><button class="btn" type="button" data-a="copy">Copiar</button><button class="btn" type="button" data-a="export">Exportar JSON</button>'+(window.__skyLogout?'<button class="btn d" type="button" data-a="logout">Cerrar sesión</button>':'')+'<button class="btn p" type="button" data-a="import">Importar JSON</button></div></div>';
  }
  h+='</div>';adm.innerHTML=h;setSync(syncMode);
 }
@@ -1366,6 +1427,7 @@ adm.addEventListener('click',function(e){
  else if(a==='tsave'){
   var ns=[].map.call(adm.querySelectorAll('[data-tn]'),function(i){return i.value.trim()}),us=[].map.call(adm.querySelectorAll('[data-tu]'),function(i){return i.value.trim()});
   S.tracks=us.map(function(u,i){return{name:ns[i]||('Pista '+(i+1)),url:u}}).filter(function(x){return x.url});persist();ti=0;load(0);if(wanted&&pl.classList.contains('on'))play();admRender();toast('Pistas guardadas')}
+ else if(a==='logout'){try{localStorage.removeItem(LSK)}catch(er){}window.__skyLogout().then(function(){location.reload()},function(){location.reload()})}
  else if(a==='export'){var d0=new Date(),pz=function(n){return (n<10?'0':'')+n},fn='tegc-sky-port-'+d0.getFullYear()+'-'+pz(d0.getMonth()+1)+'-'+pz(d0.getDate())+'.json',js=JSON.stringify(S,null,1);
   (window.claude&&claude.use?claude.use('downloads'):Promise.resolve(null)).then(function(dl){
    if(dl){return dl.save({filename:fn,data:js}).then(function(){toast('JSON exportado')},function(er){if(!er||er.code!=='declined')toast('No se pudo exportar. Usa Copiar',1)})}
