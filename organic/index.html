@@ -667,6 +667,15 @@ button:active:not(:disabled){transform:scale(.93)}
 .lb-b{display:inline-flex;gap:8px;padding:9px 16px;font-size:13px;text-transform:uppercase;font-weight:600}
 .lb-b svg{width:17px;height:17px}
 @media (max-width:860px){.lb-stage{inset:56px 8px 84px}.lb-nav{top:auto;bottom:18px;margin:0}.lb-nav.prev{left:12px}.lb-nav.next{right:12px}.lb-b span{display:none}.lb-b{padding:11px}}
+.auth{position:fixed;inset:0;z-index:60;background:var(--canvas);display:none;place-items:center;padding:16px;overflow:auto}
+.auth.on{display:grid}
+.auth .dlg{width:min(420px,100%);display:flex;flex-direction:column;gap:12px}
+.auth .field{background:var(--panel)}
+.auth-err{color:var(--warn);font-size:13px;margin:0}
+.auth-info{color:var(--green);font-size:13px;margin:0}
+.auth-link{background:none;border:0;padding:0;color:var(--blue);text-decoration:underline;font-weight:600;font-size:13px}
+.auth-pie{display:flex;flex-wrap:wrap;gap:6px 14px}
+.menuuser{margin:4px 12px 0;word-break:break-all}
 </style>
 </head>
 <body>
@@ -728,9 +737,11 @@ button:active:not(:disabled){transform:scale(.93)}
 </div>
 
 <div class="menu" id="menu" role="menu" hidden>
+  <div class="tiny menuuser" id="menuuser"></div>
   <div class="syncst" id="syncst" role="status" data-st="local">Solo en este dispositivo</div>
   <button class="mi" role="menuitem" data-a="export">Exportar datos</button>
   <button class="mi" role="menuitem" data-a="import">Importar datos</button>
+  <button class="mi" role="menuitem" data-a="logout">Cerrar sesión</button>
   <div class="label">Posición del toolbox</div>
   <div class="seg"><button class="ghost" data-a="dock-left" id="btn-dl">Izquierda</button><button class="ghost" data-a="dock-right" id="btn-dr">Derecha</button></div>
 </div>
@@ -750,14 +761,33 @@ button:active:not(:disabled){transform:scale(.93)}
 <div class="selbar" id="selbar" hidden><button class="x selx" data-a="selcancel" aria-label="Cancelar selección">Cancelar</button><span class="cnt"></span><button class="x selx selmove" data-a="selmove" aria-label="Mover a otro workspace" title="Mover a otro workspace"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h13M12 7l5 5-5 5M21 5v14"/></svg></button><button class="btn danger-fill" data-a="seldel">Eliminar</button></div>
 <div class="mini" id="mini" role="dialog" aria-label="Toolbox mini" hidden></div>
 <div class="overlay" id="ov"><div class="dlg" id="dlg"></div></div>
+<div class="auth" id="auth" role="dialog" aria-modal="true" aria-labelledby="au-titulo">
+  <form class="dlg" id="au-form" novalidate>
+    <div class="brand"><h1>Organic</h1></div>
+    <h2 id="au-titulo" class="bar" style="align-self:flex-start">Iniciar sesión</h2>
+    <p class="tiny" id="au-ayuda"></p>
+    <label class="sr" for="au-nombre">Nombre</label>
+    <input id="au-nombre" class="field" type="text" autocomplete="name" placeholder="Nombre (opcional)" hidden>
+    <label class="sr" for="au-correo">Correo</label>
+    <input id="au-correo" class="field" type="email" autocomplete="email" inputmode="email" placeholder="Correo">
+    <label class="sr" for="au-clave">Contraseña</label>
+    <input id="au-clave" class="field" type="password" autocomplete="current-password" placeholder="Contraseña">
+    <p class="auth-err" id="au-err" role="alert" hidden></p>
+    <p class="auth-info" id="au-info" role="status" hidden></p>
+    <button class="btn" type="submit" id="au-ok">Entrar</button>
+    <div class="auth-pie" id="au-pie"></div>
+  </form>
+</div>
 <div class="toast" id="toast" role="status"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
 <script>
 (function(){
 "use strict";
 var REDUCED=!!(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches);
 var progMem={},foldMem={},newMod=null,freshId=null,lastDetail;
-var KEY="organic.v2";
+var KEY="organic.v2.invitado"; // cambia a organic.v2.<id de usuario> al iniciar sesión
 var STAGES=[
  {k:"semilla",n:"Semilla",d:"Un texto plano. Todo empieza aquí. Es la hoja de la jerarquía y no contiene otros seeds."},
  {k:"proyecto",n:"Proyecto",d:"Contiene solo semillas. Puede estar en el workspace o dentro de un ecosistema."},
@@ -1912,6 +1942,7 @@ document.addEventListener("click",function(e){
   if(act==="dock-left"||act==="dock-right"){S.ui.dock=act==="dock-left"?"left":"right";save();renderTools();closeMenu();return}
   if(act==="close"){S.ui.sel=null;renderList();renderDetail();return}
   if(act==="open"){open(a.dataset.id);return}
+  if(act==="logout"){closeMenu();cerrarSesion();return}
   if(act==="export"){closeMenu();showExport();return}
   if(act==="import"){closeMenu();showImport();return}
   if(act==="dlgclose"){closeDlg();return}
@@ -2118,7 +2149,7 @@ document.addEventListener("drop",function(e){
 
 
 /* ---------- sincronización en la nube (privada por cuenta) ---------- */
-var Sync={db:null,assets:null,uid:null,meta:null,col:null,ready:false,state:"local",synced:{},metaJ:null,base:null,busy:false,again:false,choosing:false,pendRender:false,warned:{}};
+var Sync={db:null,assets:null,uid:null,meta:null,col:null,ready:false,state:"local",synced:{},metaJ:null,base:null,busy:false,again:false,choosing:false,pendRender:false,warned:{},backend:null,pend:null};
 var SYNCKEY="organic.sync";
 function hsh(s){var h=2166136261;for(var i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return (h>>>0).toString(36)+s.length.toString(36)}
 function okSeg(id){return typeof id==="string"&&/^[A-Za-z0-9_\-.~:@+]{1,190}$/.test(id)&&id!=="."&&id!==".."}
@@ -2169,7 +2200,7 @@ function syncFlush(){
   if(!Sync.ready)return;
   if(Sync.busy){Sync.again=true;return}
   Sync.busy=true;Sync.again=false;
-  doFlush().catch(function(){}).then(function(){Sync.busy=false;if(Sync.again)syncFlush()});
+  doFlush().catch(function(){}).then(function(){Sync.busy=false;if(Sync.again)syncFlush();else if(Sync.backend&&Sync.backend.again){Sync.backend.again=false;Sync.backend.sched()}});
 }
 function doFlush(){
   return uploadImages().then(function(){
@@ -2292,26 +2323,188 @@ function onMeta(snap){
   if(Array.isArray(m.workspaces)&&m.workspaces.length)S.workspaces=m.workspaces;
   orderSeeds(m.order);if(!wsById(S.ui.ws))S.ui.ws=null;migrate();saveBase();localWrite();remoteRender();
 }
-function startSync(){
-  setSync("local");
-  if(!window.claude||typeof window.claude.use!=="function")return;
-  var safe=function(n){try{return Promise.resolve(window.claude.use(n)).catch(function(){return null})}catch(e){return Promise.resolve(null)}};
-  Promise.all([safe("db"),safe("user"),safe("assets")]).then(function(r){
-    var db=r[0],user=r[1];Sync.assets=r[2];
-    if(!db||!user||typeof user.id!=="function")return null;
-    return Promise.resolve(user.id()).catch(function(){return null}).then(function(id){
-      if(!id||!okSeg(String(id)))return;
-      Sync.db=db;Sync.uid=String(id);
-      Sync.meta=db.doc("data/users/"+Sync.uid+"/organic");Sync.col=Sync.meta.collection("seeds");
-      setSync("loading");
-      var ms=null,ss=null,done=false;
-      var tm=setTimeout(function(){if(!done)setSync("offline")},10000);
-      var tryInit=function(){if(done||!ms||!ss)return;done=true;clearTimeout(tm);try{reconcile(ms,ss)}catch(e){setSync("error")}};
-      var fail=function(e){clearTimeout(tm);if(!done){done=true}Sync.ready=false;setSync(e&&e.code==="revoked"?"local":"error")};
-      Sync.meta.onSnapshot(function(s){if(!done){if(!s.metadata.fromCache){ms=s;tryInit()}return}onMeta(s)},fail);
-      Sync.col.onSnapshot(function(s){if(!done){if(!s.metadata.fromCache){ss=s;tryInit()}return}onSeeds(s)},fail);
+/* Backend Supabase: tabla organic_docs (una fila por seed + una fila «meta» por usuario).
+   Expone la misma interfaz que usaba la nube anterior (doc().set/delete y onSnapshot). */
+function sbBackend(sb,uid){
+  var T="organic_docs",B={dead:false,mL:[],sL:[],pS:{},pSJ:{},pMJ:null,first:true,pending:0,wseq:0,again:false,timer:null,chan:null};
+  var mk=function(id,data){return {id:id,data:function(){return data}}};
+  var row=function(tipo,id,data){return {user_id:uid,tipo:tipo,doc_id:id,data:data,updated_at:new Date().toISOString()}};
+  function wrap(p){
+    B.pending++;B.wseq++;
+    return Promise.resolve(p).then(function(r){if(r&&r.error)throw r.error;return r}).then(function(v){B.pending--;return v},function(e){B.pending--;throw e});
+  }
+  B.upsert=function(tipo,id,data){return wrap(sb.from(T).upsert(row(tipo,id,data)))};
+  B.remove=function(id){return wrap(sb.from(T).delete().eq("user_id",uid).eq("tipo","seed").eq("doc_id",id))};
+  var busy=function(){return B.pending>0||Sync.busy};
+  B.refresh=function(){
+    if(B.dead)return Promise.resolve();
+    if(!B.first&&busy()){B.again=true;return Promise.resolve()}
+    var w0=B.wseq;
+    return Promise.resolve(sb.from(T).select("tipo,doc_id,data").eq("user_id",uid).range(0,4999)).then(function(r){
+      if(r.error)throw r.error;
+      if(B.dead)return;
+      if(!B.first&&(busy()||B.wseq!==w0)){B.again=true;return}
+      var meta=null,seeds={},sj={},id;
+      (r.data||[]).forEach(function(x){if(x.tipo==="meta")meta=x.data;else if(x.tipo==="seed"){seeds[x.doc_id]=x.data;sj[x.doc_id]=JSON.stringify(x.data)}});
+      var changes=[];
+      for(id in seeds){if(!(id in B.pSJ))changes.push({type:"added",doc:mk(id,seeds[id])});else if(B.pSJ[id]!==sj[id])changes.push({type:"modified",doc:mk(id,seeds[id])})}
+      for(id in B.pSJ){if(!(id in sj))changes.push({type:"removed",doc:mk(id,B.pS[id])})}
+      var mj=meta?JSON.stringify(meta):null,first=B.first,metaChanged=first||mj!==B.pMJ;
+      B.pS=seeds;B.pSJ=sj;B.pMJ=mj;B.first=false;
+      var call=function(list,snap){list.forEach(function(l){try{l.cb(snap)}catch(e){console.warn("Organic: error al aplicar la nube",e)}})};
+      if(metaChanged)call(B.mL,{exists:!!meta,data:function(){return meta},metadata:{fromCache:false}});
+      if(first||changes.length)call(B.sL,{docs:Object.keys(seeds).map(function(k){return mk(k,seeds[k])}),size:Object.keys(seeds).length,metadata:{fromCache:false},docChanges:function(){return changes}});
     });
+  };
+  B.sched=function(){clearTimeout(B.timer);B.timer=setTimeout(function(){B.refresh().catch(function(e){console.warn("Organic: no se pudo leer la nube",e)})},300)};
+  B.start=function(){
+    B.chan=sb.channel("organic-docs-"+uid).on("postgres_changes",{event:"*",schema:"public",table:T,filter:"user_id=eq."+uid},function(){B.sched()}).subscribe();
+    var n=0;(function go(){B.refresh().catch(function(e){
+      if(B.dead)return;
+      if(++n<4)setTimeout(go,4000*n);
+      else B.mL.concat(B.sL).forEach(function(l){if(l.fail)l.fail(e)});
+    })})();
+  };
+  B.stop=function(){B.dead=true;clearTimeout(B.timer);try{if(B.chan)sb.removeChannel(B.chan)}catch(e){}};
+  return B;
+}
+function stopSync(){
+  if(Sync.backend)Sync.backend.stop();
+  Sync.db=null;Sync.assets=null;Sync.uid=null;Sync.meta=null;Sync.col=null;Sync.ready=false;Sync.synced={};Sync.metaJ=null;Sync.base=null;
+  Sync.busy=false;Sync.again=false;Sync.choosing=false;Sync.pendRender=false;Sync.warned={};Sync.backend=null;Sync.pend=null;
+  setSync("local");
+}
+function startSync(sb,uid){
+  stopSync();
+  if(!sb||!uid||!okSeg(String(uid)))return;
+  var B=sbBackend(sb,uid);
+  Sync.backend=B;Sync.uid=String(uid);Sync.assets=null; /* las imágenes viajan dentro de cada seed */
+  Sync.meta={set:function(o){return B.upsert("meta","meta",o)},onSnapshot:function(cb,fail){B.mL.push({cb:cb,fail:fail})}};
+  Sync.col={doc:function(id){return {set:function(o){return B.upsert("seed",id,o)},delete:function(){return B.remove(id)}}},onSnapshot:function(cb,fail){B.sL.push({cb:cb,fail:fail})}};
+  setSync("loading");
+  var ms=null,ss=null,done=false;
+  var tm=setTimeout(function(){if(!done&&Sync.backend===B)setSync("offline")},10000);
+  var tryInit=function(){if(done||!ms||!ss||Sync.backend!==B)return;done=true;clearTimeout(tm);try{reconcile(ms,ss)}catch(e){setSync("error")}};
+  var fail=function(e){clearTimeout(tm);if(!done){done=true}if(Sync.backend!==B)return;Sync.ready=false;setSync("error")};
+  Sync.meta.onSnapshot(function(s){if(Sync.backend!==B)return;if(!done){ms=s;tryInit();return}onMeta(s)},fail);
+  Sync.col.onSnapshot(function(s){if(Sync.backend!==B)return;if(!done){ss=s;tryInit();return}onSeeds(s)},fail);
+  B.start();
+}
+window.addEventListener("online",function(){if(Sync.backend){Sync.backend.sched();syncFlush()}});
+document.addEventListener("visibilitychange",function(){if(!document.hidden&&Sync.backend&&Sync.ready)Sync.backend.sched()});
+
+/* ---------- cuentas (Supabase Auth) ---------- */
+var Auth={sb:null,user:null,mode:"login",recovering:false};
+var AM={
+  login:{t:"Iniciar sesión",ayuda:"Entra para ver tus seeds en cualquier dispositivo.",ok:"Entrar",nombre:0,correo:1,clave:1,cp:"current-password"},
+  registro:{t:"Crear cuenta",ayuda:"Tus seeds quedan guardados en tu cuenta y solo tú los ves.",ok:"Crear cuenta",nombre:1,correo:1,clave:1,cp:"new-password"},
+  olvide:{t:"Recuperar contraseña",ayuda:"Escribe tu correo y te enviamos un enlace para crear una contraseña nueva.",ok:"Enviar enlace",nombre:0,correo:1,clave:0},
+  nueva:{t:"Nueva contraseña",ayuda:"Escribe la contraseña nueva para tu cuenta.",ok:"Guardar contraseña",nombre:0,correo:0,clave:1,cp:"new-password"}
+};
+var AUTH_PIE={login:[["registro","Crear cuenta"],["olvide","Olvidé mi contraseña"]],registro:[["login","Ya tengo cuenta"]],olvide:[["login","Volver"]],nueva:[["cancelar","Cancelar"]]};
+var SIN_SERVICIO="No se pudo cargar el servicio de acceso. Recarga la página.";
+function authMsg(e){
+  var c=(e&&e.code)||"",m=String((e&&e.message)||"").toLowerCase();
+  if(c==="invalid_credentials")return "Correo o contraseña incorrectos.";
+  if(c==="email_not_confirmed")return "Confirma tu correo: te enviamos un enlace de verificación.";
+  if(c==="user_already_exists"||c==="email_exists")return "Ya existe una cuenta con ese correo. Inicia sesión.";
+  if(c==="weak_password")return "La contraseña es muy débil. Usa al menos 8 caracteres, con letras y números.";
+  if(c==="same_password")return "La contraseña nueva debe ser distinta de la anterior.";
+  if(c==="over_email_send_rate_limit"||c==="over_request_rate_limit")return "Demasiados intentos. Espera unos minutos e inténtalo de nuevo.";
+  if(/fetch|network/.test(m))return "No hay conexión con el servicio. Revisa tu internet.";
+  return "No se pudo completar la acción. Inténtalo de nuevo.";
+}
+function authShow(mode){
+  var m=AM[mode]||AM.login;Auth.mode=mode;
+  $("#au-titulo").textContent=m.t;$("#au-ayuda").textContent=m.ayuda;$("#au-ok").textContent=m.ok;
+  $("#au-nombre").hidden=!m.nombre;$("#au-correo").hidden=!m.correo;$("#au-clave").hidden=!m.clave;
+  if(m.cp)$("#au-clave").setAttribute("autocomplete",m.cp);
+  $("#au-clave").placeholder=mode==="registro"||mode==="nueva"?"Contraseña (mínimo 8 caracteres)":"Contraseña";
+  $("#au-err").hidden=true;$("#au-info").hidden=true;
+  $("#au-pie").innerHTML=AUTH_PIE[mode].map(function(x){return '<button type="button" class="auth-link" data-m="'+x[0]+'">'+x[1]+'</button>'}).join("");
+  $("#auth").classList.add("on");
+  setTimeout(function(){var f=m.correo?$("#au-correo"):$("#au-clave");if(f)f.focus()},30);
+}
+function authHide(){$("#auth").classList.remove("on")}
+function authFail(msg,focus){var e=$("#au-err");e.textContent=msg;e.hidden=false;if(focus)focus.focus()}
+function pintarUsuario(){var u=Auth.user;$("#menuuser").textContent=u&&u.email?u.email:""}
+function resetS(){S={v:3,workspaces:[],seeds:[],ui:{dock:"left",ws:null,sel:null,filter:"pendientes",q:""}};picked={};dmode=false}
+function entrarUsuario(u){
+  if(!u)return;
+  if(Auth.user&&Auth.user.id===u.id){Auth.user=u;pintarUsuario();return}
+  if(Auth.recovering)return;
+  Auth.user=u;KEY="organic.v2."+u.id;SYNCKEY="organic.sync."+u.id;
+  resetS();load();
+  if(S.ui.sel&&!byId(S.ui.sel))S.ui.sel=null;
+  if(window.innerWidth<=860)S.ui.sel=null;
+  closeMenu();renderAll();authHide();pintarUsuario();
+  var id=u.id;setTimeout(function(){if(Auth.user&&Auth.user.id===id)startSync(Auth.sb,id)},0);
+}
+function salirUsuario(){
+  if(!Auth.user)return;
+  Auth.user=null;stopSync();KEY="organic.v2.invitado";SYNCKEY="organic.sync.invitado";
+  resetS();load();closeMenu();renderAll();pintarUsuario();authShow("login");
+}
+function cerrarSesion(){
+  var done=function(){salirUsuario()};
+  if(!Auth.sb){done();return}
+  Promise.resolve(Auth.sb.auth.signOut({scope:"local"})).catch(function(){}).then(done);
+}
+function iniciarAuth(){
+  var cfg=window.ORGANIC_CFG||{};
+  Auth.recovering=/(^|[#&?])type=recovery/.test(location.hash+location.search);
+  if(window.supabase&&window.supabase.createClient&&cfg.url&&cfg.anon){
+    Auth.sb=window.supabase.createClient(cfg.url,cfg.anon,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+  }
+  var hint=false;try{hint=!!(cfg.url&&localStorage.getItem("sb-"+new URL(cfg.url).hostname.split(".")[0]+"-auth-token"))}catch(e){}
+  $("#au-pie").addEventListener("click",function(e){
+    var b=e.target.closest("[data-m]");if(!b)return;var m=b.dataset.m;
+    if(m==="cancelar"){Auth.recovering=false;if(Auth.sb)Auth.sb.auth.signOut({scope:"local"}).catch(function(){});authShow("login");return}
+    authShow(m);
   });
+  $("#au-form").addEventListener("submit",function(e){
+    e.preventDefault();
+    var mode=Auth.mode,mail=$("#au-correo").value.trim(),pw=$("#au-clave").value,ok=$("#au-ok"),label=AM[mode].ok;
+    $("#au-err").hidden=true;$("#au-info").hidden=true;
+    var okMail=/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(mail);
+    if(AM[mode].correo&&!okMail){authFail("Escribe un correo válido, por ejemplo tucorreo@ejemplo.com.",$("#au-correo"));return}
+    if(AM[mode].clave){
+      if(mode==="login"&&!pw){authFail("Escribe tu contraseña.",$("#au-clave"));return}
+      if(mode!=="login"&&pw.length<8){authFail("La contraseña debe tener al menos 8 caracteres.",$("#au-clave"));return}
+    }
+    if(!Auth.sb){authFail(SIN_SERVICIO);return}
+    ok.disabled=true;ok.textContent="Un momento…";
+    var fin=function(){ok.disabled=false;ok.textContent=label};
+    var auth=Auth.sb.auth,p;
+    if(mode==="login")p=auth.signInWithPassword({email:mail,password:pw}).then(function(r){
+      if(r.error){authFail(authMsg(r.error),$("#au-clave"));return}
+      Auth.recovering=false;$("#au-form").reset();entrarUsuario(r.data.session.user);
+    });
+    else if(mode==="registro")p=auth.signUp({email:mail,password:pw,options:{data:{nombre:$("#au-nombre").value.trim()},emailRedirectTo:location.origin+location.pathname}}).then(function(r){
+      if(r.error){authFail(authMsg(r.error));return}
+      if(r.data.session){Auth.recovering=false;$("#au-form").reset();entrarUsuario(r.data.session.user)}
+      else{$("#au-form").reset();var i=$("#au-info");i.textContent="Cuenta creada. Te enviamos un correo para confirmarla: ábrelo y luego inicia sesión.";i.hidden=false}
+    });
+    else if(mode==="olvide")p=auth.resetPasswordForEmail(mail,{redirectTo:location.origin+location.pathname}).then(function(r){
+      if(r.error){authFail(authMsg(r.error));return}
+      var i=$("#au-info");i.textContent="Si el correo está registrado, te enviamos un enlace para crear una contraseña nueva.";i.hidden=false;
+    });
+    else p=auth.updateUser({password:pw}).then(function(r){
+      if(r.error){authFail(authMsg(r.error));return}
+      Auth.recovering=false;$("#au-form").reset();
+      return auth.getSession().then(function(s){if(s.data&&s.data.session)entrarUsuario(s.data.session.user)});
+    });
+    Promise.resolve(p).catch(function(x){authFail(authMsg(x))}).then(fin);
+  });
+  if(!Auth.sb){authShow("login");authFail(SIN_SERVICIO);return}
+  /* Dentro del callback no se llama a Supabase directamente: se difiere con setTimeout. */
+  Auth.sb.auth.onAuthStateChange(function(ev,session){
+    if(ev==="PASSWORD_RECOVERY"){Auth.recovering=true;setTimeout(function(){authShow("nueva")},0);return}
+    if(ev==="SIGNED_OUT"){setTimeout(salirUsuario,0);return}
+    if(session)setTimeout(function(){entrarUsuario(session.user)},0);
+    else if(ev==="INITIAL_SESSION")setTimeout(function(){if(!Auth.user)authShow(Auth.recovering?"nueva":"login")},0);
+  });
+  if(!hint||Auth.recovering)authShow(Auth.recovering?"nueva":"login");
 }
 
 /* exportar e importar */
@@ -2340,7 +2533,7 @@ load();
 if(S.ui.sel&&!byId(S.ui.sel))S.ui.sel=null;
 if(window.innerWidth<=860)S.ui.sel=null;
 renderAll();
-startSync();
+iniciarAuth();
 })();
 </script>
 </body>
