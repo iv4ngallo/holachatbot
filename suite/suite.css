@@ -1,6 +1,4 @@
 /* Hola Apps · menú de la suite y acceso compartido */
-/* Regla global que antes añadía Claude a los artefactos: un elemento con el atributo hidden nunca se muestra, aunque su clase defina display. */
-[hidden]:not([hidden=until-found i]){display:none!important}
 .suite-bar{position:relative;display:flex;align-items:center;gap:10px;height:44px;padding:0 12px;background:#111;color:#fff;font:600 14px/1 "Segoe UI",system-ui,-apple-system,sans-serif;border-bottom:1px solid #2a2a2a;box-sizing:border-box}
 .suite-bar *{box-sizing:border-box}
 .suite-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-width:36px;height:34px;padding:0 10px;border:0;border-radius:10px;background:transparent;color:#fff;font:inherit;cursor:pointer}
