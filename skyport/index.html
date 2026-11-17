@@ -15,6 +15,9 @@ html,body{margin:0;height:100%;background:var(--ink);color:var(--w);font-family:
 button{font:inherit;color:inherit;cursor:pointer}
 a{color:inherit;text-decoration:none}
 body::before{content:"";position:fixed;inset:0;background:linear-gradient(180deg,#01040F 0%,#061246 40%,#0F2E9C 78%,#2455FF 100%);z-index:0}
+#bOut{display:none;color:#FF8A8A;border-color:rgba(255,59,59,.5)}
+html.authed #bOut{display:inline-flex}
+#bOut:hover{background:rgba(255,59,59,.22);color:#fff}
 #gForm{display:none;margin:0}
 html.gated #gForm{display:block}
 html.gated #go{display:none}
@@ -334,8 +337,8 @@ label.f textarea{min-height:76px;resize:vertical}
  #aur .a2,#aur .g1{display:none}
  #cdn{right:12px;top:calc(56px + var(--sat));padding:5px 9px}
  #cdT{font-size:17px;min-width:48px}
- #bIdx,#bSky{width:34px;padding:0;justify-content:center}
- #bIdx .tx,#bSky .tx{display:none}
+ #bIdx,#bSky,#bOut{width:34px;padding:0;justify-content:center}
+ #bIdx .tx,#bSky .tx,#bOut .tx{display:none}
  #pl{left:12px;right:12px;width:auto;bottom:calc(12px + var(--sab))}
  #cTab{top:auto;bottom:calc(76px + var(--sab));right:12px}
  #card{left:0!important;top:auto!important;bottom:calc(76px + var(--sab));right:0;margin:0 12px;width:auto;max-width:none;transform:none!important;max-height:56vh;overflow:auto}
@@ -389,6 +392,7 @@ label.f textarea{min-height:76px;resize:vertical}
   <button class="chip" id="bSky" type="button" aria-pressed="false" aria-label="Deploy Skycraft" title="Deploy Skycraft (S)"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 2l3 8 7 5-1 2-6-2-1 5 2 2v1h-8v-1l2-2-1-5-6 2-1-2 7-5z" fill="currentColor"/></svg><span class="tx">Deploy Skycraft</span></button>
   <button class="chip" id="bHome" type="button">Vista general</button>
   <button class="chip y" id="bAdm" type="button">Administrar</button>
+  <button class="chip" id="bOut" type="button" aria-label="Cerrar sesión" title="Cerrar sesión"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M5 3h8v2H7v14h6v2H5zM16 7l5 5-5 5-1.4-1.4L17.2 13H9v-2h8.2l-2.6-2.6z" fill="currentColor"/></svg><span class="tx">Cerrar sesión</span></button>
  </div>
 </header>
 <div id="coord" class="hud" aria-hidden="true"></div>
@@ -558,13 +562,14 @@ var splashGo=null;
  if(!window.supabase||!window.supabase.createClient){gEr.textContent='No se pudo cargar el servicio de acceso. Recarga la página.';return}
  sb=window.supabase.createClient(cfg.url,cfg.anon,{auth:{persistSession:true,autoRefreshToken:true}});
  window.__skyLogout=function(){return sb.auth.signOut()};
+ $('#bOut').addEventListener('click',function(){try{localStorage.removeItem(LSK)}catch(er){}window.__skyLogout().then(function(){location.reload()},function(){location.reload()})});
  function onSnap(sn){
   if(!sn.exists){persist();return}
   var d=sane(JSON.parse(JSON.stringify(sn.data())));if(!d||d.rev===S.rev)return;
   S=d;lsSave();rebuild();if(admOn)admRender();
  }
  function begin(){
-  root.classList.remove('gated');
+  root.classList.remove('gated');root.classList.add('authed');
   if(started)return;started=true;
   dbRef={
    set:function(obj){return sb.from('hub_state').upsert({id:'main',data:obj,updated_at:new Date().toISOString()}).then(function(r){if(r.error)throw r.error})},
@@ -579,7 +584,7 @@ var splashGo=null;
   setSync('db');
   dbRef.onSnapshot(onSnap,function(){setSync('ro')});
  }
- function lock(){root.classList.add('gated');started=false;dbRef=null;try{localStorage.removeItem(LSK)}catch(e){}}
+ function lock(){root.classList.add('gated');root.classList.remove('authed');started=false;dbRef=null;try{localStorage.removeItem(LSK)}catch(e){}}
  gForm.addEventListener('submit',function(e){
   e.preventDefault();gEr.textContent='';gBt.disabled=true;
   sb.auth.signInWithPassword({email:$('#gEm').value.trim(),password:$('#gPw').value}).then(function(r){
