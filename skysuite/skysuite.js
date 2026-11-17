@@ -13,7 +13,7 @@
   var APPS = [
     { id: 'skyport', nombre: 'Sky Port', sub: 'Núcleo de TEGC', href: '/skyport/', color: '#FFC700' },
     { id: 'praes', nombre: 'Dôjo · Universo Praes', sub: 'Præstantia · Undead Society · Seishin', href: '/universo-praes/', color: '#00B4FF' },
-    { id: 'bgs', nombre: 'TEGC BGS', sub: 'Próximamente', href: '', color: '#FF3B3B' }
+    { id: 'bgs', nombre: 'TEGC BGS', sub: 'Estrategia de ingresos propios', href: '/bgs/', color: '#FF3B3B' }
   ];
   var base = me.src.replace(/[^\/]*$/, '');
   var $ = function (s, r) { return (r || document).querySelector(s); };
@@ -147,6 +147,7 @@
     if (!u || recuperando) return;
     SS.user = u; pintar();
     $('#ss-auth').classList.remove('on'); document.documentElement.classList.remove('ss-locked');
+    document.dispatchEvent(new CustomEvent('skysuite:in', { detail: { user: u } }));
   }
   function salir() {
     SS.user = null; pintar();
