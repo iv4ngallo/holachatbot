@@ -417,7 +417,7 @@ label.f textarea{min-height:76px;resize:vertical}
 <div id="skN1" class="skn">IV-4</div><div id="skN2" class="skn pk">EMM-4</div>
 <div id="skh" class="hud" aria-live="polite"><div id="skA"></div><div id="skB"></div><div id="skK"><b>&larr; &rarr;</b> elegir ruta &nbsp;/&nbsp; <b>&uarr;</b> acelerar &nbsp;/&nbsp; <b>&darr;</b> frenar y reversa &nbsp;/&nbsp; <b>Esc</b> replegar</div><div id="skp"><button type="button" data-k="ArrowLeft" aria-label="Izquierda">&#9664;</button><button type="button" data-k="ArrowUp" aria-label="Arriba">&#9650;</button><button type="button" data-k="ArrowDown" aria-label="Abajo">&#9660;</button><button type="button" data-k="ArrowRight" aria-label="Derecha">&#9654;</button></div></div>
 <div id="hint" class="hud"><b>Arrastra</b> para orbitar &nbsp;/&nbsp; <b>Rueda</b> para zoom &nbsp;/&nbsp; <b>Clic derecho</b> o <b>Shift</b> para desplazar &nbsp;/&nbsp; <b>Clic</b> en un cuerpo celeste &nbsp;/&nbsp; <b>S</b> Deploy Skycraft</div>
-<div id="src" class="hud">Fuente: instrucciones del proyecto HUB TEGC y artefactos publicados de TEGC.</div>
+<div id="src" class="hud">Fuente: instrucciones del proyecto HUB TEGC.</div>
 
 <div id="pl" class="hud" role="region" aria-label="Reproductor de audio">
  <button type="button" class="pp" aria-label="Reproducir"><svg class="i1" viewBox="0 0 24 24"><path d="M7 4v16l13-8z"/></svg><svg class="i2" viewBox="0 0 24 24"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg></button>
@@ -467,7 +467,6 @@ function ease(t){t=clamp(t,0,1);return 1-Math.pow(1-t,3)}
 /* ---------- datos ---------- */
 var GR={core:{n:'Núcleo',c:'#FFFFFF',h:0xffffff},ing:{n:'Business',c:'#FFC700',h:0xffc700},id:{n:'Identidad profesional',c:'#FF3B3B',h:0xff3b3b},web:{n:'Websites',c:'#9CC2FF',h:0x9cc2ff}};
 var STS={'Activo':'#FFFFFF','En desarrollo':'#FFC700','Pendiente':'#FF3B3B','Provisional':'#6F83BD'};
-var AR='https://claude.ai/artifact/';
 function N(id,name,group,kind,desc,status,url,feat,subs,rel){return{id:id,name:name,group:group,kind:kind,desc:desc,status:status,url:url||'',feat:!!feat,subs:subs||[],rel:rel||[]}}
 var BD={};
 var PD={};
@@ -494,7 +493,7 @@ try{var ls=sane(JSON.parse(localStorage.getItem(LSK)||'null'));if(ls)S=ls}catch(
 function lsSave(){try{localStorage.setItem(LSK,JSON.stringify(S))}catch(e){}}
 function byId(id){for(var i=0;i<S.nodes.length;i++)if(S.nodes[i].id===id)return S.nodes[i];return null}
 
-/* ---------- persistencia (db opcional) ---------- */
+/* ---------- persistencia ---------- */
 var dbRef=null,syncMode='local',pT=0,writing=false;
 function persist(){
  lsSave();
@@ -507,19 +506,6 @@ function persist(){
  },600);
 }
 function setSync(m){syncMode=m;var el=$('#adm .sync');if(!el)return;var T={db:['Sincronizado','#22D36B'],local:['Solo este navegador','#FFC700'],ro:['Solo lectura · cambios locales','#FF3B3B']}[m]||['',''];el.textContent=T[0];el.style.setProperty('--sy',T[1])}
-(async function(){
- try{
-  if(!window.claude||!window.claude.use)return;
-  var db=await window.claude.use('db');if(!db)return;
-  dbRef=db.doc('hub/state');setSync('db');
-  dbRef.onSnapshot(function(sn){
-   if(!sn.exists||sn.metadata.hasPendingWrites)return;
-   var d=sane(JSON.parse(JSON.stringify(sn.data())));if(!d||d.rev===S.rev)return;
-   S=d;lsSave();rebuild();if(admOn)admRender();
-  },function(){dbRef=null;setSync('local')});
- }catch(e){}
-})();
-
 /* ---------- acceso privado (Supabase, opcional) ---------- */
 var splashGo=null;
 (function(){
@@ -1365,7 +1351,7 @@ function admRender(){
     +'<label class="f">Orbita alrededor de<select id="fP"><option value="">Sol principal (TEGC)</option>'+S.nodes.filter(function(m){return m.id!==cur.id&&m.body!=='sun'&&m.body!=='asteroid'}).map(function(m){return '<option value="'+esc(m.id)+'"'+(m.id===cur.parent?' selected':'')+'>'+esc(m.name)+'</option>'}).join('')+'</select></label>'
     +'<label class="f f1">Tipo o subtítulo<input id="fK" maxlength="80" value="'+esc(cur.kind)+'"></label>'
     +'<label class="f f1">Descripción<textarea id="fD" maxlength="600">'+esc(cur.desc)+'</textarea></label>'
-    +'<label class="f f1">Enlace al artefacto (URL completa)<input id="fU" inputmode="url" placeholder="https://claude.ai/artifact/..." value="'+esc(cur.url)+'"></label>'
+    +'<label class="f f1">Enlace (URL completa)<input id="fU" inputmode="url" placeholder="https://..." value="'+esc(cur.url)+'"></label>'
     +'<label class="f f1">Incluye (separado por comas)<input id="fB" value="'+esc((cur.subs||[]).join(', '))+'"></label>'
     +'<label class="f"><span style="display:flex;align-items:center;gap:8px;margin-top:6px"><input type="checkbox" id="fF" style="width:auto;margin:0"'+(cur.feat?' checked':'')+'> Destacado</span></label></div>'
     +'<div class="f1" style="margin-top:14px"><label class="f">Vínculos con otros nodos</label><div class="rels">'+(rels||'<span class="note">Aún no hay otros nodos.</span>')+'</div></div>'
@@ -1374,7 +1360,7 @@ function admRender(){
   }else h+='<div class="frm"><p class="note">No hay nodos. Crea el primero.</p></div>';
   h+='</div>';
  }else if(admTab==='a'){
-  h+='<div class="pane one on"><p class="note" style="margin:0 0 12px">Lista de pistas del reproductor. Usa la ruta del archivo mp3 publicado con el artefacto (por ejemplo audio/mi-pista.mp3) o una URL directa. Si la lista está vacía suena un ambiente sintético.</p>'
+  h+='<div class="pane one on"><p class="note" style="margin:0 0 12px">Lista de pistas del reproductor. Usa la ruta del archivo mp3 publicado con el sitio (por ejemplo audio/mi-pista.mp3) o una URL directa. Si la lista está vacía suena un ambiente sintético.</p>'
    +S.tracks.map(function(t,i){return '<div class="trk"><input data-tn="'+i+'" value="'+esc(t.name)+'" placeholder="Nombre"><input data-tu="'+i+'" value="'+esc(t.url)+'" placeholder="audio/pista.mp3"><button class="btn d" type="button" data-td="'+i+'">Quitar</button></div>'}).join('')
    +'<div class="btns"><button class="btn" type="button" data-a="tadd">+ Agregar pista</button><button class="btn p" type="button" data-a="tsave">Guardar pistas</button></div></div>';
  }else{
@@ -1416,8 +1402,7 @@ adm.addEventListener('click',function(e){
   S.tracks=us.map(function(u,i){return{name:ns[i]||('Pista '+(i+1)),url:u}}).filter(function(x){return x.url});persist();ti=0;load(0);if(wanted&&pl.classList.contains('on'))play();admRender();toast('Pistas guardadas')}
  else if(a==='logout'){try{localStorage.removeItem(LSK)}catch(er){}window.__skyLogout().then(function(){location.reload()},function(){location.reload()})}
  else if(a==='export'){var d0=new Date(),pz=function(n){return (n<10?'0':'')+n},fn='tegc-sky-port-'+d0.getFullYear()+'-'+pz(d0.getMonth()+1)+'-'+pz(d0.getDate())+'.json',js=JSON.stringify(S,null,1);
-  (window.claude&&claude.use?claude.use('downloads'):Promise.resolve(null)).then(function(dl){
-   if(dl){return dl.save({filename:fn,data:js}).then(function(){toast('JSON exportado')},function(er){if(!er||er.code!=='declined')toast('No se pudo exportar. Usa Copiar',1)})}
+  Promise.resolve().then(function(){
    try{var u=URL.createObjectURL(new Blob([js],{type:'application/json'})),an=document.createElement('a');an.href=u;an.download=fn;document.body.appendChild(an);an.click();document.body.removeChild(an);setTimeout(function(){URL.revokeObjectURL(u)},4000);toast('JSON exportado')}catch(er){toast('No se pudo exportar. Usa Copiar',1)}
   }).catch(function(){toast('No se pudo exportar. Usa Copiar',1)})}
  else if(a==='copy'){var ta=$('#fJ',adm);ta.select();try{navigator.clipboard.writeText(ta.value).then(function(){toast('JSON copiado')},function(){toast('Selecciona el texto y copia manualmente',1)})}catch(er){toast('Selecciona el texto y copia manualmente',1)}}
