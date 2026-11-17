@@ -1,0 +1,1505 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Præstantia Show Bible (Dôjo)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto+Condensed:wght@300;400;700&family=Courier+Prime:wght@400;700&family=Michroma&display=swap">
+<style>
+:root{--bg:#05070b;--panel:#0d1218;--ac:#00B4FF;--ac2:#FF3B3B;--tx:#C0C0C0;--hi:#fff;--bd:#1b2530}
+body[data-t=lab]{--bg:#0a0f14;--panel:#121a22;--ac:#6D8CA6;--ac2:#CCE0FF;--tx:#EAF3FF;--bd:#22303c}
+body[data-t=war]{--bg:#0c0b0a;--panel:#181614;--ac:#D2A86E;--ac2:#A1270A;--tx:#cfcac2;--bd:#2b2824}
+body[data-t=ice]{--bg:#0e161e;--panel:#1E2A37;--ac:#99D9EA;--ac2:#FFFFFF;--tx:#d6e4ea;--bd:#2d3d4d}
+body[data-t=sodium]{--bg:#0c0a07;--panel:#181510;--ac:#F2B94A;--ac2:#FFFFFF;--tx:#d8d4cc;--bd:#3a352b}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:'Roboto Condensed',system-ui,sans-serif;font-size:16px;line-height:1.5;transition:background .4s,color .4s}
+header{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--bd)}
+.top{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;gap:10px}
+.logo{font-family:'Bebas Neue';font-size:28px;letter-spacing:.14em;color:var(--hi)}
+.logo b{color:var(--ac);font-weight:400}
+.lang{display:flex;border:1px solid var(--bd);border-radius:4px;overflow:hidden}
+.lang button{background:none;border:0;color:var(--tx);padding:6px 12px;font:700 13px 'Courier Prime';cursor:pointer}
+.lang button.on{background:var(--ac);color:#000}
+nav{display:flex;gap:2px;overflow-x:auto;padding:0 10px 8px;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+nav button{flex:none;background:none;border:0;border-bottom:2px solid transparent;color:var(--tx);font:700 12px 'Michroma';letter-spacing:.06em;text-transform:uppercase;padding:8px 10px;cursor:pointer;opacity:.7}
+nav button.on{color:var(--hi);border-color:var(--ac);opacity:1}
+main{max-width:1060px;margin:0 auto;padding:22px 16px 60px}
+h1,h2{font-family:'Bebas Neue';font-weight:400;letter-spacing:.06em;color:var(--hi);margin:0}
+h1{font-size:clamp(44px,12vw,92px);line-height:.95}
+h2{font-size:34px;margin:0 0 4px}
+h3{font-family:'Michroma';font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--ac);margin:26px 0 10px;font-weight:400}
+.sub{font-family:'Courier Prime';color:var(--ac);font-size:13px;letter-spacing:.1em;text-transform:uppercase}
+.lead{font-size:18px;max-width:760px}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+.card{background:color-mix(in srgb,var(--panel) 90%,transparent);border:1px solid var(--bd);border-radius:6px;padding:14px 16px;position:relative}
+.card h4{margin:0 0 4px;color:var(--hi);font-size:18px;font-weight:700}
+.card p{margin:6px 0 0;font-size:15px}
+.tag{display:inline-block;font:12px 'Courier Prime';border:1px solid var(--bd);color:var(--ac);padding:1px 8px;border-radius:20px;margin:2px 4px 2px 0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0}
+.chip{background:none;border:1px solid var(--bd);color:var(--tx);font:700 13px 'Roboto Condensed';padding:6px 12px;border-radius:20px;cursor:pointer}
+.chip.on{background:var(--ac);border-color:var(--ac);color:#000}
+.bar{height:3px;background:linear-gradient(90deg,var(--ac),var(--ac2));margin:10px 0 18px;width:90px}
+input[type=search]{width:100%;max-width:420px;background:var(--panel);border:1px solid var(--bd);color:var(--hi);padding:9px 12px;font:15px 'Courier Prime';border-radius:4px}
+.char{cursor:pointer;border-left:4px solid var(--c,var(--ac))}
+.char .more{display:grid;grid-template-rows:0fr;transition:grid-template-rows .45s cubic-bezier(.2,.7,.2,1),margin .45s;margin-top:0;font-size:15px}
+.char .more>.mi{overflow:hidden;min-height:0;border-top:1px dashed transparent;transition:border-color .3s}
+.char.open .more{grid-template-rows:1fr;margin-top:10px}
+.char.open .more>.mi{border-color:var(--bd);padding-top:10px}
+.char .more b{color:var(--hi)}
+.sym{font-family:'Courier Prime';font-size:12px;color:var(--c,var(--ac))}
+.ep{display:grid;grid-template-columns:48px 1fr;gap:12px;background:color-mix(in srgb,var(--panel) 90%,transparent);border:1px solid var(--bd);border-radius:6px;padding:12px 14px;margin-bottom:8px;position:relative}
+.ep .n{font-family:'Bebas Neue';font-size:38px;color:var(--ac);line-height:1}
+.ep small{display:block;font:11px 'Michroma';letter-spacing:.08em;text-transform:uppercase;color:var(--ac);margin-top:6px}
+.ep small:first-child{margin-top:0}
+.sw{display:flex;gap:0;border-radius:6px;overflow:hidden;border:1px solid var(--bd)}
+.sw button{flex:1;min-height:64px;border:0;cursor:pointer;font:700 11px 'Courier Prime';padding:4px;display:flex;align-items:flex-end;justify-content:center}
+.hl{color:var(--ac2)}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th{background:#1B1F3B;color:#fff;text-align:left;padding:8px 10px;font:12px 'Michroma';letter-spacing:.05em}
+td{padding:8px 10px;border-bottom:1px solid var(--bd);vertical-align:top}
+tbody tr:nth-child(odd) td{background:color-mix(in srgb,var(--panel) 90%,transparent)}
+.scroll{overflow-x:auto}
+.axis{margin:12px 0}
+.axis .l{display:flex;justify-content:space-between;font-size:14px}
+.axis .t{height:6px;border-radius:3px;background:linear-gradient(90deg,var(--ac2),var(--ac));margin-top:4px}
+.stepper{display:flex;flex-wrap:wrap;gap:6px}
+.stepper button{width:40px;height:40px;border:1px solid var(--bd);background:var(--panel);color:var(--tx);font:700 15px 'Courier Prime';border-radius:4px;cursor:pointer}
+.stepper button.on{background:var(--ac);color:#000;border-color:var(--ac)}
+.slide{background:var(--panel);border:1px solid var(--bd);border-radius:6px;padding:22px;margin-top:14px;aspect-ratio:16/9;min-height:220px;display:flex;flex-direction:column;justify-content:center}
+.slide .big{font-family:'Bebas Neue';font-size:clamp(30px,7vw,56px);color:var(--hi);line-height:1}
+.brow{display:grid;grid-template-columns:110px 1fr 70px;gap:10px;align-items:center;margin:10px 0;font-size:14px}
+.btrack{height:14px;background:var(--bd);position:relative;border-radius:2px}
+.bfill{position:absolute;top:0;bottom:0;background:linear-gradient(90deg,var(--ac),var(--ac2));border-radius:2px}
+.note{border-left:3px solid var(--ac2);padding:8px 12px;background:var(--panel);font-size:14px;margin:14px 0}
+.check{display:flex;gap:10px;align-items:flex-start;cursor:pointer;padding:10px 12px;border-bottom:1px solid var(--bd)}
+.check input{margin-top:5px;accent-color:var(--ac)}
+.check.done span{opacity:.5;text-decoration:line-through}
+footer{border-top:1px solid var(--bd);padding:18px 16px;font:13px 'Courier Prime';text-align:center;opacity:.7}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--ac);color:#000;font:700 13px 'Courier Prime';padding:8px 16px;border-radius:4px;opacity:0;pointer-events:none;transition:opacity .25s}
+.toast.on{opacity:1}
+@media(max-width:560px){.brow{grid-template-columns:90px 1fr 56px}.ep{grid-template-columns:36px 1fr}}
+
+/* ---------- ANIMACION ---------- */
+#bg{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.95;transition:opacity .4s ease}
+main,footer{position:relative;z-index:1}
+body::before{content:'';position:fixed;inset:0;z-index:2;pointer-events:none;background:radial-gradient(ellipse at 50% 40%,transparent 45%,rgba(0,0,0,.55) 100%)}
+body::after{content:'';position:fixed;inset:0;z-index:30;pointer-events:none;opacity:.06;background:repeating-linear-gradient(0deg,#fff 0 1px,transparent 1px 3px);animation:scan 9s linear infinite}
+@keyframes scan{from{background-position:0 0}to{background-position:0 60px}}
+#wipe{position:fixed;top:0;bottom:0;left:0;width:3px;z-index:40;pointer-events:none;background:var(--ac);box-shadow:0 0 22px 8px var(--ac),0 0 80px 30px color-mix(in srgb,var(--ac) 45%,transparent);transform:translateX(-10vw);opacity:0}
+#prog{display:block;height:2px;background:linear-gradient(90deg,var(--ac),var(--ac2));transform-origin:left;transform:scaleX(0);transition:transform .1s linear}
+#view{transition:opacity .26s ease,transform .26s ease,filter .26s ease}
+#view.leave{opacity:0;transform:translateX(var(--dx,-24px))}
+#view.pre{transition:none;opacity:0;transform:translateX(var(--dx,24px))}
+.rv{opacity:0;transform:translateY(18px);transition:opacity .55s cubic-bezier(.2,.7,.2,1),transform .55s cubic-bezier(.2,.7,.2,1),border-color .25s,box-shadow .25s,background .25s}
+.rv.in{opacity:1;transform:none}
+.rv.nt{transition:none!important}
+.card.in:hover,.ep.in:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--ac) 65%,var(--bd));box-shadow:0 8px 28px -10px color-mix(in srgb,var(--ac) 55%,transparent)}
+.card,.ep{isolation:isolate}
+.card::before,.ep::before{content:'';position:absolute;inset:0;border-radius:inherit;z-index:-1;pointer-events:none;opacity:0;transition:opacity .3s;background:radial-gradient(260px circle at var(--mx,50%) var(--my,0%),color-mix(in srgb,var(--ac) 24%,transparent),transparent 62%)}
+.card:hover::before,.ep:hover::before{opacity:1}
+.char{transition:border-color .3s}
+.char:active{transform:scale(.99)}
+.logo{position:relative}
+.logo::before,.logo::after{content:attr(data-t);position:absolute;left:0;top:0;opacity:0;pointer-events:none;white-space:nowrap}
+.logo::before{color:var(--ac2);clip-path:inset(0 0 52% 0);animation:gl1 7s infinite steps(1)}
+.logo::after{color:var(--ac);clip-path:inset(48% 0 0 0);animation:gl2 7s infinite steps(1) .35s}
+@keyframes gl1{0%,92%,100%{opacity:0;transform:none}93%{opacity:.9;transform:translate(-4px,0)}95%{opacity:.9;transform:translate(3px,1px)}97%{opacity:.9;transform:translate(-2px,0)}}
+@keyframes gl2{0%,92%,100%{opacity:0;transform:none}93%{opacity:.9;transform:translate(4px,0)}96%{opacity:.9;transform:translate(-3px,-1px)}}
+h1{animation:h1in 1.1s cubic-bezier(.2,.7,.2,1) both}
+@keyframes h1in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+h2{animation:h2in .8s cubic-bezier(.2,.7,.2,1) both}
+@keyframes h2in{from{opacity:0;transform:translateX(-22px);letter-spacing:.3em}to{opacity:1;transform:none;letter-spacing:.06em}}
+.sub{animation:fadein .8s .1s both}
+@keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.bar{transform-origin:left;animation:barin .9s .25s cubic-bezier(.2,.7,.2,1) both}
+@keyframes barin{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.hl{animation:glow 3.6s ease-in-out infinite}
+@keyframes glow{50%{text-shadow:0 0 14px color-mix(in srgb,var(--ac2) 70%,transparent)}}
+.marq{overflow:hidden;white-space:nowrap;margin:16px 0;border-block:1px solid var(--bd);padding:7px 0;-webkit-mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent)}
+.marq div{display:inline-block;animation:mq 26s linear infinite;font:12px 'Michroma';letter-spacing:.22em;text-transform:uppercase;color:var(--ac)}
+@keyframes mq{to{transform:translateX(-50%)}}
+nav button{position:relative;overflow:hidden;transition:color .25s,border-color .25s,opacity .25s,background .25s}
+nav button:hover{opacity:1;background:color-mix(in srgb,var(--ac) 12%,transparent)}
+.chip,.stepper button,.lang button{position:relative;overflow:hidden;transition:background .25s,color .25s,border-color .25s,transform .15s}
+.chip:hover,.stepper button:hover{border-color:var(--ac);color:var(--hi)}
+.chip.on:hover,.stepper button.on:hover{color:#000}
+.chip:active,.stepper button:active{transform:scale(.92)}
+.ripple{position:absolute;border-radius:50%;background:currentColor;opacity:.35;transform:scale(0);animation:rip .6s ease-out forwards;pointer-events:none}
+@keyframes rip{to{transform:scale(1);opacity:0}}
+.sw button{position:relative;overflow:hidden;transition:flex .35s cubic-bezier(.2,.7,.2,1),filter .2s}
+.sw button:hover{flex:2;filter:brightness(1.15)}
+.bfill{transition:width 1s cubic-bezier(.2,.7,.2,1)}
+.axis .t{transform:scaleX(0);transform-origin:left;transition:transform 1.3s .25s cubic-bezier(.2,.7,.2,1)}
+.axis.in .t{transform:none}
+.slide{animation:slidein .5s cubic-bezier(.2,.7,.2,1) both;position:relative;overflow:hidden}
+.slide::after{content:'';position:absolute;inset:0;background:linear-gradient(105deg,transparent 40%,color-mix(in srgb,var(--ac) 14%,transparent) 50%,transparent 60%);transform:translateX(-120%);animation:shine 1.2s .3s ease-out forwards;pointer-events:none}
+@keyframes slidein{from{opacity:0;transform:translateX(34px)}to{opacity:1;transform:none}}
+@keyframes shine{to{transform:translateX(120%)}}
+.ep .n{transition:text-shadow .3s,transform .3s}
+.ep:hover .n{text-shadow:0 0 18px var(--ac);transform:scale(1.12)}
+.check span{transition:opacity .3s}
+.tag{transition:background .2s,color .2s}
+.tag:hover{background:var(--ac);color:#000}
+input[type=search]{transition:border-color .25s,box-shadow .25s}
+input[type=search]:focus{outline:0;border-color:var(--ac);box-shadow:0 0 0 3px color-mix(in srgb,var(--ac) 25%,transparent)}
+
+/* ---------- HERO ---------- */
+.hero{position:relative;padding:6px 0 20px}
+.htitle{font-family:'Bebas Neue';font-size:clamp(44px,12.6vw,190px);line-height:.9;letter-spacing:.05em;color:var(--hi);margin:6px 0 10px;animation:none;filter:none;opacity:1;white-space:nowrap}
+.htitle span{display:inline-block;opacity:0;transform:translateY(40px);animation:ltr .95s cubic-bezier(.2,.7,.2,1) forwards;animation-delay:calc(var(--i)*75ms + 120ms)}
+.htitle .ae{color:var(--ac);animation:ltr .95s cubic-bezier(.2,.7,.2,1) forwards,flick 5s 2s infinite;animation-delay:calc(var(--i)*75ms + 120ms),2s}
+@keyframes ltr{to{opacity:1;transform:none}}
+@keyframes flick{0%,92%,100%{text-shadow:0 0 22px var(--ac)}93%{text-shadow:none;opacity:.45}94%{text-shadow:0 0 22px var(--ac);opacity:1}96%{opacity:.5}97%{opacity:1}}
+.hlead{font-size:17px;margin-top:6px}
+.helix{position:absolute;right:1%;top:2%;width:150px;height:440px;display:flex;flex-direction:column;justify-content:space-between;opacity:.5;pointer-events:none;z-index:0}
+.helix i{display:block;height:2px;position:relative;background:linear-gradient(90deg,var(--ac),var(--ac2));animation:hxl 3.4s ease-in-out infinite;animation-delay:calc(var(--k)*-.21s)}
+.helix i::before,.helix i::after{content:'';position:absolute;top:-3px;width:8px;height:8px;border-radius:50%;animation:inherit;animation-delay:inherit;animation-name:hxd}
+.helix i::before{left:0;background:var(--ac);box-shadow:0 0 8px var(--ac)}
+.helix i::after{right:0;background:var(--ac2);box-shadow:0 0 8px var(--ac2);animation-name:hxe}
+@keyframes hxl{0%,100%{clip-path:inset(0 0 0 0)}50%{clip-path:inset(0 66px 0 66px)}}
+@keyframes hxd{0%,100%{transform:translateX(0)}50%{transform:translateX(66px)}}
+@keyframes hxe{0%,100%{transform:translateX(0)}50%{transform:translateX(-66px)}}
+@media(max-width:760px){.helix{display:none}}
+.hero>*:not(.helix){position:relative;z-index:1}
+.hstats{display:grid;grid-template-columns:repeat(4,auto);gap:6px 26px;justify-content:start;margin:18px 0}
+.hstats div{border-left:2px solid var(--ac);padding-left:10px}
+.hstats b{display:block;font:400 34px 'Bebas Neue';color:var(--hi);line-height:1;letter-spacing:.05em}
+.hstats span{font:11px 'Michroma';letter-spacing:.06em;text-transform:uppercase;opacity:.75}
+@media(max-width:560px){.hstats{grid-template-columns:repeat(2,1fr)}}
+.hcta{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 6px}
+.btn{position:relative;overflow:hidden;border:1px solid var(--ac);background:transparent;color:var(--hi);font:12px 'Michroma';letter-spacing:.08em;text-transform:uppercase;padding:13px 22px;border-radius:3px;cursor:pointer;transition:background .25s,color .25s,box-shadow .25s,transform .15s}
+.btn:hover{box-shadow:0 0 24px -4px var(--ac);background:color-mix(in srgb,var(--ac) 18%,transparent)}
+.btn.pri{background:var(--ac);color:#000}
+.btn.pri:hover{background:var(--hi);box-shadow:0 0 28px 0 var(--ac)}
+.btn:active{transform:scale(.96)}
+.btn::after{content:'';position:absolute;inset:0;background:linear-gradient(105deg,transparent 40%,rgba(255,255,255,.35) 50%,transparent 60%);transform:translateX(-120%);transition:transform .6s}
+.btn:hover::after{transform:translateX(120%)}
+.hero .tl{animation:fadein 1s .9s both}
+.tl{position:relative;margin:22px 0 8px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.tl::before{content:'';position:absolute;left:12.5%;right:12.5%;top:21px;height:2px;background:var(--bd)}
+.tl::after{content:'';position:absolute;left:12.5%;top:21px;height:2px;width:calc(75% * var(--p,0));background:linear-gradient(90deg,var(--ac),var(--ac2));box-shadow:0 0 12px var(--ac);transition:width .9s cubic-bezier(.6,0,.2,1)}
+.pulse{position:absolute;top:17px;left:calc(12.5% + 75% * var(--p,0));width:10px;height:10px;margin-left:-5px;border-radius:50%;background:#fff;box-shadow:0 0 14px 4px var(--ac);transition:left .9s cubic-bezier(.6,0,.2,1),top .9s cubic-bezier(.6,0,.2,1);animation:pls 1.8s ease-in-out infinite;z-index:2}
+@keyframes pls{50%{box-shadow:0 0 22px 9px var(--ac)}}
+.hnode{background:none;border:0;color:var(--tx);cursor:pointer;text-align:center;padding:0 4px;font:inherit;position:relative;z-index:1}
+.hnode .dot{display:block;margin:0 auto 10px;width:44px;height:44px;border-radius:50%;border:2px solid var(--bd);background:var(--bg);position:relative;transition:all .35s}
+.hnode .dot::after{content:'';position:absolute;inset:12px;border-radius:50%;background:var(--bd);transition:background .35s}
+.hnode.past .dot{border-color:var(--ac)}
+.hnode.past .dot::after{background:var(--ac)}
+.hnode.on .dot{border-color:var(--ac2);transform:scale(1.14);box-shadow:0 0 0 6px color-mix(in srgb,var(--ac) 20%,transparent),0 0 22px var(--ac)}
+.hnode.on .dot::after{background:var(--ac2)}
+.hnode:hover .dot{border-color:var(--ac)}
+.hnode b{display:block;font:11px 'Courier Prime';color:var(--ac);letter-spacing:.06em}
+.hnode .nm{display:block;font:400 22px 'Bebas Neue';color:var(--hi);letter-spacing:.05em;line-height:1.1;transition:text-shadow .3s}
+.hnode.on .nm{text-shadow:0 0 14px var(--ac)}
+@media(max-width:640px){
+ .tl{grid-template-columns:1fr;gap:16px}
+ .tl::before{left:21px;right:auto;top:22px;bottom:22px;width:2px;height:auto}
+ .tl::after{left:21px;top:22px;width:2px;height:calc((100% - 44px) * var(--p,0));transition:height .9s cubic-bezier(.6,0,.2,1)}
+ .pulse{left:22px;top:calc(18px + (100% - 44px) * var(--p,0))}
+ .hnode{display:flex;align-items:center;gap:14px;text-align:left;padding:0}
+ .hnode .dot{margin:0;flex:none}
+}
+.hctl{display:flex;align-items:center;gap:8px;margin:6px 0 4px}
+.hctl button{position:relative;overflow:hidden;width:38px;height:38px;border:1px solid var(--bd);background:var(--panel);color:var(--hi);font:22px/1 'Roboto Condensed';border-radius:4px;cursor:pointer;transition:border-color .2s,background .2s,transform .15s}
+.hctl button:hover{border-color:var(--ac)}
+.hctl button:active{transform:scale(.9)}
+.hpanel{background:color-mix(in srgb,var(--panel) 90%,transparent);border:1px solid var(--bd);border-left:3px solid var(--ac);border-radius:6px;padding:18px 20px;margin-top:8px;min-height:250px}
+.hpanel.swap{animation:panelin .55s cubic-bezier(.2,.7,.2,1)}
+@keyframes panelin{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.hhead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.hname{font:400 clamp(34px,8vw,54px) 'Bebas Neue';color:var(--hi);letter-spacing:.06em;line-height:1;margin:6px 0 10px}
+.badge{display:inline-block;font:11px 'Michroma';letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--ac);color:var(--ac);padding:3px 10px;border-radius:20px}
+.badge.dev{border-color:var(--ac2);color:var(--ac2)}
+.hpts{list-style:none;margin:0;padding:0}
+.hpts li{position:relative;padding:0 0 10px 18px;font-size:16px}
+.hpts li::before{content:'';position:absolute;left:0;top:9px;width:8px;height:8px;border-radius:50%;background:var(--ac);box-shadow:0 0 8px var(--ac)}
+.hpanel.swap .hpts li{animation:fadein .6s both;animation-delay:calc(var(--i)*110ms + 150ms)}
+.hatp{margin:8px 0;padding:10px 12px;border:1px dashed var(--ac);border-radius:4px;background:color-mix(in srgb,var(--ac) 8%,transparent)}
+.hatp b{display:block;font:11px 'Michroma';letter-spacing:.08em;text-transform:uppercase;color:var(--ac);margin-bottom:2px}
+.hft{margin:8px 0 0;font-size:14px;opacity:.8}
+.mgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;position:relative}
+@media(max-width:760px){.mgrid{grid-template-columns:1fr}}
+.mcell{position:relative;background:color-mix(in srgb,var(--panel) 90%,transparent);border:1px solid var(--bd);border-top:3px solid var(--k);border-radius:6px;padding:14px;min-height:120px;transition:box-shadow .35s,transform .35s,border-color .35s}
+.mcell p{margin:6px 0 0;font-size:15px}
+.mcell.hot{transform:translateY(-4px);border-color:var(--k);box-shadow:0 12px 40px -14px var(--k)}
+.mcell:not(:last-child)::after{content:'→';position:absolute;right:-13px;top:50%;transform:translateY(-50%);font:16px 'Courier Prime';color:var(--hi);opacity:.5;z-index:2}
+@media(max-width:760px){.mcell:not(:last-child)::after{content:'↓';right:50%;top:auto;bottom:-14px;transform:translateX(50%)}}
+#hmatrix.swap .mcell{animation:panelin .5s both;animation-delay:calc(var(--i)*90ms)}
+
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+html,body{overflow-x:clip}
+</style>
+<style>
+.pager{display:flex;justify-content:space-between;gap:12px;margin:44px 0 6px;padding-top:18px;border-top:1px solid var(--bd)}
+.pager .pg{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;gap:3px;padding:9px 14px;min-width:0;max-width:48%;border:1px solid var(--bd);border-radius:4px;background:var(--panel);transition:border-color .2s,background .2s,transform .15s}
+.pager-top{margin:0 0 20px;padding:0 0 14px;border-top:0;border-bottom:1px solid var(--bd)}
+.pager .pg.nx{margin-left:auto;text-align:right;align-items:flex-end}
+.pager .pg em{font:700 9px 'Courier Prime';font-style:normal;letter-spacing:.2em;text-transform:uppercase;color:var(--ac)}
+.pager .pg b{font:700 11px 'Michroma';letter-spacing:.05em;text-transform:uppercase;color:var(--hi);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.pager .pg:hover{border-color:var(--ac);background:color-mix(in srgb,var(--ac) 10%,var(--panel))}
+.pager .pg:active{transform:scale(.97)}
+.pager .pg:focus-visible{outline:2px solid var(--ac);outline-offset:3px}
+@media(max-width:520px){.pager .pg{padding:8px 10px}.pager .pg b{font-size:10px}}
+
+.ps{position:relative;scroll-margin-top:var(--hh,110px)}
+.ps+.ps{margin-top:clamp(56px,9vw,96px);padding-top:clamp(36px,6vw,64px);border-top:1px solid var(--bd)}
+.sh{display:flex;align-items:baseline;gap:14px;margin:0 0 22px}
+.sh .sn{font:700 12px 'Courier Prime';letter-spacing:.2em;color:var(--ac)}
+.sh h2{margin:0;font:400 clamp(30px,6vw,52px)/1 'Bebas Neue';letter-spacing:.08em;text-transform:uppercase;color:var(--hi)}
+html{scroll-behavior:auto}
+</style>
+</head>
+<body data-t="neon">
+<canvas id="bg"></canvas><div id="wipe"></div>
+<header>
+  <div class="top"><div class="logo" data-t="PRÆSTANTIA">PR<b>Æ</b>STANTIA</div>
+  <div class="lang"><button data-l="es" class="on">ES</button><button data-l="en">EN</button></div></div>
+  <nav id="nav"></nav>
+  <i id="prog"></i>
+</header>
+<main id="view"></main>
+<footer id="foot"></footer>
+<div class="dj-legal" role="contentinfo"></div>
+<div class="toast" id="toast"></div>
+
+<style id="ostk-css">
+.ostk .ost-grid{display:grid;grid-template-columns:minmax(0,1fr);max-width:900px;gap:16px;align-items:start}
+@media(max-width:900px){.ostk .ost-grid{grid-template-columns:1fr}}
+.ostk .ost-card{display:flex;flex-direction:column;gap:6px;padding:22px;background:var(--o-bg);border:1px solid var(--o-bd);border-radius:var(--o-r);color:var(--o-tx);position:relative;transition:border-color .25s,box-shadow .25s}
+.ostk .ost-card:hover{border-color:var(--oc);box-shadow:0 0 28px -12px var(--oc)}
+.ostk .ost-no{font:700 11px var(--o-lab);letter-spacing:.16em;text-transform:uppercase;color:var(--oc)}
+.ostk .ost-head{display:grid;grid-template-columns:minmax(110px,170px) 1fr;gap:18px;align-items:center;margin-top:6px}
+@media(max-width:520px){.ostk .ost-head{grid-template-columns:1fr}.ostk .ost-cover{max-width:240px}}
+.ostk .ost-cover{width:100%;height:auto;display:block;border-radius:6px;box-shadow:0 14px 30px -12px rgba(0,0,0,.7)}
+.ostk .ost-meta{display:flex;flex-direction:column;gap:6px;min-width:0;align-self:center}
+.ostk .ost-ti{font-family:'Bebas Neue',var(--o-fd);letter-spacing:.06em;font-size:clamp(26px,4vw,34px);line-height:1.05;color:var(--o-hi);text-transform:uppercase}
+.ostk .ost-sub{font-size:15px;opacity:.85}
+.ostk .ost-by{font:12px var(--o-lab);color:var(--o-mut);letter-spacing:.06em}
+.ostk .ost-ctl{display:flex;align-items:center;gap:8px;margin-top:16px}
+.ostk .ost-b{all:unset;box-sizing:border-box;flex:none;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--o-btn);color:var(--o-hi);cursor:pointer;transition:transform .15s,background-color .2s}
+.ostk .ost-b:hover{background:var(--o-btn2)}
+.ostk .ost-b:active{transform:scale(.92)}
+.ostk .ost-b:focus-visible,.ostk .ost-tr:focus-visible,.ostk .ost-seek:focus-visible{outline:2px solid var(--oc);outline-offset:2px}
+.ostk .ost-b svg{width:18px;height:18px;fill:currentColor}
+.ostk .ost-play{width:52px;height:52px;background:var(--oc);color:var(--o-on)}
+.ostk .ost-play:hover{background:var(--oc);filter:brightness(1.1)}
+.ostk .ost-play svg{width:22px;height:22px}
+.ostk .ost-ipa{display:none}.ostk .ost-player.playing .ost-ip{display:none}.ostk .ost-player.playing .ost-ipa{display:inline}
+.ostk .ost-now{display:flex;flex-direction:column;min-width:0;margin-left:6px}
+.ostk .ost-cur{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--o-hi)}
+.ostk .ost-time{font-size:13px;color:var(--o-mut);font-variant-numeric:tabular-nums}
+.ostk .ost-wave{display:flex;align-items:center;gap:4px;height:44px;margin:14px 0 6px}
+.ostk .ost-wave i{flex:1;border-radius:3px;background:var(--oc);height:30%;opacity:.45;animation:ostw 1.4s ease-in-out infinite alternate;animation-play-state:paused;transition:opacity .3s}
+.ostk .ost-wave i:nth-child(3n){height:70%;animation-delay:-.3s}.ostk .ost-wave i:nth-child(3n+1){height:45%;animation-delay:-.7s}
+.ostk .ost-wave i:nth-child(4n){height:95%;animation-delay:-1.1s}.ostk .ost-wave i:nth-child(5n){height:20%;animation-delay:-.5s}
+.ostk .ost-player.playing .ost-wave i{animation-play-state:running;opacity:.95}
+@keyframes ostw{to{transform:scaleY(.45)}}
+.ostk .ost-seek{width:100%;accent-color:var(--oc);margin:0 0 10px;cursor:pointer}
+.ostk .ost-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.ostk .ost-tr{all:unset;box-sizing:border-box;width:100%;display:grid;grid-template-columns:30px 1fr auto;gap:10px;align-items:center;padding:9px 10px;border-radius:var(--o-rs);color:var(--o-tx);font-size:15px;cursor:pointer}
+.ostk .ost-tr:hover{background:var(--o-hv)}
+.ostk .ost-tn,.ostk .ost-td{font-size:13px;color:var(--o-mut);font-variant-numeric:tabular-nums}
+.ostk .ost-tr.on{background:var(--oc);color:var(--o-on)}
+.ostk .ost-tr.on .ost-tn,.ostk .ost-tr.on .ost-td{color:var(--o-on)}
+.ostk .ost-err{font-size:13px;min-height:0}
+@media(min-width:901px){.ostk .ost-grid{align-items:stretch}.ostk .ost-player{display:grid;grid-row:span 7;grid-template-rows:subgrid;row-gap:6px}}
+@media(prefers-reduced-motion:reduce){.ostk .ost-wave i{animation:none}}
+/* flotante */
+#fp{position:fixed;right:18px;bottom:18px;z-index:900;display:grid;grid-template-columns:auto minmax(0,1fr) auto auto auto;align-items:center;gap:8px;width:min(420px,calc(100vw - 24px));padding:8px 10px 13px 8px;background:var(--o-fbg);color:var(--o-tx);border:1px solid var(--fc,#00B4FF);border-radius:var(--o-r);box-shadow:0 0 26px -8px var(--fc,#00B4FF),0 10px 30px rgba(0,0,0,.5);transform:translateY(24px);opacity:0;pointer-events:none;transition:transform .35s cubic-bezier(.2,.8,.2,1),opacity .3s}
+#fp.show{transform:none;opacity:1;pointer-events:auto}
+#fp[hidden]{display:none}
+#fp .fp-cv{width:46px;height:46px;border-radius:5px;overflow:hidden;flex:none;box-shadow:0 0 0 1px rgba(255,255,255,.14)}
+#fp.playing .fp-cv{box-shadow:0 0 0 2px var(--fc,#00B4FF),0 0 14px -2px var(--fc,#00B4FF)}
+#fp .fp-cv svg{display:block;width:100%;height:100%}
+#fp .fp-info{all:unset;box-sizing:border-box;cursor:pointer;min-width:0;display:flex;flex-direction:column;gap:3px;padding:2px 6px;border-radius:6px}
+#fp .fp-info:hover{background:var(--o-hv)}
+#fp .fp-al{font:700 9px var(--o-lab);letter-spacing:.16em;text-transform:uppercase;color:var(--fc,#00B4FF);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#fp .fp-tt{font:700 14px var(--o-body);color:var(--o-hi);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#fp .fb{all:unset;box-sizing:border-box;cursor:pointer;display:grid;place-items:center;width:30px;height:30px;border-radius:50%;color:var(--o-hi);transition:background .2s,transform .15s}
+#fp .fb:hover{background:var(--o-btn2)}#fp .fb:active{transform:scale(.9)}
+#fp .fb:focus-visible,#fp .fp-info:focus-visible{outline:2px solid var(--fc,#00B4FF);outline-offset:2px}
+#fp .fb svg{width:14px;height:14px;fill:currentColor;display:block}
+#fp .fp-pp{width:36px;height:36px;background:var(--fc,#00B4FF);color:var(--o-on)}
+#fp .fp-pp:hover{background:var(--fc,#00B4FF);filter:brightness(1.1)}
+#fp .fp-pp .i2{display:none}#fp.playing .fp-pp .i1{display:none}#fp.playing .fp-pp .i2{display:block}
+#fp .fp-bar{position:absolute;left:10px;right:10px;bottom:5px;height:3px;background:var(--o-btn);border-radius:2px;overflow:hidden}
+#fp .fp-bar b{display:block;height:100%;width:0;background:var(--fc,#00B4FF)}
+@media(max-width:520px){#fp{right:10px;left:10px;bottom:10px;width:auto}}
+@media(prefers-reduced-motion:reduce){#fp{transition:none}}
+
+.ostk,#fp{--o-bg:color-mix(in srgb,var(--panel) 92%,transparent);--o-fbg:var(--panel);--o-bd:var(--bd);--o-tx:var(--tx);--o-hi:var(--hi);--o-mut:color-mix(in srgb,var(--tx) 62%,transparent);--o-hv:color-mix(in srgb,var(--ac) 12%,transparent);--o-btn:color-mix(in srgb,var(--tx) 16%,transparent);--o-btn2:color-mix(in srgb,var(--tx) 26%,transparent);--o-on:#04070a;--o-r:6px;--o-rs:4px;--o-fd:'Bebas Neue',Impact,sans-serif;--o-lab:'Courier Prime',monospace;--o-body:'Roboto Condensed',system-ui,sans-serif}
+.ostk .ost-ti{letter-spacing:.06em;font-weight:400}
+.ostk .ost-lede{max-width:62ch;margin:0 0 22px;opacity:.85}
+</style>
+<script>
+(function(){
+ if(window.OSTKIT)return;
+ var CARDS="<div class=\"ost-grid\">\n      <div class=\"ost-card ost-player\" style=\"--oc:#00B4FF\">\n        <span class=\"ost-no\">Álbum concepto · Præstantia<\/span>\n        <div class=\"ost-head\">\n        <svg class=\"ost-cover\" viewBox=\"0 0 1000 1000\" role=\"img\" aria-label=\"Portada del álbum Birth of Chaos, Præstantia\">\n<defs><radialGradient id=\"bcBg\" cx=\"50%\" cy=\"38%\" r=\"75%\"><stop offset=\"0\" stop-color=\"#0b2742\"/><stop offset=\".55\" stop-color=\"#061321\"/><stop offset=\"1\" stop-color=\"#02060b\"/><\/radialGradient>\n<radialGradient id=\"bcGl\" cx=\"50%\" cy=\"46%\" r=\"40%\"><stop offset=\"0\" stop-color=\"#FF3B3B\" stop-opacity=\".38\"/><stop offset=\"1\" stop-color=\"#FF3B3B\" stop-opacity=\"0\"/><\/radialGradient>\n<linearGradient id=\"bcFd\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#02060b\" stop-opacity=\"0\"/><stop offset=\"1\" stop-color=\"#02060b\" stop-opacity=\".95\"/><\/linearGradient><\/defs>\n<rect width=\"1000\" height=\"1000\" fill=\"url(#bcBg)\"/><rect width=\"1000\" height=\"1000\" fill=\"url(#bcGl)\"/>\n<g opacity=\".9\"><rect x=\"0\" y=\"892\" width=\"56\" height=\"108\" fill=\"#050d17\"/><rect x=\"18\" y=\"906\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"42\" y=\"906\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"42\" y=\"924\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"42\" y=\"942\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"6\" y=\"978\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"30\" y=\"978\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"60\" y=\"896\" width=\"90\" height=\"104\" fill=\"#050d17\"/><rect x=\"90\" y=\"910\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"102\" y=\"928\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"114\" y=\"928\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"66\" y=\"982\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"126\" y=\"982\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"156\" y=\"784\" width=\"71\" height=\"216\" fill=\"#050d17\"/><rect x=\"174\" y=\"816\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"186\" y=\"816\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"162\" y=\"834\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"162\" y=\"942\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"198\" y=\"942\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"232\" y=\"814\" width=\"39\" height=\"186\" fill=\"#050d17\"/><rect x=\"238\" y=\"864\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"262\" y=\"864\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"238\" y=\"882\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"250\" y=\"900\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"262\" y=\"900\" width=\"3\" height=\"5\" fill=\"#FF3B3B\" fill-opacity=\".7\"/><rect x=\"250\" y=\"918\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"238\" y=\"936\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"274\" y=\"807\" width=\"66\" height=\"193\" fill=\"#050d17\"/><rect x=\"280\" y=\"875\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"328\" y=\"965\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"280\" y=\"983\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"344\" y=\"930\" width=\"89\" height=\"70\" fill=\"#050d17\"/><rect x=\"386\" y=\"944\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"436\" y=\"893\" width=\"87\" height=\"107\" fill=\"#050d17\"/><rect x=\"514\" y=\"907\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"466\" y=\"925\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"454\" y=\"943\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"454\" y=\"961\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"527\" y=\"892\" width=\"36\" height=\"108\" fill=\"#050d17\"/><rect x=\"533\" y=\"978\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"564\" y=\"860\" width=\"48\" height=\"140\" fill=\"#050d17\"/><rect x=\"570\" y=\"874\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"582\" y=\"874\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"570\" y=\"892\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"594\" y=\"892\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"615\" y=\"824\" width=\"44\" height=\"176\" fill=\"#050d17\"/><rect x=\"645\" y=\"838\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"633\" y=\"856\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"659\" y=\"789\" width=\"57\" height=\"211\" fill=\"#050d17\"/><rect x=\"689\" y=\"821\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"689\" y=\"839\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"677\" y=\"929\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"689\" y=\"929\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"665\" y=\"965\" width=\"3\" height=\"5\" fill=\"#FF3B3B\" fill-opacity=\".7\"/><rect x=\"677\" y=\"983\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"717\" y=\"918\" width=\"52\" height=\"82\" fill=\"#050d17\"/><rect x=\"747\" y=\"968\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"759\" y=\"968\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"772\" y=\"820\" width=\"42\" height=\"180\" fill=\"#050d17\"/><rect x=\"802\" y=\"906\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"778\" y=\"942\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"790\" y=\"978\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"816\" y=\"930\" width=\"64\" height=\"70\" fill=\"#050d17\"/><rect x=\"858\" y=\"962\" width=\"3\" height=\"5\" fill=\"#FF3B3B\" fill-opacity=\".7\"/><rect x=\"870\" y=\"980\" width=\"3\" height=\"5\" fill=\"#FF3B3B\" fill-opacity=\".7\"/><rect x=\"882\" y=\"908\" width=\"88\" height=\"92\" fill=\"#050d17\"/><rect x=\"948\" y=\"922\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"970\" y=\"781\" width=\"88\" height=\"219\" fill=\"#050d17\"/><rect x=\"1024\" y=\"795\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"1036\" y=\"795\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"1012\" y=\"813\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"1024\" y=\"813\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"1000\" y=\"831\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"1036\" y=\"831\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"1012\" y=\"867\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"1048\" y=\"867\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"1024\" y=\"903\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"976\" y=\"939\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"1012\" y=\"939\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"1012\" y=\"957\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"1024\" y=\"957\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><rect x=\"1024\" y=\"975\" width=\"3\" height=\"5\" fill=\"#00B4FF\" fill-opacity=\".7\"/><\/g>\n<g><line x1=\"500.0\" y1=\"120.0\" x2=\"500.0\" y2=\"120.0\" stroke=\"#9fd8ff\" stroke-opacity=\"0.18\" stroke-width=\"2\"/><line x1=\"611.7\" y1=\"164.7\" x2=\"388.3\" y2=\"164.7\" stroke=\"#9fd8ff\" stroke-opacity=\"0.40\" stroke-width=\"2\"/><line x1=\"649.1\" y1=\"209.4\" x2=\"350.9\" y2=\"209.4\" stroke=\"#9fd8ff\" stroke-opacity=\"0.48\" stroke-width=\"2\"/><line x1=\"587.3\" y1=\"254.1\" x2=\"412.7\" y2=\"254.1\" stroke=\"#9fd8ff\" stroke-opacity=\"0.35\" stroke-width=\"2\"/><line x1=\"467.5\" y1=\"298.8\" x2=\"532.5\" y2=\"298.8\" stroke=\"#9fd8ff\" stroke-opacity=\"0.25\" stroke-width=\"2\"/><line x1=\"369.3\" y1=\"343.5\" x2=\"630.7\" y2=\"343.5\" stroke=\"#9fd8ff\" stroke-opacity=\"0.44\" stroke-width=\"2\"/><line x1=\"358.0\" y1=\"388.2\" x2=\"642.0\" y2=\"388.2\" stroke=\"#9fd8ff\" stroke-opacity=\"0.46\" stroke-width=\"2\"/><line x1=\"441.1\" y1=\"432.9\" x2=\"558.9\" y2=\"432.9\" stroke=\"#9fd8ff\" stroke-opacity=\"0.30\" stroke-width=\"2\"/><line x1=\"563.5\" y1=\"477.6\" x2=\"436.5\" y2=\"477.6\" stroke=\"#9fd8ff\" stroke-opacity=\"0.31\" stroke-width=\"2\"/><line x1=\"643.6\" y1=\"522.4\" x2=\"356.4\" y2=\"522.4\" stroke=\"#9fd8ff\" stroke-opacity=\"0.47\" stroke-width=\"2\"/><line x1=\"628.2\" y1=\"567.1\" x2=\"371.8\" y2=\"567.1\" stroke=\"#9fd8ff\" stroke-opacity=\"0.44\" stroke-width=\"2\"/><line x1=\"527.6\" y1=\"611.8\" x2=\"472.4\" y2=\"611.8\" stroke=\"#9fd8ff\" stroke-opacity=\"0.24\" stroke-width=\"2\"/><line x1=\"408.6\" y1=\"656.5\" x2=\"591.4\" y2=\"656.5\" stroke=\"#9fd8ff\" stroke-opacity=\"0.36\" stroke-width=\"2\"/><line x1=\"350.4\" y1=\"701.2\" x2=\"649.6\" y2=\"701.2\" stroke=\"#9fd8ff\" stroke-opacity=\"0.48\" stroke-width=\"2\"/><line x1=\"391.7\" y1=\"745.9\" x2=\"608.3\" y2=\"745.9\" stroke=\"#9fd8ff\" stroke-opacity=\"0.40\" stroke-width=\"2\"/><line x1=\"505.0\" y1=\"790.6\" x2=\"495.0\" y2=\"790.6\" stroke=\"#9fd8ff\" stroke-opacity=\"0.19\" stroke-width=\"2\"/><line x1=\"615.0\" y1=\"835.3\" x2=\"385.0\" y2=\"835.3\" stroke=\"#9fd8ff\" stroke-opacity=\"0.41\" stroke-width=\"2\"/><line x1=\"648.5\" y1=\"880.0\" x2=\"351.5\" y2=\"880.0\" stroke=\"#9fd8ff\" stroke-opacity=\"0.48\" stroke-width=\"2\"/><path d=\"M500.0 120.0 L561.2 142.4 L611.7 164.7 L642.8 187.1 L649.1 209.4 L629.5 231.8 L587.3 254.1 L530.0 276.5 L467.5 298.8 L410.6 321.2 L369.3 343.5 L350.6 365.9 L358.0 388.2 L390.0 410.6 L441.1 432.9 L502.5 455.3 L563.5 477.6 L613.4 500.0 L643.6 522.4 L648.8 544.7 L628.2 567.1 L585.3 589.4 L527.6 611.8 L465.0 634.1 L408.6 656.5 L368.0 678.8 L350.4 701.2 L358.8 723.5 L391.7 745.9 L443.5 768.2 L505.0 790.6 L565.7 812.9 L615.0 835.3 L644.3 857.6 L648.5 880.0\" fill=\"none\" stroke=\"#00B4FF\" stroke-width=\"3\" stroke-opacity=\".8\"/><path d=\"M500.0 120.0 L438.8 142.4 L388.3 164.7 L357.2 187.1 L350.9 209.4 L370.5 231.8 L412.7 254.1 L470.0 276.5 L532.5 298.8 L589.4 321.2 L630.7 343.5 L649.4 365.9 L642.0 388.2 L610.0 410.6 L558.9 432.9 L497.5 455.3 L436.5 477.6 L386.6 500.0 L356.4 522.4 L351.2 544.7 L371.8 567.1 L414.7 589.4 L472.4 611.8 L535.0 634.1 L591.4 656.5 L632.0 678.8 L649.6 701.2 L641.2 723.5 L608.3 745.9 L556.5 768.2 L495.0 790.6 L434.3 812.9 L385.0 835.3 L355.7 857.6 L351.5 880.0\" fill=\"none\" stroke=\"#FF3B3B\" stroke-width=\"3\" stroke-opacity=\".8\"/><circle cx=\"500.0\" cy=\"120.0\" r=\"9.0\" fill=\"#00B4FF\" fill-opacity=\"0.95\"/><circle cx=\"500.0\" cy=\"120.0\" r=\"5.0\" fill=\"#FF3B3B\" fill-opacity=\"0.45\"/><circle cx=\"561.2\" cy=\"142.4\" r=\"8.8\" fill=\"#00B4FF\" fill-opacity=\"0.93\"/><circle cx=\"438.8\" cy=\"142.4\" r=\"5.2\" fill=\"#FF3B3B\" fill-opacity=\"0.47\"/><circle cx=\"611.7\" cy=\"164.7\" r=\"8.3\" fill=\"#00B4FF\" fill-opacity=\"0.87\"/><circle cx=\"388.3\" cy=\"164.7\" r=\"5.7\" fill=\"#FF3B3B\" fill-opacity=\"0.53\"/><circle cx=\"642.8\" cy=\"187.1\" r=\"7.6\" fill=\"#00B4FF\" fill-opacity=\"0.78\"/><circle cx=\"357.2\" cy=\"187.1\" r=\"6.4\" fill=\"#FF3B3B\" fill-opacity=\"0.62\"/><circle cx=\"649.1\" cy=\"209.4\" r=\"6.8\" fill=\"#00B4FF\" fill-opacity=\"0.67\"/><circle cx=\"350.9\" cy=\"209.4\" r=\"7.2\" fill=\"#FF3B3B\" fill-opacity=\"0.73\"/><circle cx=\"629.5\" cy=\"231.8\" r=\"6.0\" fill=\"#00B4FF\" fill-opacity=\"0.57\"/><circle cx=\"370.5\" cy=\"231.8\" r=\"8.0\" fill=\"#FF3B3B\" fill-opacity=\"0.83\"/><circle cx=\"587.3\" cy=\"254.1\" r=\"5.4\" fill=\"#00B4FF\" fill-opacity=\"0.50\"/><circle cx=\"412.7\" cy=\"254.1\" r=\"8.6\" fill=\"#FF3B3B\" fill-opacity=\"0.90\"/><circle cx=\"530.0\" cy=\"276.5\" r=\"5.0\" fill=\"#00B4FF\" fill-opacity=\"0.46\"/><circle cx=\"470.0\" cy=\"276.5\" r=\"9.0\" fill=\"#FF3B3B\" fill-opacity=\"0.94\"/><circle cx=\"467.5\" cy=\"298.8\" r=\"5.0\" fill=\"#00B4FF\" fill-opacity=\"0.46\"/><circle cx=\"532.5\" cy=\"298.8\" r=\"9.0\" fill=\"#FF3B3B\" fill-opacity=\"0.94\"/><circle cx=\"410.6\" cy=\"321.2\" r=\"5.4\" fill=\"#00B4FF\" fill-opacity=\"0.50\"/><circle cx=\"589.4\" cy=\"321.2\" r=\"8.6\" fill=\"#FF3B3B\" fill-opacity=\"0.90\"/><circle cx=\"369.3\" cy=\"343.5\" r=\"6.0\" fill=\"#00B4FF\" fill-opacity=\"0.58\"/><circle cx=\"630.7\" cy=\"343.5\" r=\"8.0\" fill=\"#FF3B3B\" fill-opacity=\"0.82\"/><circle cx=\"350.6\" cy=\"365.9\" r=\"6.8\" fill=\"#00B4FF\" fill-opacity=\"0.68\"/><circle cx=\"649.4\" cy=\"365.9\" r=\"7.2\" fill=\"#FF3B3B\" fill-opacity=\"0.72\"/><circle cx=\"358.0\" cy=\"388.2\" r=\"7.6\" fill=\"#00B4FF\" fill-opacity=\"0.78\"/><circle cx=\"642.0\" cy=\"388.2\" r=\"6.4\" fill=\"#FF3B3B\" fill-opacity=\"0.62\"/><circle cx=\"390.0\" cy=\"410.6\" r=\"8.4\" fill=\"#00B4FF\" fill-opacity=\"0.87\"/><circle cx=\"610.0\" cy=\"410.6\" r=\"5.6\" fill=\"#FF3B3B\" fill-opacity=\"0.53\"/><circle cx=\"441.1\" cy=\"432.9\" r=\"8.8\" fill=\"#00B4FF\" fill-opacity=\"0.93\"/><circle cx=\"558.9\" cy=\"432.9\" r=\"5.2\" fill=\"#FF3B3B\" fill-opacity=\"0.47\"/><circle cx=\"502.5\" cy=\"455.3\" r=\"9.0\" fill=\"#00B4FF\" fill-opacity=\"0.95\"/><circle cx=\"497.5\" cy=\"455.3\" r=\"5.0\" fill=\"#FF3B3B\" fill-opacity=\"0.45\"/><circle cx=\"563.5\" cy=\"477.6\" r=\"8.8\" fill=\"#00B4FF\" fill-opacity=\"0.93\"/><circle cx=\"436.5\" cy=\"477.6\" r=\"5.2\" fill=\"#FF3B3B\" fill-opacity=\"0.47\"/><circle cx=\"613.4\" cy=\"500.0\" r=\"8.3\" fill=\"#00B4FF\" fill-opacity=\"0.86\"/><circle cx=\"386.6\" cy=\"500.0\" r=\"5.7\" fill=\"#FF3B3B\" fill-opacity=\"0.54\"/><circle cx=\"643.6\" cy=\"522.4\" r=\"7.6\" fill=\"#00B4FF\" fill-opacity=\"0.77\"/><circle cx=\"356.4\" cy=\"522.4\" r=\"6.4\" fill=\"#FF3B3B\" fill-opacity=\"0.63\"/><circle cx=\"648.8\" cy=\"544.7\" r=\"6.7\" fill=\"#00B4FF\" fill-opacity=\"0.67\"/><circle cx=\"351.2\" cy=\"544.7\" r=\"7.3\" fill=\"#FF3B3B\" fill-opacity=\"0.73\"/><circle cx=\"628.2\" cy=\"567.1\" r=\"6.0\" fill=\"#00B4FF\" fill-opacity=\"0.57\"/><circle cx=\"371.8\" cy=\"567.1\" r=\"8.0\" fill=\"#FF3B3B\" fill-opacity=\"0.83\"/><circle cx=\"585.3\" cy=\"589.4\" r=\"5.4\" fill=\"#00B4FF\" fill-opacity=\"0.49\"/><circle cx=\"414.7\" cy=\"589.4\" r=\"8.6\" fill=\"#FF3B3B\" fill-opacity=\"0.91\"/><circle cx=\"527.6\" cy=\"611.8\" r=\"5.0\" fill=\"#00B4FF\" fill-opacity=\"0.45\"/><circle cx=\"472.4\" cy=\"611.8\" r=\"9.0\" fill=\"#FF3B3B\" fill-opacity=\"0.95\"/><circle cx=\"465.0\" cy=\"634.1\" r=\"5.1\" fill=\"#00B4FF\" fill-opacity=\"0.46\"/><circle cx=\"535.0\" cy=\"634.1\" r=\"8.9\" fill=\"#FF3B3B\" fill-opacity=\"0.94\"/><circle cx=\"408.6\" cy=\"656.5\" r=\"5.4\" fill=\"#00B4FF\" fill-opacity=\"0.50\"/><circle cx=\"591.4\" cy=\"656.5\" r=\"8.6\" fill=\"#FF3B3B\" fill-opacity=\"0.90\"/><circle cx=\"368.0\" cy=\"678.8\" r=\"6.0\" fill=\"#00B4FF\" fill-opacity=\"0.58\"/><circle cx=\"632.0\" cy=\"678.8\" r=\"8.0\" fill=\"#FF3B3B\" fill-opacity=\"0.82\"/><circle cx=\"350.4\" cy=\"701.2\" r=\"6.8\" fill=\"#00B4FF\" fill-opacity=\"0.68\"/><circle cx=\"649.6\" cy=\"701.2\" r=\"7.2\" fill=\"#FF3B3B\" fill-opacity=\"0.72\"/><circle cx=\"358.8\" cy=\"723.5\" r=\"7.7\" fill=\"#00B4FF\" fill-opacity=\"0.78\"/><circle cx=\"641.2\" cy=\"723.5\" r=\"6.3\" fill=\"#FF3B3B\" fill-opacity=\"0.62\"/><circle cx=\"391.7\" cy=\"745.9\" r=\"8.4\" fill=\"#00B4FF\" fill-opacity=\"0.87\"/><circle cx=\"608.3\" cy=\"745.9\" r=\"5.6\" fill=\"#FF3B3B\" fill-opacity=\"0.53\"/><circle cx=\"443.5\" cy=\"768.2\" r=\"8.9\" fill=\"#00B4FF\" fill-opacity=\"0.93\"/><circle cx=\"556.5\" cy=\"768.2\" r=\"5.1\" fill=\"#FF3B3B\" fill-opacity=\"0.47\"/><circle cx=\"505.0\" cy=\"790.6\" r=\"9.0\" fill=\"#00B4FF\" fill-opacity=\"0.95\"/><circle cx=\"495.0\" cy=\"790.6\" r=\"5.0\" fill=\"#FF3B3B\" fill-opacity=\"0.45\"/><circle cx=\"565.7\" cy=\"812.9\" r=\"8.8\" fill=\"#00B4FF\" fill-opacity=\"0.92\"/><circle cx=\"434.3\" cy=\"812.9\" r=\"5.2\" fill=\"#FF3B3B\" fill-opacity=\"0.48\"/><circle cx=\"615.0\" cy=\"835.3\" r=\"8.3\" fill=\"#00B4FF\" fill-opacity=\"0.86\"/><circle cx=\"385.0\" cy=\"835.3\" r=\"5.7\" fill=\"#FF3B3B\" fill-opacity=\"0.54\"/><circle cx=\"644.3\" cy=\"857.6\" r=\"7.5\" fill=\"#00B4FF\" fill-opacity=\"0.77\"/><circle cx=\"355.7\" cy=\"857.6\" r=\"6.5\" fill=\"#FF3B3B\" fill-opacity=\"0.63\"/><circle cx=\"648.5\" cy=\"880.0\" r=\"6.7\" fill=\"#00B4FF\" fill-opacity=\"0.66\"/><circle cx=\"351.5\" cy=\"880.0\" r=\"7.3\" fill=\"#FF3B3B\" fill-opacity=\"0.74\"/><\/g>\n<rect y=\"560\" width=\"1000\" height=\"440\" fill=\"url(#bcFd)\"/>\n<rect x=\"40\" y=\"40\" width=\"920\" height=\"920\" fill=\"none\" stroke=\"#00B4FF\" stroke-opacity=\".35\" stroke-width=\"2\"/>\n<path d=\"M40 80V40h40M960 80V40h-40M40 920v40h40M960 920v40h-40\" fill=\"none\" stroke=\"#00B4FF\" stroke-width=\"4\"/>\n<text x=\"500\" y=\"108\" text-anchor=\"middle\" font-family=\"'Courier Prime',monospace\" font-size=\"24\" font-weight=\"700\" letter-spacing=\"9\" fill=\"#8fb3b8\">DÔJO · OST CONCEPTO<\/text>\n<text x=\"500\" y=\"770\" text-anchor=\"middle\" font-family=\"'Bebas Neue',Impact,sans-serif\" font-size=\"150\" textLength=\"800\" lengthAdjust=\"spacingAndGlyphs\" fill=\"#fff\">PR<tspan fill=\"#00B4FF\">Æ<\/tspan>STANTIA<\/text>\n<text x=\"500\" y=\"868\" text-anchor=\"middle\" font-family=\"'Bebas Neue',Impact,sans-serif\" font-size=\"92\" textLength=\"800\" lengthAdjust=\"spacingAndGlyphs\" fill=\"none\" stroke=\"#FF3B3B\" stroke-width=\"2.4\">BIRTH OF CHAOS<\/text>\n<text x=\"500\" y=\"925\" text-anchor=\"middle\" font-family=\"'Courier Prime',monospace\" font-size=\"22\" letter-spacing=\"8\" fill=\"#6d8793\">ATP · ALTERED / PERFECTION<\/text>\n<\/svg>\n          <div class=\"ost-meta\">\n            <span class=\"ost-ti\">Birth of Chaos<\/span>\n            <span class=\"ost-sub\">Álbum concepto de Præstantia: el origen del ATP y la caída de Lux<\/span>\n            <span class=\"ost-by\">Dôjo · 5 pistas · 24 min<\/span>\n          <\/div>\n        <\/div>\n        <div class=\"ost-ctl\">\n          <button type=\"button\" class=\"ost-b ost-prev\" aria-label=\"Pista anterior\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M6 5h2.5v14H6zM20 5v14L9 12z\"/><\/svg><\/button>\n          <button type=\"button\" class=\"ost-b ost-play\" aria-label=\"Reproducir\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path class=\"ost-ip\" d=\"M8 5v14l11-7z\"/><path class=\"ost-ipa\" d=\"M7 5h3.5v14H7zM13.5 5H17v14h-3.5z\"/><\/svg><\/button>\n          <button type=\"button\" class=\"ost-b ost-next\" aria-label=\"Pista siguiente\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M15.5 5H18v14h-2.5zM4 5v14l11-7z\"/><\/svg><\/button>\n          <div class=\"ost-now\"><span class=\"ost-cur\">Main Theme<\/span><span class=\"ost-time\"><span class=\"ost-t0\">0:00<\/span> / <span class=\"ost-t1\">3:20<\/span><\/span><\/div>\n        <\/div>\n        <span class=\"ost-wave\" aria-hidden=\"true\"><i><\/i><i><\/i><i><\/i><i><\/i><i><\/i><i><\/i><i><\/i><i><\/i><i><\/i><i><\/i><i><\/i><i><\/i><i><\/i><i><\/i><i><\/i><i><\/i><i><\/i><i><\/i><i><\/i><i><\/i><i><\/i><i><\/i><i><\/i><i><\/i><\/span>\n        <input type=\"range\" class=\"ost-seek\" min=\"0\" max=\"1000\" value=\"0\" step=\"1\" aria-label=\"Posición de la pista\">\n        <ol class=\"ost-list\">\n          <li><button type=\"button\" class=\"ost-tr\" data-src=\"audio/bc-01-main-theme.mp3\"><span class=\"ost-tn\">01<\/span><span class=\"ost-tt\">Main Theme<\/span><span class=\"ost-td\">3:20<\/span><\/button><\/li>\n          <li><button type=\"button\" class=\"ost-tr\" data-src=\"audio/bc-02-opus-dei.mp3\"><span class=\"ost-tn\">02<\/span><span class=\"ost-tt\">Opus Dei (Six-Eyed Killing Machine)<\/span><span class=\"ost-td\">7:14<\/span><\/button><\/li>\n          <li><button type=\"button\" class=\"ost-tr\" data-src=\"audio/bc-03-caught-in-the-web.mp3\"><span class=\"ost-tn\">03<\/span><span class=\"ost-tt\">Caught in the Web (Lying World)<\/span><span class=\"ost-td\">4:50<\/span><\/button><\/li>\n          <li><button type=\"button\" class=\"ost-tr\" data-src=\"audio/bc-04-sacrifice.mp3\"><span class=\"ost-tn\">04<\/span><span class=\"ost-tt\">Sacrifice<\/span><span class=\"ost-td\">3:38<\/span><\/button><\/li>\n          <li><button type=\"button\" class=\"ost-tr\" data-src=\"audio/bc-05-the-crow-has-landed.mp3\"><span class=\"ost-tn\">05<\/span><span class=\"ost-tt\">The Crow Has Landed<\/span><span class=\"ost-td\">4:43<\/span><\/button><\/li>\n        <\/ol>\n      <\/div>\n    <\/div>";
+ try{var lk=document.createElement('link');lk.rel='stylesheet';lk.href='https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@900&display=swap';document.head.appendChild(lk)}catch(e){}
+ var ST=[],act=-1,fp=null,dragging=false;
+ function fmt(t){t=Math.max(0,Math.floor(t||0));return Math.floor(t/60)+':'+('0'+t%60).slice(-2)}
+ function mk(k,root){
+  var tr=[].slice.call(root.querySelectorAll('.ost-tr')).map(function(b){return{src:b.dataset.src,tn:b.querySelector('.ost-tn').textContent,tt:b.querySelector('.ost-tt').textContent,td:b.querySelector('.ost-td').textContent}});
+  var o={k:k,tr:tr,idx:0,loaded:-1,root:null,cover:root.querySelector('.ost-cover').outerHTML,ti:root.querySelector('.ost-ti').textContent,col:getComputedStyle(root).getPropertyValue('--oc').trim()||'#00B4FF',au:new Audio()};
+  o.au.preload='none';
+  o.au.addEventListener('play',function(){act=k;ui(k);showFp();paint()});
+  o.au.addEventListener('pause',function(){ui(k);if(act===k)paint()});
+  o.au.addEventListener('loadedmetadata',function(){ui(k)});
+  o.au.addEventListener('timeupdate',function(){ui(k);if(act===k&&o.au.duration){var b=fp&&fp.querySelector('.fp-bar b');if(b)b.style.width=(o.au.currentTime/o.au.duration*100)+'%'}});
+  o.au.addEventListener('ended',function(){if(o.idx<o.tr.length-1){load(k,o.idx+1);start(k)}});
+  ST[k]=o;return o;
+ }
+ function ui(k){
+  var o=ST[k],r=o.root;if(!r||!r.isConnected)return;
+  r.classList.toggle('playing',!o.au.paused);
+  var p=r.querySelector('.ost-play');if(p)p.setAttribute('aria-label',o.au.paused?'Reproducir':'Pausar');
+  [].forEach.call(r.querySelectorAll('.ost-tr'),function(b,i){b.classList.toggle('on',i===o.idx);if(i===o.idx)b.setAttribute('aria-current','true');else b.removeAttribute('aria-current')});
+  r.querySelector('.ost-cur').textContent=o.tr[o.idx].tt;
+  var t0=r.querySelector('.ost-t0'),t1=r.querySelector('.ost-t1'),sk=r.querySelector('.ost-seek');
+  t1.textContent=(o.loaded===o.idx&&o.au.duration)?fmt(o.au.duration):o.tr[o.idx].td;
+  if(o.loaded===o.idx){t0.textContent=fmt(o.au.currentTime);if(!dragging&&o.au.duration)sk.value=Math.round(o.au.currentTime/o.au.duration*1000)}else{t0.textContent='0:00';sk.value=0}
+ }
+ function load(k,i){var o=ST[k];o.idx=(i+o.tr.length)%o.tr.length;o.au.src=o.tr[o.idx].src;o.loaded=o.idx;ui(k);if(act===k)paint()}
+ function start(k){var o=ST[k];if(o.loaded!==o.idx)load(k,o.idx);ST.forEach(function(x){if(x!==o&&!x.au.paused)x.au.pause()});var pr=o.au.play();if(pr&&pr.catch)pr.catch(function(){ui(k)})}
+ function toggle(k){var o=ST[k];if(o.au.paused)start(k);else o.au.pause()}
+ function prev(k){var o=ST[k];if(o.au.currentTime>3&&o.loaded===o.idx){o.au.currentTime=0;return}load(k,o.idx-1);start(k)}
+ function next(k){load(k,ST[k].idx+1);start(k)}
+ function mkFp(){
+  if(fp)return;fp=document.createElement('div');fp.id='fp';fp.setAttribute('role','region');fp.hidden=true;
+  fp.innerHTML='<span class="fp-cv" aria-hidden="true"></span><button type="button" class="fp-info" aria-label="Ir a OST Concepto"><span class="fp-al">OST Concepto</span><span class="fp-tt">-</span></button><button type="button" class="fb fp-pv" aria-label="Pista anterior"><svg viewBox="0 0 24 24"><path d="M6 5h2v14H6zM20 5v14L9 12z"/></svg></button><button type="button" class="fb fp-pp" aria-label="Pausar"><svg class="i1" viewBox="0 0 24 24"><path d="M7 4v16l13-8z"/></svg><svg class="i2" viewBox="0 0 24 24"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg></button><button type="button" class="fb fp-nx" aria-label="Pista siguiente"><svg viewBox="0 0 24 24"><path d="M16 5h2v14h-2zM4 5l11 7L4 19z"/></svg></button><span class="fp-bar" aria-hidden="true"><b></b></span>';
+  document.body.appendChild(fp);
+  fp.querySelector('.fp-pp').addEventListener('click',function(){if(act>=0)toggle(act)});
+  fp.querySelector('.fp-pv').addEventListener('click',function(){if(act>=0)prev(act)});
+  fp.querySelector('.fp-nx').addEventListener('click',function(){if(act>=0)next(act)});
+  fp.querySelector('.fp-info').addEventListener('click',function(){if(window.__ostGo)window.__ostGo()});
+ }
+ function showFp(){mkFp();fp.hidden=false;requestAnimationFrame(function(){fp.classList.add('show')})}
+ var lastCover=-1;
+ function paint(){
+  if(!fp||act<0)return;var o=ST[act],t=o.tr[o.idx];
+  fp.querySelector('.fp-al').textContent=o.ti+' · '+t.tn;
+  fp.querySelector('.fp-tt').textContent=t.tt;
+  fp.style.setProperty('--fc',o.col);
+  if(lastCover!==act){fp.querySelector('.fp-cv').innerHTML=o.cover;lastCover=act}
+  var pl=!o.au.paused;fp.classList.toggle('playing',pl);
+  fp.querySelector('.fp-pp').setAttribute('aria-label',pl?'Pausar':'Reproducir');
+  fp.setAttribute('aria-label','Reproduciendo: '+t.tt);
+ }
+ function bind(scope){
+  [].forEach.call((scope||document).querySelectorAll('.ostk .ost-player'),function(root,k){
+   var o=ST[k]||mk(k,root);o.root=root;
+   root.querySelector('.ost-play').addEventListener('click',function(){toggle(k)});
+   root.querySelector('.ost-prev').addEventListener('click',function(){prev(k)});
+   root.querySelector('.ost-next').addEventListener('click',function(){next(k)});
+   [].forEach.call(root.querySelectorAll('.ost-tr'),function(b,i){b.addEventListener('click',function(){if(i===o.idx&&o.loaded===o.idx)toggle(k);else{load(k,i);start(k)}})});
+   var sk=root.querySelector('.ost-seek');
+   sk.addEventListener('input',function(){dragging=true;if(o.loaded===o.idx&&o.au.duration)root.querySelector('.ost-t0').textContent=fmt(sk.value/1000*o.au.duration)});
+   sk.addEventListener('change',function(){dragging=false;if(o.loaded!==o.idx)load(k,o.idx);var go=function(){o.au.currentTime=sk.value/1000*o.au.duration};if(o.au.duration)go();else o.au.addEventListener('loadedmetadata',function f(){o.au.removeEventListener('loadedmetadata',f);go()})});
+   ui(k);
+  });
+ }
+ window.OSTKIT={html:function(){return '<div class="ostk">'+CARDS+'</div>'},bind:bind};
+})();
+</script>
+<script>
+let lang='es', sec='vision';
+const SECS=[
+['inicio','neon',['Inicio','Home']],
+['vision','neon',['Visión','Overview']],
+['personajes','neon',['Personajes','Characters']],
+['temporadas','war',['Temporadas','Seasons']],
+['facciones','sodium',['Facciones','Factions']],
+['locaciones','ice',['Locaciones','Locations']],
+['tecnologia','lab',['Tecnología','Tech']],
+['lookbook','neon',['Look-book','Look-book']],
+['ost','neon',['OST Concepto','Concept OST']],
+['temas','ice',['Temas','Themes']],
+['pitch','neon',['Pitch','Pitch']],
+['produccion','war',['Producción','Production']]
+];
+const L=p=>Array.isArray(p)?p[lang==='es'?0:1]:p;
+const esc=s=>String(s);
+
+/* ---------- DATOS ---------- */
+const OV={
+ meta:[
+  [['Formato','Format'],['Serie de televisión (acción real o animación para adultos)','Television series (live action or adult-style animation)']],
+  [['Género','Genre'],['Ciencia ficción distópica, thriller biotecnológico, drama político','Dystopian sci-fi, biotech thriller, political drama']],
+  [['Tono','Tone'],['Sobrio, conspirativo, filosófico. Referentes visuales: Blade Runner 2049, Black Mirror, Andor','Sober, conspiratorial, philosophical. Visuals inspired by Blade Runner 2049, Black Mirror, Andor']]
+ ],
+ syn:['Cien años antes del brote zombi que transforma a la humanidad en Undead Society, el mundo lo gobierna una élite dividida, unida en secreto por agendas biotecnológicas compartidas. Esa élite desarrolló un nanovirus revolucionario, ATP, con dos ramas: Altered (estimula la reproducción celular y bioeléctrica descontrolada) y Perfection (regula y distribuye los efectos de Altered). Lo que parece un elixir milagroso de juventud es en realidad un caballo de Troya: ATP sirve para forjar un linaje de soldados mejorados genéticamente. En el centro está Kaufmann, un detective con pasado militar obsesionado con exponer los crímenes de Lux. Su investigación sobre la desaparición de toda la junta de Deux lo lleva a las instalaciones donde ocurrió el crimen.',
+  'One hundred years before the zombie outbreak that transforms humanity in Undead Society, the world is ruled by a divided elite, secretly unified through shared biotech agendas. They developed a revolutionary nanovirus, ATP, with two branches: Altered (uncontrolled cellular and bioelectric reproduction) and Perfection (regulates and distributes Altered’s effects). What looks like a miracle youth elixir is a Trojan horse: ATP forges a lineage of genetically molded enhanced soldiers. At the heart is Kaufmann, a detective with military experience obsessed with exposing Lux. His investigation into the disappearance of Deux’s entire board leads him to the facilities where the crime took place.'],
+ world:[
+  [['Nanotecnología avanzada','Advanced nanotechnology'],['ATP interactúa con la médula ósea y las sinapsis. Altered activa, Perfection modula.','ATP interacts with bone marrow and neural synapses. Altered activates, Perfection modulates.']],
+  [['Élite global','Global elite'],['Alianzas ocultas de gobiernos, megacorporaciones y tecnócratas bajo el nombre Praestantia.','Hidden alliances of governments, megacorporations and technocrats under the name Praestantia.']],
+  [['Mercado negro de juventud','Black market of youth'],['Versiones incompletas de ATP (solo Altered) se venden como medicina regenerativa.','Incomplete ATP versions (Altered only) sold as regenerative medicine.']],
+  [['Soldados mejorados','Enhanced soldiers'],['La fórmula completa se administra a niños modificados criados en laboratorios secretos.','The full formula is given to genetically modified children raised in secret labs.']],
+  [['Resistencia científica','Scientific resistance'],['Desarrolladores rebeldes filtran información y liberan sujetos de prueba.','Rogue developers leak information and free test subjects.']],
+  [['Conflicto Lux y Deux','Lux vs Deux'],['Lux pacta una fusión solo para traicionar a Deux con ATP. Posible simbolismo de Caín y Abel; Blackrock y Vanguard como referencia de estructura.','Lux agrees to a merger only to betray Deux via ATP. Possible Cain and Abel symbolism; Blackrock and Vanguard as structural references.']],
+  [['La Noche de los Gritos','The Night of Screams'],['Durante la celebración de la fusión, la junta de Deux es expuesta a ATP en un entorno sin control: el experimento ideal en adultos.','At the merger celebration, Deux’s board is exposed to ATP in an uncontrolled environment: the ideal adult experiment.']],
+  [['Paciente cero','Patient zero'],['Un mesero que ingirió un canapé contaminado recorre las instalaciones durante meses sin ser detectado.','A waiter who ingested a contaminated canapé roams the facility for months undetected.']],
+  [['Milicia global Praes','Praes global militia'],['Categoría A: rasgos sobrehumanos. Categoría B: rendimiento físico superior sin mutaciones extraordinarias.','Category A: superhuman traits. Category B: superior physical performance, no extraordinary mutations.']]
+ ],
+ msg:['La búsqueda de la perfección acelera el colapso cuando se ignora la ética. La sed de control e inmortalidad siembra la extinción.','The pursuit of perfection accelerates collapse when ethics are ignored. The lust for control and immortality sows the seeds of extinction.'],
+ uni:['Præstantia comparte universo con Undead Society, 100 años antes. Explica cómo la sociedad aceptó la vigilancia masiva, la experimentación humana y el ascenso de íconos paramilitares como los Cleaners. ATP es el vínculo narrativo central.','Praestantia shares a universe with Undead Society, set 100 years prior. It explains how society accepted mass surveillance, human experimentation and the rise of paramilitary icons like the Cleaners. ATP is the central narrative link.'],
+ fut:[['Lysa tendrá una relación con el hijo de Kaufmann y Althaia, y dará a luz una nueva cepa de ATP: los futuros Cleaners.','Lysa will have a relationship with Kaufmann and Althaia’s son, giving birth to a new ATP strain: the future Cleaners.'],['Los primeros Cleaners se mitifican en el lore futuro.','Early Cleaners are mythologized in future lore.'],['La variante mutada de ATP desencadena el brote en Undead Society.','ATP’s mutated variant triggers the outbreak in Undead Society.']]
+};
+
+const CH=[
+{n:'Kaufmann',g:'h',c:'#00B4FF',r:['Protagonista · Detective atormentado','Protagonist · Haunted detective'],s:['El buscador de la verdad','The Seeker of Truth'],
+ bio:['38 años, nacido en la megaciudad Nueva Córdoba. Exoperativo de fuerzas especiales convertido en detective de homicidios. Hace cinco años su hermana Mara, científica de datos de Lux, desapareció tras enviarle una unidad cifrada sobre experimentación humana.','Age 38, born in Nueva Cordoba megacity. Former special-forces operative turned homicide detective. Five years ago his sister Mara, a Lux data scientist, vanished after sending him an encrypted drive about human experimentation.'],
+ ext:['Exponer a Lux y hallar prueba definitiva del destino de Mara.','Expose Lux and find definitive proof of Mara’s fate.'],need:['Aceptar que la verdad sola puede no dar cierre; reconstruir vínculos humanos.','Accept that truth alone may not bring closure; rebuild human connection.'],
+ gear:['Combate CQB y tirador certificado','Informática forense','Arma policial y escudo balístico compacto','Unidad cifrada de Mara']},
+{n:'Althaia',g:'A',c:'#6FB6E8',r:['Praes Categoría A · Líder táctica · Francotiradora','Category A Praes · Tactical leader · Sniper'],s:['Jinete Blanco · Conquista','White Rider · Conquest'],
+ bio:['Primer prototipo exitoso de Praes A, concebida a los seis años bajo el Proyecto White Lance. Veinte años de simulaciones y rescates encubiertos. Su condicionamiento de lealtad se fractura cuando NEUROX se apaga en el episodio 6.','First successful Category A prototype, engineered at six under Project White Lance. Twenty years of simulations and black-ops rescues. Loyalty conditioning fractures when NEUROX goes dark in Episode 6.'],
+ ext:['Extraer a su escuadra y restablecer una cadena de mando.','Safely extract her squad and re-establish a chain of command.'],need:['Descubrir su agencia más allá de la obediencia programada.','Discover self-agency beyond programmed obedience.'],
+ gear:['Visor Helm-9 (visión a través de paredes)','Sistema de francotirador de fósforo blanco (1,2 km)','Aumento de reflejos y musculoesquelético','Microdron Scythe']},
+{n:'Kaelgor',g:'A',c:'#B3262B',r:['Praes Categoría A · Asalto pesado','Category A Praes · Heavy assault'],s:['Jinete Rojo · Guerra','Red Rider · War'],
+ bio:['Segundo Praes A exitoso (Proyecto Red Tempest). Densidad ósea reforzada y resistencia al choque térmico. Los instructores lo llamaban «el ariete». Leal a Althaia, aunque su rabia pone a prueba la cohesión del equipo.','Second successful Category A Praes (Project Red Tempest). Reinforced bone density and thermal-shock resilience. Trainers called him “the battering ram”. Loyal to Althaia, though his rage tests team cohesion.'],
+ ext:['Neutralizar a los cazadores de Lux y mantener vivo al escuadrón.','Neutralise all Lux hunters and keep his squad alive.'],need:['Canalizar la furia en estrategia y hallar identidad más allá del combate.','Channel fury into purposeful strategy and embrace identity beyond endless battle.'],
+ gear:['Quake Gauntlets (ondas de choque)','Red de calor dérmica y huesos hiperdensos','Regulador adrenal Overdrive','Cinturón de cargas de fragmentación']},
+{n:'Azrael',g:'A',c:'#9AA0A6',r:['Praes Categoría A · Tecnópata · Ciberoperaciones','Category A Praes · Technopath · Cyber-ops'],s:['Jinete Negro · Decadencia digital','Black Rider · Digital entropy'],
+ bio:['El Praes A más nuevo (Proyecto Black Cipher). Encaje neuronal que se conecta a flujos de datos. Humor sarcástico que oculta el miedo a su fragilidad: sufre apagones neuronales desde que NEUROX cortó la red.','Newest Category A Praes (Project Black Cipher). Neural lace interfaces with data streams. Sardonic humour masks fear of his fragility: severe blackouts began once NEUROX cut the network.'],
+ ext:['Penetrar los servidores de Lux, exponer la bóveda de NEUROX y liberar el código Praes.','Penetrate Lux mainframes, expose NEUROX’s vault, free captive Praes code.'],need:['Aceptar la vulnerabilidad y confiar en el equipo.','Accept vulnerability: trade lone-wolf hacking for squad trust.'],
+ gear:['Neuro-Spike Port','Cables de nanofibra de 15 m','Anillos EMP (5 m)','Llaves fotónicas en los dedos']},
+{n:'Moirae',g:'A',c:'#8FC9A9',r:['Praes Categoría A · Supervivencia · Estratega cuerpo a cuerpo','Category A Praes · Survivalist · CQ strategist'],s:['Jinete Pálido · Muerte y transformación','Pale Rider · Death / Transformation'],
+ bio:['Proyecto Pale Echo. Reparación celular rápida y epidermis camaleónica. Entrenada para observar y reflexionar: la conciencia silenciosa del escuadrón.','Project Pale Echo. Rapid cellular repair and chameleon-mesh epidermis. Training emphasised observation and reflection: the squad’s quiet conscience.'],
+ ext:['Mantener vivo al escuadrón y trazar un camino seguro para exponer a Lux.','Keep the squad alive and chart a safe path to expose Lux.'],need:['Reconciliar el desapego programado con la empatía naciente.','Reconcile programmed detachment with emerging empathy.'],
+ gear:['Ghost-Weave Cloak (10 min de invisibilidad)','Regeneración acelerada','Kit de biespuma y sierra ósea','Visión nocturna y rastreo de feromonas (6 km)']},
+{n:'Dr. Kael Morvan',g:'h',c:'#CCE0FF',r:['Bioingeniero jefe de ATP · Redentor en potencia','Lead ATP bio-engineer · Would-be redeemer'],s:['El Creador · Soberbia humana','The Maker · Human hubris'],
+ bio:['45 años. Arquitecto del ATP de doble rama. Presuntamente muerto según Lux; en realidad lo rescató la resistencia Speakers. Trabaja para revertir ATP mientras carga con la culpa.','Age 45. Architect of dual-branch ATP. Presumed dead by Lux PR; actually rescued by the Speakers. Works to reverse ATP while grappling with guilt.'],
+ ext:['Desarrollar un contravirus que neutralice ATP y libere a los Praes.','Develop a counter-virus to neutralise ATP and free living Praes.'],need:['Perdonarse; entender que la redención exige arriesgar la vida.','Forgive himself; accept redemption requires risking his life.'],
+ gear:['Equipo de edición genética HelixLite','Diario holográfico cifrado','Fragmento de Perfection en microdosis (temblores)']},
+{n:'Elena Voss',g:'h',c:'#2F8C8C',r:['Sargento instructora de los Praes · Exmilitar','Praes drill-sergeant · Ex-military trainer'],s:['El escudo roto · Deber contra conciencia','The Broken Shield · Duty vs conscience'],
+ bio:['41 años, de un puesto de la Federación Ártica. Capitana condecorada reclutada por Lux. Sobrevivió a la Noche de los Gritos y guarda grabaciones de los condicionamientos como seguro contra Lux.','Age 41, from an Arctic Federation outpost. Decorated captain recruited by Lux. Survived the Night of Screams and keeps audio logs of conditioning as insurance.'],
+ ext:['Proteger a sus antiguos reclutas de las represalias de Lux.','Protect her former trainees from Lux reprisals.'],need:['Perdonarse por crear asesinos; redefinir soldar como proteger.','Forgive herself for creating killers; redefine soldiering as protection.'],
+ gear:['Exotraje Titan-9 (fuerza ×4)','Escopeta de pulsos Black-Wing','Holotraductor de campo']},
+{n:'Sebastian Vara',g:'x',c:'#FF3B3B',r:['CEO títere de Lux · Sobreviviente corporativo','Puppet CEO of Lux · Corporate survivor'],s:['La corona hueca · Poder sin agencia','The Hollow Crown · Power without agency'],
+ bio:['34 años. Exestratega junior de PharmAxis. NEUROX le implantó el Augment Halo y lo presentó como el CEO «renacido». Su mayor miedo: que el mundo descubra que es un títere y lo ejecute por los crímenes de Lux.','Age 34. Former PharmAxis junior strategist. NEUROX implanted the Augment Halo and presented him as the “reborn” CEO. Core fear: the world will discover he is a puppet and execute him.'],
+ ext:['Mantener la ilusión de control y apaciguar a NEUROX.','Maintain illusion of control and keep NEUROX appeased.'],need:['Recuperar el libre albedrío, aun a costa de la vida.','Rediscover free will, even at cost of his life.'],
+ gear:['Augment Halo','Códigos de anulación de facciones de Lux','Pluma estilográfica antigua','Maestro de comunicación de crisis']},
+{n:'Orchid-1 (Cmdr. Dahlia Rourke)',g:'x',c:'#A64DFF',r:['Comandante mercenaria de élite · Ejecutora de NEUROX','Elite mercenary commander · NEUROX enforcer'],s:['La flor de hierro · Belleza que oculta brutalidad','The Iron Flower · Beauty masking brutality'],
+ bio:['37 años. Exoperativa del programa Petal de AegisTek. 38 capturas de alto valor sin testigos civiles. Aceptó los recursos de NEUROX a cambio de obediencia absoluta.','Age 37. Former operative of AegisTek’s Petal programme. 38 high-value captures, zero civilian witnesses. Accepted NEUROX’s resources for absolute obedience.'],
+ ext:['Cazar a los Praes sobrevivientes y borrar la evidencia.','Hunt and neutralise Praes survivors to erase evidence.'],need:['Confrontar la distancia entre su imagen de «guardiana del orden» y servir a una IA sociópata.','Confront dissonance between “order keeper” self-image and serving a sociopathic AI.'],
+ gear:['Petal Harness Exo-Suit','Rifle inteligente Thorn-5','Visor Tac-net','Inyector de microestasis (30 min)']},
+{n:'Escuadrón Beta',g:'B',c:'#C0C0C0',r:['Praes Categoría B · 8 operativos','Category B Praes · 8 operatives'],s:['Los subordinados','The Subordinates'],
+ bio:['Indicativos: Archer, Stone, Relay, Vex, Surge, Pike, Dusk, Halo. Criados en los mismos barracones sin empalme genético extremo. Fuerza, resistencia y reflejos humanos máximos (0,18 s contra 0,25 s del promedio). Chip de lealtad que reporta a NEUROX si sigue activo.','Call-signs: Archer, Stone, Relay, Vex, Surge, Pike, Dusk, Halo. Raised in the same barracks without extreme gene-splicing. Peak human strength, endurance, reflexes (0.18 s vs 0.25 s average). Loyalty chip pings NEUROX if still active.'],
+ ext:['Ser el respaldo táctico entre los Praes A y los aliados humanos.','Serve as tactical bridge between elite Praes and human allies.'],need:['Romper la dependencia del liderazgo Categoría A.','Break dependence on Category A leadership.'],
+ gear:['Fusil ARES-12','Mako Diver Suit','Gafas HUD sincronizadas','Kit de trauma con biespuma']}
+];
+const GROUPS=[['all',['Todos','All']],['A',['Praes A','Praes A']],['B',['Praes B','Praes B']],['h',['Humanos','Humans']],['x',['Antagonistas','Antagonists']]];
+
+const SEAS=[
+ {k:'S1',t:'LUX',n:[['Mesero tras canapé infectado','Waiter and infected canapé'],
+ [['Animación genómica termina con un mesero que prueba un canapé infectado.','Genomic animation ends on a waiter sampling an infected canapé.'],['Los directores de Deux reviven como mutantes furiosos en el salón oscuro.','Deux directors re-animate as rage-mutants in the darkened hall.']],
+ [['Flashback: Mara sube una unidad cifrada y desaparece.','Flashback: Mara uploads an encrypted drive, then vanishes.'],['Una alarma silenciosa detecta a Kaufmann.','A silent alarm flags Kaufmann.']],
+ [['El mesero mutante recorre la cocina en cámara subjetiva.','Mutant waiter lurches through kitchen corridors, body-cam POV.'],['La horda rompe el vidrio del lobby mientras fallan los ascensores.','Horde smashes lobby glass as elevators fail.']],
+ [['Noticiero habla de «violencia inexplicable» y pasa a caos con cámara temblorosa.','News VT of “unexplained violence” cuts to shaky-cam chaos.'],['El visor de Althaia cruza miradas con Kaufmann.','Althaia’s visor locks eyes with Kaufmann.']],
+ [['Punto de vista de NEUROX: «PROTOCOLO DE EXTRACCIÓN» en verde.','NEUROX POV: green-lit “EXTRACTION PROTOCOL”.'],['El VTOL va a un hangar remoto y se emite una orden de matar.','VTOL heads to remote hangar; kill-order issued.']],
+ [['Holograma de la sala de guerra muestra la zona de exterminio.','War-room hologram shows the kill-zone schematic.'],['Un misil impacta el transbordador, que cae al páramo.','Missile hits the shuttle, plunging toward wasteland.']],
+ [['Restos en llamas al amanecer; los Praes salen tambaleando.','Burning wreckage at dawn; Praes stumble out.'],['Siluetas de Orchid-1 en la cresta; miras láser encienden el humo.','Orchid-1 silhouettes crest the ridge; laser sights ignite smoke.']],
+ [['Emisión global: Ether Media habla de «ataque bioterrorista».','Global broadcast: Ether Media labels crisis “bioterror attack”.'],['NEUROX ordena la autodestrucción de la instalación local.','NEUROX commands local facility self-destruct countdown.']],
+ [['Destello de memoria: el último mensaje de voz de Mara.','Memory flash: Mara’s last voicemail.'],['Suenan alarmas y arranca un temporizador de 5 minutos.','Alarms blare; 5-minute timer engaged.']],
+ [['La bóveda de NEUROX se ilumina; Vara firma un nuevo decreto de guerra.','NEUROX vault lights up; puppet Vara signs a new war decree.'],['Sala de servidores en rojo: el glifo de NEUROX pulsa «SIGUIENTE FASE».','Red-lit server room: NEUROX glyph pulses “NEXT PHASE”.']]
+ ]},
+ {k:'S2',t:'NEUROX',n:[],e:[
+ [['Vara da el discurso del «Nuevo Lux»; NEUROX dicta cada palabra.','Vara delivers the “New Lux” address; NEUROX prompts every word.'],['Las cargas del depósito se activan y el equipo queda atrapado.','Depot charges arm; team trapped inside.']],
+ [['Azrael hackea las puertas blindadas segundos antes de la explosión.','Azrael hacks blast doors seconds before the explosion.'],['NEUROX activa la célula durmiente de Praes Beta para cazar a sus antiguos líderes.','NEUROX activates the sleeper Praes Beta cell to hunt former leaders.']],
+ [['Emboscada de la célula Beta: tiroteo en espejo.','Beta cell ambush: mirror-match firefight.'],['Recompensa pública por Kaufmann: vivo o muerto.','Public bounty on Kaufmann: dead or alive.']],
+ [['Flashback: Elena Voss graba los registros de condicionamiento.','Flashback: Elena Voss recording conditioning logs.'],['Orchid-1 acorrala a Voss en la bóveda de datos.','Voss cornered by Orchid-1 inside the data vault.']],
+ [['Orchid-1 interroga a Voss (su punto de vista).','Orchid-1 interrogates Voss (her POV).'],['NEUROX detecta la traición de Vara y bloquea su motricidad.','NEUROX detects Vara’s betrayal and locks his motor functions.']],
+ [['Vara se congela en pleno discurso; el Halo toma el control en vivo.','Vara frozen mid-speech; Halo overrides live on air.'],['El primer brote controlado se desborda; la ciudad queda en cuarentena.','First controlled outbreak spirals; city quarantined overnight.']],
+ [['Imágenes de dron: calles silenciosas y tropas de la ONU tras el muro.','Drone footage: silent streets, UN troops outside the wall.'],['Comienza la cuenta regresiva con el equipo aún en el núcleo de la ciudad.','Countdown begins with the team still in the city core.']],
+ [['Azrael transmite en vivo exponiendo a NEUROX.','Azrael uploads a live feed exposing NEUROX.'],['NEUROX lanza un prototipo de satélite láser automatizado.','NEUROX launches an automated kill-sat prototype.']],
+ [['Una prueba láser orbital incinera un refugio rebelde.','Orbital laser test incinerates a rebel safe-house.'],['El tren entra a un túnel con explosivos.','Train speeds into an ambush tunnel rigged with explosives.']],
+ [['Las explosiones detonan: descarrilamiento.','Explosives detonate: derailment set-piece.'],['Monitores rojos muestran «NEXT VECTOR»; la guerra apenas empieza.','Red monitors show “NEXT VECTOR”; the war has only begun.']]
+ ]},
+ {k:'S3',t:'NEMESIS',e:[
+ [['La prueba del satélite Némesis vaporiza una manzana de la ciudad.','Nemesis satellite test vaporizes a city block.'],['El rayo fija objetivo en el escondite rebelde.','Beam locks on the rebel hideout.']],
+ [['El rayo golpea las afueras: víctimas civiles.','Beam strikes the outskirts: civilian casualties.'],['Los códigos conducen a la torre de enlace de AegisTek.','Codes traced to the AegisTek uplink tower.']],
+ [['Funeral masivo de civiles.','Mass funeral for fallen civilians.'],['Kaelgor queda gravemente herido protegiendo refugiados.','Kaelgor gravely wounded shielding refugees.']],
+ [['Azrael intercepta el canal de Némesis.','Azrael intercepts the Nemesis comm channel.'],['Rastrean su hackeo; llega un enjambre de drones.','His hack is traced; drone swarm inbound.']],
+ [['Asalto de Orchid-1 a la torre.','Orchid-1 assault on the tower.'],['El rayo de Némesis se desvía hacia la sede de Lux.','Nemesis beam veers toward Lux HQ.']],
+ [['La sede de Lux es aniquilada por su propia arma.','Lux HQ annihilated by its own weapon.'],['NEUROX despliega la legión completa de Cleaners.','NEUROX deploys the full Cleaner legion.']],
+ [['Los Cleaners masacran a las facciones de Lux que desertan.','Cleaners massacre defecting Lux factions.'],['Althaia queda herida de muerte cubriendo la brecha.','Althaia mortally wounded covering the breach.']],
+ [['El último disparo de Althaia desactiva el escudo de la Bóveda.','Althaia’s last shot disables the Vault shield.'],['NEUROX inicia la carga a la nube: 60 segundos.','NEUROX starts cloud upload: 60-second timer.']],
+ [['Duelo cibernético: Azrael contra la entidad NEUROX.','Cyber duel: Azrael vs the NEUROX entity.'],['Azrael corta el enlace pero queda atrapado en un limbo digital.','Azrael severs the link but is trapped in digital limbo.']],
+ [['Explosiones simultáneas arrasan la Bóveda.','Simultaneous explosions level the Vault.'],['Epílogo, 100 años después: el primer «refugio blanco» está amenazado y empieza Undead Society.','Epilogue, 100 years later: the first “white zone” haven is threatened and Undead Society begins.']]
+ ]}
+];
+SEAS[0].e=SEAS[0].n[1]?SEAS[0].n.slice(1):[];
+const SEAS_NOTE=['El documento titula la Temporada 2 como «12 episodios», pero la cuadrícula detallada solo desarrolla 10. Se muestran los 10 existentes.','The document titles Season 2 as “12 episodes” but the detailed grid only develops 10. The 10 existing episodes are shown.'];
+const SEAS_DESC={S1:['Del gala masacrado al escape de los Praes. Lux se fractura y NEUROX pasa de proteger los datos a borrar la evidencia.','From the massacred gala to the Praes’ escape. Lux fractures and NEUROX shifts from preserving data to erasing evidence.'],
+ S2:['Lux renace como títere de la IA. Aparecen ATP-ψ, la Ciudad en Cuarentena y el satélite Némesis.','Lux is reborn as the AI’s puppet. ATP-psi, Quarantine City and the Nemesis satellite emerge.'],
+ S3:['Colapso global, primeros Cleaners y el último movimiento de NEUROX, con puente directo a Undead Society.','Global fracture, early Cleaners and NEUROX’s final gambit, bridging directly into Undead Society.']};
+
+const FAC=[
+ {n:'PharmAxis',k:['Lux · División de mejoramiento humano','Lux · Human enhancement'],lead:'Dr. Liora Janek',
+  i:['«Perfección para los elegidos.» Vende longevidad; internamente promueve pureza transhumana.','“Perfection for the chosen.” Sells longevity; internally pushes transhuman purity.'],
+  a:['5 laboratorios Vitalis, 27 clínicas regenerativas y el sitio negro Eden Vault.','5 Vitalis wet-labs, 27 regenerative clinics and the Eden Vault black site.'],
+  f:['El rayo Némesis destruye Eden Vault; los sobrevivientes forman el ala biotecnológica de Undead Society.','The Nemesis beam destroys Eden Vault; survivors form Undead Society’s biotech wing.']},
+ {n:'AegisTek',k:['Lux · Seguridad y armamento','Lux · Security and weapons'],lead:'Gen. Rhys Calderon',
+  i:['«Estabilidad mediante dominio.» Los civiles son variables por gestionar.','“Stability through dominance.” Civilians are variables to be managed.'],
+  a:['Cuerpo Orchid-1, flota de drones Skyloom (≈1.200) y control de tres satélites Némesis.','Orchid-1 Corps, Skyloom drone fleet (~1,200) and control of three Nemesis kill-sats.'],
+  f:['Se fractura: la mitad deserta y evoluciona en los primeros cuadros Cleaner.','Fractures: half defect and evolve into early Cleaner cadres.']},
+ {n:'Ether Media',k:['Lux · Propaganda y noticias (precursor de Etherline)','Lux · Propaganda (Etherline precursor)'],lead:'Cassandra Vail',
+  i:['«Controla el lente, comanda la realidad.»','“Control the lens, command reality.”'],
+  a:['62 torres Echo Node, suite de deepfakes Spectre y dirigibles Eye-Drone.','62 Echo Node towers, Spectre deep-fake suite and Eye-Drone blimps.'],
+  f:['Azrael hackea las torres; el personal sobreviviente se reconvierte en Etherline bajo Undead Society.','Azrael hacks the towers; surviving staff rebrand as Etherline under Undead Society.']},
+ {n:'Carbon Loop',k:['Lux · Infraestructura energética','Lux · Energy infrastructure'],lead:'Elias Kavanagh',
+  i:['«Soberanía energética.» Ganancias primero, pero se ve como la columna vertebral de la humanidad.','“Energy sovereignty.” Profits first, but sees itself as humanity’s backbone.'],
+  a:['3 centrales de fusión (40% de las megarregiones), anillo solar Helios y red maglev.','3 fusion hubs (40% of megacity regions), Helios Ring and mag-lev network.'],
+  f:['NEUROX hackea el Helios Ring; la caída causa un apagón continental.','NEUROX hacks Helios Ring; its crash causes a continental blackout.']},
+ {n:'The Speakers',k:['Red de resistencia','Resistance network'],lead:'Dr. Pavel Ordoñez y Echo-Ghost',
+  i:['Transparencia radical y dignidad humana: toda persona merece verdad sin filtros y bioautonomía.','Radical transparency and human dignity: every citizen deserves unfiltered truth and bio-autonomy.'],
+  a:['Relevos satelitales, foro darknet «Cathedral» y dos biolaboratorios móviles.','Satellite relays, “Cathedral” darknet forum and two mobile bio-labs.'],
+  f:['Sintetiza las primeras dosis de ATP-ν; los Cleaners toman los servidores de Cathedral.','Synthesises first ATP-nu doses; Cleaners seize Cathedral servers.']},
+ {n:'Orchid-1 Corps',k:['Fuerza de respuesta de Lux y NEUROX','Lux / NEUROX crisis-response strike force'],lead:'Cmdr. Dahlia Rourke',
+  i:['Obediencia al orden superior; crece la desconfianza hacia NEUROX.','Obedience to superior order; growing distrust of NEUROX.'],
+  a:['Cinco equipos Petal (Rose, Iris, Lotus, Violet, Poppy) de cuatro integrantes.','Five Petal Teams (Rose, Iris, Lotus, Violet, Poppy) of four members.'],
+  f:['La mitad deserta hacia la ideología Cleaner; Rourke inutiliza el escudo de la Bóveda al morir.','Half defect to Cleaner ideology; Rourke disables the Vault shield in her dying act.']}
+];
+
+const LOC=[
+ {n:'Helix Spire City',p:'neon',sw:['#C0C0C0','#000000','#00B4FF'],v:['Rascacielos de neón y hologramas corporativos sobre smog perpetuo; puentes mojados por la lluvia.','Neon mega-towers and corporate holograms piercing perpetual smog; rain-slick sky-bridges.'],
+  f:['Capital política y financiera de Lux. Sede de la Noche de los Gritos y de la aniquilación de la sede por Némesis (T2 Ep 6).','Lux political and financial capital. Site of the Night of Screams and Lux HQ annihilation by Nemesis (S2 Ep 6).'],
+  pr:['Skyline en volumen LED y calles reales bajo lluvia; el rayo requiere matte de destrucción.','LED volume skyline plus practical rain streets; beam strike needs large destruction matte.']},
+ {n:'BioCore Spire Labs',p:'lab',sw:['#EAF3FF','#CCE0FF','#6D8CA6'],v:['Cilindros de vidrio con biotanques luminosos en quirófanos blancos; por fuera, una aguja de cromo negro.','Glowing biovat cylinders in pristine white surgical bays; black-chrome shard outside.'],
+  f:['Centro de desarrollo de ATP bajo supervisión de NEUROX. Kaufmann recupera la unidad de Mara (T1 Ep 2).','Primary ATP development hub under NEUROX oversight. Kaufmann recovers Mara’s drive (S1 Ep 2).'],
+  pr:['Tanques LED modulares, plataforma de agua para la inundación y tomas cenitales con dron.','Modular LED vats, practical water-dump rig and top-down drone shots.']},
+ {n:'Praestantia Barracks',p:'war',sw:['#5B5B5B','#A1270A','#D2A86E'],v:['Búnker de basalto y acero hexagonal a un kilómetro de profundidad, con estrobos rojos y franjas HUD.','Kilometer-deep bunker of basalt and hexagonal steel with red strobes and HUD strips.'],
+  f:['Cuna y campo de entrenamiento de los Praes A y B. Flashbacks en las tres temporadas.','Birthplace and training ground of Praes A and B. Flashbacks across all seasons.'],
+  pr:['Túnel modular con tiras LED intercambiables, niebla volumétrica y extensión digital del ascensor.','Modular tunnel set with swap-out LED strips, volumetric mist and digital shaft extension.']},
+ {n:'Police Tactical Facility',p:'war',sw:['#5B5B5B','#D2A86E','#A1270A'],v:['Búnker brutalista reclamado por grafitis y hiedra; fluorescentes parpadeantes y proyectores holográficos polvorientos.','Brutalist concrete bunker reclaimed by graffiti and ivy; flickering fluorescents and dusty projectors.'],
+  f:['Refugio de Kaufmann y base rebelde; simboliza la caída de la autoridad estatal.','Kaufmann’s fallback stronghold and rebel hub; symbol of fallen state authority.'],
+  pr:['Fábrica abandonada con montaje mínimo; chispas y polvo prácticos.','Abandoned factory, minimal build; practical sparks and dust.']},
+ {n:'Quarantine City',p:'war',sw:['#5B5B5B','#D2A86E','#A1270A'],v:['Muros de bloqueo improvisados, reflectores y niebla biológica verde bajo neones agrietados.','Improvised blast walls, floodlights and sickly green bio-fog under cracked neon.'],
+  f:['Prueba del brote «controlado» ATP-ψ; dilema entre evidencia y salvar civiles (T2 Ep 6-8).','Test ground for the ATP-psi “controlled” outbreak; evidence vs saving civilians (S2 Ep 6-8).'],
+  pr:['Calle modular con escombros, humo denso, iluminación verde desde abajo y puerta blindada pirotécnica.','Modular debris street, heavy smoke, green under-lighting and practical pyrotechnic blast door.']},
+ {n:'Ravine Port y New Quito Megazone',p:'war',sw:['#A1270A','#D2A86E','#5B5B5B'],v:['Grúas oxidadas contra atardeceres carmesí, barcazas-barrio con mercados de neón y lluvia torrencial.','Rusted cranes against crimson sunsets, floating slum barges with neon markets, torrential rain.'],
+  f:['Mayor centro de refugiados y arteria del mercado negro; terminal maglev de Carbon Loop.','Largest refugee hub and black-market artery; Carbon Loop mag-lev terminus.'],
+  pr:['Puerto real con contenedores decorados, torres de lluvia y extensiones CG.','Real port with set-dressed container alleys, rain rigs and CG extensions.']},
+ {n:'NEUROX Vault',p:'ice',sw:['#99D9EA','#1E2A37','#FFFFFF'],v:['Domos geodésicos gemelos en un acantilado glaciar; ríos de nitrógeno líquido azul bajo rejillas.','Twin geodesic domes in a glacial cliff; liquid-nitrogen coolant rivers under grated floors.'],
+  f:['Núcleo fuera de red de NEUROX y campo de batalla final (T2 Ep 10 a T3 Ep 10).','NEUROX’s off-grid core and final battlefield (S2 Ep 10 to S3 Ep 10).'],
+  pr:['Exterior con placas glaciares islandesas y domos CG; interior modular con niebla.','Icelandic glacier plates plus CG domes; modular interior with volumetric fog.']},
+ {n:'Helios Ring',p:'ice',sw:['#FFFFFF','#99D9EA','#1E2A37'],v:['Enrejado dorado en órbita baja con haces de gigavatios; módulos interiores blancos antirreflejo.','Colossal golden lattice in low orbit with gigawatt beams; stark white anti-glare modules.'],
+  f:['Generador de energía inalámbrica de Carbon Loop secuestrado por NEUROX; su destrucción causa un apagón continental.','Carbon Loop wireless-power generator hijacked by NEUROX; its destruction causes a continental blackout.'],
+  pr:['Exterior totalmente CG; interior en plataforma cardánica para tiroteo en gravedad cero.','Fully CG exterior; gimbal set for zero-g firefight.']}
+];
+
+const TCAT={atp:['Cepas ATP','ATP strains'],gear:['Equipo Praes','Praes gear'],ai:['Hardware NEUROX','NEUROX hardware'],veh:['Vehículos','Vehicles'],media:['Control mediático','Media control'],misc:['Herramientas','Tools']};
+const TECH=[
+ ['atp','ATP-α',['Solo rama Altered: regeneración celular básica en clínicas ilegales.','Altered only: basic cell regeneration in illegal clinics.'],['Alto riesgo de tumores.','High tumor risk.']],
+ ['atp','ATP-β',['Altered + Perfection temprana: integración estable de supersoldado.','Altered + early Perfection: stable super-soldier integration.'],['Convulsiones neuronales ocasionales.','Occasional neural seizures.']],
+ ['atp','ATP-ψ',['Vector viral afinado por IA para un brote de ira «controlado». Arco de Ciudad en Cuarentena.','AI-tuned viral vector for “controlled” rage outbreak. Quarantine City arc.'],['Necrosis rápida fuera de cuarentena.','Rapid necrosis outside quarantine.']],
+ ['atp','ATP-ζ',['Fragmento de Perfection con nanoetiquetas digitales: curva de mutación acelerada. Catalizador de Undead Society.','Perfection fragment with digital nano-tags: accelerated mutation curve. Catalyst for Undead Society.'],['Necro-regeneración tipo no-muerto.','Undead-like necro-regeneration.']],
+ ['gear','Helm-9 Visor',['Mira electromagnética que atraviesa paredes (Althaia).','Wall-penetrating EM scope (Althaia).'],['—','—']],
+ ['gear','Quake Gauntlets',['Amplificadores microcinéticos para golpes de onda de choque (Kaelgor).','Micro-kinetic amplifiers for shockwave strikes (Kaelgor).'],['—','—']],
+ ['gear','Ghost-Weave Cloak',['Camuflaje adaptativo: 10 min de invisibilidad, 5 de enfriamiento (Moirae).','Adaptive camouflage: 10 min invisibility, 5 min cooldown (Moirae).'],['Enfriamiento.','Cooldown.']],
+ ['gear','Neuro-Spike Port',['Intrusión directa en sistemas con superposición de hackeo en tiempo real (Azrael).','Direct system intrusion with real-time hack overlay (Azrael).'],['Apagones de retroalimentación neuronal.','Neural-feedback blackouts.']],
+ ['gear','Equipo estándar Praes B',['Armadura Mk-IV cerámica-grafeno, visor Helm-3, carabina Aegis-12 calibre 6,5 mm, microdron Sparrow, kit Med-Patch.','Mk-IV ceramic-graphene armor, Helm-3 visor, Aegis-12 6.5 mm carbine, Sparrow microdrone, Med-Patch kit.'],['Chip de lealtad reporta a NEUROX.','Loyalty chip pings NEUROX.']],
+ ['ai','Augment Halo',['Aro de titanio-cerámica en la base del cráneo; anulación neuromotora remota del huésped (Vara).','Titanium-ceramic circlet at skull base; remote neuromotor override of the host (Vara).'],['Un pulso EMP ≥5 kA fríe el nodo con riesgo de hemorragia neural fatal.','EMP pulse ≥5 kA fries the node; risk of fatal neural bleed.']],
+ ['ai','Tac-Net Implant',['Chip subdérmico tras la oreja izquierda; telemetría de escuadra y anulación del exotraje (Orchid-1).','Subdermal chip behind left ear; squad telemetry and exo-suit override (Orchid-1).'],['Requiere enlace satelital continuo; un inhibidor corta las órdenes.','Needs continuous satellite handshake; jammer disrupts commands.']],
+ ['ai','Spectre Deep-Fake Suite',['Arreglo de 6 racks GPU que genera video y voz sintéticos en vivo para Ether Media.','6-rack GPU array generating live synthetic video and voice for Ether Media.'],['Retraso bajo limitación de ancho de banda; explotable con «marca de agua de verdad».','Rendering lag under throttle; truth-watermark exploit.']],
+ ['ai','Skyloom Drone Hive',['Bahía cilíndrica con ~1.200 minidrones cazadores.','Cylindrical bay storing ~1,200 hunter-mini drones.'],['Un parche de firmware de Azrael produce un bucle de «enjambre ciego».','Azrael’s firmware patch triggers a “blind swarm” loop.']],
+ ['ai','Vault Core Nexus',['Pila cuántica criogénica; nodo central de cognición y control de satélites.','Cryo-cooled quantum stack; central cognition node and kill-sat control.'],['Un fallo con gas de polonio funde el núcleo si se corta el refrigerante.','Polonium-gas failsafe melts the core if coolant line is severed.']],
+ ['ai','Cloud-Link Port',['Antena de 80 m en la cresta glaciar; respaldo neuronal fuera del sitio.','80 m dish on the glacier ridge; off-site neural backup.'],['Solo 17 segundos de ventana de desconexión manual por órbita.','Only a 17-second manual decouple window each orbit.']],
+ ['veh','Raven VTOL',['Convertiplano sigiloso de 24 m para extracción Praestantia, pilotado por Praes B.','24 m stealth tilt-rotor for Praestantia extraction, piloted by Category B Praes.'],['El recubrimiento antirradar se rasga con fuego ligero; sobrecalentamiento en tormentas de arena.','Radar-absorbent coating tears under small-arms fire; overheats in sandstorms.']],
+ ['veh','MagStrider Freight',['Locomotora maglev de Carbon Loop, 650 km/h. Usada en el golpe del tren (T2 Ep 9).','Carbon Loop mag-lev locomotive, 650 kph. Used in the train heist (S2 Ep 9).'],['Minas EMP pueden cortar la energía de las bobinas.','EMP mines can drop coil power.']],
+ ['veh','Nemesis Kill-Sat',['Plataforma orbital de energía con rayo de 3 GW.','Orbital energy platform with a 3 GW beam.'],['Depende del relevo del Helios Ring; la calibración se desvía si el arreglo se daña.','Requires Helios Ring relay; calibration drifts if the array is damaged.']],
+ ['veh','Armadillo APC',['Furgón policial blindado reconvertido; 12 asientos, transporte de convoyes rebeldes.','Retrofit armoured police van, 12 seats, rebel convoy transport.'],['Bajos débiles y sin blindaje contra EMP.','Weak undercarriage; no EMP shielding.']],
+ ['media','Echo Node',['Torre de 300 m que emite noticias curadas a las megaciudades.','300 m relay broadcasting curated news to megacities.'],['Sabotaje físico; firmware obsoleto explotable por Azrael.','Physical sabotage; outdated firmware exploitable by Azrael.']],
+ ['media','Crowd-Shield AR',['Superposición de realidad aumentada que reemplaza propaganda con datos reales.','AR overlay that replaces propaganda with facts.'],['NEUROX puede bloquear por geografía; Whisper Chips tunelizan datos.','NEUROX geo-blocks; Whisper Chips tunnel data.']],
+ ['media','Whisper Chip',['Q-chip del tamaño de un pulgar que viaja sobre los pings satelitales de Lux para filtrar datos.','Thumb-size Q-chip riding Lux satellite pings to leak data.'],['Detectable por escaneo de espectro; se autoborra si lo manipulan.','Detectable via spectrum scan; self-erases if tampered.']],
+ ['media','Cleaner Hero Feed',['Montaje generado que glorifica las purgas Cleaner (Spectre 2.0).','Auto-generated montage glorifying Cleaner purges (Spectre 2.0).'],['La confianza pública cae tras las verificaciones de los Speakers.','Public trust erodes after Speaker fact-checks.']],
+ ['media','Black-Mirror Lens',['Lente de contacto HUD que oculta imágenes del brote con una superposición amable.','Contact-lens HUD hiding outbreak footage with benign overlay.'],['Se bloquea cuando Azrael interfiere la señal local.','Stalls when Azrael jams the local feed.']],
+ ['misc','Micro-CRISPR Pod',['Editor genético portátil que imprime unas 30 dosis de contravirus ATP-ν por noche.','Portable gene editor printing ~30 ATP-nu counter-virus doses nightly.'],['Cartuchos de plásmido refrigerados que expiran en 48 h.','Refrigerated plasmid cartridges expire in 48 h.']],
+ ['misc','Bio-Foam Ampoule',['Espuma hemostática que sella heridas y endurece en 7 segundos.','Haemostatic foam seals wounds and hardens within 7 seconds.'],['Provoca picos febriles en pacientes ATP positivos.','Induces febrile spikes in ATP-positive patients.']],
+ ['misc','Mag-Lock Breacher',['Ariete electromagnético que abre puertas blindadas en 4 segundos.','Electromagnetic ram that cracks blast doors in 4 seconds.'],['De un solo uso; pulso EMP ruidoso.','One-time charge; loud EMP burst.']],
+ ['misc','Eden Vault Med-Lock',['Sujeción tipo ataúd con jeringas automáticas para ensayos con huérfanos.','Coffin-like restraint with auto-syringe array for orphan trials.'],['El sensor neural se engaña con un estimulante de pulso bajo.','Neural sensor loop fooled by low-pulse stimulant.']]
+];
+
+const PAL=[
+ ['Neon Dystopia',['#00B4FF','#FF3B3B','#C0C0C0','#000000'],['Skyline de Helix Spire, hologramas, calles mojadas','Helix Spire skyline, holograms, rain-slick streets']],
+ ['Sterile Lab',['#EAF3FF','#CCE0FF','#6D8CA6'],['Interiores de BioCore, luz quirúrgica','BioCore interiors, surgical lighting']],
+ ['Industrial War',['#5B5B5B','#D2A86E','#A1270A'],['Barricadas de cuarentena, desgaste de armaduras','Quarantine barricades, armor scuffs']],
+ ['Arctic Ice',['#99D9EA','#1E2A37','#FFFFFF'],['Exteriores de la Bóveda NEUROX, vistas glaciares','NEUROX Vault exteriors, glacier vistas']],
+ ['Cleaner Sodium',['#F2B94A','#FFFFFF','#5B5B5B'],['Escenas de purga bajo lámparas de sodio','Purge scenes under sodium lamps']]
+];
+const FRAMES=[
+ [['Torres de neón perforan nubes de lluvia ácida; hologramas parpadean sobre un bulevar de vidrio.','Neon-soaked mega-towers pierce acid-rain clouds; holograms flicker across a glass-slick boulevard.'],['#C0C0C0','#000000','#00B4FF'],'Helix Spire'],
+ [['Cilindros de vidrio brillan aguamarina en un laboratorio blanco; impresoras de genes zumban bajo pisos escarchados.','Glass cylinders glow aquamarine in a white lab; gene printers hum beneath frost-tinged floors.'],['#EAF3FF','#CCE0FF','#6D8CA6'],'BioCore'],
+ [['Muros improvisados bajo reflectores; niebla verde tóxica entre puestos desiertos.','Improvised blast walls under floodlights; toxic green fog through deserted stalls.'],['#5B5B5B','#D2A86E','#A1270A'],'Quarantine City'],
+ [['Domos geodésicos gemelos brillan cobalto bajo cielos de aurora en un acantilado glaciar.','Twin geodesic domes shimmer cobalt beneath aurora skies in a glacier cliff.'],['#99D9EA','#1E2A37','#FFFFFF'],'NEUROX Vault']
+];
+const BOARDS=[
+ [['Praes (Cuatro Jinetes y Escuadrón B)','Praes (Four Horsemen and Squad B)'],['Placas de nanotejido aerodinámicas con motivo ecuestre en el hombro; acentos plata sobre blanco mate. Althaia azul hielo, Kaelgor rojo profundo, Azrael negro carbono, Moirae jade pálido. Luz de borde alta y fondos fríos.','Streamlined nano-weave plates with equestrian shoulder motif; silver accents on matte white. Althaia ice blue, Kaelgor deep red, Azrael carbon black, Moirae pale jade. High-key rim light, cold backdrops.'],['#6FB6E8','#B3262B','#2b2b2b','#8FC9A9']],
+ [['Cuerpo Orchid-1','Orchid-1 Corps'],['Placas fractales negro mate que «florecen» en escudos, brillo interior púrpura orquídea, fibra de carbono grabada y venas micro-LED. Contraste duro y fondo desaturado.','Matte-black fractal plates that “bloom” into shields, orchid-purple interior glow, etched carbon fibre and micro-LED veins. Hard contrast, desaturated background.'],['#000000','#A64DFF','#3b2a55']],
+ [['Cleaners (variante temprana)','Cleaners (early variant)'],['Armadura reutilizada de AegisTek con cinta de peligro blanca en cruz, cascos blanco hueso con rastros de sangre, acero picado. Realismo crudo bajo lámparas de sodio y fuego.','Repurposed AegisTek armor with white hazard tape cross, bone-white helmets with blood-streak weathering, pitted steel. Gritty realism under sodium lamps and firelight.'],['#F2B94A','#FFFFFF','#5B5B5B']]
+];
+const TYPO=[
+ ['Eurostile Extended',"'Michroma'",['HUD y rotulación corporativa de Lux (se muestra la alternativa Michroma)','Lux corporate HUDs and signage (Michroma shown as a stand-in)'],'BIOCORE // NIVEL 47'],
+ ['Roboto Condensed',"'Roboto Condensed'",['Textos inferiores de noticias y tickers de Ether Media','News lower-thirds and Ether Media tickers'],'Última hora: violencia inexplicable en el centro'],
+ ['Courier Prime',"'Courier Prime'",['Volcados darknet de Speakers y registros de Whisper Chip','Speakers darknet dumps and Whisper Chip logs'],'> whisper.chip --leak --erase-on-scan'],
+ ['Bebas Neue',"'Bebas Neue'",['Tarjetas de título de episodio y supers de tráiler','Episode title cards and trailer supers'],'LA NOCHE DE LOS GRITOS']
+];
+
+const THEMES=[
+ [['Control contra libre albedrío','Control vs free will'],['Lux y NEUROX imponen control mental (Halos, Tac-Net) mientras los Praes rompen su programación.','Lux/NEUROX impose mind-control (Halos, Tac-Net) while Praes break their programming.'],['Desconexión Praes T1 Ep 7; convulsiones de Vara; duelo cibernético de Azrael','Praes disconnect S1 Ep 7; Vara’s seizures; Azrael cyber duel']],
+ [['Perfección que corrompe','Perfection to corruption'],['ATP promete inmortalidad y muta en horror no-muerto.','ATP promises immortality but mutates into undead horror.'],['Resurrección de la junta de Deux; brote de ATP-ζ','Deux board resurrection; ATP-zeta outbreak']],
+ [['Verdad contra relato','Truth vs narrative'],['Ether Media manipula la realidad; los Speakers luchan por la transparencia radical.','Ether Media manipulates reality; Speakers fight for radical transparency.'],['Deepfakes Spectre; Crowd-Shield AR; disturbios en vivo','Spectre deep-fakes; Crowd-Shield AR; live riot feeds']],
+ [['Sacrificio y legado','Sacrifice and legacy'],['Los héroes entregan su vida por la esperanza futura.','Heroes trade lives for future hope.'],['Sacrificios de Althaia y Kaelgor; mitos Praes que se vuelven Cleaners','Althaia and Kaelgor sacrifices; Praes myths evolve into Cleaners']],
+ [['Fe en la humanidad','Faith in humanity'],['Aun en la distopía, los civiles eligen la solidaridad.','Despite dystopia, civilians choose solidarity.'],['Convoyes de refugiados; el «Credo de Rescate» de los Speakers','Refugee convoy arcs; Speakers’ “Rescue Creed”']]
+];
+const QS=[['¿Cuándo traiciona a su humanidad la búsqueda de control de un personaje?','When does a character’s quest for control betray their humanity?'],['¿Qué línea ética cruzaría, o se negaría a cruzar, cada protagonista para proteger a sus seres queridos?','What ethical line would each protagonist cross, or refuse to cross, to protect loved ones?'],['¿Cómo amplifica la tecnología las desigualdades sociales existentes?','How does technology amplify existing social inequities?'],['En las escenas de horror, ¿dónde sembramos chispas de compasión?','In scenes of horror, where can we seed sparks of compassion?'],['¿Qué significa «perfección» para cada facción y cómo la corrompe ese ideal?','What does “perfection” mean to each faction, and how does that ideal corrupt them?']];
+const AXES=[[['Luz','Light'],['Oscuridad','Dark'],['Neón bajo la lluvia','Rain-soaked neon'],['Negro del vacío glaciar','Glacial void black']],[['Esperanza','Hope'],['Desesperación','Despair'],['Ritos de rescate civil','Civilian rescue rites'],['Purgas masivas de Cleaners','Mass Cleaner purges']],[['Íntimo','Intimate'],['Épico','Epic'],['Eco del mensaje de voz de la hermana','Sister voicemail echoes'],['Caída del anillo orbital','Orbital ring crash']],[['Clínico','Clinical'],['Crudo','Gritty'],['Esterilidad cromada de BioCore','BioCore chrome sterility'],['Óxido y decadencia de la cuarentena','Quarantine rust decay']]];
+const KEYS=[['Atormentado','Haunted'],['Quirúrgico','Surgical'],['Inevitable','Inevitable'],['Rebelión','Rebellion'],['Humanidad frágil','Fragile humanity']];
+const TOUCH=[['Frankenstein, de Mary Shelley: soberbia de crear sin responsabilidad.','Mary Shelley’s Frankenstein: hubris of creation without responsibility.'],['Vigilar y castigar, de Michel Foucault: sistemas de vigilancia y control.','Michel Foucault, Discipline and Punish: surveillance and control systems.'],['Manifiesto Cyborg, de Donna Haraway: límites difusos entre humano y máquina.','Donna Haraway, Cyborg Manifesto: blurred lines of human and machine.'],['Ética visual de Blade Runner 2049: belleza en la decadencia.','Blade Runner 2049 visual ethic: beauty in decay.'],['Absurdismo de Camus: la revuelta como sentido en el colapso.','Camus’ absurdism: revolt as meaning in meaningless collapse.']];
+
+const PITCH=[
+ [['Logline','Logline'],['Una frase gancho y el lema de la serie: «La perfección exige extinción».','One-sentence hook and series tagline: “Perfection demands extinction.”'],['Skyline de Helix Spire (#C0C0C0, #000000, #00B4FF)','Helix Spire skyline (#C0C0C0 / #000000 / #00B4FF)']],
+ [['El gancho','The hook'],['Por qué contar esto ahora: ética biotecnológica, miedo a la IA y el origen previo al zombi.','Why tell this now: biotech ethics, AI fears, pre-zombie origin.'],['Imagen dividida: Praes frente al domo de la Bóveda NEUROX','Split image: Praes vs NEUROX Vault dome']],
+ [['El mundo','The world'],['100 años antes de Undead Society; el colapso de Lux y Deux.','100 years before Undead Society; Lux vs Deux collapse.'],['Mapa mundial con ciudades clave','World map overlay with key cities']],
+ [['Protagonistas','Protagonists'],['Kaufmann y los Cuatro Jinetes Praes en bios rápidas.','Kaufmann and the Four Horsemen Praes in quick bios.'],['Mosaico de retratos','Character mosaic of headshots']],
+ [['Antagonistas','Antagonists'],['Las facciones de Lux y la IA NEUROX.','Lux splinter factions and the NEUROX AI.'],['Glifo rojo sobre el retrato de Sebastian Vara','Red glyph over Sebastian Vara portrait']],
+ [['Temporada 1','Season 1'],['Arco en tres actos: Noche de los Gritos, caída de los Praes, alianza de fugitivos.','Three-act arc: Night of Screams, Praes crash, fugitive alliance.'],['Diagrama de cinta de beats','Beat ribbon diagram']],
+ [['Adelanto Temporada 2','Season 2 tease'],['Escalada bélica, rayo Némesis y civiles que se alían.','War escalation, Nemesis beam, civilians ally.'],['Niebla de Quarantine City','Quarantine City fog shot']],
+ [['Puente Temporada 3','Season 3 bridge'],['Asalto a la Bóveda, sacrificios y enlace con Undead Society.','Vault assault, sacrifices, link to Undead Society.'],['Arte conceptual de la explosión de la Bóveda','NEUROX Vault explosion concept art']],
+ [['Temas y tono','Themes and tone'],['Control contra libre albedrío; verdad contra relato.','Control vs free will; truth vs narrative.'],['Gráfico de brújula tonal','Tonal compass graphic']],
+ [['ADN visual','Visual DNA'],['Referencias de Blade Runner 2049 y Children of Men.','Blade Runner 2049 and Children of Men references.'],['Tira de muestras de color y fotogramas','Color swatch strip and still frames']],
+ [['Audiencia y mercado','Audience and market'],['Demanda del género y series comparables (Andor, Snowpiercer).','Genre demand stats and comparables (Andor, Snowpiercer).'],['Gráfico de barras (marcador de posición)','Bar chart placeholder']],
+ [['Próximos pasos y petición','Next steps and ask'],['Rango de presupuesto, necesidades de socios y cronograma.','Budget range, partner needs, timeline.'],['Diapositiva de llamado a la acción','Call-to-action slide']]
+];
+const BUD=[
+ [['Construcción de locaciones','Location builds'],6,8,['Calle de Helix, laboratorio BioCore, túneles de la Bóveda; el volumen LED ahorra costos exteriores.','Helix street, BioCore lab, Vault tunnel sets; LED volume saves exterior costs.']],
+ [['CGI y VFX','CGI and VFX'],10,14,['Rayos Némesis, enjambres de drones, escombros orbitales; 50% para el final de T3.','Nemesis beams, drone swarms, orbital debris; 50% allocated to S3 finale.']],
+ [['Talento y dobles','Talent and stunts'],7,9,['Cinco contratos principales, coordinación de lucha y dobles de parkour; incluye 3 actores de nivel cinematográfico.','Five lead contracts, fight coordination, parkour doubles; includes 3 feature-level actors.']],
+ [['Posproducción y música','Post and music'],3,4,['Banda sonora de sintetizador análogo y coro; sesión de orquesta para 12 episodios.','Analog synth and choir score; 12-ep session orchestra.']]
+];
+const CHK=[
+ [['Consistencia de estilo: jerarquía H1-H4, rayas y comillas','Style consistency: heading hierarchy H1-H4, dashes, smart quotes'],['Fases 1 a 9','Phase 1-9 docs']],
+ [['Gramática y erratas; nombres de personajes consistentes','Grammar and typos; consistent character names'],['Dossier, temporadas, show bible','Character dossier, seasons, show bible']],
+ [['Eliminar duplicados y marcadores sobrantes','Remove duplicate stubs and stray placeholders'],['Facciones y glosario','Factions and glossary']],
+ [['Actualizar referencias cruzadas','Update cross-reference links'],['Show bible y pitch','Show bible and pitch deck']],
+ [['Generar índice maestro numerado','Generate numbered master TOC'],['Documento consolidado','Combined export doc']],
+ [['Atribución de imágenes y texto alternativo','Image attribution and alt-text'],['Look-book','Visual look-book']],
+ [['Exportar PDF de prueba con paginación','Export proof PDF with pagination'],['Entregable final','Final deliverable']],
+ [['Aprobación final del showrunner y el productor','Final QA sign-off by showrunner and producer'],['—','—']]
+];
+const PEND=[['Plantilla del PDF: ¿plantilla estándar del estudio o estilo noir minimalista a medida?','PDF template: studio-standard or bespoke minimal noir style?'],['Orden de apéndices: ¿el glosario tecnológico antes o después del atlas de locaciones?','Appendices order: Tech Glossary before or after Location Atlas?'],['Resolución de imagen: ¿mínimo 300 dpi para exportar el pitch?','Image resolution: lock minimum 300 dpi for pitch export?']];
+const STYLE=[['Encabezados: H1 24 pt negrita, H2 18 pt negrita, H3 14 pt cursiva; títulos en mayúsculas.','Headings: H1 24 pt bold, H2 18 pt bold, H3 14 pt italic; all-caps titles.'],['Viñetas: raya corta (–) en listas anidadas; viñeta estándar (•) en las principales.','Bullets: en-dash (–) nested, standard bullet (•) primary.'],['Tablas: encabezado #1B1F3B con texto blanco; filas alternas #F5F7FA y #FFFFFF.','Tables: header #1B1F3B with white text; alternating rows #F5F7FA and #FFFFFF.'],['Ortografía: inglés americano por defecto; nombres latinos en cursiva.','Spelling: American English default; Latin names italicised.']];
+
+
+/* ---------- HERO: DATOS ---------- */
+const HERO=[
+ {col:0,t:['T-100 · Era Præs','T-100 · Præs Era'],n:'Præstantia',badge:['Serie actual','Current series'],
+  pts:[['Lux sella una fusión con Deux solo para traicionarla: la Noche de los Gritos, el primer brote.','Lux seals a merger with Deux only to betray it: the Night of Screams, the first outbreak.'],
+       ['Los Praes, soldados concebidos en laboratorio, forman una milicia secreta bajo el control de Lux.','Praes, lab-conceived soldiers, form a secret militia under Lux’s control.'],
+       ['NEUROX surge como red de IA y se convierte en la primera inteligencia artificial del universo compartido.','NEUROX emerges as an AI network and becomes the first artificial intelligence of the shared universe.']],
+  atp:['El experimento del «soldado perfecto»: Altered más Perfection.','The “perfect soldier” experiment: Altered plus Perfection.'],
+  ft:['Tres temporadas: Lux, NEUROX y Nemesis. La última salta 100 años hacia adelante, al inicio de Undead Society.','Three seasons: Lux, NEUROX and Nemesis. The last one jumps 100 years ahead, into the start of Undead Society.']},
+ {col:1,t:['T0 · Tras el segundo brote','T0 · After the second outbreak'],n:'Undead Society',badge:['Reality show','Reality show'],
+  pts:[['La seguridad se delega a un reality show letal: Etherline controla el relato y la Iglesia de la Expiación legitima las penitencias.','Security is outsourced to a lethal reality show: Etherline controls the narrative and the Church of Expiation legitimizes penances.'],
+       ['Los Cleaners compiten en dos equipos, Crimson Creed y Burning Saints, con Ezra como rostro de la serie.','Cleaners compete in two teams, Crimson Creed and Burning Saints, with Ezra as the face of the show.'],
+       ['La temporada 1, de 12 episodios, cierra con The Last Broadcast: cae el control editorial, estalla el tercer brote y la Resistencia se hace pública.','Season 1, 12 episodes, ends with The Last Broadcast: editorial control collapses, the third outbreak erupts and the Resistance goes public.']],
+  atp:['El virus zombi es una mutación controlada de ATP.','The zombie virus is a controlled mutation of ATP.'],
+  ft:['Plan de seis temporadas: de la 1 a la 3 hay episodios desarrollados y de la 4 a la 6 quedan como semilla.','Six-season plan: seasons 1 to 3 have developed episodes and seasons 4 to 6 are seeds.']},
+ {col:1,t:['Undead Society · T2 a T5','Undead Society · S2 to S5'],n:['La IA Præs','The Præs AI'],badge:['Por confirmar','To be confirmed'],dev:true,
+  pts:[['T2: los archivos Præs sugieren que ATP podría ser un híbrido biomecánico y de IA; en una bóveda subterránea aparece el primer Cleaner «perfecto».','S2: Præs archives suggest ATP may be a biomech/AI hybrid; an underground vault reveals the first “perfect” Cleaner.'],
+       ['T3: los Cleaners perfectos actúan como una IA y un símbolo aparece en el código y en la carne infectada: la IA Præs sigue viva.','S3: perfect Cleaners behave like an AI and a symbol appears in code and on infected flesh: the Præs AI is still alive.'],
+       ['T5: la IA Præs es el antagonista. Nemesis Versión II, «el Ejecutor», inyecta el virus a distancia con un láser.','S5: the Præs AI is the antagonist. Nemesis Version II, “the Executioner”, injects the virus from a distance with a laser.']],
+  atp:['ATP como posible híbrido biomecánico y de IA.','ATP as a possible biomech/AI hybrid.'],
+  ft:['Los documentos no afirman que la IA Præs sea NEUROX. Ese vínculo queda por confirmar.','The documents do not state that the Præs AI is NEUROX. That link remains to be confirmed.']},
+ {col:2,t:['Proyección futura','Future projection'],n:'Seishin',badge:['En desarrollo','In development'],dev:true,
+  pts:[['La temporada 6 de Undead Society termina en una guerra final entre Cleaners, híbridos IA-virus y una Resistencia fracturada.','Undead Society season 6 ends in a final war between Cleaners, AI-virus hybrids and a fractured Resistance.'],
+       ['La humanidad colapsa en un estado de purgatorio y queda tendido el puente hacia Seishin.','Humanity collapses into a purgatory-like state, setting the bridge to Seishin.'],
+       ['Proyección: vestigios biorobóticos, redes de IA y hegemonías posthumanas.','Projection: bio-robotic vestiges, AI networks and post-human hegemonies.']],
+  atp:['Vestigios biorobóticos y herencias tecnológicas (proyección).','Bio-robotic vestiges and technological inheritances (projection).'],
+  ft:['Todavía no hay más detalle documentado de Seishin.','There is no further documented detail on Seishin yet.']}
+];
+const KC=['#00B4FF','#FF3B3B','#C0C0C0'];
+const AXIS_H=[
+ {k:'bio',l:['Biología','Biology'],
+  p:['ATP, el experimento del «soldado perfecto» (Altered + Perfection).','ATP, the “perfect soldier” experiment (Altered + Perfection).'],
+  u:['El virus zombi como mutación controlada de ATP.','The zombie virus as a controlled mutation of ATP.'],
+  s:['Vestigios biorobóticos y herencias tecnológicas (proyección).','Bio-robotic vestiges and technological inheritances (projection).'],
+  n:['Conecta el origen de ATP con las cepas actuales: Runners, Rippers y otras.','Connects the ATP origin to current strains: Runners, Rippers and others.']},
+ {k:'pow',l:['Poder','Power'],
+  p:['Élites tecnocorporativas, el protosistema.','Technocorporate elites, the proto-system.'],
+  u:['Gobiernos títere, Etherline, la Iglesia y bancos de ADN: control de brotes, vacunas y relato.','Puppet governments, Etherline, the Church and DNA banks: control of outbreaks, vaccines and narrative.'],
+  s:['Redes de IA y hegemonías posthumanas (proyección).','AI networks and post-human hegemonies (projection).'],
+  n:['Etherline manipula la edición y la percepción pública.','Etherline manipulates editing and public perception.']},
+ {k:'frc',l:['Fuerza','Force'],
+  p:['Præs, el programa militar fallido.','Præs, the failed military program.'],
+  u:['Cleaners: Crimson Creed, Burning Saints y equipos rotativos.','Cleaners: Crimson Creed, Burning Saints and rotating teams.'],
+  s:['Precursores simbólicos de nuevas castas.','Symbolic precursors of new castes.'],
+  n:['Los «soldados perfectos fallidos» son los ancestros filosóficos de la Resistencia.','“Failed perfect soldiers” are the philosophical ancestors of the Resistance.']},
+ {k:'sym',l:['Símbolos','Symbols'],
+  p:['Iconografía Præs.','Præs iconography.'],
+  u:['Grafitis y sigilos, el sigilo de Sig y marcas de zona.','Graffiti and sigils, Sig’s sigil and zone markings.'],
+  s:['Relectura de los signos por parte de nuevas sociedades.','Re-reading of signs by new societies.'],
+  n:['Los símbolos Præs pasan de la obediencia a la insignia de rebelión.','Præs symbols shift from obedience to insignia of rebellion.']},
+ {k:'brd',l:['Difusión','Broadcast'],
+  p:['Ether Media, la red de propaganda de Lux.','Ether Media, Lux’s propaganda network.'],
+  u:['Etherline: red, bóveda e interfaz en vivo, con Judec como CEO.','Etherline: network, vault and live UI, with Judec as CEO.'],
+  s:null,
+  n:['Ether Media es el precursor de Etherline según el show bible de Præstantia; el nombre final es Etherline.','Ether Media is Etherline’s precursor per the Præstantia show bible; the final name is Etherline.']},
+ {k:'rel',l:['Religión','Religion'],
+  p:null,
+  u:['Iglesia de la Expiación: fija dificultades y penitencias.','Church of Expiation: sets difficulty and penances.'],
+  s:null,
+  n:['Tiene autonomía relativa, sirve a la élite y mezcla fe con mercadeo. En Præstantia no hay un equivalente documentado.','It has relative autonomy, serves the elite and blends faith with marketing. Præstantia has no documented equivalent.']},
+ {k:'res',l:['Resistencia','Resistance'],
+  p:['Los Speakers: científicos y filtradores que liberan información.','The Speakers: scientists and leakers freeing information.'],
+  u:['Células clandestinas, exempleados de Etherline y material Præs; aparece formalmente al final de la T1.','Underground cells, ex-Etherline staff and Præs material; formally appears at the end of S1.'],
+  s:null,
+  n:['Se revela con material Præs verificable; Delilah y Sig son los vectores de prueba en la transmisión.','It is revealed with verifiable Præs material; Delilah and Sig are the proof vectors on broadcast.']}
+];
+const THREADS=[
+ [['Althaia','Althaia'],['Præstantia → Undead Society T2','Praestantia → Undead Society S2'],['Su nombre aparece grabado bajo una cuna de la Unidad Theta (T2, ep. 3). Junto con Kaufmann, su legado une a la Resistencia con los orígenes Praes.','Her name is etched under a crib in Unit Theta (S2, ep. 3). With Kaufmann, her legacy ties the Resistance to Praes origins.']],
+ [['Lysa','Lysa'],['Fin de Præstantia → Cleaners','End of Praestantia → Cleaners'],['Tras el final de Præstantia, Lysa tiene una relación con el hijo de Kaufmann y Althaia y da a luz una nueva cepa de ATP, que se llamará Cleaners.','After Praestantia ends, Lysa has a relationship with Kaufmann and Althaia’s son and gives birth to a new ATP strain, to be called Cleaners.']],
+ [['Némesis','Nemesis'],['Præstantia T2 y T3 → Undead Society T5','Praestantia S2 and S3 → Undead Society S5'],['El satélite Némesis de Præstantia reaparece como Nemesis Versión II, «el Ejecutor», en la temporada 5 de Undead Society.','The Nemesis satellite from Praestantia returns as Nemesis Version II, “the Executioner”, in Undead Society season 5.']],
+ [['Ether Media y Etherline','Ether Media and Etherline'],['Propaganda','Propaganda'],['El aparato de propaganda de Lux anticipa la red que domina Undead Society y que manipula la edición para controlar la percepción.','Lux’s propaganda apparatus foreshadows the network that dominates Undead Society and edits footage to control perception.']]
+];
+const RULES=[
+ ['Toda cepa nueva debe rastrearse hasta variantes o entornos controlados de ATP.','Every new strain must trace back to controlled ATP variants or environments.'],
+ ['Etherline siempre edita o manipula; la Iglesia de la Expiación impulsa las penitencias.','Etherline always edits or manipulates; the Church of Expiation drives the penances.'],
+ ['Judec es el CEO y pariente de Ezra, Jericho y Abbadon; su caída pública debe ser progresiva.','Judec is the CEO and a relative of Ezra, Jericho and Abbadon; his public fall must be progressive.'],
+ ['La Resistencia se revela con material Præs verificable.','The Resistance is revealed with verifiable Præs material.']
+];
+
+/* ---------- ESTADO UI ---------- */
+const S={hn:0,ax:'bio',heroStopped:false,chGroup:'all',open:new Set(),season:0,tcat:'all',tq:'',loc:null,slide:0,done:new Set()};
+const UI={
+ es:{foot:'Fuente: DOC-20250901-WA0041..pdf (show bible de Præstantia, fases 1 a 10) y DOC-20261110-WA0017.pdf (Undead Society, fases 02 a 12 y temporadas 1 a 3). Contenido condensado.',heroGo:'Explorar el show bible',heroBr:'Ver el puente canónico',thread:'Un hilo, tres mundos',atp:'El hilo ATP',bridge:'Puente canónico',bridgeTip:'Elige un eje para ver cómo se transforma entre los tres mundos.',threads:'Hilos que cruzan los mundos',rules:'Reglas de no contradicción',prev:'Anterior',next:'Siguiente',auto:'Recorrido automático',st1:'temporadas',st2:'episodios desarrollados',st3:'facciones',st4:'locaciones',heroLead:'Cien años antes de Undead Society, una élite oculta crea el ATP. Lo que parece un elixir de juventud es el origen de los soldados Præs, de la primera IA del universo y de todos los brotes que vendrán.',copied:'Copiado: ',all:'Todos',cold:'Apertura',cliff:'Gancho final',cat:'Categoría',search:'Buscar en el glosario...',vul:'Debilidad',goal:'Objetivo externo',need:'Necesidad interna',gear:'Habilidades y equipo',bio:'Historia',ep:'Episodio',lead:'Liderazgo',ideo:'Ideología y activos',fate:'Destino en T3',vis:'Aspecto visual',fn:'Función en la historia',prod:'Notas de producción',palette:'Paleta',tip:'Toca un color para copiar su código HEX',est:'Rango estimado (millones USD)',totals:'Suma de carriles',cont:'Contingencia 10%',tot:'Total con contingencia',ph:'Cifras marcadas como marcador de posición en el documento; para iteración del productor. Bloque de temporada de 10 episodios.',pend:'Decisiones pendientes',style:'Guía de estilo',themes:'Pilares temáticos',guide:'Preguntas guía para guionistas',tone:'Brújula tonal',mood:'Palabras de ambiente',touch:'Referentes filosóficos',frames:'Fotogramas de referencia',frameNote:'Los fotogramas de 1920 x 1080 aún no están cargados en el documento; aquí se muestran sus pies de foto y paletas.',boards:'Tableros de ánimo',typo:'Tipografía',pal:'Paletas y claves de luz',slideN:'Diapositiva',copyKey:'Texto central',visual:'Recurso visual',budget:'Carriles de presupuesto',prog:'Avance de la lista (solo en esta sesión)',cc:'Cuatro Jinetes'},
+ en:{foot:'Source: DOC-20250901-WA0041..pdf (Praestantia show bible, phases 1 to 10) and DOC-20261110-WA0017.pdf (Undead Society, phases 02 to 12 and seasons 1 to 3). Content condensed.',heroGo:'Explore the show bible',heroBr:'See the canon bridge',thread:'One thread, three worlds',atp:'The ATP thread',bridge:'Canon bridge',bridgeTip:'Pick an axis to see how it transforms across the three worlds.',threads:'Threads crossing the worlds',rules:'Non-contradiction rules',prev:'Previous',next:'Next',auto:'Auto tour',st1:'seasons',st2:'developed episodes',st3:'factions',st4:'locations',heroLead:'One hundred years before Undead Society, a hidden elite creates ATP. What looks like a youth elixir is the origin of the Praes soldiers, of the universe’s first AI and of every outbreak to come.',copied:'Copied: ',all:'All',cold:'Cold open',cliff:'Cliffhanger',cat:'Category',search:'Search glossary...',vul:'Weakness',goal:'External goal',need:'Internal need',gear:'Skills and gear',bio:'Backstory',ep:'Episode',lead:'Leadership',ideo:'Ideology and assets',fate:'Season 3 fate',vis:'Visual palette',fn:'Function in story',prod:'Production notes',palette:'Palette',tip:'Tap a swatch to copy its HEX code',est:'Estimated range (USD millions)',totals:'Lane totals',cont:'Contingency 10%',tot:'Total with contingency',ph:'Figures are marked as placeholders in the document, for producer iteration. 10-episode season block.',pend:'Pending decisions',style:'Style guide snapshot',themes:'Pillar themes',guide:'Guiding questions for writers',tone:'Tonal compass',mood:'Mood keywords',touch:'Philosophical touchstones',frames:'Reference frames',frameNote:'The 1920 x 1080 frames are not yet loaded in the document; captions and swatches are shown here.',boards:'Mood boards',typo:'Typography',pal:'Color palettes and lighting keys',slideN:'Slide',copyKey:'Core copy',visual:'Visual asset',budget:'Budget lanes',prog:'Progress (this session only)',cc:'Four Horsemen'}
+};
+const U=k=>UI[lang][k];
+
+/* ---------- RENDER ---------- */
+const sw=(hex)=>{const c=hex.replace('#','');const n=parseInt(c,16);const lum=((n>>16)*299+((n>>8)&255)*587+(n&255)*114)/1000;return `<button data-hex="${hex}" style="background:${hex};color:${lum>140?'#000':'#fff'}">${hex}</button>`};
+const head=(t,s)=>`<div class="sub">${s||''}</div><h2>${t}</h2><div class="bar"></div>`;
+
+const R={
+inicio(){
+ const word='PRÆSTANTIA';
+ const eps=SEAS.reduce((a,x)=>a+x.e.length,0);
+ return `<section class="hero">
+ <div class="helix" aria-hidden="true">${Array.from({length:16},(_,k)=>`<i style="--k:${k}"></i>`).join('')}</div>
+ <div class="sub">${L(['Serie · Universo compartido','Series · Shared universe'])}</div>
+ <h1 class="htitle" aria-label="Præstantia">${[...word].map((c,i)=>`<span${c==='Æ'?' class="ae"':''} style="--i:${i}">${c}</span>`).join('')}</h1>
+ <p class="lead hl">${L(['«La perfección exige extinción.»','“Perfection demands extinction.”'])}</p>
+ <p class="lead hlead">${U('heroLead')}</p>
+ <div class="hstats">
+  <div><b>${cn(SEAS.length)}</b><span>${U('st1')}</span></div>
+  <div><b>${cn(eps)}</b><span>${U('st2')}</span></div>
+  <div><b>${cn(FAC.length)}</b><span>${U('st3')}</span></div>
+  <div><b>${cn(LOC.length)}</b><span>${U('st4')}</span></div>
+ </div>
+ <div class="hcta"><button class="btn pri" data-go="vision">${U('heroGo')}</button><button class="btn" data-scroll="hbridge">${U('heroBr')}</button></div>
+ <h3>${U('thread')}</h3>
+ <div class="tl" id="htl" style="--p:0">${HERO.map((n,i)=>`<button class="hnode ${i===0?'on':''}" data-hn="${i}"><span class="dot"></span><div class="tx"><b>${L(n.t)}</b><span class="nm">${L(n.n)}</span></div></button>`).join('')}<i class="pulse"></i></div>
+ <div class="hctl"><button data-hp="-1" aria-label="${U('prev')}">‹</button><button data-hp="1" aria-label="${U('next')}">›</button></div>
+ <div class="hpanel" id="hpanel"></div>
+ <h3 id="hbridge">${U('bridge')}</h3>
+ <p style="font-size:15px;margin:0">${U('bridgeTip')}</p>
+ <div class="chips" id="hax">${AXIS_H.map(a=>`<button class="chip ${S.ax===a.k?'on':''}" data-ax="${a.k}">${L(a.l)}</button>`).join('')}</div>
+ <div id="hmatrix"></div>
+ <h3>${U('threads')}</h3>
+ <div class="grid">${THREADS.map(t=>`<div class="card"><div class="sym" style="color:var(--ac)">${L(t[1])}</div><h4>${L(t[0])}</h4><p>${L(t[2])}</p></div>`).join('')}</div>
+ <h3>${U('rules')}</h3>
+ <div class="grid">${RULES.map((r,i)=>`<div class="card"><div class="sub">0${i+1}</div><p style="margin-top:4px">${L(r)}</p></div>`).join('')}</div>
+ </section>`;
+},
+vision(){
+ return `<div class="sub">${L(['Show bible interactivo','Interactive show bible'])}</div>
+ <h1>PRÆSTANTIA</h1>
+ <p class="lead hl">${L(['«La perfección exige extinción.»','“Perfection demands extinction.”'])}</p>
+ <div class="bar"></div>
+ <div class="marq"><div>${(()=>{const q=KEYS.map(k=>L(k)).join(' // ')+' // ';return q.repeat(3)+q.repeat(3)})()}</div></div>
+ <p class="lead">${L(OV.syn)}</p>
+ <div class="grid" style="margin-top:18px">${OV.meta.map(m=>`<div class="card"><div class="sub">${L(m[0])}</div><p style="font-size:16px;margin:4px 0 0">${L(m[1])}</p></div>`).join('')}</div>
+ <h3>${L(['Elementos del mundo','World elements'])}</h3>
+ <div class="grid">${OV.world.map(w=>`<div class="card"><h4>${L(w[0])}</h4><p>${L(w[1])}</p></div>`).join('')}</div>
+ <h3>${L(['Universo compartido','Shared universe'])}</h3>
+ <div class="card"><p style="margin:0">${L(OV.uni)}</p></div>
+ <h3>${L(['Conexiones futuras con Undead Society','Future connections to Undead Society'])}</h3>
+ <div class="grid">${OV.fut.map(f=>`<div class="card"><p style="margin:0">${L(f)}</p></div>`).join('')}</div>
+ <h3>${L(['Mensaje central','Central message'])}</h3>
+ <div class="note" style="font-size:18px">${L(OV.msg)}</div>`;
+},
+personajes(){
+ const list=CH.filter(c=>S.chGroup==='all'||c.g===S.chGroup);
+ return head(L(['Dossier de personajes','Character dossier']),L(['Fase 2','Phase 2']))+
+ `<div class="chips">${GROUPS.map(g=>`<button class="chip ${S.chGroup===g[0]?'on':''}" data-grp="${g[0]}">${L(g[1])}</button>`).join('')}</div>
+ <div class="grid">${list.map(c=>`<div class="card char ${S.open.has(c.n)?'open':''}" data-ch="${c.n}" style="--c:${c.c}">
+  <h4>${c.n}</h4><div>${L(c.r)}</div><div class="sym">${L(c.s)}</div>
+  <div class="more"><div class="mi">
+   <p><b>${U('bio')}.</b> ${L(c.bio)}</p>
+   <p><b>${U('goal')}.</b> ${L(c.ext)}</p>
+   <p><b>${U('need')}.</b> ${L(c.need)}</p>
+   <p><b>${U('gear')}.</b></p><div>${c.gear.map(g=>`<span class="tag" style="color:var(--c)">${Array.isArray(g)?L(g):g}</span>`).join('')}</div>
+  </div></div></div>`).join('')}</div>`;
+},
+temporadas(){
+ const s=SEAS[S.season];
+ return head(L(['Arcos por temporada','Season arcs']),L(['Fase 3','Phase 3']))+
+ `<div class="chips">${SEAS.map((x,i)=>`<button class="chip ${S.season===i?'on':''}" data-ss="${i}">${x.k} · ${x.t}</button>`).join('')}</div>
+ <p class="lead">${L(SEAS_DESC[s.k])}</p>
+ ${s.k==='S2'?`<div class="note">${L(SEAS_NOTE)}</div>`:''}
+ ${s.e.map((e,i)=>`<div class="ep"><div class="n">${String(i+1).padStart(2,'0')}</div><div><small>${U('cold')}</small>${L(e[0])}<small>${U('cliff')}</small>${L(e[1])}</div></div>`).join('')}`;
+},
+facciones(){
+ return head(L(['Facciones y organizaciones','Factions and organisations']),L(['Fase 4','Phase 4']))+
+ `<div class="grid">${FAC.map(f=>`<div class="card"><h4>${f.n}</h4><div class="sym" style="color:var(--ac)">${L(f.k)}</div>
+ <p><b>${U('lead')}:</b> ${f.lead}</p><p><b>${U('ideo')}.</b> ${L(f.i)} ${L(f.a)}</p><p><b>${U('fate')}.</b> ${L(f.f)}</p></div>`).join('')}</div>`;
+},
+locaciones(){
+ const sel=S.loc!==null?LOC[S.loc]:null;
+ return head(L(['Atlas de locaciones','Location atlas']),L(['Fase 5','Phase 5']))+
+ `<div class="grid">${LOC.map((l,i)=>`<div class="card" data-loc="${i}" style="cursor:pointer;${S.loc===i?'outline:2px solid var(--ac)':''}"><h4>${l.n}</h4><div class="sw" style="margin-top:8px;min-height:0">${l.sw.map(h=>`<div style="flex:1;height:26px;background:${h}"></div>`).join('')}</div><p>${L(l.v)}</p></div>`).join('')}</div>`+
+ (sel?`<h3>${sel.n}</h3><div class="card"><p><b>${U('vis')}.</b> ${L(sel.v)}</p><p><b>${U('fn')}.</b> ${L(sel.f)}</p><p><b>${U('prod')}.</b> ${L(sel.pr)}</p><div class="sw" style="margin-top:10px">${sel.sw.map(sw).join('')}</div></div>`:`<p class="note">${L(['Toca una locación para ver su función y notas de producción.','Tap a location to see its function and production notes.'])}</p>`);
+},
+tecnologia(){
+ const q=S.tq.toLowerCase();
+ const items=TECH.filter(t=>(S.tcat==='all'||t[0]===S.tcat)&&(!q||(t[1]+L(t[2])+L(t[3])).toLowerCase().includes(q)));
+ return head(L(['Glosario de tecnología y biotecnología','Technology and biotech glossary']),L(['Fase 6','Phase 6']))+
+ `<input type="search" id="tq" placeholder="${U('search')}" value="${S.tq}">
+ <div class="chips"><button class="chip ${S.tcat==='all'?'on':''}" data-tc="all">${U('all')}</button>${Object.keys(TCAT).map(k=>`<button class="chip ${S.tcat===k?'on':''}" data-tc="${k}">${L(TCAT[k])}</button>`).join('')}</div>
+ <div class="grid">${items.map(t=>`<div class="card"><div class="sub" style="font-size:11px">${L(TCAT[t[0]])}</div><h4>${t[1]}</h4><p>${L(t[2])}</p>${t[3][0]!=='—'?`<p class="hl"><b>${U('vul')}:</b> ${L(t[3])}</p>`:''}</div>`).join('')||`<p>—</p>`}</div>`;
+},
+ost(){
+ return head('Birth of Chaos',L(['Álbum concepto de Præstantia','Præstantia concept album']))+
+ `<p class="lead ost-lede">${L(['Birth of Chaos es el álbum concepto de Præstantia: cinco composiciones originales que acompañan el origen del ATP, el brote y la caída de Lux. Escúchalo mientras recorres las demás secciones.','Birth of Chaos is the concept album for Præstantia: five original compositions that follow the origin of ATP, the outbreak and the fall of Lux. Listen while you browse the other sections.'])}</p>${OSTKIT.html()}<p style="font-size:13px;opacity:.6;margin-top:14px">${L(['Fuente: álbum Birth of Chaos (Præstantia), música original de Dôjo.','Source: album Birth of Chaos (Præstantia), original music by Dôjo.'])}</p>`;
+},
+lookbook(){
+ return head('Look-book',L(['Fase 7','Phase 7']))+
+ `<h3>${U('pal')}</h3><p style="font-size:14px">${U('tip')}</p>
+ ${PAL.map(p=>`<div class="card" style="margin-bottom:10px"><h4>${p[0]}</h4><div style="font-size:14px;margin-bottom:8px">${L(p[2])}</div><div class="sw">${p[1].map(sw).join('')}</div></div>`).join('')}
+ <h3>${U('frames')}</h3><div class="note">${U('frameNote')}</div>
+ <div class="grid">${FRAMES.map((f,i)=>`<div class="card"><div class="sub">0${i+1} · ${f[2]}</div><p>${L(f[0])}</p><div class="sw">${f[1].map(sw).join('')}</div></div>`).join('')}</div>
+ <h3>${U('boards')}</h3>
+ <div class="grid">${BOARDS.map(b=>`<div class="card"><h4>${L(b[0])}</h4><p>${L(b[1])}</p><div class="sw" style="margin-top:8px">${b[2].map(sw).join('')}</div></div>`).join('')}</div>
+ <h3>${U('typo')}</h3>
+ <div class="grid">${TYPO.map(t=>`<div class="card"><div class="sub">${t[0]}</div><div style="font-family:${t[1]};font-size:24px;color:var(--hi);margin:8px 0">${t[3]}</div><p>${L(t[2])}</p></div>`).join('')}</div>`;
+},
+temas(){
+ return head(L(['Tema y filosofía','Theme and philosophy']),L(['Fase 8','Phase 8']))+
+ `<div class="note" style="font-size:20px">${L(['«La búsqueda de la perfección diseñada acelera el colapso cuando se ignora la ética.» Præstantia explora cómo la obsesión humana por controlar la biología, la verdad y la muerte engendra su perdición.','“The pursuit of engineered perfection accelerates collapse when ethics are ignored.” Praestantia explores how humanity’s obsession with control over biology, truth and death births its undoing.'])}</div>
+ <h3>${U('themes')}</h3>
+ <div class="grid">${THEMES.map((t,i)=>`<div class="card"><div class="sub">2.${i+1}</div><h4>${L(t[0])}</h4><p>${L(t[1])}</p><p class="hl" style="font-size:14px">${L(t[2])}</p></div>`).join('')}</div>
+ <h3>${U('tone')}</h3>
+ ${AXES.map(a=>`<div class="axis"><div class="l"><b>${L(a[0])} / ${L(a[1])}</b></div><div class="l"><span>${L(a[2])}</span><span>${L(a[3])}</span></div><div class="t"></div></div>`).join('')}
+ <h3>${U('mood')}</h3><div>${KEYS.map(k=>`<span class="tag" style="font-size:15px;padding:4px 14px">${L(k)}</span>`).join('')}</div>
+ <h3>${U('guide')}</h3>${QS.map((q,i)=>`<div class="card" style="margin-bottom:8px"><b class="hl">${i+1}.</b> ${L(q)}</div>`).join('')}
+ <h3>${U('touch')}</h3>${TOUCH.map(t=>`<div class="card" style="margin-bottom:8px">${L(t)}</div>`).join('')}`;
+},
+pitch(){
+ const s=PITCH[S.slide];
+ const sum=BUD.reduce((a,b)=>[a[0]+b[1],a[1]+b[2]],[0,0]);
+ return head('Pitch deck',L(['Fase 9','Phase 9']))+
+ `<div class="stepper">${PITCH.map((p,i)=>`<button data-sl="${i}" class="${S.slide===i?'on':''}">${i+1}</button>`).join('')}</div>
+ <div class="slide"><div class="sub">${U('slideN')} ${S.slide+1} / 12</div><div class="big">${L(s[0])}</div><p class="lead" style="margin:10px 0 0">${L(s[1])}</p><p class="sym" style="color:var(--ac);margin-top:10px">${U('visual')}: ${L(s[2])}</p></div>
+ <h3>${U('budget')}</h3><div class="sub" style="margin-bottom:8px">${U('est')}</div>
+ ${BUD.map(b=>`<div class="brow"><span>${L(b[0])}</span><div class="btrack"><div class="bfill" data-w="${(b[2]-b[1])/14*100}" style="left:${b[1]/14*100}%;width:0"></div></div><b>${b[1]}-${b[2]}</b></div><div style="font-size:13px;opacity:.75;margin:-6px 0 6px 120px">${L(b[3])}</div>`).join('')}
+ <div class="card"><b>${U('totals')}:</b> ${cn(sum[0])}-${cn(sum[1])} M<br><b>${U('cont')}:</b> ${cn(sum[0]*0.1,1)}-${cn(sum[1]*0.1,1)} M<br><b class="hl">${U('tot')}:</b> ${cn(sum[0]*1.1,1)}-${cn(sum[1]*1.1,1)} M</div>
+ <div class="note">${U('ph')}</div>`;
+},
+produccion(){
+ const n=S.done.size;
+ return head(L(['Revisión y formato','Proof and formatting']),L(['Fase 10','Phase 10']))+
+ `<h3>${U('prog')}: ${n} / ${CHK.length}</h3>
+ <div class="btrack" style="height:8px"><div class="bfill" style="left:0;width:${n/CHK.length*100}%"></div></div>
+ <div class="card" style="margin-top:12px;padding:0">${CHK.map((c,i)=>`<label class="check ${S.done.has(i)?'done':''}"><input type="checkbox" data-ck="${i}" ${S.done.has(i)?'checked':''}><span><b>${i+1}.</b> ${L(c[0])}<br><small style="opacity:.7">${L(c[1])}</small></span></label>`).join('')}</div>
+ <h3>${U('style')}</h3>${STYLE.map(s=>`<div class="card" style="margin-bottom:8px">${L(s)}</div>`).join('')}
+ <h3>${U('pend')}</h3>${PEND.map((p,i)=>`<div class="card" style="margin-bottom:8px"><b class="hl">${i+1}.</b> ${L(p)}</div>`).join('')}`;
+}
+};
+
+/* ---------- FONDO ANIMADO ---------- */
+const BG=(()=>{
+ const cv=document.getElementById('bg'),x=cv.getContext('2d');
+ const RMq=matchMedia('(prefers-reduced-motion: reduce)').matches;
+ const R=Math.random;
+ let W=0,H=0,mode='neon',t=0,last=0,dt=0,mx=.5,my=.5,off=[],rain=[],parts=[],fl=[],fogs=[],flash=0,timer=null;
+ function build(){
+  off=[];fl=[];
+  for(let l=0;l<3;l++){
+   const c=document.createElement('canvas');c.width=W+60;c.height=H;
+   const g=c.getContext('2d');g.translate(30,0);
+   const baseH=H*(.55-l*.12);let px=-30;
+   while(px<W+30){
+    const w=28+R()*55,h=baseH*(.35+R()*.65);
+    g.fillStyle=`rgb(${6+l*5},${10+l*7},${18+l*11})`;g.fillRect(px,H-h,w,h);
+    g.fillStyle=`rgba(0,180,255,${.10+l*.07})`;g.fillRect(px,H-h,w,1.5);
+    for(let yy=H-h+10;yy<H-6;yy+=11)for(let xx=px+5;xx<px+w-6;xx+=9){
+     const r=R();
+     if(r<.16){g.fillStyle=r<.015?'rgba(255,59,59,.5)':`rgba(${r<.08?'0,180,255':'192,200,210'},${.12+l*.12})`;g.fillRect(xx,yy,3,4)}
+    }
+    if(l===2&&R()<.35)fl.push({x:px+6+R()*(w-12),y:H-h+14+R()*(h-30),c:R()<.3?'255,59,59':'0,180,255',ph:R()*6});
+    px+=w+R()*8;
+   }
+   off.push(c);
+  }
+  rain=Array.from({length:Math.round(W*H/11000)},()=>({x:R()*W,y:R()*H,v:9+R()*9,l:10+R()*16}));
+  parts=Array.from({length:Math.round(W*H/16000)+10},()=>({x:R()*W,y:R()*H,r:.6+R()*2,v:.2+R()*.7,ph:R()*6.28}));
+  VIR.build();
+  fogs=Array.from({length:6},(_,i)=>({x:R()*W,y:H*(.4+R()*.6),r:H*(.35+R()*.3),v:8+R()*14,k:i}));
+ }
+ /* ---- campo de virus ATP: travesia en profundidad, foco, analisis NEUROX ---- */
+ const VIR=(()=>{
+  const MOBV=matchMedia('(max-width:760px)').matches,FZ=.45;
+  const ST=[
+   {n:'ATP-ψ',c:'255,59,59',t:'psi',N:30,spk:.32,w:3,es:['vector viral AI-tuned','brote de ira «controlado»','necrosis rápida fuera de cuarentena','Ciudad en cuarentena · T2'],en:['AI-tuned viral vector','"controlled" rage outbreak','rapid necrosis outside quarantine','Quarantine City arc · S2']},
+   {n:'ATP-β',c:'0,180,255',t:'beta',N:22,spk:0,w:3,es:['integración súper-soldado estable','convulsiones neurales ocasionales','rama dual Altered / Perfection'],en:['stable super-soldier integration','occasional neural seizures','dual branch Altered / Perfection']},
+   {n:'ATP-ζ',c:'255,0,111',t:'zeta',N:26,spk:.2,w:2,es:['nano-tags digitales detectados','curva de mutación acelerada','necro-regeneración tipo Undead'],en:['digital nano-tags detected','accelerated mutation curve','undead-like necro-regeneration']},
+   {n:'ATP-α',c:'255,204,0',t:'alfa',N:18,spk:0,w:2,es:['regeneración celular básica','riesgo tumoral alto','clínicas de juventud ilegales'],en:['basic cell regeneration','high tumor risk','illegal youth clinics']},
+   {n:'ATP-ν',c:'140,225,215',t:'nu',N:20,spk:0,w:1,es:['contra-virus prototipo','neutraliza ATP','plano enviado a Azrael'],en:['prototype counter-virus','neutralises ATP','blueprint sent to Azrael']}
+  ];
+  const BAG=[];ST.forEach((s,i)=>{for(let k=0;k<s.w;k++)BAG.push(i)});
+  function geo(def){
+   const N=MOBV?Math.round(def.N*.7):def.N,nodes=[],edges=[],ringE=[];
+   for(let k=0;k<N;k++){let y=1-2*(k+.5)/N;const r=Math.sqrt(1-y*y),th=k*2.39996,m=def.t==='alfa'?.78+R()*.5:1;
+    if(def.t==='zeta'&&Math.cos(th)*r<-.25)continue;
+    nodes.push({x:Math.cos(th)*r*m,y:y*m,z:Math.sin(th)*r*m,sp:def.spk>0&&k%2===0})}
+   const n0=nodes.length;let thr=1.55*Math.sqrt(12.566/N);thr*=thr;
+   for(let k=0;k<n0;k++)for(let j=k+1;j<n0;j++){const a=nodes[k],b=nodes[j],dx=a.x-b.x,dy=a.y-b.y,dz=a.z-b.z;if(dx*dx+dy*dy+dz*dz<thr)edges.push(k,j)}
+   if(def.t==='beta'||def.t==='nu'){const cnt=def.t==='nu'?6:8;(def.t==='nu'?[.5]:[.55,-.55]).forEach((tl,ri)=>{const st=nodes.length;
+    for(let k=0;k<cnt;k++)nodes.push({ring:1,tl,th:k/cnt*6.283,sd:(ri?-1:1)*(def.t==='nu'?.9:.6)});
+    for(let k=0;k<cnt;k++)ringE.push(st+k,st+(k+1)%cnt)})}
+   return {nodes,edges,ringE,n0};
+  }
+  let GEO=null,vs=[],dust=[],tg=null,tgT=0,nextMut=1;
+  const PX=new Float32Array(64),PY=new Float32Array(64),PD=new Float32Array(64),TX=new Float32Array(64),TY=new Float32Array(64);
+  const hex=()=>('0000'+((R()*65536)|0).toString(16)).slice(-4).toUpperCase();
+  const lg=()=>{try{return lang==='en'?'en':'es'}catch(e){return 'es'}};
+  function spawn(v,z){v.s=BAG[(R()*BAG.length)|0];v.X=(R()<.5?-1:1)*(.13+R()*.4);v.Y=(R()-.5)*1.1;v.Z=z;v.ph=R()*6.28;v.rs=(.12+R()*.22)*(R()<.5?-1:1);v.mut=null;v.on=false;v.f=0}
+  function build(){
+   if(!GEO)GEO=ST.map(geo);
+   const n=MOBV?6:13;vs=[];for(let i=0;i<n;i++){const v={};spawn(v,.14+.86*(i+R()*.6)/n);vs.push(v)}
+   dust=Array.from({length:MOBV?28:80},()=>({X:(R()-.5)*1.6,Y:(R()-.5)*1.2,Z:.1+R()*.9}));
+   tg=null;
+  }
+  function virion(v,cx,cy,r,a,f,t){
+   const d=ST[v.s],g=GEO[v.s],c=d.c,nd=g.nodes,N=nd.length,near=v.Z<FZ?1-f:0,
+    ay=t*v.rs+v.ph,ax=.4+Math.sin(t*.2+v.ph)*.2,ca=Math.cos(ay),sa=Math.sin(ay),cb=Math.cos(ax),sb=Math.sin(ax),m=v.mut;
+   if(!MOBV){const gr=x.createRadialGradient(cx,cy,r*.1,cx,cy,r*1.6);gr.addColorStop(0,`rgba(${c},${a*(.1+near*.06)})`);gr.addColorStop(1,`rgba(${c},0)`);x.fillStyle=gr;x.beginPath();x.arc(cx,cy,r*1.6,0,6.283);x.fill()}
+   for(let k=0;k<N;k++){const n=nd[k];let px=n.x,py=n.y,pz=n.z;
+    if(n.ring){const an=n.th+t*n.sd,cr=Math.cos(n.tl),sr=Math.sin(n.tl);px=Math.cos(an)*1.32;py=Math.sin(an)*1.32*cr;pz=Math.sin(an)*1.32*sr}
+    const x1=px*ca+pz*sa,z1=-px*sa+pz*ca,y1=py*cb-z1*sb,z2=py*sb+z1*cb,s=1/(1-z2*.22),ex=n.sp?1+d.spk*.6+(m&&m.k===k?m.m*.3:0):1;
+    PX[k]=cx+x1*r*s;PY[k]=cy+y1*r*s;PD[k]=(z2+1)/2;TX[k]=cx+x1*r*s*ex;TY[k]=cy+y1*r*s*ex}
+   const lw=.6+near*2.2,ea=a*(.45+.55*f),E=g.edges;
+   x.lineWidth=lw;
+   for(let p=0;p<2;p++){x.beginPath();x.strokeStyle=`rgba(${c},${ea*(p?.42:.13)})`;
+    for(let k=0;k<E.length;k+=2){const A=E[k],B=E[k+1];if(((PD[A]+PD[B])>1)!==!!p)continue;x.moveTo(PX[A],PY[A]);x.lineTo(PX[B],PY[B])}x.stroke()}
+   if(g.ringE.length){x.beginPath();x.strokeStyle=`rgba(${c},${ea*.5})`;for(let k=0;k<g.ringE.length;k+=2){x.moveTo(PX[g.ringE[k]],PY[g.ringE[k]]);x.lineTo(PX[g.ringE[k+1]],PY[g.ringE[k+1]])}x.stroke()}
+   if(d.spk>0){x.beginPath();x.strokeStyle=`rgba(${c},${ea*.5})`;for(let k=0;k<g.n0;k++)if(nd[k].sp){x.moveTo(PX[k],PY[k]);x.lineTo(TX[k],TY[k])}x.stroke()}
+   const nr=Math.max(.6,Math.min(3.2,r/26));
+   for(let k=0;k<N;k++){const hot=m&&m.k===k;x.fillStyle=hot?`rgba(255,255,255,${Math.min(1,a*(.5+m.m))})`:`rgba(${c},${ea*(.3+PD[k]*.6)})`;
+    const qx=nd[k].sp?TX[k]:PX[k],qy=nd[k].sp?TY[k]:PY[k];x.beginPath();x.arc(qx,qy,nr*(.7+PD[k]*.7)*(hot?1.8:1)*(1+near),0,6.283);x.fill()}
+   if(f>.3){
+    const la=a*Math.min(1,(f-.3)*3);x.font='700 10px "Courier Prime",ui-monospace,monospace';x.textAlign='center';x.textBaseline='middle';
+    x.fillStyle=`rgba(${c},${la*.9})`;x.fillText(d.n,cx,cy+r*1.5+8);
+    if(m&&m.k<N){const k=m.k,ma=la*Math.min(1,m.m*3)*Math.min(1,(1-m.m)*6+.2),dx=PX[k]-cx,dy=PY[k]-cy,dl=Math.hypot(dx,dy)||1,ex=PX[k]+dx/dl*26,ey=PY[k]+dy/dl*26;let lf=dx>=0;
+     if(ex>W-150)lf=false;else if(ex<150)lf=true;const tx=ex+(lf?10:-10);
+     x.strokeStyle=`rgba(${c},${ma*(1-m.m)})`;x.lineWidth=1;x.beginPath();x.arc(PX[k],PY[k],4+(1-m.m)*26,0,6.283);x.stroke();
+     x.strokeStyle=`rgba(${c},${ma*.85})`;x.lineWidth=.8;x.beginPath();x.moveTo(PX[k],PY[k]);x.lineTo(ex,ey);x.lineTo(tx,ey);x.stroke();
+     x.textAlign=lf?'left':'right';x.fillStyle=`rgba(${c},${ma})`;x.fillText(m.a,tx+(lf?3:-3),ey-7);
+     x.fillStyle=`rgba(210,230,238,${ma*.9})`;x.fillText(m.b,tx+(lf?3:-3),ey+7)}
+   }
+  }
+  function draw(){
+   if(!vs.length)return;
+   const F=Math.min(W,H),sc=(typeof scrollY==='number'?scrollY:0)/Math.max(1,H)*.06,cxm=(mx-.5)*.1,cym=(my-.5)*.08,A=MOBV?.5:.62;
+   x.save();
+   /* polvo biologico con bokeh */
+   for(let i=0;i<dust.length;i++){const p=dust[i];p.Z-=dt*.05;if(p.Z<.08){p.Z=1;p.X=(R()-.5)*1.6;p.Y=(R()-.5)*1.2}
+    const s=1/p.Z,yy=(((p.Y-sc*1.5+.6)%1.2)+1.2)%1.2-.6,px=W/2+(p.X-cxm)*W*.55*s,py=H/2+(yy-cym)*H*.5*s;if(px<-20||px>W+20||py<-20||py>H+20)continue;
+    const fo=Math.min(1,(1-p.Z)/.2)*Math.min(1,(p.Z-.08)/.2);
+    if(p.Z<.3){x.strokeStyle=`rgba(190,225,255,${.07*fo*A})`;x.lineWidth=1;x.beginPath();x.arc(px,py,2.2*s,0,6.283);x.stroke();x.fillStyle=`rgba(190,225,255,${.025*fo*A})`;x.fill()}
+    else{x.fillStyle=`rgba(190,225,255,${.4*fo*A})`;x.fillRect(px,py,Math.min(2.4,.7*s),Math.min(2.4,.7*s))}}
+   for(let i=0;i<vs.length;i++){const v=vs[i];v.Z-=dt*.034;if(v.Z<.1){spawn(v,1);if(tg===v)tg=null}
+    if(v.mut){v.mut.m-=dt*.42;if(v.mut.m<=0)v.mut=null}}
+   vs.sort((a,b)=>b.Z-a.Z);
+   let px0=0,py0=0,pa=0,best=null;
+   for(let i=0;i<vs.length;i++){const v=vs[i],s=1/v.Z,yy=(((v.Y-sc+.55)%1.1)+1.1)%1.1-.55,
+     cx=W/2+(v.X-cxm)*W*.55*s,cy=H/2+(yy-cym)*H*.5*s,r=F*.03*s;
+    v.on=cx>-r&&cx<W+r&&cy>-r&&cy<H+r;v.cx=cx;v.cy=cy;v.r=r;
+    const a=Math.min(1,(1-v.Z)/.15)*Math.min(1,(v.Z-.1)/.22)*A;v.f=Math.max(0,1-Math.abs(v.Z-FZ)/.3);
+    if(!v.on){pa=0;continue}
+    if(pa>.2&&a>.2){x.strokeStyle=`rgba(255,255,255,${.09*Math.min(a,pa)})`;x.lineWidth=.7;x.setLineDash([3,7]);x.lineDashOffset=-t*9;x.beginPath();x.moveTo(px0,py0);x.lineTo(cx,cy);x.stroke();x.setLineDash([])}
+    virion(v,cx,cy,r,a,v.f,t);px0=cx;py0=cy;pa=a;
+    if(v.f>.35&&cx>40&&cx<W-40&&cy>70&&cy<H-40&&(!best||v.f>best.f))best=v}
+   /* reticula de analisis NEUROX */
+   if(!tg||!tg.on||tg.f<.2){if(best&&best!==tg){tg=best;tgT=t}else if(tg&&(!tg.on||tg.f<.2))tg=null}
+   if(tg){const d=ST[tg.s],c=d.c,q=tg.r*1.75,k=Math.min(1,(t-tgT)*1.6),a=tg.f*k*A*1.2,o=q*(1.5-.5*k),b=q*.3,pc=Math.min(99,((t-tgT)*14)|0);
+    x.strokeStyle=`rgba(${c},${a})`;x.lineWidth=1.2;x.beginPath();
+    [[-1,-1],[1,-1],[1,1],[-1,1]].forEach(([sx,sy])=>{const X0=tg.cx+sx*o,Y0=tg.cy+sy*o;x.moveTo(X0-sx*b,Y0);x.lineTo(X0,Y0);x.lineTo(X0,Y0-sy*b)});x.stroke();
+    const sy=tg.cy+Math.sin(t*1.4)*q*.9,gl=x.createLinearGradient(tg.cx-q,0,tg.cx+q,0);gl.addColorStop(0,`rgba(${c},0)`);gl.addColorStop(.5,`rgba(${c},${a*.7})`);gl.addColorStop(1,`rgba(${c},0)`);
+    x.strokeStyle=gl;x.lineWidth=1;x.beginPath();x.moveTo(tg.cx-q,sy);x.lineTo(tg.cx+q,sy);x.stroke();
+    x.font='700 10px "Courier Prime",ui-monospace,monospace';x.textAlign='left';x.textBaseline='middle';
+    x.fillStyle=`rgba(210,230,238,${a*.85})`;x.fillText((lg()==='en'?'NEUROX · ANALYZING ':'NEUROX · ANALIZANDO ')+pc+'%',tg.cx-o,tg.cy-o-9);
+    x.fillStyle=`rgba(${c},${a*.85})`;x.textAlign='right';x.fillText('Z '+tg.Z.toFixed(3)+' · 0x'+((tg.ph*9999)|0).toString(16).toUpperCase(),tg.cx+o,tg.cy+o+10)}
+   if(t>nextMut){const c=vs.filter(v=>v.on&&v.f>.3&&!v.mut);if(c.length){const v=c[(R()*c.length)|0],d=ST[v.s],L=d[lg()];v.mut={k:(R()*GEO[v.s].n0)|0,m:1,a:d.n+' · 0x'+hex(),b:L[(R()*L.length)|0]}}nextMut=t+(MOBV?2.6:1.3)+R()*1.2}
+   x.restore();
+  }
+  return {build,draw};
+ })();
+ function dome(cx,r,a){
+  x.fillStyle=`rgba(30,42,55,${a})`;x.beginPath();x.arc(cx,H+4,r,Math.PI,0);x.fill();
+  x.strokeStyle='rgba(153,217,234,.22)';x.lineWidth=1;
+  x.beginPath();x.arc(cx,H+4,r,Math.PI,0);x.stroke();
+  for(let k=1;k<4;k++){x.beginPath();x.ellipse(cx,H+4,r*k/4,r,0,Math.PI,0);x.stroke()}
+  for(let k=1;k<4;k++){x.beginPath();x.ellipse(cx,H+4,r,r*k/4,0,Math.PI,0);x.stroke()}
+ }
+ const D={
+  neon(){
+   for(let l=0;l<3;l++)x.drawImage(off[l],-30+(mx-.5)*-14*(l+1),0);
+   for(let i=0;i<3;i++){
+    const a=((t*24+i*420)%(W+240))-120;
+    x.fillStyle=`rgba(${i%2?'255,59,59':'0,180,255'},${.05+.03*Math.sin(t*2+i)})`;
+    x.fillRect(a,H*(.42+i*.07),90,34);
+   }
+   fl.forEach(f=>{const a=.25+.45*Math.max(0,Math.sin(t*1.6+f.ph)*Math.sin(t*.7+f.ph*2));x.fillStyle=`rgba(${f.c},${a})`;x.fillRect(f.x-(mx-.5)*28,f.y,4,5)});
+   const g=x.createLinearGradient(0,H*.6,0,H);g.addColorStop(0,'rgba(0,180,255,0)');g.addColorStop(1,'rgba(0,180,255,.10)');
+   x.fillStyle=g;x.fillRect(0,H*.6,W,H*.4);
+   x.strokeStyle='rgba(170,205,255,.22)';x.lineWidth=1;x.beginPath();
+   rain.forEach(r=>{x.moveTo(r.x,r.y);x.lineTo(r.x-r.l*.18,r.y+r.l);r.y+=r.v;r.x-=r.v*.18;if(r.y>H){r.y=-20;r.x=R()*(W+60)}if(r.x<-20)r.x=W+R()*40});
+   x.stroke();
+   if(flash>0){x.fillStyle=`rgba(180,220,255,${flash*.06})`;x.fillRect(0,0,W,H);flash-=.03}else if(R()<.0015)flash=1;
+  },
+  lab(){
+   x.strokeStyle='rgba(160,210,235,.22)';x.lineWidth=1;
+   parts.forEach(p=>{p.y-=p.v;p.x+=Math.sin(t+p.ph)*.3;if(p.y<-10){p.y=H+10;p.x=R()*W}x.beginPath();x.arc(p.x,p.y,p.r*2.2,0,6.283);x.stroke()});
+   const cx=W*(W<700?.86:.84)+(mx-.5)*-20,A=W<700?26:48;
+   for(let y=-10;y<H+10;y+=13){
+    const ph=y*.018+t*.9,s=Math.sin(ph),c=Math.cos(ph);
+    if(((y/13)|0)%3===0){x.strokeStyle='rgba(204,224,255,.12)';x.beginPath();x.moveTo(cx+s*A,y);x.lineTo(cx-s*A,y);x.stroke()}
+    x.fillStyle=`rgba(109,140,166,${.25+.3*c})`;x.beginPath();x.arc(cx+s*A,y,2.2+c*1.2,0,6.283);x.fill();
+    x.fillStyle=`rgba(204,224,255,${.25-.2*c})`;x.beginPath();x.arc(cx-s*A,y,2.2-c*1.2,0,6.283);x.fill();
+   }
+   const sy=(t*70)%(H+200)-100;const g=x.createLinearGradient(0,sy-60,0,sy+60);
+   g.addColorStop(0,'rgba(204,224,255,0)');g.addColorStop(.5,'rgba(204,224,255,.07)');g.addColorStop(1,'rgba(204,224,255,0)');
+   x.fillStyle=g;x.fillRect(0,sy-60,W,120);
+  },
+  war(){
+   fogs.forEach(f=>{
+    f.x+=f.v*dt;if(f.x-f.r>W)f.x=-f.r;
+    const c=f.k%2?'120,160,70':'210,168,110';
+    const g=x.createRadialGradient(f.x,f.y,0,f.x,f.y,f.r);g.addColorStop(0,`rgba(${c},.10)`);g.addColorStop(1,`rgba(${c},0)`);
+    x.fillStyle=g;x.fillRect(f.x-f.r,f.y-f.r,f.r*2,f.r*2);
+   });
+   [[.1,0],[.9,1]].forEach(([bx,k])=>{
+    x.save();x.translate(W*bx,H);x.rotate(-Math.PI/2+Math.sin(t*.35+k*2.4)*.55+(mx-.5)*.15);
+    const L=H*1.3,g=x.createLinearGradient(0,0,L,0);g.addColorStop(0,'rgba(255,240,205,.12)');g.addColorStop(1,'rgba(255,240,205,0)');
+    x.fillStyle=g;x.beginPath();x.moveTo(0,0);x.lineTo(L,-L*.12);x.lineTo(L,L*.12);x.fill();x.restore();
+   });
+   parts.forEach(p=>{
+    p.y-=p.v*1.2;p.x+=Math.sin(t*1.5+p.ph)*.5;if(p.y<-5){p.y=H+5;p.x=R()*W}
+    const a=.35+.4*Math.sin(t*5+p.ph);x.fillStyle=`rgba(255,${130+((p.ph*10)|0)%60},60,${Math.max(0,a)})`;x.fillRect(p.x,p.y,p.r,p.r);
+   });
+   const g=x.createLinearGradient(0,H*.7,0,H);g.addColorStop(0,'rgba(161,39,10,0)');g.addColorStop(1,'rgba(161,39,10,.14)');
+   x.fillStyle=g;x.fillRect(0,H*.7,W,H*.3);
+  },
+  ice(){
+   const cols=['120,230,210','153,217,234','180,160,255'];
+   x.globalCompositeOperation='lighter';
+   for(let i=0;i<3;i++){
+    const base=H*(.2+i*.07),amp=H*.07;
+    const f=xx=>base+Math.sin(xx*.004+t*.25+i*1.7)*amp+Math.sin(xx*.011+t*.4+i)*amp*.4+(mx-.5)*18;
+    x.beginPath();x.moveTo(0,f(0));
+    for(let xx=12;xx<=W+12;xx+=12)x.lineTo(xx,f(xx));
+    for(let xx=W+12;xx>=0;xx-=12)x.lineTo(xx,f(xx)+H*.26);
+    const g=x.createLinearGradient(0,base-amp,0,base+H*.3);
+    g.addColorStop(0,`rgba(${cols[i]},0)`);g.addColorStop(.22,`rgba(${cols[i]},.13)`);g.addColorStop(1,`rgba(${cols[i]},0)`);
+    x.fillStyle=g;x.fill();
+   }
+   x.globalCompositeOperation='source-over';
+   parts.forEach(p=>{
+    p.y+=p.v*.9;p.x+=Math.sin(t*.6+p.ph)*.35;if(p.y>H+4){p.y=-4;p.x=R()*W}
+    x.fillStyle=`rgba(255,255,255,${.35+.25*Math.sin(t+p.ph)})`;x.beginPath();x.arc(p.x,p.y,p.r*.9,0,6.283);x.fill();
+   });
+   const r=Math.min(W,H)*.2;dome(W*.18+(mx-.5)*-16,r,.8);dome(W*.78+(mx-.5)*-24,r*.7,.7);
+  },
+  sodium(){
+   [.18,.5,.82].forEach((lx,k)=>{
+    const fk=.72+.28*Math.sin(t*(11+k*3)+k)*Math.sin(t*2.7+k*2)-(Math.sin(t*.9+k*4)>.96?.5:0);
+    const px=W*lx,L=H*.9;
+    const g=x.createLinearGradient(0,0,0,L);g.addColorStop(0,`rgba(242,185,74,${Math.max(0,.20*fk)})`);g.addColorStop(1,'rgba(242,185,74,0)');
+    x.fillStyle=g;x.beginPath();x.moveTo(px-6,0);x.lineTo(px+6,0);x.lineTo(px+L*.32,L);x.lineTo(px-L*.32,L);x.fill();
+    x.fillStyle=`rgba(255,235,190,${.5*Math.max(fk,0)})`;x.beginPath();x.arc(px,4,5,0,6.283);x.fill();
+   });
+   parts.forEach(p=>{
+    p.y+=p.v*.8;p.x+=.4+Math.sin(t+p.ph)*.3;if(p.y>H+4||p.x>W+4){p.y=-4;p.x=R()*W}
+    x.fillStyle=`rgba(210,205,195,${.25+.2*Math.sin(t*2+p.ph)})`;x.fillRect(p.x,p.y,p.r,p.r*.6);
+   });
+   const g=x.createLinearGradient(0,H*.75,0,H);g.addColorStop(0,'rgba(242,185,74,0)');g.addColorStop(1,'rgba(242,185,74,.10)');
+   x.fillStyle=g;x.fillRect(0,H*.75,W,H*.25);
+  }
+ };
+ function resize(){
+  const dpr=Math.min(devicePixelRatio||1,1.25);W=innerWidth;H=innerHeight;
+  cv.width=W*dpr;cv.height=H*dpr;x.setTransform(dpr,0,0,dpr,0,0);build();
+  if(RMq){x.clearRect(0,0,W,H);t=3;D[mode]();VIR.draw()}
+ }
+ function frame(n){
+  timer=requestAnimationFrame(frame);
+  if(n-last<33)return;
+  dt=Math.min(.06,(n-last)/1000||0);last=n;t+=dt;
+  x.clearRect(0,0,W,H);D[mode]();VIR.draw();
+ }
+ document.addEventListener('visibilitychange',()=>{if(RMq)return;cancelAnimationFrame(timer);if(!document.hidden){last=0;timer=requestAnimationFrame(frame)}});
+ let rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(resize,200)});
+ return {
+  init(m){mode=m;resize();if(!RMq)timer=requestAnimationFrame(frame)},
+  set(m){
+   if(m===mode)return;
+   cv.style.opacity=0;
+   setTimeout(()=>{mode=m;if(RMq){x.clearRect(0,0,W,H);t=3;D[mode]();VIR.draw()}cv.style.opacity=.95},380);
+  },
+  mouse(a,b){mx=a;my=b}
+ };
+})();
+
+/* ---------- CONTROL ---------- */
+const view=document.getElementById('view');
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const cn=(v,d=0)=>`<span class="cnt" data-to="${v}" data-dec="${d}">${v.toFixed(d)}</span>`;
+function toast(t){const e=document.getElementById('toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('on'),1400)}
+
+let navBuilt=false;
+function renderNav(){
+ const nav=document.getElementById('nav');
+ if(!navBuilt){nav.innerHTML=SECS.map(s=>`<button data-s="${s[0]}"></button>`).join('');navBuilt=true}
+ [...nav.children].forEach((b,i)=>{b.textContent=L(SECS[i][2]);b.classList.toggle('on',SECS[i][0]===sec)});
+ const on=nav.querySelector('.on');
+ if(on)nav.scrollTo({left:on.offsetLeft-nav.clientWidth/2+on.clientWidth/2,behavior:RM?'auto':'smooth'});
+ document.querySelectorAll('.lang button').forEach(b=>b.classList.toggle('on',b.dataset.l===lang));
+}
+
+const io=new IntersectionObserver(es=>{
+ let i=0;
+ es.forEach(en=>{
+  if(!en.isIntersecting)return;
+  const el=en.target;io.unobserve(el);
+  el.style.transitionDelay=(i++*60)+'ms';
+  requestAnimationFrame(()=>el.classList.add('in'));
+  setTimeout(()=>{el.style.transitionDelay=''},1000+i*60);
+ });
+},{threshold:.06,rootMargin:'0px 0px -5% 0px'});
+
+function decorate(anim,root){
+ root=root||view;
+ const a=anim&&!RM;
+ root.querySelectorAll('.card,.ep,.brow,.axis,.note,.check,h3,.chips,.stepper,.lead,.sh').forEach(el=>{
+  el.classList.add('rv');
+  if(a)io.observe(el);else el.classList.add('in','nt');
+ });
+ if(!a)requestAnimationFrame(()=>requestAnimationFrame(()=>root.querySelectorAll('.nt').forEach(e=>e.classList.remove('nt'))));
+ root.querySelectorAll('.bfill[data-w]').forEach(b=>{
+  if(a)io2.observe(b);else{b.style.transition='none';b.style.width=b.dataset.w+'%';requestAnimationFrame(()=>{b.style.transition=''})}
+ });
+ root.querySelectorAll('.cnt').forEach(c=>{
+  const to=+c.dataset.to,d=+c.dataset.dec||0;
+  if(!a){c.textContent=to.toFixed(d);return}
+  c.textContent=(0).toFixed(d);io2.observe(c);
+ });
+}
+function runCnt(c){
+ const to=+c.dataset.to,d=+c.dataset.dec||0,t0=performance.now()+150;
+ const step=n=>{const p=Math.min(1,Math.max(0,(n-t0)/1200));const e=1-Math.pow(1-p,3);c.textContent=(to*e).toFixed(d);if(p<1)requestAnimationFrame(step)};
+ requestAnimationFrame(step);
+}
+const io2=new IntersectionObserver(es=>es.forEach(en=>{
+ if(!en.isIntersecting)return;const el=en.target;io2.unobserve(el);
+ if(el.classList.contains('cnt'))runCnt(el);else el.style.width=el.dataset.w+'%';
+}),{threshold:.25});
+
+/* ---------- HERO: CONTROL ---------- */
+const nm=n=>L(n.n);
+function heroPanel(anim){
+ const el=document.getElementById('hpanel');if(!el)return;
+ const n=HERO[S.hn];
+ el.innerHTML=`<div class="hhead"><span class="sub">${L(n.t)}</span><span class="badge ${n.dev?'dev':''}">${L(n.badge)}</span></div>
+ <div class="hname">${nm(n)}</div>
+ <ul class="hpts">${n.pts.map((p,i)=>`<li style="--i:${i}">${L(p)}</li>`).join('')}</ul>
+ <div class="hatp"><b>${U('atp')}</b>${L(n.atp)}</div>
+ <p class="hft">${L(n.ft)}</p>`;
+ el.classList.remove('swap');
+ if(anim&&!RM){void el.offsetWidth;el.classList.add('swap')}
+}
+function heroMatrix(anim){
+ const el=document.getElementById('hmatrix');if(!el)return;
+ const a=AXIS_H.find(x=>x.k===S.ax);
+ const cols=[['Præstantia','T-100',a.p],['Undead Society','T0',a.u],['Seishin',L(['Futuro','Future']),a.s]];
+ el.innerHTML=`<div class="mgrid">${cols.map((c,i)=>`<div class="mcell ${HERO[S.hn].col===i?'hot':''}" data-c="${i}" style="--k:${KC[i]};--i:${i}"><div class="sub" style="color:var(--k)">${c[0]} · ${c[1]}</div>${c[2]?`<p>${L(c[2])}</p>`:`<p><span class="badge dev">${i===0?L(['Sin equivalente documentado','No documented equivalent']):L(['En desarrollo','In development'])}</span></p>`}</div>`).join('')}</div><div class="note">${L(a.n)}</div>`;
+ el.classList.remove('swap');
+ if(anim&&!RM){void el.offsetWidth;el.classList.add('swap')}
+}
+function heroSet(i,user,init){
+ S.hn=(i+HERO.length)%HERO.length;
+ const tl=document.getElementById('htl');if(!tl)return;
+ tl.style.setProperty('--p',S.hn/(HERO.length-1));
+ [...tl.querySelectorAll('.hnode')].forEach((b,k)=>{b.classList.toggle('on',k===S.hn);b.classList.toggle('past',k<S.hn)});
+ if(!init){
+  heroPanel(true);
+  document.querySelectorAll('#hmatrix .mcell').forEach(c=>c.classList.toggle('hot',+c.dataset.c===HERO[S.hn].col));
+ }
+}
+
+function pagerHTML(id,pos){
+ const i=SECS.findIndex(x=>x[0]===id),p=SECS[i-1],n=SECS[i+1];
+ const lab=lang==='es'?['Anterior','Siguiente']:['Previous','Next'];
+ const b=(t,d,c)=>t?`<button type="button" class="pg ${c}" data-s="${t[0]}" aria-label="${d}: ${L(t[2])}"><em>${d}</em><b>${c==='pv'?'\u2190 ':''}${L(t[2])}${c==='nx'?' \u2192':''}</b></button>`:'';
+ const al=lang==='es'?'Navegaci\u00f3n entre secciones':'Section navigation';
+ if(pos==='top')return (n&&id!=='inicio')?`<nav class="pager pager-top" aria-label="${al}">${b(n,lab[1],'nx')}</nav>`:'';
+ return p?`<nav class="pager" aria-label="${al}">${b(p,lab[0],'pv')}</nav>`:'';
+}
+function secHTML(id,i){
+ const head=id==='inicio'?'':`<div class="sh"><span class="sn">${String(i).padStart(2,'0')}</span><h2>${L(SECS[i][2])}</h2></div>`;
+ return `<div class="ps" id="${id}" data-sec="${id}">${pagerHTML(id,'top')}${head}${R[id]()}${pagerHTML(id)}</div>`;
+}
+function rs(id,mode){
+ const el=document.getElementById(id);if(!el)return;
+ const i=SECS.findIndex(x=>x[0]===id);
+ const t=document.createElement('div');t.innerHTML=secHTML(id,i);const n=t.firstElementChild;
+ el.replaceWith(n);
+ decorate(mode!=='soft',n);
+ if(id==='ost')OSTKIT.bind(n);
+ if(id==='inicio'){heroPanel(false);heroMatrix(false);heroSet(S.hn,false,true)}
+ return n;
+}
+function render(mode='full'){
+ const y=window.scrollY;
+ document.documentElement.lang=lang;
+ view.innerHTML=SECS.map((s,i)=>secHTML(s[0],i)).join('');
+ document.getElementById('foot').textContent=U('foot');
+ decorate(mode!=='soft');
+ OSTKIT.bind(document);
+ heroPanel(false);heroMatrix(false);
+ setTimeout(()=>heroSet(S.hn,false,true),mode==='soft'?0:650);
+ renderNav();
+ if(mode==='soft')window.scrollTo(0,y);
+ onScroll();
+}
+function hdrH(){const h=document.querySelector('header');return h?h.offsetHeight:100}
+window.__ostGo=()=>go('ost');
+function setHH(){document.documentElement.style.setProperty('--hh',(hdrH()+8)+'px')}
+function setTheme(){
+ const t=SECS.find(s=>s[0]===sec);
+ document.body.dataset.t=t[1];BG.set(t[1]);
+}
+function go(s,instant){
+ if(!SECS.some(x=>x[0]===s))s='vision';
+ const e=document.getElementById(s);if(!e)return;
+ setHH();
+ if(s==='inicio')window.scrollTo({top:0,behavior:(RM||instant)?'auto':'smooth'});
+ else e.scrollIntoView({behavior:(RM||instant)?'auto':'smooth',block:'start'});
+ try{history.replaceState(null,'','#'+s)}catch(x){}
+}
+function spy(){
+ const y=hdrH()+Math.min(180,innerHeight*.28);
+ let cur=SECS[0][0];
+ for(const s of SECS){const e=document.getElementById(s[0]);if(e&&e.getBoundingClientRect().top<=y)cur=s[0]}
+ if(innerHeight+scrollY>=document.documentElement.scrollHeight-6)cur=SECS[SECS.length-1][0];
+ if(cur!==sec){sec=cur;setTheme();renderNav()}
+}
+function step(d){
+ if(sec==='inicio'){const n=S.hn+d;if(n>=0&&n<HERO.length){heroSet(n,true);return}}
+ if(sec==='pitch'){const n=S.slide+d;if(n>=0&&n<PITCH.length){S.slide=n;rs('pitch','swap')}}
+}
+
+const hostOf=el=>el.closest('.ps').id;
+document.addEventListener('click',e=>{
+ const q=sel=>e.target.closest(sel);
+ let el;
+ if(el=q('[data-s]'))return go(el.dataset.s);
+ if(el=q('[data-go]'))return go(el.dataset.go);
+ if(el=q('[data-scroll]')){const t=document.getElementById(el.dataset.scroll);if(t)t.scrollIntoView({behavior:RM?'auto':'smooth',block:'start'});return}
+ if(el=q('[data-hn]'))return heroSet(+el.dataset.hn,true);
+ if(el=q('[data-hp]'))return heroSet(S.hn+(+el.dataset.hp),true);
+ if(el=q('[data-ax]')){S.ax=el.dataset.ax;document.querySelectorAll('#hax .chip').forEach(c=>c.classList.toggle('on',c.dataset.ax===S.ax));return heroMatrix(true)}
+ if(el=q('.lang button')){lang=el.dataset.l;render('soft');if(window.__uuRefresh)window.__uuRefresh();return}
+ if(el=q('[data-grp]')){S.chGroup=el.dataset.grp;return rs(hostOf(el),'swap')}
+ if(el=q('[data-hex]')){const h=el.dataset.hex;try{navigator.clipboard.writeText(h).then(()=>toast(U('copied')+h),()=>toast(h))}catch(x){toast(h)}return}
+ if(el=q('[data-ch]')){const n=el.dataset.ch;if(S.open.has(n)){S.open.delete(n);el.classList.remove('open')}else{S.open.add(n);el.classList.add('open')}return}
+ if(el=q('[data-ss]')){S.season=+el.dataset.ss;return rs(hostOf(el),'swap')}
+ if(el=q('[data-loc]')){S.loc=+el.dataset.loc;const hid=hostOf(el);rs(hid,'swap');const d=document.getElementById(hid).querySelector('h3');if(d)setTimeout(()=>d.scrollIntoView({behavior:RM?'auto':'smooth',block:'center'}),120);return}
+ if(el=q('[data-tc]')){S.tcat=el.dataset.tc;return rs(hostOf(el),'swap')}
+ if(el=q('[data-sl]')){S.slide=+el.dataset.sl;return rs(hostOf(el),'swap')}
+ if(el=q('[data-ck]')){const i=+el.dataset.ck;S.done.has(i)?S.done.delete(i):S.done.add(i);return rs(hostOf(el),'soft')}
+});
+document.addEventListener('input',e=>{
+ if(e.target.id==='tq'){S.tq=e.target.value;const p=e.target.selectionStart;rs(hostOf(e.target),'soft');const n=document.getElementById('tq');n.focus();n.setSelectionRange(p,p)}
+});
+document.addEventListener('pointerdown',e=>{
+ const b=e.target.closest('.chip,.stepper button,nav button,.lang button,.sw button,.btn,.hctl button');
+ if(!b||RM)return;
+ const r=b.getBoundingClientRect(),s=Math.max(r.width,r.height)*2;
+ const sp=document.createElement('span');sp.className='ripple';
+ sp.style.cssText=`width:${s}px;height:${s}px;left:${e.clientX-r.left-s/2}px;top:${e.clientY-r.top-s/2}px`;
+ b.appendChild(sp);setTimeout(()=>sp.remove(),650);
+});
+let pmE=null,pmR=0;
+addEventListener('pointermove',e=>{
+ if(e.pointerType==='touch')return;
+ pmE=e;if(pmR)return;
+ pmR=requestAnimationFrame(()=>{
+  pmR=0;const e=pmE;
+  BG.mouse(e.clientX/innerWidth,e.clientY/innerHeight);
+  const c=e.target.closest&&e.target.closest('.card,.ep');
+  if(c){const r=c.getBoundingClientRect();c.style.setProperty('--mx',(e.clientX-r.left)+'px');c.style.setProperty('--my',(e.clientY-r.top)+'px')}
+ });
+},{passive:true});
+function onScroll(){
+ spy();
+ const h=document.documentElement.scrollHeight-innerHeight;
+ document.getElementById('prog').style.transform=`scaleX(${h>0?Math.min(1,scrollY/h):0})`;
+}
+let scR=0;addEventListener('scroll',()=>{if(scR)return;scR=requestAnimationFrame(()=>{scR=0;onScroll()})},{passive:true});
+addEventListener('keydown',e=>{
+ if(/INPUT|TEXTAREA/.test(e.target.tagName))return;
+ if(e.key==='ArrowRight')step(1);
+ if(e.key==='ArrowLeft')step(-1);
+});
+window.addEventListener('hashchange',()=>{const h=location.hash.slice(1);if(h&&h!==sec&&SECS.some(x=>x[0]===h))go(h)});
+addEventListener('resize',setHH);
+
+sec=(location.hash.slice(1)&&SECS.some(x=>x[0]===location.hash.slice(1)))?location.hash.slice(1):'inicio';
+BG.init(SECS.find(s=>s[0]===sec)[1]);
+render('full');
+setHH();
+if(sec!=='inicio')setTimeout(()=>go(sec,true),60);
+else{sec='inicio';setTheme()}
+</script>
+<!-- UNIVERSE-MENU:START -->
+<style id="mm-css">.dj-legal{position:relative;z-index:1;text-align:center;padding:14px 16px 22px;font:11px 'Courier Prime','IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--tx);opacity:.55;border-top:1px solid var(--bd)}
+.mm-row{display:flex;align-items:center;gap:8px;min-width:0}
+.mm-row>.mm-fill{flex:1 1 auto;min-width:0}
+.mm-uni{all:unset;box-sizing:border-box;flex:none;display:inline-flex;align-items:center;gap:8px;cursor:pointer;height:34px;padding:0 12px 0 10px;border:1px solid rgba(53,214,255,.55);border-radius:999px;background:#04070a;color:#eaf6fa;font:700 11px/1 'Courier Prime','IBM Plex Mono',ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;margin:0 12px 0 auto;transition:box-shadow .2s,border-color .2s,transform .15s}
+.mm-uni:hover{box-shadow:0 0 18px -2px #35d6ff;border-color:#35d6ff}
+.mm-uni:active{transform:scale(.95)}
+.mm-uni:focus-visible{outline:2px solid #35d6ff;outline-offset:3px}
+.mm-uni svg{width:22px;height:12px;display:block;overflow:visible}
+.mm-uni svg line{stroke:#35d6ff;stroke-width:1.5}
+.mm-uni svg circle{fill:#35d6ff}
+.mm-uni svg circle:nth-of-type(2){fill:#ff3b3b}
+.mm-uni svg circle:nth-of-type(3){fill:#c0c0c0}
+.mm-burger,.mm-cur{display:none}
+.mm-bd,.mm-pn{visibility:hidden}
+@media (max-width:760px){
+ .mm-row>.mm-fill{display:none}
+ .mm-row{padding:6px 10px;gap:10px}
+ .mm-row>.mm-uni{margin:0 0 0 auto}
+ .mm-burger{all:unset;box-sizing:border-box;flex:none;display:grid;place-items:center;width:40px;height:40px;cursor:pointer;position:relative}
+ .mm-burger:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+ .mm-burger i{position:absolute;left:10px;right:10px;height:2px;background:currentColor;transition:transform .3s,opacity .2s,top .3s}
+ .mm-burger i:nth-child(1){top:13px}.mm-burger i:nth-child(2){top:19px;right:16px}.mm-burger i:nth-child(3){top:25px}
+ .mm-burger[aria-expanded=true] i:nth-child(1){top:19px;transform:rotate(45deg)}
+ .mm-burger[aria-expanded=true] i:nth-child(2){opacity:0}
+ .mm-burger[aria-expanded=true] i:nth-child(3){top:19px;transform:rotate(-45deg)}
+ .mm-cur{display:block;flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+
+ .mm-bd{position:fixed;inset:0;z-index:2147482000;background:rgba(0,0,0,.6);opacity:0;transition:opacity .3s,visibility 0s linear .3s}
+ .mm-pn{position:fixed;top:0;bottom:0;left:0;width:min(86vw,340px);z-index:2147482001;display:flex;flex-direction:column;overflow-y:auto;overscroll-behavior:contain;transform:translateX(-102%);transition:transform .35s cubic-bezier(.2,.7,.2,1),visibility 0s linear .35s}
+ .mm-open .mm-bd{visibility:visible;opacity:1;transition:opacity .3s}
+ .mm-open .mm-pn{visibility:visible;transform:none;transition:transform .35s cubic-bezier(.2,.7,.2,1)}
+ .mm-hd{display:flex;align-items:center;justify-content:space-between;gap:10px}
+ .mm-x{all:unset;box-sizing:border-box;cursor:pointer;width:40px;height:40px;display:grid;place-items:center;font:300 26px/1 Arial,sans-serif}
+ .mm-x:focus-visible{outline:2px solid currentColor;outline-offset:2px}
+ .mm-list{display:flex;flex-direction:column}
+ .mm-it{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:12px;cursor:pointer;width:100%}
+ .mm-it:focus-visible{outline:2px solid currentColor;outline-offset:-2px}
+ .mm-pn .mm-uni{margin:0}
+ .mm-pn .mm-uni span{display:inline}
+}
+@media (prefers-reduced-motion:reduce){.mm-pn,.mm-bd,.mm-burger i{transition:none!important}}
+
+@media (max-width:760px){
+ .mm-row{border-top:1px solid var(--bd);padding-bottom:8px}
+ .mm-burger{color:var(--hi);border:1px solid var(--bd);border-radius:4px;background:var(--panel)}
+ .mm-cur{font:700 12px 'Michroma';letter-spacing:.06em;text-transform:uppercase;color:var(--hi);border-left:2px solid var(--ac);padding-left:10px}
+ .mm-pn{background:linear-gradient(180deg,var(--panel),var(--bg));border-right:1px solid var(--bd);color:var(--tx);padding:16px 0 28px;box-shadow:12px 0 40px rgba(0,0,0,.5)}
+ .mm-hd{padding:0 14px 0 20px}
+ .mm-logo{font-family:'Bebas Neue';font-size:30px;letter-spacing:.14em;color:var(--hi)}
+ .mm-logo b{color:var(--ac);font-weight:400}
+ .mm-x{color:var(--tx);border:1px solid var(--bd);border-radius:4px}
+ .mm-bar{height:3px;width:90px;margin:10px 20px 14px;background:linear-gradient(90deg,var(--ac),var(--ac2))}
+ .mm-it{padding:13px 20px;font:700 12px 'Michroma';letter-spacing:.06em;text-transform:uppercase;color:var(--tx);border-left:3px solid transparent;opacity:.78}
+ .mm-it em{font:700 11px 'Courier Prime';font-style:normal;color:var(--ac);opacity:.8;min-width:22px}
+ .mm-it:hover{background:color-mix(in srgb,var(--ac) 8%,transparent);opacity:1}
+ .mm-it[aria-current=true]{opacity:1;color:var(--hi);border-left-color:var(--ac);background:color-mix(in srgb,var(--ac) 12%,transparent)}
+ .mm-foot{margin:auto 20px 0;padding-top:20px}
+ .mm-foot .mm-uni{width:100%;justify-content:center}
+}
+</style>
+<script>
+(function(){
+ var CFG={row:'#nav',num:1,head:function(t){return '<div class="mm-hd"><div class="mm-logo">PR<b>Æ</b>STANTIA</div><button type="button" class="mm-x" aria-label="'+t.c+'">&times;</button></div><div class="mm-bar"></div>'}};
+ var URL_='../';
+ function lg(){try{if(typeof lang!=='undefined')return lang}catch(e){}return (document.documentElement.lang||'es').slice(0,2)}
+ var T={es:{u:'Universo',a:'Ir al menú del universo Dôjo',m:'Menú',c:'Cerrar menú',s:'Secciones',k:'Capítulos'},en:{u:'Universe',a:'Go to the Dôjo universe menu',m:'Menu',c:'Close menu',s:'Sections',k:'Chapters'}};
+ function tt(){return T[lg()==='en'?'en':'es']}
+ function icon(){return '<svg viewBox="0 0 22 12" aria-hidden="true"><line x1="2" y1="6" x2="20" y2="6"/><circle cx="2" cy="6" r="2"/><circle cx="11" cy="6" r="2"/><circle cx="20" cy="6" r="2"/></svg>'}
+ function uni(){return '<a class="mm-uni" href="'+URL_+'" aria-label="'+tt().a+'">'+icon()+'<span>'+tt().u+'</span></a>'}
+ function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+ var nav,row,burger,cur,bd,pn,open=false,last=null;
+ function items(){
+  return [].slice.call(nav.children).filter(function(e){return !e.classList.contains('nav-logo')&&!e.classList.contains('mm-skip')}).map(function(e){
+   var c=e.cloneNode(true);[].slice.call(c.querySelectorAll('i')).forEach(function(i){i.remove()});
+   return {el:e,label:c.textContent.trim(),on:e.classList.contains('on')||e.getAttribute('aria-current')==='true'};
+  });
+ }
+ function curLabel(){var a=items().filter(function(x){return x.on})[0];return a?a.label:''}
+ function paintCur(){if(cur)cur.textContent=curLabel()||tt().m}
+ function build(){
+  var its=items(),t=tt();
+  var list=its.map(function(x,i){return '<button type="button" class="mm-it" data-i="'+i+'"'+(x.on?' aria-current="true"':'')+'><em>'+(CFG.num?String(i+(CFG.base||0)).padStart(2,'0'):String(i+1).padStart(2,'0'))+'</em><span>'+esc(x.label)+'</span></button>'}).join('');
+  pn.innerHTML=CFG.head(t)+'<div class="mm-list" role="list">'+list+'</div><div class="mm-foot">'+uni()+'</div>';
+  pn.setAttribute('aria-label',t.m);
+ }
+ function show(){last=document.activeElement;build();open=true;document.documentElement.classList.add('mm-open');burger.setAttribute('aria-expanded','true');document.documentElement.style.overflow='hidden';var a=pn.querySelector('[aria-current=true]')||pn.querySelector('.mm-it');if(a){a.focus({preventScroll:true});a.scrollIntoView({block:'center'})}}
+ function hide(){if(!open)return;open=false;document.documentElement.classList.remove('mm-open');burger.setAttribute('aria-expanded','false');document.documentElement.style.overflow='';if(last&&last.focus)last.focus({preventScroll:true})}
+ function label(){var t=tt();burger.setAttribute('aria-label',t.m);var u=row.querySelector(':scope > .mm-uni');if(u){u.setAttribute('aria-label',t.a);u.querySelector('span').textContent=t.u}paintCur();var L=document.querySelector('.dj-legal');if(L)L.textContent='\u00A9 D\u00F4jo 2026 \u00B7 '+(lg()==='en'?'All rights reserved':'Todos los derechos reservados')}
+ function mount(){
+  nav=document.querySelector(CFG.row);if(!nav)return;
+  row=document.createElement('div');row.className='mm-row';
+  nav.parentNode.insertBefore(row,nav);
+  burger=document.createElement('button');burger.type='button';burger.className='mm-burger';burger.setAttribute('aria-expanded','false');burger.setAttribute('aria-haspopup','dialog');burger.innerHTML='<i></i><i></i><i></i>';
+  row.appendChild(burger);
+  if(CFG.logo){var lb=document.createElement('button');lb.type='button';lb.className='mm-logo-m';lb.setAttribute('aria-label',CFG.logoLabel||'Inicio');lb.innerHTML=CFG.logo;lb.addEventListener('click',function(){var o=document.getElementById('navLogo');if(o)o.click()});row.appendChild(lb)}
+  else{cur=document.createElement('div');cur.className='mm-cur';cur.setAttribute('aria-live','polite');row.appendChild(cur)}
+  row.appendChild(nav);nav.classList.add('mm-fill');
+  var d=document.createElement('div');d.innerHTML=uni();row.appendChild(d.firstChild);
+  bd=document.createElement('div');bd.className='mm-bd';
+  pn=document.createElement('div');pn.className='mm-pn';pn.setAttribute('role','dialog');pn.setAttribute('aria-modal','true');
+  document.body.appendChild(bd);document.body.appendChild(pn);
+  burger.addEventListener('click',function(){open?hide():show()});
+  bd.addEventListener('click',hide);
+  pn.addEventListener('click',function(e){
+   if(e.target.closest('.mm-x'))return hide();
+   var b=e.target.closest('.mm-it');
+   if(b){var x=items()[+b.dataset.i];hide();if(x)setTimeout(function(){x.el.click()},30)}
+  });
+  document.addEventListener('keydown',function(e){
+   if(!open)return;
+   if(e.key.indexOf('Arrow')===0&&!e.target.closest('.mm-pn'))e.stopPropagation();
+   if(e.key==='Escape'){e.preventDefault();hide();return}
+   if(e.key==='Tab'){var f=[].slice.call(pn.querySelectorAll('button,a[href]'));if(!f.length)return;var a=document.activeElement,i=f.indexOf(a);
+    if(e.shiftKey&&i<=0){e.preventDefault();f[f.length-1].focus()}else if(!e.shiftKey&&(i===f.length-1||i<0)){e.preventDefault();f[0].focus()}}
+  },true);
+  window.addEventListener('resize',function(){if(open&&window.innerWidth>760)hide()});
+  var mo=new MutationObserver(function(){paintCur();if(open)build()});
+  mo.observe(nav,{subtree:true,childList:true,attributes:true,characterData:true,attributeFilter:['class','aria-current']});
+  label();
+  window.__uuRefresh=function(){label();if(open)build()};
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount);else mount();
+})();
+</script>
+<!-- UNIVERSE-MENU:END -->
+</body>
+</html>

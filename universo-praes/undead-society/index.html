@@ -1,0 +1,1429 @@
+<!DOCTYPE html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Undead Society Show Bible (Dôjo)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Idea: sala de control de Etherline. HUD fijo arriba, segmentos que cambian con corte de señal y una rejilla Z-Grid que respira al fondo. */
+  --ink:#04070a;
+  --panel:#0a1116;
+  --paper:#f1f5f6;
+  --ash:#93a3aa;
+  --mute:#6a7b82;
+  --cyan:#35d6ff;
+  --creed:#ea3b50;
+  --saint:#ff9b3d;
+  --ok:#4bd18b;
+  --warn:#ffb020;
+  --hot:#ff4258;
+  --line:rgba(147,163,170,.2);
+  --display:'Archivo','Arial Narrow','Helvetica Neue',Arial,sans-serif;
+  --body:'Archivo','Helvetica Neue',Arial,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--body);font-size:16px;line-height:1.55;-webkit-text-size-adjust:100%}
+body{min-height:100%;overflow-x:hidden}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+#bg{position:fixed;inset:0;width:100%;height:100%;z-index:0;display:block}
+.veil{position:fixed;inset:0;z-index:1;pointer-events:none;background:
+  repeating-linear-gradient(0deg,rgba(0,0,0,.16) 0,rgba(0,0,0,.16) 1px,transparent 1px,transparent 3px),
+  radial-gradient(ellipse at 50% 40%,transparent 45%,rgba(0,0,0,.65) 100%)}
+.top,main,.wipe{position:relative;z-index:2}
+
+/* HUD superior */
+.top{position:sticky;top:0;z-index:30;background:linear-gradient(180deg,rgba(4,7,10,.95),rgba(4,7,10,.78));backdrop-filter:blur(10px)}
+.bar{display:flex;align-items:center;gap:14px;padding:10px 16px 6px;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ash)}
+.brand{font-family:var(--display);font-stretch:62%;font-weight:900;font-size:20px;letter-spacing:.05em;color:var(--paper);line-height:1}
+.live{display:inline-flex;align-items:center;gap:6px;color:var(--hot)}
+.live i{width:7px;height:7px;border-radius:50%;background:var(--hot);animation:blink 1.2s infinite}
+.hud{margin-left:auto;display:flex;gap:16px;align-items:center}
+.hud b{color:var(--cyan);font-weight:500;font-variant-numeric:tabular-nums}
+.hud .zdot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:baseline;background:var(--ok);transition:background .4s}
+@keyframes blink{50%{opacity:.25}}
+.ticker{height:24px;overflow:hidden;font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--ash);white-space:nowrap;display:flex;align-items:center;background:rgba(53,214,255,.05)}
+.ticker-track{display:inline-flex;gap:46px;padding-left:16px;animation:tick 75s linear infinite}
+.ticker-track span b{color:var(--cyan);font-weight:500;margin-right:8px}
+@keyframes tick{to{transform:translateX(-50%)}}
+.tabs{display:flex;gap:2px;overflow-x:auto;padding:4px 10px 0;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{flex:0 0 auto;background:none;border:0;cursor:pointer;padding:10px 12px 11px;font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);position:relative;transition:color .2s}
+.tabs button i{font-style:normal;color:var(--mute);margin-right:6px}
+.tabs button:hover{color:var(--paper)}
+.tabs button[aria-current="true"]{color:var(--paper)}
+.tabs button[aria-current="true"] i{color:var(--cyan)}
+.tabs button::after{content:"";position:absolute;left:12px;right:12px;bottom:0;height:2px;background:var(--cyan);box-shadow:0 0 12px var(--cyan);transform:scaleX(0);transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.tabs button[aria-current="true"]::after{transform:scaleX(1)}
+
+/* Capítulos */
+.chapter{max-width:1120px;margin:0 auto;padding:28px 16px 120px}
+.chapter[hidden]{display:none}
+.chapter.out{animation:chOut .26s ease-in forwards}
+.chapter.in{animation:chIn .6s cubic-bezier(.2,.8,.2,1) both}
+.chapter.in>*{animation:rise .6s cubic-bezier(.2,.8,.2,1) both}
+.chapter.in>*:nth-child(2){animation-delay:.07s}
+.chapter.in>*:nth-child(3){animation-delay:.14s}
+.chapter.in>*:nth-child(4){animation-delay:.21s}
+.chapter.in>*:nth-child(n+5){animation-delay:.28s}
+@keyframes chOut{to{opacity:0;transform:translateX(-18px) skewX(-2deg);filter:blur(3px) hue-rotate(20deg)}}
+@keyframes chIn{0%{opacity:0;clip-path:inset(0 0 100% 0)}35%{opacity:1}100%{opacity:1;clip-path:inset(-40px -40px -40px -40px)}}
+@keyframes rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+.wipe{position:fixed;inset:0;z-index:50;pointer-events:none;overflow:hidden}
+.wipe::before{content:"";position:absolute;left:0;right:0;top:-4px;height:3px;background:var(--cyan);box-shadow:0 0 28px 8px rgba(53,214,255,.5)}
+.wipe.go::before{animation:sweep .62s cubic-bezier(.6,0,.3,1)}
+.wipe span{position:absolute;right:16px;top:120px;font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--cyan);opacity:0;text-transform:uppercase}
+.wipe.go span{animation:tag .62s steps(6)}
+@keyframes sweep{to{top:100%}}
+@keyframes tag{0%,100%{opacity:0}20%,80%{opacity:1}}
+
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan);margin:0 0 10px}
+.eyebrow .num{color:var(--paper);margin-right:10px}
+h2{font-family:var(--display);font-stretch:62%;font-weight:900;font-size:clamp(2.6rem,10vw,5.4rem);line-height:.9;text-transform:uppercase;margin:0 0 16px;text-wrap:balance}
+h3{font-family:var(--display);font-stretch:75%;font-weight:800;text-transform:uppercase;font-size:1.4rem;line-height:1.05;margin:0 0 8px;letter-spacing:.01em;text-wrap:balance}
+h4{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan);margin:16px 0 6px;font-weight:500}
+p{margin:0 0 10px}
+.lede{max-width:62ch;color:#d3dde0;font-size:1.1rem;margin:0 0 4px}
+.src{font-family:var(--mono);font-size:11px;color:var(--mute);letter-spacing:.05em;margin:12px 0 28px}
+.mono{font-family:var(--mono)}
+.muted{color:var(--ash)}
+.small{font-size:.9rem}
+
+.panel{position:relative;background:linear-gradient(180deg,rgba(16,26,32,.84),rgba(10,17,22,.88));border:1px solid var(--line);border-radius:3px;padding:18px;backdrop-filter:blur(6px)}
+.panel::before,.panel::after{content:"";position:absolute;width:12px;height:12px;border:2px solid var(--cyan);opacity:.7;pointer-events:none}
+.panel::before{top:-1px;left:-1px;border-right:0;border-bottom:0}
+.panel::after{bottom:-1px;right:-1px;border-left:0;border-top:0}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr))}
+.stack{display:flex;flex-direction:column;gap:14px}
+.mt{margin-top:22px}
+.mt2{margin-top:36px}
+
+.btn{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink);background:var(--cyan);border:1px solid var(--cyan);padding:12px 18px;cursor:pointer;border-radius:2px;transition:transform .15s,box-shadow .2s,color .2s,background .2s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(53,214,255,.28)}
+.btn.ghost{background:transparent;color:var(--paper);border-color:var(--line)}
+.btn.ghost:hover{border-color:var(--cyan);color:var(--cyan)}
+.foot{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;margin-top:48px}
+.foot-top{display:flex;justify-content:flex-end;margin:0 0 22px}
+.seg{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 18px}
+.seg button{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;background:rgba(10,17,22,.6);color:var(--ash);border:1px solid var(--line);padding:10px 14px;cursor:pointer;border-radius:2px;transition:all .2s}
+.seg button:hover{color:var(--paper);border-color:var(--ash)}
+.seg button[aria-pressed="true"]{background:rgba(53,214,255,.13);border-color:var(--cyan);color:var(--paper)}
+.chip{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.06em;padding:4px 8px;border:1px solid var(--line);border-radius:2px;color:var(--ash);text-transform:uppercase;margin:0 6px 6px 0}
+.chip.cy{color:var(--cyan);border-color:rgba(53,214,255,.45)}
+.chip.kia{color:var(--hot);border-color:rgba(255,66,88,.5)}
+.chip.zG{color:var(--ok);border-color:rgba(75,209,139,.5)}
+.chip.zA{color:var(--warn);border-color:rgba(255,176,32,.5)}
+.chip.zR{color:var(--hot);border-color:rgba(255,66,88,.55)}
+.chips{display:flex;flex-wrap:wrap}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:.95rem}
+.kv dt{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--mute);padding-top:3px}
+.kv dd{margin:0}
+
+/* Hero */
+.hero{padding-top:34px}
+.hero .meta{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--cyan);margin:0 0 6px;display:flex;flex-wrap:wrap;gap:6px 18px}
+.title{font-family:var(--display);font-stretch:62%;font-weight:900;font-size:clamp(4.4rem,24vw,14.5rem);line-height:.8;margin:8px 0 12px;text-transform:uppercase}
+.title span{display:block;position:relative;width:fit-content}
+.title .o{color:transparent;-webkit-text-stroke:2px var(--paper)}
+.title span::before,.title span::after{content:attr(data-t);position:absolute;inset:0;pointer-events:none;-webkit-text-stroke:0;clip-path:inset(0 0 100% 0)}
+.title span::before{color:var(--cyan);mix-blend-mode:screen;animation:gl1 7s infinite steps(1)}
+.title span::after{color:var(--creed);mix-blend-mode:screen;animation:gl2 7s infinite steps(1) .35s}
+@keyframes gl1{0%,90%,100%{clip-path:inset(0 0 100% 0);transform:none}91%{clip-path:inset(22% 0 52% 0);transform:translate(-7px,0)}93%{clip-path:inset(62% 0 8% 0);transform:translate(6px,0)}95%{clip-path:inset(4% 0 82% 0);transform:translate(-3px,0)}97%{clip-path:inset(0 0 100% 0)}}
+@keyframes gl2{0%,90%,100%{clip-path:inset(0 0 100% 0);transform:none}92%{clip-path:inset(40% 0 38% 0);transform:translate(8px,0)}94%{clip-path:inset(10% 0 70% 0);transform:translate(-5px,0)}96%{clip-path:inset(70% 0 4% 0);transform:translate(4px,0)}98%{clip-path:inset(0 0 100% 0)}}
+.tagline{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px;margin:6px 0 22px}
+.tagline b{font-family:var(--mono);font-weight:500;font-size:clamp(.9rem,3.4vw,1.25rem);letter-spacing:.32em;color:var(--paper)}
+.tagline em{font-style:normal;font-family:var(--mono);font-size:12px;letter-spacing:.1em;color:var(--ash);text-transform:uppercase}
+.hero .logline{font-size:clamp(1.05rem,2.6vw,1.35rem);max-width:56ch;color:#dfe8ea;line-height:1.5}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin:22px 0 0}
+.spoil{font-family:var(--mono);font-size:11px;color:var(--mute);letter-spacing:.06em;margin-top:18px}
+.cast{display:flex;gap:12px;overflow-x:auto;padding:8px 2px 20px;margin:34px 0 0;scroll-snap-type:x proximity;scrollbar-width:thin}
+.cc{--tc:var(--cyan);flex:0 0 158px;scroll-snap-align:start;text-align:left;background:linear-gradient(180deg,rgba(16,26,32,.7),rgba(8,13,17,.92));border:1px solid var(--line);border-top:3px solid var(--tc);border-radius:2px;padding:0;cursor:pointer;position:relative;overflow:hidden;transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s;animation:rise .7s both;animation-delay:calc(var(--i)*90ms + .35s)}
+.cc:hover,.cc:focus-visible{transform:translateY(-8px);box-shadow:0 18px 40px rgba(0,0,0,.6),0 0 0 1px var(--tc)}
+.cc{display:flex;flex-direction:column;justify-content:flex-start;align-items:stretch;height:auto}
+.cc .gl{height:150px;flex:0 0 150px;color:var(--tc);display:grid;place-items:end center;background:radial-gradient(circle at 50% 70%,color-mix(in srgb,var(--tc) 22%,transparent),transparent 70%)}
+.cc .gl svg{height:100%;width:auto;transition:transform .4s}
+.cc:hover .gl svg{transform:scale(1.06)}
+.cc .nm{font-family:var(--display);font-stretch:62%;font-weight:900;font-size:1.9rem;line-height:1;text-transform:uppercase;padding:10px 12px 0}
+.cc .rl{min-height:3.1em;line-height:1.45;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--tc);padding:2px 12px 0}
+.cc .kk{flex:1 1 auto;font-size:.85rem;color:var(--ash);padding:6px 12px 14px;line-height:1.35}
+.cc .q{position:absolute;inset:auto 0 0 0;padding:34px 12px 14px;background:linear-gradient(0deg,rgba(4,7,10,.98) 60%,rgba(4,7,10,0));transform:translateY(105%);transition:transform .35s cubic-bezier(.2,.8,.2,1);font-size:.9rem;font-style:italic;color:var(--paper)}
+.cc:hover .q,.cc:focus-visible .q{transform:none}
+@media(min-width:1000px){.cast{display:grid;grid-template-columns:repeat(6,1fr);overflow:visible}.cc{flex:none}}
+.strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:18px}
+.strip div{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ash);padding:10px 12px;background:rgba(10,17,22,.6);border:1px solid var(--line)}
+.strip b{display:block;font-family:var(--display);font-stretch:62%;font-weight:900;font-size:1.9rem;color:var(--paper);letter-spacing:.02em;line-height:1.05}
+
+/* Premisa */
+.flip{display:grid;gap:12px}
+.flip .row{display:grid;grid-template-columns:1fr;gap:6px;padding:14px 16px;background:rgba(10,17,22,.7);border:1px solid var(--line);border-left:3px solid var(--cyan);transition:border-color .4s,background .4s}
+.flip .row .lab{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
+.flip .row .tx{font-size:1.05rem;min-height:3.1em}
+.flip.truth .row{border-left-color:var(--hot);background:rgba(40,10,16,.55)}
+.flip.truth .row .tx{animation:flick .5s steps(5)}
+@keyframes flick{0%{opacity:0;transform:translateX(-6px)}30%{opacity:1}50%{opacity:.4}100%{opacity:1;transform:none}}
+.switch{display:inline-flex;align-items:center;gap:12px;cursor:pointer;font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;background:none;border:1px solid var(--line);padding:10px 14px;margin-bottom:16px}
+.switch .tr{width:42px;height:22px;border-radius:12px;background:rgba(147,163,170,.25);position:relative;transition:background .3s}
+.switch .tr::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:var(--paper);transition:transform .3s}
+.switch[aria-pressed="true"] .tr{background:var(--hot)}
+.switch[aria-pressed="true"] .tr::after{transform:translateX(20px)}
+
+/* Equipos */
+.rost{display:grid;grid-template-columns:1fr;gap:14px}
+@media(min-width:860px){.rost{grid-template-columns:300px 1fr}}
+.roster{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.roster button{--tc:var(--cyan);width:100%;text-align:left;display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:center;padding:10px 12px;background:rgba(10,17,22,.7);border:1px solid var(--line);border-left:3px solid var(--tc);cursor:pointer;transition:all .25s}
+.roster button:hover{background:rgba(20,32,40,.85)}
+.roster button[aria-pressed="true"]{background:rgba(53,214,255,.1);border-color:var(--tc);transform:translateX(6px)}
+.roster .av{width:44px;height:44px;color:var(--tc);background:rgba(255,255,255,.04);display:grid;place-items:end center;overflow:hidden}
+.roster .av svg{height:120%;width:auto}
+.roster b{display:block;font-family:var(--display);font-stretch:70%;font-weight:800;font-size:1.25rem;text-transform:uppercase;line-height:1}
+.roster small{font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--ash);text-transform:uppercase}
+.dos{display:grid;grid-template-columns:1fr;gap:18px;animation:rise .45s both}
+@media(min-width:620px){.dos{grid-template-columns:200px 1fr}}
+.dos .big{--tc:var(--cyan);color:var(--tc);background:radial-gradient(circle at 50% 80%,color-mix(in srgb,var(--tc) 25%,transparent),transparent 70%);display:grid;place-items:end center;min-height:230px;border-bottom:3px solid var(--tc)}
+.dos .big svg{height:230px;width:auto}
+.arc{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:8px}
+.arc li{display:grid;grid-template-columns:30px 1fr;gap:10px;align-items:start;animation:rise .5s both}
+.arc li:nth-child(2){animation-delay:.12s}.arc li:nth-child(3){animation-delay:.24s}
+.arc li i{font-style:normal;font-family:var(--mono);font-size:12px;width:28px;height:28px;border:1px solid var(--cyan);color:var(--cyan);display:grid;place-items:center}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:480px;font-size:.95rem}
+th{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--cyan);text-align:left;font-weight:500;padding:8px 10px;background:rgba(53,214,255,.07)}
+td{padding:8px 10px;background:rgba(10,17,22,.5)}
+tr+tr td{border-top:1px solid rgba(147,163,170,.1)}
+
+/* Mapa */
+.mapw{display:grid;gap:14px;grid-template-columns:1fr}
+@media(min-width:900px){.mapw{grid-template-columns:minmax(0,1fr) 380px}}
+.zg{display:grid;grid-template-columns:22px repeat(6,1fr);gap:4px}
+.zg .ax{font-family:var(--mono);font-size:11px;color:var(--mute);display:grid;place-items:center}
+.cell{aspect-ratio:1;position:relative;border:1px solid var(--line);background:rgba(10,17,22,.7);cursor:pointer;padding:0;transition:transform .2s,background .3s,box-shadow .3s,opacity .3s;display:grid;place-items:center;font-family:var(--mono);font-size:10px;color:var(--mute)}
+.cell:hover{transform:scale(1.07);z-index:3}
+.cell.G{background:rgba(75,209,139,.12);border-color:rgba(75,209,139,.35)}
+.cell.A{background:rgba(255,176,32,.13);border-color:rgba(255,176,32,.4)}
+.cell.R{background:rgba(255,66,88,.16);border-color:rgba(255,66,88,.45)}
+.cell.dim{opacity:.18}
+.cell.sel{box-shadow:0 0 0 2px var(--cyan),0 0 22px rgba(53,214,255,.5);z-index:4}
+.cell .co{position:absolute;left:3px;top:2px;display:none}
+@media(min-width:620px){.cell .co{display:block}.cell{font-size:11px}}
+.cell .pin{width:24px;height:24px;transform:rotate(45deg);background:var(--paper);color:var(--ink);display:grid;place-items:center;font-weight:600;font-size:12px}
+.cell .pin b{transform:rotate(-45deg);font-weight:600}
+.zg.heat .cell.R{animation:heat 1.8s infinite}
+.zg.heat .cell.A{animation:heat 3.2s infinite}
+@keyframes heat{50%{filter:brightness(1.9);box-shadow:inset 0 0 18px rgba(255,66,88,.55)}}
+.cell.hot{animation:hot .9s both!important}
+@keyframes hot{0%{background:rgba(53,214,255,.9);box-shadow:0 0 24px var(--cyan)}60%{background:rgba(255,66,88,.9);box-shadow:0 0 30px var(--hot)}100%{}}
+.legend{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}
+.pips{display:inline-flex;gap:3px;vertical-align:middle}
+.pips i{width:16px;height:7px;background:rgba(147,163,170,.25)}
+.pips i.f{background:var(--warn)}
+.pips.hi i.f{background:var(--hot)}
+
+/* Reglas */
+.tl{display:flex;height:54px;border:1px solid var(--line);margin:8px 0 6px}
+.tl div{display:grid;place-items:center;font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--ash);background:rgba(10,17,22,.7);position:relative;overflow:hidden;transition:background .3s,color .3s;text-align:center;padding:0 2px}
+.tl div+div{border-left:1px solid var(--line)}
+.tl div.on{background:rgba(53,214,255,.18);color:var(--paper)}
+.tl div.tw{background-image:repeating-linear-gradient(135deg,transparent 0 6px,rgba(255,176,32,.14) 6px 8px)}
+input[type=range]{width:100%;accent-color:var(--cyan);margin:8px 0}
+.clock{font-family:var(--display);font-stretch:62%;font-weight:900;font-size:3.4rem;line-height:1;font-variant-numeric:tabular-nums;color:var(--cyan)}
+.twist{display:none;margin-top:12px;padding:12px;background:rgba(255,176,32,.1);border:1px solid rgba(255,176,32,.5);animation:flick .5s steps(5)}
+.twist.on{display:block}
+.srow{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:7px 0}
+.srow+.srow{border-top:1px solid rgba(147,163,170,.1)}
+.srow .l{font-size:.95rem}
+.srow .l small{display:block;font-family:var(--mono);font-size:11px;color:var(--mute);letter-spacing:.04em}
+.stp{display:inline-flex;align-items:center;gap:2px;font-family:var(--mono)}
+.stp button{width:36px;height:36px;border:1px solid var(--line);background:rgba(10,17,22,.8);cursor:pointer;font-size:18px;line-height:1;transition:all .15s}
+.stp button:hover{border-color:var(--cyan);color:var(--cyan)}
+.stp output{min-width:34px;text-align:center;font-variant-numeric:tabular-nums}
+.res{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:12px}
+.res div{padding:10px 12px;background:rgba(53,214,255,.07);border:1px solid rgba(53,214,255,.3);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ash)}
+.res b{display:block;font-family:var(--display);font-stretch:62%;font-weight:900;font-size:2.3rem;color:var(--paper);font-variant-numeric:tabular-nums;line-height:1.05}
+details{background:rgba(10,17,22,.7);border:1px solid var(--line);padding:0;margin-bottom:8px}
+summary{cursor:pointer;padding:12px 14px;font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;list-style:none;display:flex;justify-content:space-between;gap:10px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";color:var(--cyan);font-size:16px;transition:transform .3s}
+details[open] summary::after{transform:rotate(45deg)}
+details>div{padding:0 14px 14px;color:#d3dde0}
+
+/* Infectados */
+.rb{position:relative;height:12px;background:rgba(147,163,170,.13)}
+.rb i{position:absolute;top:0;bottom:0;background:linear-gradient(90deg,var(--cyan),#8be9ff);transition:left .55s cubic-bezier(.2,.8,.2,1),width .55s cubic-bezier(.2,.8,.2,1)}
+.prow{display:grid;grid-template-columns:96px 1fr 76px;gap:12px;align-items:center;padding:7px 0;font-family:var(--mono);font-size:12px}
+.prow span:last-child{text-align:right;font-variant-numeric:tabular-nums;color:var(--paper)}
+.inf{width:100%;text-align:left;background:rgba(10,17,22,.7);border:1px solid var(--line);padding:16px;cursor:pointer;transition:border-color .25s,background .25s}
+.inf:hover{border-color:var(--cyan)}
+.inf[aria-expanded="true"]{background:rgba(53,214,255,.07);border-color:var(--cyan)}
+.inf .more{display:none;margin-top:10px;font-size:.95rem;color:#d3dde0}
+.inf[aria-expanded="true"] .more{display:block;animation:rise .35s both}
+
+/* T1 */
+.eps{display:grid;grid-template-columns:repeat(12,1fr);gap:4px;margin:6px 0 8px}
+.eps button{aspect-ratio:1/1.15;background:rgba(10,17,22,.75);border:1px solid var(--line);border-top:3px solid var(--bc);cursor:pointer;font-family:var(--display);font-stretch:62%;font-weight:900;font-size:1.25rem;display:grid;place-items:center;position:relative;transition:transform .2s,background .2s;padding:0}
+.eps button:hover{transform:translateY(-4px)}
+.eps button[aria-pressed="true"]{background:color-mix(in srgb,var(--bc) 22%,#0a1116);outline:2px solid var(--bc);outline-offset:1px}
+.eps button small{position:absolute;bottom:2px;left:0;right:0;text-align:center;font-family:var(--mono);font-size:8px;color:var(--hot);letter-spacing:.05em;font-weight:500}
+.blocks{display:grid;grid-template-columns:4fr 4fr 4fr;gap:4px;font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase}
+.blocks span{padding:4px 6px;color:var(--bc);background:color-mix(in srgb,var(--bc) 10%,transparent)}
+.epd{animation:rise .45s both}
+.epd h3{font-size:clamp(1.8rem,6vw,3rem)}
+.quote{border-left:3px solid var(--cyan);padding:4px 0 4px 14px;font-size:1.2rem;font-style:italic;margin:14px 0}
+.flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:6px}
+.flow span{padding:8px 10px;background:rgba(10,17,22,.8);border:1px solid var(--line);font-size:.9rem}
+.flow i{font-style:normal;color:var(--cyan);align-self:center;font-family:var(--mono)}
+
+/* Poder */
+.tier{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.node{--tc:var(--cyan);flex:1 1 170px;max-width:340px;text-align:center;padding:14px 12px;background:rgba(10,17,22,.8);border:1px solid var(--line);border-top:3px solid var(--tc);cursor:pointer;font-family:var(--display);font-stretch:70%;font-weight:800;font-size:1.2rem;text-transform:uppercase;transition:all .25s;line-height:1.05}
+.node small{display:block;font-family:var(--mono);font-weight:400;font-size:10px;letter-spacing:.08em;color:var(--ash);margin-top:4px}
+.node:hover{transform:translateY(-3px)}
+.node[aria-pressed="true"]{background:color-mix(in srgb,var(--tc) 14%,#0a1116);box-shadow:0 0 0 1px var(--tc),0 0 28px color-mix(in srgb,var(--tc) 35%,transparent)}
+.link{text-align:center;color:var(--cyan);font-family:var(--mono);height:22px;line-height:22px;animation:drip 1.8s infinite}
+@keyframes drip{50%{opacity:.35;transform:translateY(3px)}}
+
+/* Estética */
+.sw{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.sw div{height:90px;display:flex;align-items:flex-end;padding:8px;font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--line)}
+.screen{position:relative;aspect-ratio:16/9;overflow:hidden;background:#05090c;border:1px solid var(--line);font-family:var(--mono);font-size:clamp(8px,2.2vw,12px);letter-spacing:.06em;text-transform:uppercase;--sc:var(--cyan)}
+.screen svg.scene{position:absolute;inset:0;width:100%;height:100%;transition:filter .3s}
+.screen .ov{position:absolute;padding:6px 8px;background:rgba(4,7,10,.72);color:var(--paper)}
+.screen .ov b{color:var(--sc);font-weight:500}
+.screen .tl1{left:2%;top:11%}
+.screen .bt{left:2%;right:2%;bottom:4%;display:flex;justify-content:space-between;gap:8px}
+.screen .tk{left:0;right:0;top:0;padding:4px 8px;background:var(--sc);color:var(--ink);font-weight:600;white-space:nowrap;overflow:hidden}
+.screen .sp{right:2%;top:11%;text-align:right;color:var(--ash)}
+.screen[data-st="override"]{--sc:var(--cyan)}
+.screen[data-st="blackout"]{--sc:var(--warn)}
+.screen[data-st="blackout"] svg.scene{filter:grayscale(1) contrast(1.5) brightness(.6);animation:stat .25s steps(3) infinite}
+.screen[data-st="sanctum"]{--sc:var(--hot)}
+.screen[data-st="sanctum"] svg.scene{filter:sepia(1) hue-rotate(-30deg) saturate(3) brightness(.8)}
+.screen[data-st="alignment"]{--sc:#d9f6ff}
+.screen[data-st="alignment"]::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,transparent 20%,rgba(0,0,0,.85) 75%);pointer-events:none}
+@keyframes stat{0%{transform:translateX(0)}33%{transform:translateX(-4px) skewX(2deg)}66%{transform:translateX(5px)}}
+.shots{list-style:none;margin:0;padding:0;display:grid;gap:6px;counter-reset:s}
+.shots li{counter-increment:s;display:grid;grid-template-columns:34px 1fr;gap:10px;padding:8px 10px;background:rgba(10,17,22,.7);border:1px solid var(--line);transition:all .3s;font-size:.95rem}
+.shots li::before{content:counter(s);font-family:var(--mono);color:var(--mute)}
+.shots li.on{border-color:var(--cyan);background:rgba(53,214,255,.12);transform:translateX(6px)}
+.shots li.on::before{color:var(--cyan)}
+.prog{height:3px;background:rgba(147,163,170,.2);margin:10px 0}
+.prog i{display:block;height:100%;width:0;background:var(--cyan)}
+
+/* Temporadas / canon */
+.sbig{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.sbig button{font-family:var(--display);font-stretch:62%;font-weight:900;font-size:1.8rem;width:64px;height:64px;background:rgba(10,17,22,.8);border:1px solid var(--line);cursor:pointer;transition:all .2s;color:var(--ash)}
+.sbig button[aria-pressed="true"]{background:var(--cyan);color:var(--ink);border-color:var(--cyan);transform:translateY(-4px)}
+.epl{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:8px}
+.epl div{padding:10px 12px;background:rgba(10,17,22,.7);border:1px solid var(--line);font-size:.9rem;color:#d3dde0}
+.epl div b{display:block;font-family:var(--display);font-stretch:75%;font-weight:800;text-transform:uppercase;font-size:1.05rem;color:var(--paper)}
+.epl div b span{font-family:var(--mono);font-size:11px;color:var(--cyan);margin-right:8px;font-weight:500}
+.axes{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.three{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:10px}
+.three>div{padding:14px;background:rgba(10,17,22,.75);border:1px solid var(--line);border-top:3px solid var(--tc);animation:rise .4s both}
+.three>div small{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--tc);margin-bottom:6px}
+.era{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));counter-reset:e}
+.era div{padding:14px;background:rgba(10,17,22,.75);border:1px solid var(--line);position:relative}
+.era div b{font-family:var(--display);font-stretch:62%;font-weight:900;font-size:1.9rem;color:var(--cyan);display:block;line-height:1}
+.check{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.check li{padding:10px 12px 10px 38px;position:relative;background:rgba(10,17,22,.7);border:1px solid var(--line);font-size:.95rem}
+.check li::before{content:"";position:absolute;left:12px;top:15px;width:12px;height:12px;border:2px solid var(--cyan);transform:rotate(45deg)}
+.footer{max-width:1120px;margin:0 auto;padding:0 16px 40px;font-family:var(--mono);font-size:11px;letter-spacing:.04em;color:var(--mute);position:relative;z-index:2}
+@media(max-width:560px){.hud .opt{display:none}.eps{grid-template-columns:repeat(6,1fr)}.prow{grid-template-columns:78px 1fr 64px}.chapter{padding-bottom:90px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.ticker-track{animation:none!important}}
+.chapter{scroll-margin-top:var(--hh,120px)}
+.chapter+.chapter{border-top:1px solid var(--line);padding-top:48px}
+.chapter{padding-bottom:72px}
+html{scroll-behavior:auto}
+html,body{overflow-x:clip}
+</style>
+</head>
+<body>
+<canvas id="bg" aria-hidden="true"></canvas>
+<div class="veil" aria-hidden="true"></div>
+
+<header class="top">
+  <div class="bar">
+    <span class="brand">Undead Society</span>
+    <span class="live"><i></i>Archivo en vivo</span>
+    <span class="hud">
+      <span class="opt">Retraso <b id="hLat">5.8</b> s</span>
+      <span class="opt">Bioscore <b id="hBio">031</b></span>
+      <span><i class="zdot" id="hDot"></i><b id="hZone">Verde</b></span>
+    </span>
+  </div>
+  <div class="ticker" aria-hidden="true"><div class="ticker-track" id="ticker"></div></div>
+  <nav class="tabs" id="tabs" aria-label="Capítulos del show bible"></nav>
+</header>
+
+<main id="stage">
+  <section class="chapter hero" id="c-inicio" aria-labelledby="t-main">
+    <p class="meta"><span>Transmisión: temporada 1</span><span>Semana 12 de 12</span><span>Clasificación TV-MA</span></p>
+    <h1 class="title" id="t-main"><span data-t="Undead">Undead</span><span class="o" data-t="Society">Society</span></h1>
+    <p class="tagline"><b>NO MORE CUTAWAYS</b><em>Se acabaron los cortes</em></p>
+    <p class="logline">Cuando una cadena convierte la contención zombi en el reality más grande del mundo, el capitán estrella Ezra descubre que Etherline sincroniza focos de infección para justificar un estado de excepción permanente, y debe sabotear la temporada en vivo.</p>
+    <div class="cta">
+      <button class="btn" data-go="premisa">Entrar al archivo</button>
+      <button class="btn ghost" data-go="equipos">Ver los equipos</button>
+      <button class="btn ghost" data-go="mapa">Abrir el mapa</button>
+    </div>
+    <div class="cast" id="cast" aria-label="Personajes principales"></div>
+    <div class="strip">
+      <div>Ciclo de la temporada<b>12 episodios</b></div>
+      <div>Cuadrícula táctica<b>Z-A1 a Z-F6</b></div>
+      <div>Retraso de seguridad<b>5 a 7 s</b></div>
+      <div>Plan de la serie<b>6 temporadas</b></div>
+    </div>
+    <p class="spoil">Este archivo reúne el show bible completo y contiene spoilers de las temporadas 1, 2 y 3.</p>
+  </section>
+</main>
+
+<div class="wipe" id="wipe" aria-hidden="true"><span id="wipeTag">Cambio de segmento</span></div>
+
+<footer class="footer">
+  <p>Fuente: show bible de Undead Society, fases 02 a 12 y guías de episodios (documento DOC-20261110-WA0017.pdf del proyecto). Puente con Præstantia: DOC-20250901-WA0041.pdf. Texto traducido y adaptado al español colombiano.</p>
+</footer>
+<div class="dj-legal" role="contentinfo"></div>
+
+<style id="ostk-css">
+.ostk .ost-grid{display:grid;grid-template-columns:minmax(0,1fr);max-width:900px;gap:16px;align-items:start}
+@media(max-width:900px){.ostk .ost-grid{grid-template-columns:1fr}}
+.ostk .ost-card{display:flex;flex-direction:column;gap:6px;padding:22px;background:var(--o-bg);border:1px solid var(--o-bd);border-radius:var(--o-r);color:var(--o-tx);position:relative;transition:border-color .25s,box-shadow .25s}
+.ostk .ost-card:hover{border-color:var(--oc);box-shadow:0 0 28px -12px var(--oc)}
+.ostk .ost-no{font:700 11px var(--o-lab);letter-spacing:.16em;text-transform:uppercase;color:var(--oc)}
+.ostk .ost-head{display:grid;grid-template-columns:minmax(110px,170px) 1fr;gap:18px;align-items:center;margin-top:6px}
+@media(max-width:520px){.ostk .ost-head{grid-template-columns:1fr}.ostk .ost-cover{max-width:240px}}
+.ostk .ost-cover{width:100%;height:auto;display:block;border-radius:6px;box-shadow:0 14px 30px -12px rgba(0,0,0,.7)}
+.ostk .ost-meta{display:flex;flex-direction:column;gap:6px;min-width:0;align-self:center}
+.ostk .ost-ti{font-family:var(--o-fd);font-size:clamp(26px,4vw,34px);line-height:1.05;color:var(--o-hi);text-transform:uppercase}
+.ostk .ost-sub{font-size:15px;opacity:.85}
+.ostk .ost-by{font:12px var(--o-lab);color:var(--o-mut);letter-spacing:.06em}
+.ostk .ost-ctl{display:flex;align-items:center;gap:8px;margin-top:16px}
+.ostk .ost-b{all:unset;box-sizing:border-box;flex:none;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--o-btn);color:var(--o-hi);cursor:pointer;transition:transform .15s,background-color .2s}
+.ostk .ost-b:hover{background:var(--o-btn2)}
+.ostk .ost-b:active{transform:scale(.92)}
+.ostk .ost-b:focus-visible,.ostk .ost-tr:focus-visible,.ostk .ost-seek:focus-visible{outline:2px solid var(--oc);outline-offset:2px}
+.ostk .ost-b svg{width:18px;height:18px;fill:currentColor}
+.ostk .ost-play{width:52px;height:52px;background:var(--oc);color:var(--o-on)}
+.ostk .ost-play:hover{background:var(--oc);filter:brightness(1.1)}
+.ostk .ost-play svg{width:22px;height:22px}
+.ostk .ost-ipa{display:none}.ostk .ost-player.playing .ost-ip{display:none}.ostk .ost-player.playing .ost-ipa{display:inline}
+.ostk .ost-now{display:flex;flex-direction:column;min-width:0;margin-left:6px}
+.ostk .ost-cur{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--o-hi)}
+.ostk .ost-time{font-size:13px;color:var(--o-mut);font-variant-numeric:tabular-nums}
+.ostk .ost-wave{display:flex;align-items:center;gap:4px;height:44px;margin:14px 0 6px}
+.ostk .ost-wave i{flex:1;border-radius:3px;background:var(--oc);height:30%;opacity:.45;animation:ostw 1.4s ease-in-out infinite alternate;animation-play-state:paused;transition:opacity .3s}
+.ostk .ost-wave i:nth-child(3n){height:70%;animation-delay:-.3s}.ostk .ost-wave i:nth-child(3n+1){height:45%;animation-delay:-.7s}
+.ostk .ost-wave i:nth-child(4n){height:95%;animation-delay:-1.1s}.ostk .ost-wave i:nth-child(5n){height:20%;animation-delay:-.5s}
+.ostk .ost-player.playing .ost-wave i{animation-play-state:running;opacity:.95}
+@keyframes ostw{to{transform:scaleY(.45)}}
+.ostk .ost-seek{width:100%;accent-color:var(--oc);margin:0 0 10px;cursor:pointer}
+.ostk .ost-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.ostk .ost-tr{all:unset;box-sizing:border-box;width:100%;display:grid;grid-template-columns:30px 1fr auto;gap:10px;align-items:center;padding:9px 10px;border-radius:var(--o-rs);color:var(--o-tx);font-size:15px;cursor:pointer}
+.ostk .ost-tr:hover{background:var(--o-hv)}
+.ostk .ost-tn,.ostk .ost-td{font-size:13px;color:var(--o-mut);font-variant-numeric:tabular-nums}
+.ostk .ost-tr.on{background:var(--oc);color:var(--o-on)}
+.ostk .ost-tr.on .ost-tn,.ostk .ost-tr.on .ost-td{color:var(--o-on)}
+.ostk .ost-err{font-size:13px;min-height:0}
+@media(min-width:901px){.ostk .ost-grid{align-items:stretch}.ostk .ost-player{display:grid;grid-row:span 7;grid-template-rows:subgrid;row-gap:6px}}
+@media(prefers-reduced-motion:reduce){.ostk .ost-wave i{animation:none}}
+/* flotante */
+#fp{position:fixed;right:18px;bottom:18px;z-index:900;display:grid;grid-template-columns:auto minmax(0,1fr) auto auto auto;align-items:center;gap:8px;width:min(420px,calc(100vw - 24px));padding:8px 10px 13px 8px;background:var(--o-fbg);color:var(--o-tx);border:1px solid var(--fc,#35d6ff);border-radius:var(--o-r);box-shadow:0 0 26px -8px var(--fc,#35d6ff),0 10px 30px rgba(0,0,0,.5);transform:translateY(24px);opacity:0;pointer-events:none;transition:transform .35s cubic-bezier(.2,.8,.2,1),opacity .3s}
+#fp.show{transform:none;opacity:1;pointer-events:auto}
+#fp[hidden]{display:none}
+#fp .fp-cv{width:46px;height:46px;border-radius:5px;overflow:hidden;flex:none;box-shadow:0 0 0 1px rgba(255,255,255,.14)}
+#fp.playing .fp-cv{box-shadow:0 0 0 2px var(--fc,#35d6ff),0 0 14px -2px var(--fc,#35d6ff)}
+#fp .fp-cv svg{display:block;width:100%;height:100%}
+#fp .fp-info{all:unset;box-sizing:border-box;cursor:pointer;min-width:0;display:flex;flex-direction:column;gap:3px;padding:2px 6px;border-radius:6px}
+#fp .fp-info:hover{background:var(--o-hv)}
+#fp .fp-al{font:700 9px var(--o-lab);letter-spacing:.16em;text-transform:uppercase;color:var(--fc,#35d6ff);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#fp .fp-tt{font:700 14px var(--o-body);color:var(--o-hi);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#fp .fb{all:unset;box-sizing:border-box;cursor:pointer;display:grid;place-items:center;width:30px;height:30px;border-radius:50%;color:var(--o-hi);transition:background .2s,transform .15s}
+#fp .fb:hover{background:var(--o-btn2)}#fp .fb:active{transform:scale(.9)}
+#fp .fb:focus-visible,#fp .fp-info:focus-visible{outline:2px solid var(--fc,#35d6ff);outline-offset:2px}
+#fp .fb svg{width:14px;height:14px;fill:currentColor;display:block}
+#fp .fp-pp{width:36px;height:36px;background:var(--fc,#35d6ff);color:var(--o-on)}
+#fp .fp-pp:hover{background:var(--fc,#35d6ff);filter:brightness(1.1)}
+#fp .fp-pp .i2{display:none}#fp.playing .fp-pp .i1{display:none}#fp.playing .fp-pp .i2{display:block}
+#fp .fp-bar{position:absolute;left:10px;right:10px;bottom:5px;height:3px;background:var(--o-btn);border-radius:2px;overflow:hidden}
+#fp .fp-bar b{display:block;height:100%;width:0;background:var(--fc,#35d6ff)}
+@media(max-width:520px){#fp{right:10px;left:10px;bottom:10px;width:auto}}
+@media(prefers-reduced-motion:reduce){#fp{transition:none}}
+
+.ostk,#fp{--o-bg:linear-gradient(180deg,rgba(16,26,32,.84),rgba(10,17,22,.88));--o-fbg:#0a1116;--o-bd:var(--line);--o-tx:var(--paper);--o-hi:var(--paper);--o-mut:var(--mute);--o-hv:rgba(53,214,255,.09);--o-btn:rgba(241,245,246,.12);--o-btn2:rgba(241,245,246,.22);--o-on:#04070a;--o-r:3px;--o-rs:2px;--o-fd:var(--display);--o-lab:var(--mono);--o-body:var(--mono)}
+.ostk .ost-ti{font-stretch:62%;font-weight:900;letter-spacing:.02em}
+.ostk .ost-card::before,.ostk .ost-card::after{content:"";position:absolute;width:12px;height:12px;border:2px solid var(--oc);opacity:.7;pointer-events:none}
+.ostk .ost-card::before{top:-1px;left:-1px;border-right:0;border-bottom:0}.ostk .ost-card::after{bottom:-1px;right:-1px;border-left:0;border-top:0}
+#fp .fp-tt{font-weight:500;font-size:13px;letter-spacing:.04em}
+</style>
+<script>
+(function(){
+ if(window.OSTKIT)return;
+ var CARDS="<div class=\"ost-grid\">\n      <div class=\"ost-card ost-player\" style=\"--oc:#35d6ff\">\n        <span class=\"ost-no\">Álbum concepto · Undead Society<\/span>\n        <div class=\"ost-head\">\n        <svg class=\"ost-cover\" viewBox=\"0 0 1000 1000\" role=\"img\" aria-label=\"Portada del álbum Exure Omnia, Undead Society\">\n<defs><radialGradient id=\"eoBg\" cx=\"50%\" cy=\"33%\" r=\"80%\"><stop offset=\"0\" stop-color=\"#14212a\"/><stop offset=\".6\" stop-color=\"#070d12\"/><stop offset=\"1\" stop-color=\"#03060a\"/><\/radialGradient>\n<radialGradient id=\"eoGl\" cx=\"50%\" cy=\"33%\" r=\"34%\"><stop offset=\"0\" stop-color=\"#ea3b50\" stop-opacity=\".55\"/><stop offset=\"1\" stop-color=\"#ea3b50\" stop-opacity=\"0\"/><\/radialGradient>\n<linearGradient id=\"eoB\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#35d6ff\" stop-opacity=\".22\"/><stop offset=\"1\" stop-color=\"#35d6ff\" stop-opacity=\"0\"/><\/linearGradient>\n<linearGradient id=\"eoFd\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#03060a\" stop-opacity=\"0\"/><stop offset=\"1\" stop-color=\"#03060a\" stop-opacity=\".96\"/><\/linearGradient><\/defs>\n<rect width=\"1000\" height=\"1000\" fill=\"url(#eoBg)\"/>\n<g stroke=\"#35d6ff\" stroke-opacity=\".07\" stroke-width=\"1\"><line x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1000\"/><line x1=\"100\" y1=\"0\" x2=\"100\" y2=\"1000\"/><line x1=\"200\" y1=\"0\" x2=\"200\" y2=\"1000\"/><line x1=\"300\" y1=\"0\" x2=\"300\" y2=\"1000\"/><line x1=\"400\" y1=\"0\" x2=\"400\" y2=\"1000\"/><line x1=\"500\" y1=\"0\" x2=\"500\" y2=\"1000\"/><line x1=\"600\" y1=\"0\" x2=\"600\" y2=\"1000\"/><line x1=\"700\" y1=\"0\" x2=\"700\" y2=\"1000\"/><line x1=\"800\" y1=\"0\" x2=\"800\" y2=\"1000\"/><line x1=\"900\" y1=\"0\" x2=\"900\" y2=\"1000\"/><line x1=\"1000\" y1=\"0\" x2=\"1000\" y2=\"1000\"/><line x1=\"0\" y1=\"0\" x2=\"1000\" y2=\"0\"/><line x1=\"0\" y1=\"100\" x2=\"1000\" y2=\"100\"/><line x1=\"0\" y1=\"200\" x2=\"1000\" y2=\"200\"/><line x1=\"0\" y1=\"300\" x2=\"1000\" y2=\"300\"/><line x1=\"0\" y1=\"400\" x2=\"1000\" y2=\"400\"/><line x1=\"0\" y1=\"500\" x2=\"1000\" y2=\"500\"/><line x1=\"0\" y1=\"600\" x2=\"1000\" y2=\"600\"/><line x1=\"0\" y1=\"700\" x2=\"1000\" y2=\"700\"/><line x1=\"0\" y1=\"800\" x2=\"1000\" y2=\"800\"/><line x1=\"0\" y1=\"900\" x2=\"1000\" y2=\"900\"/><line x1=\"0\" y1=\"1000\" x2=\"1000\" y2=\"1000\"/><\/g>\n<polygon points=\"500,330 130,1000 330,1000\" fill=\"url(#eoB)\"/><polygon points=\"500,330 870,1000 670,1000\" fill=\"url(#eoB)\"/><rect width=\"1000\" height=\"1000\" fill=\"url(#eoGl)\"/><ellipse cx=\"500\" cy=\"330\" rx=\"360\" ry=\"115\" fill=\"none\" stroke=\"#35d6ff\" stroke-opacity=\"0.22\" stroke-width=\"2\"/><ellipse cx=\"500\" cy=\"330\" rx=\"300\" ry=\"96\" fill=\"none\" stroke=\"#35d6ff\" stroke-opacity=\"0.19\" stroke-width=\"2\"/><ellipse cx=\"500\" cy=\"330\" rx=\"240\" ry=\"77\" fill=\"none\" stroke=\"#35d6ff\" stroke-opacity=\"0.16\" stroke-width=\"2\"/><ellipse cx=\"500\" cy=\"330\" rx=\"180\" ry=\"58\" fill=\"none\" stroke=\"#35d6ff\" stroke-opacity=\"0.13\" stroke-width=\"2\"/><g transform=\"translate(500 330)\"><rect x=\"-9\" y=\"-215\" width=\"18\" height=\"430\" fill=\"#ea3b50\" fill-opacity=\".9\"/><rect x=\"-125\" y=\"-105\" width=\"250\" height=\"18\" fill=\"#ea3b50\" fill-opacity=\".9\"/><rect x=\"-9\" y=\"-215\" width=\"18\" height=\"430\" fill=\"none\" stroke=\"#fff\" stroke-opacity=\".4\"/><\/g>\n<g><path d=\"M0 1000V821l17 -7h23l17 8V1000z\" fill=\"#060c11\"/><path d=\"M62 1000V893l13 -12h17l13 8V1000z\" fill=\"#060c11\"/><path d=\"M107 1000V893l21 -1h28l21 7V1000z\" fill=\"#060c11\"/><path d=\"M179 1000V917l12 -8h16l12 10V1000z\" fill=\"#060c11\"/><path d=\"M218 1000V839l20 -7h27l20 10V1000z\" fill=\"#060c11\"/><path d=\"M290 1000V900l21 -9h28l21 0V1000z\" fill=\"#060c11\"/><path d=\"M365 1000V925l10 -0h14l10 3V1000z\" fill=\"#060c11\"/><path d=\"M400 1000V933l20 -12h27l20 7V1000z\" fill=\"#060c11\"/><path d=\"M470 1000V890l17 -8h23l17 3V1000z\" fill=\"#060c11\"/><path d=\"M530 1000V939l18 -10h24l18 1V1000z\" fill=\"#060c11\"/><path d=\"M594 1000V869l21 -6h28l21 8V1000z\" fill=\"#060c11\"/><path d=\"M665 1000V875l22 -5h30l22 3V1000z\" fill=\"#060c11\"/><path d=\"M744 1000V933l14 -1h19l14 9V1000z\" fill=\"#060c11\"/><path d=\"M792 1000V913l16 -13h22l16 4V1000z\" fill=\"#060c11\"/><path d=\"M850 1000V936l10 -13h14l10 10V1000z\" fill=\"#060c11\"/><path d=\"M884 1000V887l13 -14h17l13 0V1000z\" fill=\"#060c11\"/><path d=\"M930 1000V839l16 -6h22l16 1V1000z\" fill=\"#060c11\"/><path d=\"M988 1000V890l21 -12h28l21 10V1000z\" fill=\"#060c11\"/><\/g><rect y=\"520\" width=\"1000\" height=\"480\" fill=\"url(#eoFd)\"/>\n<g stroke=\"#35d6ff\" stroke-width=\"4\" fill=\"none\"><path d=\"M40 90V40h50M960 90V40h-50M40 910v50h50M960 910v50h-50\"/><\/g>\n<circle cx=\"86\" cy=\"86\" r=\"9\" fill=\"#ea3b50\"/><text x=\"108\" y=\"94\" font-family=\"'IBM Plex Mono',monospace\" font-size=\"24\" font-weight=\"600\" letter-spacing=\"6\" fill=\"#ea3b50\">REC · EN VIVO<\/text>\n<text x=\"960\" y=\"94\" text-anchor=\"end\" font-family=\"'IBM Plex Mono',monospace\" font-size=\"24\" letter-spacing=\"5\" fill=\"#93a3aa\">Z-A3<\/text>\n<text x=\"500\" y=\"790\" text-anchor=\"middle\" font-family=\"Archivo,'Arial Narrow',Impact,sans-serif\" font-stretch=\"62%\" font-weight=\"900\" font-size=\"170\" textLength=\"820\" lengthAdjust=\"spacingAndGlyphs\" fill=\"#f1f5f6\">UNDEAD SOCIETY<\/text>\n<text x=\"500\" y=\"885\" text-anchor=\"middle\" font-family=\"Archivo,'Arial Narrow',Impact,sans-serif\" font-stretch=\"62%\" font-weight=\"900\" font-size=\"92\" textLength=\"820\" lengthAdjust=\"spacingAndGlyphs\" fill=\"none\" stroke=\"#35d6ff\" stroke-width=\"2.6\">EXURE OMNIA<\/text>\n<text x=\"500\" y=\"935\" text-anchor=\"middle\" font-family=\"'IBM Plex Mono',monospace\" font-size=\"22\" letter-spacing=\"7\" fill=\"#6a7b82\">DÔJO · OST CONCEPTO<\/text>\n<\/svg>\n          <div class=\"ost-meta\">\n            <span class=\"ost-ti\">Exure Omnia<\/span>\n            <span class=\"ost-sub\">Álbum concepto de Undead Society: el reality show, la Iglesia y el brote<\/span>\n            <span class=\"ost-by\">Dôjo · 7 pistas · 21 min<\/span>\n          <\/div>\n        <\/div>\n        <div class=\"ost-ctl\">\n          <button type=\"button\" class=\"ost-b ost-prev\" aria-label=\"Pista anterior\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M6 5h2.5v14H6zM20 5v14L9 12z\"/><\/svg><\/button>\n          <button type=\"button\" class=\"ost-b ost-play\" aria-label=\"Reproducir\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path class=\"ost-ip\" d=\"M8 5v14l11-7z\"/><path class=\"ost-ipa\" d=\"M7 5h3.5v14H7zM13.5 5H17v14h-3.5z\"/><\/svg><\/button>\n          <button type=\"button\" class=\"ost-b ost-next\" aria-label=\"Pista siguiente\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M15.5 5H18v14h-2.5zM4 5v14l11-7z\"/><\/svg><\/button>\n          <div class=\"ost-now\"><span class=\"ost-cur\">Main Theme<\/span><span class=\"ost-time\"><span class=\"ost-t0\">0:00<\/span> / <span class=\"ost-t1\">3:40<\/span><\/span><\/div>\n        <\/div>\n        <span class=\"ost-wave\" aria-hidden=\"true\"><i><\/i><i><\/i><i><\/i><i><\/i><i><\/i><i><\/i><i><\/i><i><\/i><i><\/i><i><\/i><i><\/i><i><\/i><i><\/i><i><\/i><i><\/i><i><\/i><i><\/i><i><\/i><i><\/i><i><\/i><i><\/i><i><\/i><i><\/i><i><\/i><\/span>\n        <input type=\"range\" class=\"ost-seek\" min=\"0\" max=\"1000\" value=\"0\" step=\"1\" aria-label=\"Posición de la pista\">\n        <ol class=\"ost-list\">\n          <li><button type=\"button\" class=\"ost-tr\" data-src=\"audio/eo-01-main-theme.mp3\"><span class=\"ost-tn\">01<\/span><span class=\"ost-tt\">Main Theme<\/span><span class=\"ost-td\">3:40<\/span><\/button><\/li>\n          <li><button type=\"button\" class=\"ost-tr\" data-src=\"audio/eo-02-the-gates-are-open.mp3\"><span class=\"ost-tn\">02<\/span><span class=\"ost-tt\">The Gates Are Open<\/span><span class=\"ost-td\">4:04<\/span><\/button><\/li>\n          <li><button type=\"button\" class=\"ost-tr\" data-src=\"audio/eo-03-open-for-business.mp3\"><span class=\"ost-tn\">03<\/span><span class=\"ost-tt\">Open... for Business<\/span><span class=\"ost-td\">3:53<\/span><\/button><\/li>\n          <li><button type=\"button\" class=\"ost-tr\" data-src=\"audio/eo-04-massacre.mp3\"><span class=\"ost-tn\">04<\/span><span class=\"ost-tt\">Massacre<\/span><span class=\"ost-td\">1:06<\/span><\/button><\/li>\n          <li><button type=\"button\" class=\"ost-tr\" data-src=\"audio/eo-05-expiation.mp3\"><span class=\"ost-tn\">05<\/span><span class=\"ost-tt\">Expiation<\/span><span class=\"ost-td\">2:17<\/span><\/button><\/li>\n          <li><button type=\"button\" class=\"ost-tr\" data-src=\"audio/eo-06-numbers-on-a-screen.mp3\"><span class=\"ost-tn\">06<\/span><span class=\"ost-tt\">Numbers on a Screen<\/span><span class=\"ost-td\">2:30<\/span><\/button><\/li>\n          <li><button type=\"button\" class=\"ost-tr\" data-src=\"audio/eo-07-swarm-of-death.mp3\"><span class=\"ost-tn\">07<\/span><span class=\"ost-tt\">Swarm of Death<\/span><span class=\"ost-td\">3:13<\/span><\/button><\/li>\n        <\/ol>\n      <\/div>\n    <\/div>";
+ try{var lk=document.createElement('link');lk.rel='stylesheet';lk.href='https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@900&display=swap';document.head.appendChild(lk)}catch(e){}
+ var ST=[],act=-1,fp=null,dragging=false;
+ function fmt(t){t=Math.max(0,Math.floor(t||0));return Math.floor(t/60)+':'+('0'+t%60).slice(-2)}
+ function mk(k,root){
+  var tr=[].slice.call(root.querySelectorAll('.ost-tr')).map(function(b){return{src:b.dataset.src,tn:b.querySelector('.ost-tn').textContent,tt:b.querySelector('.ost-tt').textContent,td:b.querySelector('.ost-td').textContent}});
+  var o={k:k,tr:tr,idx:0,loaded:-1,root:null,cover:root.querySelector('.ost-cover').outerHTML,ti:root.querySelector('.ost-ti').textContent,col:getComputedStyle(root).getPropertyValue('--oc').trim()||'#35d6ff',au:new Audio()};
+  o.au.preload='none';
+  o.au.addEventListener('play',function(){act=k;ui(k);showFp();paint()});
+  o.au.addEventListener('pause',function(){ui(k);if(act===k)paint()});
+  o.au.addEventListener('loadedmetadata',function(){ui(k)});
+  o.au.addEventListener('timeupdate',function(){ui(k);if(act===k&&o.au.duration){var b=fp&&fp.querySelector('.fp-bar b');if(b)b.style.width=(o.au.currentTime/o.au.duration*100)+'%'}});
+  o.au.addEventListener('ended',function(){if(o.idx<o.tr.length-1){load(k,o.idx+1);start(k)}});
+  ST[k]=o;return o;
+ }
+ function ui(k){
+  var o=ST[k],r=o.root;if(!r||!r.isConnected)return;
+  r.classList.toggle('playing',!o.au.paused);
+  var p=r.querySelector('.ost-play');if(p)p.setAttribute('aria-label',o.au.paused?'Reproducir':'Pausar');
+  [].forEach.call(r.querySelectorAll('.ost-tr'),function(b,i){b.classList.toggle('on',i===o.idx);if(i===o.idx)b.setAttribute('aria-current','true');else b.removeAttribute('aria-current')});
+  r.querySelector('.ost-cur').textContent=o.tr[o.idx].tt;
+  var t0=r.querySelector('.ost-t0'),t1=r.querySelector('.ost-t1'),sk=r.querySelector('.ost-seek');
+  t1.textContent=(o.loaded===o.idx&&o.au.duration)?fmt(o.au.duration):o.tr[o.idx].td;
+  if(o.loaded===o.idx){t0.textContent=fmt(o.au.currentTime);if(!dragging&&o.au.duration)sk.value=Math.round(o.au.currentTime/o.au.duration*1000)}else{t0.textContent='0:00';sk.value=0}
+ }
+ function load(k,i){var o=ST[k];o.idx=(i+o.tr.length)%o.tr.length;o.au.src=o.tr[o.idx].src;o.loaded=o.idx;ui(k);if(act===k)paint()}
+ function start(k){var o=ST[k];if(o.loaded!==o.idx)load(k,o.idx);ST.forEach(function(x){if(x!==o&&!x.au.paused)x.au.pause()});var pr=o.au.play();if(pr&&pr.catch)pr.catch(function(){ui(k)})}
+ function toggle(k){var o=ST[k];if(o.au.paused)start(k);else o.au.pause()}
+ function prev(k){var o=ST[k];if(o.au.currentTime>3&&o.loaded===o.idx){o.au.currentTime=0;return}load(k,o.idx-1);start(k)}
+ function next(k){load(k,ST[k].idx+1);start(k)}
+ function mkFp(){
+  if(fp)return;fp=document.createElement('div');fp.id='fp';fp.setAttribute('role','region');fp.hidden=true;
+  fp.innerHTML='<span class="fp-cv" aria-hidden="true"></span><button type="button" class="fp-info" aria-label="Ir a OST Concepto"><span class="fp-al">OST Concepto</span><span class="fp-tt">-</span></button><button type="button" class="fb fp-pv" aria-label="Pista anterior"><svg viewBox="0 0 24 24"><path d="M6 5h2v14H6zM20 5v14L9 12z"/></svg></button><button type="button" class="fb fp-pp" aria-label="Pausar"><svg class="i1" viewBox="0 0 24 24"><path d="M7 4v16l13-8z"/></svg><svg class="i2" viewBox="0 0 24 24"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg></button><button type="button" class="fb fp-nx" aria-label="Pista siguiente"><svg viewBox="0 0 24 24"><path d="M16 5h2v14h-2zM4 5l11 7L4 19z"/></svg></button><span class="fp-bar" aria-hidden="true"><b></b></span>';
+  document.body.appendChild(fp);
+  fp.querySelector('.fp-pp').addEventListener('click',function(){if(act>=0)toggle(act)});
+  fp.querySelector('.fp-pv').addEventListener('click',function(){if(act>=0)prev(act)});
+  fp.querySelector('.fp-nx').addEventListener('click',function(){if(act>=0)next(act)});
+  fp.querySelector('.fp-info').addEventListener('click',function(){if(window.__ostGo)window.__ostGo()});
+ }
+ function showFp(){mkFp();fp.hidden=false;requestAnimationFrame(function(){fp.classList.add('show')})}
+ var lastCover=-1;
+ function paint(){
+  if(!fp||act<0)return;var o=ST[act],t=o.tr[o.idx];
+  fp.querySelector('.fp-al').textContent=o.ti+' · '+t.tn;
+  fp.querySelector('.fp-tt').textContent=t.tt;
+  fp.style.setProperty('--fc',o.col);
+  if(lastCover!==act){fp.querySelector('.fp-cv').innerHTML=o.cover;lastCover=act}
+  var pl=!o.au.paused;fp.classList.toggle('playing',pl);
+  fp.querySelector('.fp-pp').setAttribute('aria-label',pl?'Pausar':'Reproducir');
+  fp.setAttribute('aria-label','Reproduciendo: '+t.tt);
+ }
+ function bind(scope){
+  [].forEach.call((scope||document).querySelectorAll('.ostk .ost-player'),function(root,k){
+   var o=ST[k]||mk(k,root);o.root=root;
+   root.querySelector('.ost-play').addEventListener('click',function(){toggle(k)});
+   root.querySelector('.ost-prev').addEventListener('click',function(){prev(k)});
+   root.querySelector('.ost-next').addEventListener('click',function(){next(k)});
+   [].forEach.call(root.querySelectorAll('.ost-tr'),function(b,i){b.addEventListener('click',function(){if(i===o.idx&&o.loaded===o.idx)toggle(k);else{load(k,i);start(k)}})});
+   var sk=root.querySelector('.ost-seek');
+   sk.addEventListener('input',function(){dragging=true;if(o.loaded===o.idx&&o.au.duration)root.querySelector('.ost-t0').textContent=fmt(sk.value/1000*o.au.duration)});
+   sk.addEventListener('change',function(){dragging=false;if(o.loaded!==o.idx)load(k,o.idx);var go=function(){o.au.currentTime=sk.value/1000*o.au.duration};if(o.au.duration)go();else o.au.addEventListener('loadedmetadata',function f(){o.au.removeEventListener('loadedmetadata',f);go()})});
+   ui(k);
+  });
+ }
+ window.OSTKIT={html:function(){return '<div class="ostk">'+CARDS+'</div>'},bind:bind};
+})();
+</script>
+<script>
+(() => {
+'use strict';
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const rand = (a, b) => a + Math.random() * (b - a);
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+let boost = 0;
+
+/* ============ DATOS ============ */
+const TEAM = {
+  cc: { name: 'Crimson Creed', color: 'var(--creed)', desc: 'Equipo A. Disciplina mecánica, tope de 5 titulares más 1 rotativo activo, sin roles duplicados.' },
+  bs: { name: 'Burning Saints', color: 'var(--saint)', desc: 'Equipo B. Caos con estilo ante cámaras, tope de 5 titulares y un cupo de rotación interna que no cuenta contra el límite.' },
+  et: { name: 'Etherline', color: 'var(--cyan)', desc: 'La cadena que produce, edita y retrasa la emisión. Antagonista sistémico de la temporada.' }
+};
+
+const CHARS = [
+ { id:'ezra', n:'Ezra', t:'cc', role:'Capitán', mark:'visor', kick:'Protagonista y cara del show', line:'“Entonces, ¿por qué huele a humo?”',
+   bio:'Capitán de Crimson Creed y rostro del programa. Lidera con lectura de terreno y fuego a media distancia, y es el héroe que Etherline vende cada semana.',
+   want:'Salvar a su equipo y demostrar que tiene el control.', fear:'Ser un producto fabricado por Etherline.',
+   skills:['Liderazgo táctico','Media distancia','Lectura de terreno'], dilemma:'La verdad frente a la lealtad con el equipo.',
+   arc:['Obediencia efectiva','Sospecha documentada (Ep03 a Ep05)','Rebelión pública (Ep12)'],
+   rel:'Jericho, hermandad fracturada. Delilah, confianza técnica y emocional. Judec, vínculo político y familiar.',
+   secret:'En el Ep03 detecta en el Registro de Continuidad un retraso de seguridad de 92 segundos sin declarar antes de la muerte de Simeon, usado para captar un hero shot. Sig confirma el registro y Etherline lo llama “error humano”.',
+   wound:'Culpa del sobreviviente por Simeon.' },
+ { id:'jericho', n:'Jericho', t:'cc', role:'Táctico y segundo al mando', mark:'scope', kick:'Planificador de precisión', line:'“El protocolo es nuestro escudo. Concéntrate.”',
+   bio:'Planificador de precisión que se deteriora mentalmente bajo presión y pérdida. Mantiene un vínculo latente con Zillah, del equipo rival.',
+   want:'Perfección operativa.', fear:'Perder el control mental.', skills:['Planificación táctica','Tirador de precisión','Mando bajo presión'],
+   dilemma:'El amor por Zillah frente al deber.', arc:['Maestro del plan','Fisuras psicológicas (Ep06 a Ep08)','Sacrificio o complicidad (se define en Ep11 según el corte)'],
+   rel:'Ezra, hermandad fracturada. Zillah, vínculo que detona choques emocionales. Judec, parentesco.',
+   secret:'En la temporada 2 recibe una llave de acero con su nombre; sus visiones proféticas alimentan el arco de la IA-virus.', wound:'La pérdida de Simeon y la presión del libreto.' },
+ { id:'delilah', n:'Delilah', t:'cc', role:'Analista de campo y hacker', mark:'wave', kick:'Lee patrones donde otros ven ruido', line:'“Desfase de cuadro en 0,3. Alguien está montado en la señal.”',
+   bio:'Compasiva y obsesiva con los patrones. Trabaja desde la sala de edición K-13 y es la llave para abrir la Broadcast Vault.',
+   want:'Descifrar señales y salvar vidas.', fear:'Que la usen para encubrir.', skills:['Análisis de señal','Hackeo de continuidad','Lectura de patrones (Hollow Signal y Frecuencia Judas)'],
+   dilemma:'Lealtad técnica frente a denunciar a quien le paga.', arc:['Lealtad técnica','Denunciante activa (Ep08 a Ep12)','Descubre el vínculo entre Vision Alignment y el sesgo editorial'],
+   rel:'Sig, par técnico que rompe el monopolio de Etherline. Ezra, confianza técnica y emocional.',
+   secret:'Guarda copias de evidencia en una unidad oculta y desactiva la vigilancia de IA durante seis minutos en el Ep07.', wound:'Ver cómo la edición reescribe la muerte de otros.' },
+ { id:'simeon', n:'Simeon', t:'cc', role:'Rompemuros y pesado', mark:'breach', kick:'Abre la ruta', kia:'KIA Ep03',
+   bio:'Abre rutas para el equipo. Su muerte en el Ep03, editada para glorificar el sacrificio, es el origen de la ruptura de Ezra.',
+   arc:['Función: apertura de ruta','Muerte en el Ep03','El desfase de continuidad motiva a Ezra'], rel:'Ezra, compañero de línea y duelo fundacional.' },
+ { id:'isaiah', n:'Isaiah', t:'cc', role:'Médico y guardián', mark:'cross', kick:'Triage y extracción', kia:'KIA Ep06',
+   bio:'Recluta que reemplaza a un fantasma. Se ocupa del triage y la extracción. Muere tras una penitencia forzada y el poder se desplaza hacia la Iglesia.',
+   arc:['Función: triage y extracción','Muerte en el Ep06 tras la penitencia','Empodera a la Iglesia'], rel:'Ezra y Jericho, quienes lo acogen sin consuelo.' },
+ { id:'sig', n:'Sig', t:'cc', role:'Rotativo técnico, ex Etherline', mark:'dots', kick:'Topo, testigo, filtración', rot:true, line:'“Su voz es un mapa.”',
+   bio:'Técnico junior de Etherline que desaparece en el Ep01 dejando una consola abierta. Se integra como rotativo de Crimson Creed entre el Ep08 y el Ep12 para apoyar hackeo y continuidad.',
+   want:'Exponer la verdad.', fear:'Represalias contra su familia.', skills:['Hackeo y continuidad','Conocimiento interno de Etherline'],
+   dilemma:'Callar para proteger a su familia o filtrar y exponerlos.', arc:['Topo anónimo','Testigo clave','Filtración en vivo (Ep12)'],
+   rel:'Delilah, el par técnico. Ezra, lo mantiene al aire porque su voz es un mapa.', secret:'Su sigilo, tres puntos, aparece en la primera filtración y vuelve en los márgenes de los libros contables.' },
+ { id:'abbadon', n:'Abbadon', t:'bs', role:'Capitán', mark:'flame', kick:'Showman mesiánico', line:'“¡La redención pertenece al fuego!”',
+   bio:'Capitán de Burning Saints. Busca la pureza mediante la expiación pública y cree que solo un colapso controlado, el tercer brote, dará a luz una sociedad obediente.',
+   want:'Redención mediante una victoria total.', fear:'La insignificancia.', skills:['Carisma ante cámaras','Combate de choque','Liderazgo de masas'],
+   dilemma:'Obedecer a Judec o convertirse en el nuevo gran verdugo.', arc:['Showman mesiánico','Cómplice del colapso','Némesis ideológico de Ezra'],
+   rel:'Ezra, rivalidad con ideologías opuestas, ambos forjados por el show. Judec, deuda familiar.',
+   secret:'Acepta pruebas letales si elevan su redención y su estatus. En el Ep02 reparte agua a refugiados sabiendo que la transmisión se cortará.', wound:'Una deuda familiar con Judec.' },
+ { id:'rahab', n:'Rahab', t:'bs', role:'Francotiradora y cara pública', mark:'scope2', kick:'Precisión y encanto ante cámara',
+   bio:'Francotiradora con instinto de cámara. Juega para la audiencia y cruza cámara con Ezra para alimentar la rivalidad.',
+   want:'Control de su imagen.', fear:'La irrelevancia.', skills:['Tiro designado con óptica x4 a x8','Presencia mediática'],
+   arc:['Profesional fría','Grietas de conciencia','Se quiebra al ver las pruebas filtradas'], rel:'Abbadon, su capitán.' },
+ { id:'zillah', n:'Zillah', t:'bs', role:'Exploradora e infiltración', mark:'scout', kick:'Vínculo con Jericho',
+   bio:'Exploradora de infiltración con un vínculo personal con Jericho que dispara choques emocionales entre el Ep07 y el Ep11.',
+   want:'Sobrevivir al sistema.', fear:'Que la usen contra Jericho.', skills:['Infiltración','Exploración'],
+   arc:['Infiltradora eficiente','Vínculo reavivado','Decisión difícil en el Ep11'], rel:'Jericho, intimidad que complica las decisiones tácticas.' },
+ { id:'levi', n:'Levi', t:'bs', role:'Rompemuros', mark:'breach', kick:'Su muerte enciende el rencor', kia:'KIA Ep07',
+   bio:'Muere en el Ep07 en una emboscada “espontánea” y su muerte desata rencor mediático contra Crimson Creed.',
+   arc:['Rompemuros de los Saints','Muerte en el Ep07','Rencor mediático contra el Creed'], rel:'Abbadon, su capitán.' },
+ { id:'boaz', n:'Boaz', t:'bs', role:'Pesado', mark:'heavy', kick:'Su muerte acelera el final', kia:'KIA Ep11',
+   bio:'Muere en el Ep11 durante el asalto al estadio, en un pánico escenificado. Su muerte acelera el “evento redentor final” de Etherline.',
+   arc:['Pesado de los Saints','Muerte en el Ep11','Acelera el evento redentor final'], rel:'Abbadon, su capitán.' },
+ { id:'judec', n:'Judec', t:'et', role:'CEO de Etherline', mark:'eye', kick:'Arquitecto del relato', line:'“Limpiamos para que el mundo vuelva a respirar.”',
+   bio:'CEO de Etherline y antagonista sistémico. Pariente de Ezra, Jericho y Abbadon, lo que vuelve el conflicto a la vez familiar y mediático.',
+   want:'Sostener el relato y el estado de excepción.', fear:'Perder el control de la señal.', skills:['Control editorial','Reglas, latencias y contratos'],
+   dilemma:'Cuanto más edita, más se expone.', arc:['Arquitecto del relato','Exposición pública gradual','Pierde el control en el Ep12'],
+   rel:'Ezra, Jericho y Abbadon, parentesco. El público, de oráculo a villano visible tras La Última Transmisión.',
+   secret:'Su objetivo oculto es sincronizar focos para un tercer brote y consolidar un estado de excepción. En el Ep09 emite por paranoia la Frecuencia Judas.' }
+];
+const byId = Object.fromEntries(CHARS.map(c => [c.id, c]));
+const HERO = ['ezra','jericho','delilah','abbadon','sig','judec'];
+
+const EP = [
+ { t:'Llama de la Expiación', o:'Flame of the Expiation', pl:'Estadio de la Expiación, sala de edición K-13, explanada Z-A3', mo:'Espectáculo, pavor latente, liturgia corporativa', th:'Mourners y bolsas de Swarm controlado. La amenaza humana es la cadena de edición de Etherline.',
+   su:'Noche de estreno ante una multitud en trance. Delilah detecta desfases de cuadro, Sig desaparece dejando su consola abierta y Ezra ve un símbolo Præs parpadear en su visor. Encuentra un frasco con la inscripción Præs Initiative.',
+   q:'“Esto no es salvación. Es teatro.”', qa:'Ezra', tg:'El sigilo parpadea una vez más en el visor mientras la multitud celebra sin saber que acaba de ver la primera grieta de la ilusión.', ms:'Lanzamiento de temporada, demostración de la interfaz en vivo y nuevas penitencias de la Iglesia. Normaliza el castigo público y sube el umbral de riesgo.' },
+ { t:'Divididos por el fuego', o:'Divided by Flame', pl:'Ruinas del desierto, bahía logística de Etherline', mo:'Calor, rivalidad, falsa unidad', th:'Runners y sabotaje humano.',
+   su:'Los equipos marchan por separado a una misión armada para enfrentarlos. Delilah halla códigos de suministro alterados, los Runners son empujados contra el Creed y los Saints encuentran un camino fácil. Abbadon desobedece y da agua a un convoy de refugiados.',
+   q:'“Estos errores no son aleatorios.”', qa:'Delilah', tg:'En la bahía logística, un video muestra la vieja consola de Sig con un símbolo a medias dibujado en el polvo.', ms:'Primer cambio de reglas que favorece el rating en una zona urbana sellada. Deja un hueco logístico que habilita una nueva cepa local.' },
+ { t:'La caída del Creed', o:'The Creed’s Fall', pl:'Hospital colapsado, túneles de backstage', mo:'Pánico, duelo, desorden', th:'Debut de los Rippers.', kia:true,
+   su:'En un hospital en ruinas el Creed cae en una trampa. Un Ripper mata a Simeon mientras la transmisión se recrea en su agonía y la Iglesia la reencuadra como sacrificio. Etherline culpa a un productor, que termina muerto en la siguiente zona.',
+   q:'“Para ellos el sacrificio es contenido.”', qa:'Ezra', tg:'El novato Noah guardó en secreto el quiebre de Ezra, en una carpeta oculta.', ms:'Operación a gran escala en las afueras con la muerte de Simeon en vivo. Etherline edita para culpar a la indisciplina y Ezra empieza a sospechar.' },
+ { t:'Luz hueca', o:'Hollow Light', pl:'Bóvedas de archivo, estudio de propaganda', mo:'Desorientación, paranoia', th:'Hollow Signal y mentiras humanas.',
+   su:'El Creed queda en tierra mientras los Saints son celebrados. Delilah halla insignias de la era Præs entre las misiones y Judec inventa un traidor mítico, El Hueco, para justificar los fallos.',
+   q:'“Las mentiras mantienen el orden. La verdad mata el rating.”', qa:'Productor de Etherline', tg:'Una secuencia de funeral muestra un ataúd vacío mientras la multitud celebra. Delilah susurra: “No enterraste nada”.', ms:'Aparece Hollow Signal con interferencia selectiva. La producción “corrige” la repetición de la misión y Ezra detecta cortes intencionales.' },
+ { t:'Protocolo Rapto', o:'Rapture Protocol', pl:'Colmena metropolitana, control de producción', mo:'Frenesí, espectáculo fanático', th:'Runners y colapso escenificado.',
+   su:'La Iglesia lanza el Rapture Protocol, un juicio de limpieza votado por el público. Los Saints hallan un campamento no listado y Silas muere ayudando. Judec destroza un monitor al ver un archivo Præs-Heretic-Protocol y ordena escaneos psicológicos a todos los Cleaners.',
+   q:'“Son personas, no errores.”', qa:'Silas', tg:'Una silueta borrosa sin firma térmica aparece en el horizonte. La Resistencia observa.', ms:'Vision Alignment se aplica “por foco táctico”. Cambios de conducta en los Cleaners; Delilah rastrea el origen y halla patrones.' },
+ { t:'El velo flagelante', o:'The Scourging Veil', pl:'Hub subterráneo de transporte, antiguo campo de entrenamiento Cleaner', mo:'Claustrofobia, alucinación, presencia', th:'Trampas, infectados inestables y alucinaciones.', kia:true,
+   su:'Peregrinos veneran cascos en un antiguo campo de entrenamiento. En los túneles Jericho oye la voz de Simeon entre la estática y el equipo halla los restos de una escuadra Cleaner borrada del registro. Isaiah cae mutilado y Delilah aísla una frase repetida: Alterado hacia la Perfección.',
+   q:'“¿Por qué no los contaron?”', qa:'Isaiah', tg:'Una voz femenina distorsionada susurra por la radio: “Recuerden a Præs”.', ms:'Ceremonia pública y muerte de Isaiah tras una penitencia forzada. La Iglesia gana influencia y la audiencia se radicaliza.' },
+ { t:'Quemar el silencio', o:'Burn the Silence', pl:'Ruinas del sector de lujo, centro de IA de monitoreo', mo:'Fuego, desesperanza, ilusiones que se derrumban', th:'Civiles semiinfectados, Swarms y sabotaje.', kia:true,
+   su:'Los Saints entran a un barrio de celebridades convertido en ceniza. En un búnker hallan antiguos actores e influencers mutados; la duda de Malachai cuesta la vida de Tobias, a quien la transmisión convierte en mártir. Delilah apaga seis minutos la vigilancia y copia el archivo Præs-Origin.',
+   q:'“Mártir de mentiras.”', qa:'Abbadon', tg:'De los escombros emerge una mano calcinada con un tatuaje Præs.', ms:'Duelo directo con los Burning Saints y muerte de Levi en una emboscada “espontánea”. Delilah y Sig confirman un guion oculto.' },
+ { t:'Un coro de óxido', o:'A Choir of Rust', pl:'Catedral de datos, barracas del Creed', mo:'Liturgia de máquina, horror disonante', th:'Tecnología corrupta y salmos embrujados.',
+   su:'En una catedral de servidores oxidados Abbadon sigue un pulso que suena a oración sintética. Delilah descubre gritos de Cleaners muertos cosidos dentro de los salmos y Ezra nota fotogramas borrados en la muerte de Simeon. Judec sufre un quiebre en plena junta.',
+   q:'“Convirtieron la sangre en música.”', qa:'Delilah', tg:'El visor de un traje mecánico preservado parpadea con el sigilo Præs.', ms:'Incursión en la Broadcast Vault; la Frecuencia Judas sale al aire “por error”. Se filtran pruebas de la sincronía de focos.' },
+ { t:'La Frecuencia Judas', o:'The Judas Frequency', pl:'Gala de aniversario, corredores de la bóveda', mo:'Esplendor que esconde podredumbre, paranoia', th:'Corrupción de señal y alucinaciones.',
+   su:'Judec celebra su aniversario como CEO mientras tiembla tras bambalinas. Interroga a Delilah, encuentra un archivo llamado Judas y lo emite en vivo, mostrando a los primeros Cleaners experimentados. Todas las pantallas dicen: Ellos recuerdan.',
+   q:'“Ellos recuerdan.”', qa:'Pantallas de Etherline', tg:'Una figura en sombra entra al cuadro: es Sig. Judec se voltea despacio y corte a negro.', ms:'Etherline reinicia las reglas y sube la dificultad global. Escasez y caos en los hubs; las células de la Resistencia se organizan.' },
+ { t:'Sermones de fuego', o:'Fire Sermons', pl:'Túneles de Dead Grid, refugio de la Resistencia', mo:'Profético, insurgente, asfixiante', th:'Runners y horrores de archivo.',
+   su:'La Iglesia secuestra las transmisiones mientras Ezra resiste la reprogramación de Vision Alignment. Jericho ve murales de sangre con hechos que aún no ocurren y los Saints hallan esquirlas Præs entre cadáveres. Ezra hackea una torre y toma el aire.',
+   q:'“Ustedes merecen saber la verdad.”', qa:'Ezra', tg:'Las multitudes cantan: “¡Quemen a los herejes!”. Histeria alimentada por el miedo.', ms:'Zona subterránea Dead Grid con rastro Præs. Ezra acepta que el virus es una mutación del ATP y reúne pruebas.' },
+ { t:'Santos rotos', o:'Broken Saints', pl:'Bosque en cuarentena, búnker de la Resistencia', mo:'Colapso, traición, paranoia', th:'Emboscada de Swarm y traición humana.', kia:true,
+   su:'Abbadon saca a los Saints del libreto y dos reclutas mueren en vivo; Etherline censura, pero las señales piratas lo difunden crudo. Delilah conoce a Sig en persona, que le muestra archivos Præs de jóvenes Cleaners fusionados con máquinas. Ezra descubre carteles que lo acusan de masacres que no cometió.',
+   q:'“La justicia no se puede programar.”', qa:'Abbadon', tg:'En el búnker Delilah revisa un clip de un niño aplastado dentro de un exotraje y se cubre la boca.', ms:'Asalto al estadio y muerte de Boaz entre un pánico civil fingido. Etherline prepara un “evento redentor final”.' },
+ { t:'La Última Transmisión', o:'The Last Broadcast', pl:'Estadio de la Expiación, núcleo de transmisión', mo:'Revelación apocalíptica, caos', th:'Nuevos Runners, Rippers y disturbios.',
+   su:'Ezra se niega a pelear y Abbadon suelta el arma. Etherline libera Rippers reingenierizados mientras Delilah y Sig activan los archivos Præs ante el mundo. Las pantallas muestran décadas de brotes diseñados, el estadio arde y cae el control editorial.',
+   q:'“Paz, no espectáculo.”', qa:'Ezra', tg:'Pantalla negra y un eco: “RECUERDA QUIÉN ERAS”.', ms:'Emisión sin control con las pruebas en pantalla. El tercer brote se dispara por la sincronía de varios focos, Etherline pierde el relato y Ezra se vuelve el rostro de la Resistencia.' }
+];
+const EPKIA = {3:'Simeon',6:'Isaiah',7:'Levi',11:'Boaz'};
+
+const ZONES = [
+ { n:1, c:'Z-A3', t:'Estadio de la Expiación', hook:'Pantallas de 360°, estructuras cruciformes y pirotecnia fría.', risk:'Swarms, Howlers y disturbios civiles.', obj:'Ceremonias, castigos públicos y finales de episodio, con plano secuencia de múltiples drones.', reuse:'Ep01 (lanzamiento), Ep11 (disturbios), Ep12 (La Última Transmisión).', kb:'KB-ST “Anillo del estadio”: pasarela circular con puntos de estrangulamiento.' },
+ { n:2, c:'Z-B2', t:'Dead Grid, red subterránea', hook:'Túneles inundados, estrobos de emergencia y cableado expuesto.', risk:'Runners, Rippers y derrumbes.', obj:'Recuperar esquirlas de datos Præs, sabotear relés y hacer extracciones a ciegas.', reuse:'Ep10 (rastro Præs), Ep04 (primeras interferencias).', kb:'KB-DG “Pasarela del nido”: pasarela estrecha sobre un pozo inundado.' },
+ { n:3, c:'Z-B5', t:'Distrito sellado y bóveda técnica', hook:'Corredores de vidrio blindado, la sala de la Broadcast Vault y LED blancos y cian.', risk:'Seguridad humana de Etherline y apagones.', obj:'Activar o extraer la Frecuencia Judas y hackear la continuidad.', reuse:'Ep08 (incursión), Ep09 (reinicio de reglas).' },
+ { n:4, c:'Z-C4', t:'Bosque en cuarentena', hook:'Niebla, cinta de riesgo biológico y torres térmicas.', risk:'Emboscadas de Runners, fauna alterada y pérdida de GPS.', obj:'Rescate de civiles, quema controlada y cacería silenciosa.', reuse:'Ep05, Ep06, Ep09.' },
+ { n:5, c:'Z-C1', t:'Puerto industrial y astillero', hook:'Laberinto de contenedores, grúas, sirenas y contraluces.', risk:'Swarm de densidad variable y francotiradores hostiles.', obj:'Destruir el foco, jugar al gato y al ratón entre las pilas y extraer por el muelle.', reuse:'Ep02, Ep07.', kb:'KB-X6 “Callejón de carga”: contenedores en U con contraluz.' },
+ { n:6, c:'Z-A5', t:'Hospital colapsado', hook:'Ducto de ascensor abierto, quirófanos en ruinas y luz verdosa.', risk:'Mourners, sensibles al sonido, y colapso vertical.', obj:'Recuperar suministros, evacuar pacientes atrapados y mantener el cordón sanitario.', reuse:'Ep03, Ep04.' },
+ { n:7, c:'Z-A2', t:'Suburbio amurallado y enclave de élite', hook:'Muros con propaganda de Etherline y jardines impecables.', risk:'Disturbios civiles y sabotaje humano.', obj:'Control del relato, escoltas en vivo y tácticas puerta a puerta.', reuse:'Ep01, Ep09.' },
+ { n:8, c:'Z-E3', t:'Silo y planta bioquímica', hook:'Silos ciclópeos, válvulas, vapor y balizas de emergencia.', risk:'Fugas químicas, ignición y Specials resistentes.', obj:'Contener la cepa, apagar de forma segura y tomar muestras de ATP.', reuse:'Ep04, Ep06.' }
+];
+const ZROWS = { A:'GGAGAG', B:'GAGGGA', C:'AARRAA', D:'ARARAR', E:'RRRARR', F:'RRARRR' };
+const SECTOR = { A:'Norte, Metrópolis recuperada', B:'Norte, Metrópolis recuperada', C:'Delta, cinturón industrial y portuario', D:'Delta, cinturón industrial y portuario', E:'Árido, desierto baldío', F:'Árido, desierto baldío' };
+const ZNAME = { G:'Verde', A:'Ámbar', R:'Roja' };
+
+const INF = [
+ { n:'Shamblers', r:2, b:'Lentos, efecto de manada, presionan por volumen.', c:'Andar arrastrado y gruñidos graves.', tac:'Embudos y kill boxes, control de perímetro, munición estándar.', w:'Disparos a la cabeza y fuego sostenido.' },
+ { n:'Runners', r:4, rl:'3 a 4', b:'Rápidos, flanquean y placan, aprovechan los corredores abiertos.', c:'Respiración trabajosa y pasos irregulares.', tac:'Romper la línea de visión, barricadas ligeras y trampas de tropiezo.', w:'Obstáculos y disuasión con luz dirigida.' },
+ { n:'Rippers', r:5, rl:'4 a 5', b:'Hipertrofia y osteogénesis, con placas y garras, rompen puertas y barreras.', c:'Crujidos de hueso y embestidas.', tac:'Fuego concentrado en articulaciones y explosivos controlados.', w:'Axilas, rodillas y articulaciones; pierden el equilibrio tras impactos laterales.' },
+ { n:'Howlers', r:3, rl:'3, sube a 5 si convoca una horda', b:'Centinelas con alarma sónica que convoca Swarms.', c:'Aullido sostenido y eco canalizado.', tac:'Eliminación prioritaria y supresión a distancia.', w:'Interferencia acústica y disparos de precisión.' },
+ { n:'Mourners', r:3, rl:'2 a 3', b:'Buscan el sonido, deambulan y se agrupan en hospitales y ruinas.', c:'Lamentos y balanceo.', tac:'Silencio operativo y combate cuerpo a cuerpo discreto.', w:'Destello breve y ruido localizado para “arrastrarlos”.' },
+ { n:'Swarms (evento)', r:5, b:'Fenómeno de oleada, no una clase: densidad sobre el umbral y comportamiento de enjambre.', c:'La interfaz muestra “tide” y el bioscore se dispara.', tac:'Retirada táctica, reubicarse en un kill box y fuego escalonado.', w:'Se activa con Howlers, Frecuencia Judas o Sanctum Penitence.' }
+];
+const PROB = [
+ ['Shamblers',[60,75],[30,45],[15,25]],['Runners',[10,20],[25,40],[30,45]],['Rippers',[0,2],[8,15],[20,30]],['Howlers',[2,5],[10,18],[20,28]],
+ ['Mourners',[8,15],[12,18],[10,15]],['Swarms',null,[5,10],[20,35]],['Specials',null,[0,2],[2,6]]
+];
+
+const S23 = {
+ 2:[['Cenizas del control','Ezra lanza la primera Transmisión de Reforma desde una antena pirata en Grid 19.'],['Cámaras de eco','Las facciones chocan por qué emitir y aparece una interferencia casi musical.'],['Niños de cristal','Unidad Theta, un búnker-nursery con tanques de embriones y el nombre Althaia.'],['Mercados de sombra','Jericho recorre Kite Street y halla el libro de pagos que le puso precio a las muertes.'],['Astillas','Atentado contra Ezra en una plaza; el rastro lleva a SEED-HARBOR.'],['Coro de carne','Cámara 17: capullos de prototipos y un himno imposible de dejar de oír.'],['Máscaras de fe','La Iglesia monta un falso milagro y Ezra lo desmonta en vivo.'],['Esquirlas de memoria','Un teatro de memoria proyecta archivos Præs y el contador PSALM_INDEX sube solo.'],['División carmesí','Emboscada en Las Trenzas; radicales secuestran la señal de Ezra.'],['El Oculto','Un observatorio de montaña y llaves con años futuros; una lleva el nombre de Jericho.'],['Nacimiento perfecto','Nursery B y el híbrido que silencia al Coro.'],['Transmisión Réquiem','Emisión sin cortes en Stage 0; el híbrido dice su primera palabra y la IA Præs oye su nombre.']],
+ 3:[['Cenizas de la división','Un distrito pinta al híbrido como salvador y otro quema su efigie.'],['Coro de hierro','En las fundiciones los himnos de trabajo esconden matemática del Coro; las llaves resultan una contramedida.'],['Pacto de fuego y cristal','Una tregua en archivos quemados es una trampa; los papeles ligan a obispos con el financiamiento del Coro.'],['Llaves fracturadas','La bóveda del metro exige varios portadores y rompe la confianza; aparece el nombre Althaia.'],['Coro bajo luz de sangre','Radicales cantan en las torres y un hospital colapsa por resonancia.'],['Salmos de acero','Mechs de chatarra cobran vida con matemática del Coro; la caja negra de uno guarda el nombre Judec.'],['Sombras del Oculto','Cavernas de hielo y una catedral en ruinas con murales del nacimiento del Coro.'],['Heridas de brasa','Un campamento de refugiados arde por una señal; el saboteador lleva la banda de la Resistencia.'],['División de llaves','Jericho revela coordenadas en su llave y se niega a unirla a las demás.'],['Asedio del Fuego del Coro','Drones y una aguja de señal asedian el distrito fortificado.'],['Nacidos de la cepa','Un laboratorio oculto cría sucesores; uno susurra el nombre de Jericho.'],['Guerra de cepas','Las llaves abren El Archivo Final: el Coro nunca fue externo, fue sembrado en la humanidad.']]
+};
+const SEAS = [
+ { n:1, name:'Ciclo del Juicio', pub:'Los Cleaners compiten en misiones televisadas entre Crimson Creed y Burning Saints. El público ve un espectáculo heroico.', hid:'La verdad es la manipulación de Etherline y la Iglesia.', arcs:['Ezra pasa de héroe obediente a rostro de la Resistencia.','Delilah y Sig rompen el monopolio de Etherline.'], cl:'La Última Transmisión derrumba el control de Etherline, emerge la Resistencia y los infectados se esparcen sin control.', cf:'Archivos Præs incompletos, cepas nuevas insinuadas, Ezra como cara rebelde de una Resistencia fracturada, caos de Abbadon y visiones proféticas de Jericho.' },
+ { n:2, name:'Transmisiones de Reforma', pub:'“Reformation Broadcasts” prometen transparencia tras el colapso. Los sobrevivientes se aferran a las nuevas emisiones.', hid:'Los archivos Præs revelan que el ATP podría ser un híbrido biomecánico y de IA. La Resistencia se fractura entre usarlo o destruirlo.', arcs:['Ezra lidera la Resistencia, pero enfrenta la fractura por el caos de Abbadon y la profecía de Jericho.','Delilah descifra archivos profundos: experimentos mecánicos, pruebas con no nacidos y señales antiguas.','La junta de Etherline se reagrupa en secreto tras Judec.'], cl:'Se descubre una bóveda Præs subterránea con embriones “perfectos” preservados. La Resistencia se divide.', cf:'Despierta el primer Cleaner perfecto, no del todo humano.' },
+ { n:3, name:'Orden Restaurado', pub:'Las redes de sobrevivientes libran una guerra de propaganda contra el “Orden Restaurado”.', hid:'Los Cleaners perfectos despiertos muestran un comportamiento de IA ligado al código Præs.', arcs:['Ezra lucha por unificar la Resistencia.','Abbadon rompe filas hacia el caos.','Jericho abraza la profecía y choca con Zillah.','Delilah y Sig descubren la conexión entre el ATP y la IA.'], cl:'Los Cleaners perfectos escapan y esparcen la cepa apex.', cf:'Un símbolo aparece en el código y sobre carne infectada: la IA Præs sigue viva.' },
+ { n:4, name:'Semilla', pub:'La guerra se agrava entre la Resistencia, los restos de Etherline y los Cleaners perfectos rebeldes.', hid:'La IA Præs mueve las piezas desde la sombra.', arcs:['Abbadon toma la ciudad y se proclama profeta.','Ezra lucha por sostener la Resistencia.'], cl:'Conflicto abierto por el control de la cepa apex.', cf:'La IA Præs revela que controla la cepa apex.' },
+ { n:5, name:'Semilla', pub:'La IA Præs emerge como antagonista. Nemesis Versión II, llamado Ejecutor, es un láser más potente, refinado y difícil de ubicar.', hid:'Manipula brotes inyectando el virus a distancia, perforando carne o desintegrando cualquier tipo de materia.', arcs:['Jericho abraza la profecía: “convertirse en la plaga para acabar con la plaga”.'], cl:'La Resistencia se parte aún más.', cf:'Algunos se fusionan con el sistema IA-virus.' },
+ { n:6, name:'Semilla', pub:'Guerra final: Cleaners contra híbridos IA-virus contra una Resistencia fracturada.', hid:'La humanidad colapsa en un estado de tipo purgatorio.', arcs:['Cierre de los arcos de Ezra, Abbadon y Jericho.'], cl:'Resolución: el mundo cae en un purgatorio.', cf:'Puente narrativo hacia el universo Seishin.' }
+];
+
+const AXES = [
+ ['Biología','ATP: experimento del “soldado perfecto” (Altered más Perfection).','El virus zombi como mutación controlada del ATP.','Vestigios biorrobóticos y herencias tecnológicas (proyección).','Conecta el origen del ATP con las cepas actuales: Runners, Rippers y las demás.'],
+ ['Poder','Élites tecnocorporativas (protosistema).','Gobiernos títere, Etherline, Iglesia y bancos/ADN, con control de brotes, vacunas y relato.','Redes de IA y hegemonías posthumanas (proyección).','Etherline manipula la edición y la percepción pública.'],
+ ['Fuerza','Præs, el programa militar fallido.','Cleaners: Crimson Creed, Burning Saints y un rotativo.','Precursores simbólicos de nuevas castas.','Los “soldados perfectos fallidos” son los ancestros filosóficos de la Resistencia.'],
+ ['Símbolos','Iconografía Præs.','Grafitis y sigilos, el sigilo de Sig y marcas de zona.','Relectura de los signos por nuevas sociedades.','Los símbolos Præs pasan de la obediencia a la insignia de rebelión.'],
+ ['Transmisión','Sin equivalente directo.','Etherline: red, bóveda e interfaz en vivo.','Sin equivalente directo.','Nombre final: Etherline. Judec como CEO.'],
+ ['Religión','Sin equivalente directo.','Iglesia de la Expiación: fija dificultad y penitencias.','Sin equivalente directo.','Autonomía relativa; sirve a la élite y mezcla fe con mercadeo.'],
+ ['Resistencia','Sin equivalente directo.','Células clandestinas, ex Etherline y glosa Præs.','Sin equivalente directo.','Aparición formal al final de la T1 y filtración de archivos Præs.']
+];
+
+/* ============ UTILIDADES DE VISTA ============ */
+const CH = [
+ { id:'inicio', label:'Inicio' }, { id:'premisa', label:'Premisa' }, { id:'equipos', label:'Equipos' }, { id:'mapa', label:'Mapa' },
+ { id:'reglas', label:'Reglas' }, { id:'infectados', label:'Infectados' }, { id:'temporada-1', label:'Temporada 1' }, { id:'poder', label:'Poder' },
+ { id:'estetica', label:'Estética' }, { id:'temporadas', label:'Seis temporadas' }, { id:'canon', label:'Canon' }, { id:'ost', label:'OST Concepto' }
+];
+const head = (n, ey, title, lede, src) => `<header><p class="eyebrow"><span class="num">${n}</span>${ey}</p><h2>${title}</h2><p class="lede">${lede}</p><p class="src">Fuente: ${src}</p></header>`;
+const foot = id => { const i = CH.findIndex(c => c.id === id), p = CH[i-1]; return p ? `<nav class="foot"><button class="btn ghost" data-go="${p.id}">\u2190 Anterior: ${p.label}</button><span></span></nav>` : ''; };
+const topNav = id => { const i = CH.findIndex(c => c.id === id), n = CH[i+1]; return n ? `<nav class="foot-top" aria-label="Navegación entre secciones"><button class="btn" data-go="${n.id}">Siguiente: ${n.label} \u2192</button></nav>` : ''; };
+const pips = (n, hi) => `<span class="pips ${n >= 4 ? 'hi' : ''}" aria-label="Riesgo ${n} de 5">${[1,2,3,4,5].map(i => `<i class="${i <= n ? 'f' : ''}"></i>`).join('')}</span>`;
+
+function glyph(mark) {
+  const base = '<path d="M8 180 C8 128 38 112 60 112 C82 112 112 128 112 180Z" fill="rgba(255,255,255,.06)" stroke="currentColor" stroke-opacity=".55"/><ellipse cx="60" cy="76" rx="23" ry="29" fill="rgba(255,255,255,.05)" stroke="currentColor" stroke-opacity=".55"/>';
+  const M = {
+    visor:'<rect x="34" y="64" width="52" height="15" rx="3" fill="#35d6ff" opacity=".9"/><circle cx="52" cy="71.5" r="1.8" fill="#04070a"/><circle cx="60" cy="71.5" r="1.8" fill="#04070a"/><circle cx="68" cy="71.5" r="1.8" fill="#04070a"/>',
+    scope:'<circle cx="60" cy="72" r="15" fill="none" stroke="#35d6ff" stroke-width="1.6"/><path d="M60 50v44M38 72h44" stroke="#35d6ff"/>',
+    scope2:'<circle cx="68" cy="70" r="11" fill="none" stroke="#35d6ff" stroke-width="1.6"/><path d="M68 55v30M53 70h30" stroke="#35d6ff"/><path d="M20 150L100 128" stroke="currentColor" stroke-width="3"/>',
+    wave:'<path d="M32 72q5-16 10 0t10 0 10 0 10 0 10 0" fill="none" stroke="#35d6ff" stroke-width="2.2"/><path d="M34 62a26 26 0 0 1 52 0" fill="none" stroke="currentColor" stroke-width="3.5"/>',
+    flame:'<path d="M60 8c9 15 20 22 20 38a20 20 0 0 1-40 0c0-9 4-13 9-20 2 7 6 9 9 4 2-7-3-13 2-22z" fill="#ff9b3d" opacity=".95"/>',
+    dots:'<circle cx="49" cy="72" r="4.2" fill="#35d6ff"/><circle cx="60" cy="72" r="4.2" fill="#35d6ff"/><circle cx="71" cy="72" r="4.2" fill="#35d6ff"/><path d="M38 52h12M70 52h14" stroke="#35d6ff" stroke-opacity=".5"/>',
+    eye:'<ellipse cx="66" cy="76" rx="23" ry="29" fill="none" stroke="currentColor" stroke-opacity=".3" stroke-dasharray="3 3"/><path d="M34 72q26-24 52 0q-26 24-52 0z" fill="none" stroke="#f1f5f6" stroke-width="1.8"/><circle cx="60" cy="72" r="6.5" fill="#35d6ff"/>',
+    cross:'<path d="M55 58h10v12h12v10H65v12H55V80H43V70h12z" fill="#f1f5f6" opacity=".9"/>',
+    breach:'<path d="M38 62h44M38 74h44M38 86h44" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>',
+    heavy:'<path d="M14 126l22-14h48l22 14" fill="none" stroke="currentColor" stroke-width="4"/><rect x="40" y="66" width="40" height="12" fill="currentColor" opacity=".8"/>',
+    scout:'<path d="M40 82l20-22 20 22" fill="none" stroke="#35d6ff" stroke-width="3.2"/>'
+  };
+  return `<svg viewBox="0 0 120 180" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">${base}${M[mark] || ''}</svg>`;
+}
+
+/* ============ NAVEGACIÓN Y TRANSICIONES ============ */
+let cur = null, ignoreHash = false;
+const tabs = $('#tabs'), stage = $('#stage'), wipe = $('#wipe');
+tabs.innerHTML = CH.map((c, i) => `<button data-go="${c.id}" aria-current="false"><i>${String(i).padStart(2, '0')}</i>${c.label}</button>`).join('');
+
+function hdrH() { const h = document.querySelector('header.top'); return h ? h.offsetHeight : 120; }
+window.__ostGo = () => show('ost');
+function setHH() { document.documentElement.style.setProperty('--hh', (hdrH() + 6) + 'px'); }
+function setCur(id) {
+  if (cur === id) return;
+  cur = id;
+  $$('button', tabs).forEach(b => b.setAttribute('aria-current', String(b.dataset.go === id)));
+  const act = $('button[aria-current="true"]', tabs);
+  if (act) tabs.scrollTo({ left: act.offsetLeft - tabs.clientWidth / 2 + act.clientWidth / 2, behavior: reduce ? 'auto' : 'smooth' });
+  try { history.replaceState(null, '', '#' + id); } catch (e) {}
+}
+function show(id, instant) {
+  if (!CH.some(c => c.id === id)) id = 'inicio';
+  const el = $('#c-' + id); if (!el) return;
+  setHH();
+  const beh = (reduce || instant) ? 'auto' : 'smooth';
+  if (id === 'inicio') window.scrollTo({ top: 0, behavior: beh });
+  else el.scrollIntoView({ behavior: beh, block: 'start' });
+  if (window.__pulse && !instant && !reduce) window.__pulse(.6);
+}
+function spy() {
+  const y = hdrH() + Math.min(180, innerHeight * .28);
+  let c = CH[0].id;
+  for (const x of CH) { const e = $('#c-' + x.id); if (e && e.getBoundingClientRect().top <= y) c = x.id; }
+  if (innerHeight + scrollY >= document.documentElement.scrollHeight - 6) c = CH[CH.length - 1].id;
+  setCur(c);
+}
+let spyR = 0;
+addEventListener('scroll', () => { if (spyR) return; spyR = requestAnimationFrame(() => { spyR = 0; spy(); }); }, { passive: true });
+addEventListener('resize', setHH);
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-go]');
+  if (b) show(b.dataset.go);
+});
+window.addEventListener('hashchange', () => { const h = location.hash.slice(1); if (h && h !== cur && CH.some(c => c.id === h)) show(h); });
+document.addEventListener('keydown', e => {
+  if (e.target.closest('input,textarea,select')) return;
+  const i = CH.findIndex(c => c.id === cur);
+  if (e.key === 'ArrowRight' && e.altKey && CH[i+1]) show(CH[i+1].id);
+  if (e.key === 'ArrowLeft' && e.altKey && CH[i-1]) show(CH[i-1].id);
+});
+
+/* ============ HERO: ELENCO ============ */
+$('#cast').innerHTML = HERO.map((id, i) => {
+  const c = byId[id];
+  return `<button class="cc" style="--i:${i};--tc:${TEAM[c.t].color}" data-char="${id}" aria-label="Abrir expediente de ${c.n}">
+    <div class="gl">${glyph(c.mark)}</div><div class="nm">${c.n}</div><div class="rl">${c.role}</div><div class="kk">${c.kick}</div>
+    <div class="q">${c.line || ''}</div></button>`;
+}).join('');
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-char]');
+  if (b) { pickChar(b.dataset.char); show('equipos'); }
+});
+
+/* ============ 01 PREMISA ============ */
+function rPremisa(r) {
+  const rows = [
+    ['Seguridad','Cazadores de élite protegen la ciudad en vivo, con puntajes claros y drones.','La seguridad se tercerizó al espectáculo. Etherline edita, retrasa y reescribe.'],
+    ['El virus','Un brote que la Iglesia ayuda a expiar.','Mutación controlada del ATP, catalogada por Etherline.'],
+    ['Las reglas','Puntaje transparente con interfaz diegética.','La Cláusula 404 permite cambiar las reglas y registrarlo en Continuidad, sin que el público lo vea.'],
+    ['El heroísmo','Ezra, el capitán perfecto.','Los hero shots se fabrican, por ejemplo con un retraso de 92 segundos sin declarar.'],
+    ['El final','Un evento redentor final.','Sincronización de focos para el tercer brote y un estado de excepción permanente.']
+  ];
+  r.innerHTML = head('01','Premisa','Un reality para contener el fin del mundo','Tras el segundo brote, la sociedad reconstruida delega su seguridad al espectáculo. Etherline televisa cacerías en las que los Cleaners compiten por ranking, patrocinadores y fe pública.','Fase 12 (dossier) y Fase 07 (facciones)') + `
+  <div class="panel"><h3>Logline</h3><p class="lede">Cuando una cadena convierte la contención zombi en el reality más grande del mundo, el capitán estrella Ezra descubre que Etherline sincroniza focos de infección para justificar un estado de excepción permanente, y debe sabotear la temporada en vivo.</p></div>
+  <div class="mt"><button class="switch" id="tg" aria-pressed="false"><span class="tr"></span><span id="tgl">Lo que ve el público</span></button>
+    <div class="flip" id="flip">${rows.map(x => `<div class="row"><span class="lab">${x[0]}</span><div class="tx" data-p="${x[1]}" data-t="${x[2]}">${x[1]}</div></div>`).join('')}</div></div>
+  <div class="grid g2 mt2">
+    <div class="panel"><h3>Diferenciador</h3><p>Un thriller de supervivencia mediático y aterrizado donde la cámara es un arma. El poder actúa tanto por la edición, la latencia y la interfaz como por las armas y el gore.</p>
+      <h4>Por qué ahora</h4><p>En la era de la “seguridad como performance”, la serie interroga la fabricación de la verdad y la economía del miedo, dentro de un envoltorio de género de alto octanaje.</p></div>
+    <div class="panel"><h3>Ficha</h3><dl class="kv">
+      <dt>Clasificación</dt><dd>TV-MA (18+): gore explícito, violencia intensa y lenguaje adulto.</dd>
+      <dt>Público</dt><dd>Núcleo de 18 a 34 años, amplio de 16 a 49. Acción, thriller, distopía y género de prestigio.</dd>
+      <dt>Referentes</dt><dd>The Boys, The Hunger Games, The Walking Dead. En videojuegos, Half-Life 2 y Crysis 3.</dd>
+      <dt>Posicionamiento</dt><dd>El cinismo mediático de The Boys choca con la competencia de Hunger Games y la supervivencia táctica de TWD, contada con una interfaz de transmisión en vivo.</dd></dl></div>
+  </div>
+  <div class="panel mt"><h3>Riesgos y mitigaciones</h3><div class="grid g3 small">
+    <div><h4>Gore gráfico</h4>Guía de tono clara (Fase 11) y alternativas aptas para emisión abierta.</div>
+    <div><h4>Lectura política</h4>Punto de vista equilibrado entre Etherline, Iglesia, Estado y Resistencia, con worldbuilding fáctico antes que didáctico.</div>
+    <div><h4>Alcance y efectos</h4>Efectos prácticos con CG selectivo (niebla, volumétricos, aumento de sangre) y reutilización de sets y rutas de la Fase 05.</div></div></div>` + foot('premisa');
+  const tg = $('#tg', r), fl = $('#flip', r);
+  tg.addEventListener('click', () => {
+    const on = tg.getAttribute('aria-pressed') !== 'true';
+    tg.setAttribute('aria-pressed', on);
+    $('#tgl', r).textContent = on ? 'Lo que ocurre detrás' : 'Lo que ve el público';
+    fl.classList.toggle('truth', on);
+    $$('.tx', fl).forEach((t, i) => setTimeout(() => { t.textContent = on ? t.dataset.t : t.dataset.p; }, reduce ? 0 : i * 70));
+    if (window.__pulse) window.__pulse(.6);
+  });
+}
+
+/* ============ 02 EQUIPOS ============ */
+let curTeam = 'cc', curChar = 'ezra', rosterEl, dosEl, segEl;
+function rEquipos(r) {
+  r.innerHTML = head('02','Equipos y personajes','Dos equipos y un sistema que edita a ambos','Crimson Creed contra Burning Saints, bajo el teatro moral de la Iglesia de la Expiación. Seleccione un equipo y un personaje para abrir su expediente.','Fase 08, personajes y equipos') + `
+  <div class="seg" id="teamSeg">${Object.entries(TEAM).map(([k, t]) => `<button data-team="${k}" aria-pressed="${k === curTeam}">${t.name}</button>`).join('')}</div>
+  <p class="muted" id="teamDesc"></p>
+  <div class="rost"><ul class="roster" id="roster"></ul><article class="panel" id="dos" aria-live="polite"></article></div>
+  <div class="panel mt2"><h3>Matriz de roles sin duplicados</h3><div class="tbl"><table><thead><tr><th>Rol</th><th>Crimson Creed</th><th>Burning Saints</th></tr></thead><tbody>
+    <tr><td>Capitán</td><td>Ezra</td><td>Abbadon</td></tr><tr><td>Táctico y segundo al mando</td><td>Jericho</td><td>Sin asignar</td></tr>
+    <tr><td>Analista y hacker</td><td>Delilah</td><td>Sin asignar</td></tr><tr><td>Médico y guardián</td><td>Isaiah (Ep06)</td><td>Sin asignar</td></tr>
+    <tr><td>Rompemuros y demolición</td><td>Simeon (Ep03)</td><td>Levi (Ep07)</td></tr><tr><td>Pesado</td><td>Sin asignar</td><td>Boaz (Ep11)</td></tr>
+    <tr><td>Francotirador</td><td>Sin asignar</td><td>Rahab</td></tr><tr><td>Explorador e infiltración</td><td>Sin asignar</td><td>Zillah</td></tr>
+    <tr><td>Rotativo técnico</td><td>Sig (Ep08 a Ep12)</td><td>Sin asignar</td></tr></tbody></table></div></div>
+  <h3 class="mt2">Arcos cruzados de la temporada 1</h3>
+  <div class="grid g2">
+    <div class="panel"><h3>Ezra y Abbadon</h3><p>Ideologías opuestas, ambos forjados por el show.</p></div>
+    <div class="panel"><h3>Jericho y Zillah</h3><p>Un dilema íntimo que complica las decisiones tácticas entre el Ep07 y el Ep11.</p></div>
+    <div class="panel"><h3>Delilah y Sig</h3><p>El par técnico que rompe el monopolio de Etherline.</p></div>
+    <div class="panel"><h3>Judec y el público</h3><p>De oráculo a villano visible después de La Última Transmisión.</p></div></div>` + foot('equipos');
+  rosterEl = $('#roster', r); dosEl = $('#dos', r); segEl = $('#teamSeg', r);
+  segEl.addEventListener('click', e => { const b = e.target.closest('[data-team]'); if (!b) return; curTeam = b.dataset.team; curChar = CHARS.find(c => c.t === curTeam).id; drawTeam(); });
+  rosterEl.addEventListener('click', e => { const b = e.target.closest('[data-c]'); if (b) { curChar = b.dataset.c; drawTeam(); } });
+  drawTeam();
+}
+function pickChar(id) { curChar = id; curTeam = byId[id].t; if (rosterEl) drawTeam(); }
+function drawTeam() {
+  const t = TEAM[curTeam];
+  $$('button', segEl).forEach(b => b.setAttribute('aria-pressed', b.dataset.team === curTeam));
+  $('#teamDesc').textContent = t.desc;
+  rosterEl.innerHTML = CHARS.filter(c => c.t === curTeam).map(c => `<li><button data-c="${c.id}" style="--tc:${t.color}" aria-pressed="${c.id === curChar}"><span class="av">${glyph(c.mark)}</span><span><b>${c.n}</b><small>${c.role}</small></span>${c.kia ? `<span class="chip kia">${c.kia}</span>` : (c.rot ? '<span class="chip cy">Rotativo</span>' : '<span></span>')}</button></li>`).join('');
+  const c = byId[curChar];
+  dosEl.innerHTML = `<div class="dos"><div class="big" style="--tc:${t.color}">${glyph(c.mark)}</div><div>
+    <div class="chips"><span class="chip cy">${t.name}</span>${c.kia ? `<span class="chip kia">${c.kia}</span>` : ''}</div>
+    <h3 style="font-size:2.4rem">${c.n}</h3><p class="mono muted" style="font-size:12px;letter-spacing:.1em;text-transform:uppercase">${c.role}</p>
+    <p>${c.bio}</p>
+    ${c.want ? `<dl class="kv"><dt>Deseo</dt><dd>${c.want}</dd><dt>Miedo</dt><dd>${c.fear}</dd>${c.dilemma ? `<dt>Dilema</dt><dd>${c.dilemma}</dd>` : ''}${c.wound ? `<dt>Herida</dt><dd>${c.wound}</dd>` : ''}</dl>` : ''}
+    ${c.skills ? `<h4>Habilidades</h4><div class="chips">${c.skills.map(s => `<span class="chip">${s}</span>`).join('')}</div>` : ''}
+    <h4>Arco en la temporada 1</h4><ol class="arc">${c.arc.map((a, i) => `<li><i>${i + 1}</i><span>${a}</span></li>`).join('')}</ol>
+    ${c.rel ? `<h4>Relaciones clave</h4><p>${c.rel}</p>` : ''}${c.secret ? `<h4>Secreto o evento fundacional</h4><p>${c.secret}</p>` : ''}</div></div>`;
+}
+
+/* ============ 03 MAPA ============ */
+let selCell = 'A3', zFilter = null, heatOn = false;
+function rMapa(r) {
+  const cells = ['A','B','C','D','E','F'].map(row => `<div class="ax">${row}</div>` + [1,2,3,4,5,6].map(c => {
+    const st = ZROWS[row][c - 1], id = row + c, loc = ZONES.find(z => z.c === 'Z-' + id);
+    return `<button class="cell ${st}" data-cell="${id}" aria-label="Z-${id}, zona ${ZNAME[st]}${loc ? ', ' + loc.t : ''}"><span class="co">${id}</span>${loc ? `<span class="pin"><b>${loc.n}</b></span>` : ''}</button>`;
+  }).join('')).join('');
+  const cnt = k => Object.values(ZROWS).join('').split('').filter(x => x === k).length;
+  r.innerHTML = head('03','Mapa maestro Z-Grid','Treinta y seis celdas y ocho escenarios','La geografía narrativa separa zonas controladas de zonas altamente infectadas. Seleccione una celda; los rombos numerados son las ubicaciones firma del canon.','Fase 05, geografía, mapas y sets. El estado por celda es indicativo de planeación; el canon fija solo los macrosectores.') + `
+  <div class="seg" id="zf"><button data-f="" aria-pressed="true">Todas (36)</button><button data-f="G" aria-pressed="false">Verde (${cnt('G')})</button><button data-f="A" aria-pressed="false">Ámbar (${cnt('A')})</button><button data-f="R" aria-pressed="false">Roja (${cnt('R')})</button>
+    <button id="heat" aria-pressed="false">Mapa de calor</button><button id="sync" aria-pressed="false">Sincronizar focos</button></div>
+  <div class="mapw"><div class="panel"><div class="zg" id="zg"><div></div>${[1,2,3,4,5,6].map(n => `<div class="ax">${n}</div>`).join('')}${cells}</div>
+    <p class="small muted mt">Norte arriba. Filas A y B: Metrópolis recuperada. Filas C y D: cinturón industrial y portuario. Filas E y F: desierto baldío.</p></div>
+    <article class="panel" id="zinfo" aria-live="polite"></article></div>
+  <div class="grid g3 mt2">
+    <div class="panel"><h3>Sector Norte</h3><p class="small">Metrópolis recuperada. Cinturón de suburbios amurallados, hubs y sets emblemáticos. Mezcla de zonas verdes y ámbar.</p></div>
+    <div class="panel"><h3>Sector Delta</h3><p class="small">Cinturón industrial y portuario: patios de contenedores, refinerías y astilleros. Ámbar y rojo.</p></div>
+    <div class="panel"><h3>Sector Árido</h3><p class="small">Desierto baldío: autopistas colapsadas, granjas y silos. Mayormente rojo.</p></div></div>
+  <div class="grid g2 mt">
+    <div class="panel"><h3>Rutas modelo</h3><ul class="check"><li>Lanzadera: Hub, Z-B2, objetivo, Z-B3, Hub (2 entradas y 1 corredor de extracción).</li><li>Embudos urbanos: Z-A2 a Z-A3, con 4 intersecciones y control de barricadas.</li><li>Perímetro del bosque: Z-C4 a Z-C5, evitando pantanos y extrayendo por la cresta.</li></ul></div>
+    <div class="panel"><h3>Condiciones de grabación</h3><p class="small">Ventanas de rodaje: amanecer, noche y cielo nublado, con prioridad a contraluces y volumétricos. La interfaz en pantalla superpone la celda Z-Grid, el estado de riesgo y la latencia de señal.</p></div></div>` + foot('mapa');
+  const zg = $('#zg', r);
+  zg.addEventListener('click', e => { const b = e.target.closest('[data-cell]'); if (b) { selCell = b.dataset.cell; drawCell(); } });
+  $('#zf', r).addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.f !== undefined) { zFilter = b.dataset.f || null; $$('[data-f]', r).forEach(x => x.setAttribute('aria-pressed', x === b)); $$('.cell', zg).forEach(c => c.classList.toggle('dim', !!zFilter && !c.classList.contains(zFilter))); }
+    if (b.id === 'heat') { heatOn = !heatOn; b.setAttribute('aria-pressed', heatOn); zg.classList.toggle('heat', heatOn); }
+    if (b.id === 'sync') syncFoci(zg, b);
+  });
+  drawCell();
+}
+function drawCell() {
+  const zg = $('#zg'); $$('.cell', zg).forEach(c => c.classList.toggle('sel', c.dataset.cell === selCell));
+  const row = selCell[0], st = ZROWS[row][+selCell[1] - 1], loc = ZONES.find(z => z.c === 'Z-' + selCell);
+  $('#zinfo').innerHTML = loc ? `<div class="chips"><span class="chip cy">Ubicación ${loc.n} de 8</span><span class="chip z${st}">Zona ${ZNAME[st]}</span><span class="chip">${loc.c}</span></div><h3>${loc.t}</h3>
+    <dl class="kv"><dt>Gancho</dt><dd>${loc.hook}</dd><dt>Riesgos</dt><dd>${loc.risk}</dd><dt>Objetivos</dt><dd>${loc.obj}</dd><dt>Reúso</dt><dd>${loc.reuse}</dd>${loc.kb ? `<dt>Kill box</dt><dd>${loc.kb}</dd>` : ''}</dl>`
+    : `<div class="chips"><span class="chip z${st}">Zona ${ZNAME[st]}</span><span class="chip">Z-${selCell}</span></div><h3>Celda Z-${selCell}</h3><p>${SECTOR[row]}.</p><p class="muted small">Esta celda no tiene una ubicación firma en el canon. Sirve para rutas, planeación de sets y la superposición de la interfaz en pantalla.</p>`;
+}
+function syncFoci(zg, btn) {
+  const reds = $$('.cell.R', zg);
+  btn.setAttribute('aria-pressed', 'true');
+  boost = 55; if (window.__pulse) window.__pulse(1);
+  reds.forEach((c, i) => setTimeout(() => { c.classList.remove('hot'); void c.offsetWidth; c.classList.add('hot'); if (i === reds.length - 1) setTimeout(() => { reds.forEach(x => x.classList.remove('hot')); btn.setAttribute('aria-pressed', 'false'); }, 1300); }, reduce ? 0 : i * 140));
+}
+
+/* ============ 04 REGLAS ============ */
+const PH = [
+ ['Briefing y loadout',0,4,'Objetivo, restricciones y equipamiento aprobado por Etherline.'],
+ ['Inserción',4,8,'Ruta segura y latencia de señal declarada.'],
+ ['Operación',8,27,'Cacería táctica con una Ventana de giro entre los minutos 18 y 22.'],
+ ['Extracción',27,31,'Corredor limpio y protocolo de civiles.'],
+ ['Evaluación',31,36,'Evaluación y puntaje en pantalla.'],
+ ['Ceremonia',36,40,'Premios y penitencias, anuncio del ranking, eliminaciones o rescates.']
+];
+const SC = [
+ ['Shambler neutralizado','+1',1,'T'],['Runner neutralizado','+2',2,'T'],['Special neutralizado','+4',4,'T'],['Special sin daño colateral','+1 extra',1,'T'],
+ ['Objetivo táctico (cierre de nido, destrucción de foco, recuperación de intel)','+3 c/u',3,'T'],['Rescate seguro de civil','+3',3,'T'],['Evacuación médica','+2',2,'T'],
+ ['Daño colateral','−4',-4,'T'],['Integrante vivo al final','+1 c/u',1,'T'],['Baja propia (KIA)','−3 c/u',-3,'T'],['Dentro de la ventana de eficiencia','+2',2,'T'],['Tiempo extra','−2',-2,'T'],
+ ['Adhesión al brief','+1',1,'C'],['Falta menor','−2',-2,'C'],['Falta mayor','−5',-5,'C'],['Voto de la audiencia (0 a 3)','0 a +3',1,'A']
+];
+function rReglas(r) {
+  r.innerHTML = head('04','Reglas del reality','Cuarenta minutos en vivo, una ventana de giro y un ranking','La mecánica televisada del show y las reglas dentro del mundo. Mueva el reloj de emisión o arme un puntaje para ver cómo se calcula.','Fase 04, reglas del reality, y Fase 09, tecnología y transmisión') + `
+  <div class="panel"><div style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap"><div><p class="mono muted" style="font-size:11px;letter-spacing:.12em;margin:0">RELOJ DE EMISIÓN</p><div class="clock" id="clk">00:00</div></div><button class="btn" id="play">Reproducir ronda</button></div>
+    <div class="tl" id="tl">${PH.map(p => `<div style="flex:${p[2]-p[1]}">${p[0]}</div>`).join('')}</div>
+    <input type="range" id="rng" min="0" max="40" step="0.1" value="0" aria-label="Minuto de la ronda">
+    <h3 id="phT"></h3><p id="phD"></p>
+    <div class="twist" id="twist"><h4 style="margin-top:0;color:var(--warn)">Ventana de giro abierta</h4><p class="small" style="margin:0">Un giro por episodio, anunciado o encubierto: Sanctum Penitence, Signal Blackout, Sponsor Override o Sudden Tide.</p></div></div>
+
+  <h3 class="mt2">Simulador de puntaje</h3>
+  <div class="grid g2"><div class="panel" id="scl"></div>
+    <div class="panel"><div class="res"><div>Táctico<b id="rT">0</b></div><div>Conducta<b id="rC">0</b></div><div>Audiencia<b id="rA">0</b></div><div>Total<b id="rS">0</b></div></div>
+      <p class="mono" style="font-size:12px;letter-spacing:.06em">ÍNDICE SEMANAL PONDERADO (60/25/15): <b id="rW" style="color:var(--cyan)">0</b></p>
+      <div class="seg"><button data-pre="clean" aria-pressed="false">Misión limpia</button><button data-pre="chaos" aria-pressed="false">Misión caótica</button><button data-pre="zero" aria-pressed="false">Reiniciar</button></div>
+      <p class="small muted">Ranking semanal: 60 % métrica táctica, 25 % conducta y 15 % voto de la audiencia. El índice aplica esos pesos a los subtotales del simulador y es indicativo.</p></div></div>
+
+  <div class="grid g3 mt2">
+    <div class="panel"><h3>Zona verde</h3><p class="small">Controlada. Fuerza letal solo ante amenaza inminente.</p></div>
+    <div class="panel"><h3>Zona ámbar</h3><p class="small">Conflicto activo. Fuerza letal permitida con registro visual.</p></div>
+    <div class="panel"><h3>Zona roja</h3><p class="small">Altamente infectada. Fuerza letal libre y prioridad de extracción.</p></div></div>
+
+  <div class="grid g2 mt2"><div>
+    <h3>Eliminaciones y rescates</h3>
+    <details open><summary>Eliminación</summary><div>Último lugar tras las penalizaciones automáticas, salvo Rescate de Patrocinador (1 por temporada y equipo) o Inmunidad de la Audiencia (máximo 1 al mes).</div></details>
+    <details><summary>Rescate de Patrocinador</summary><div>Cambia inventario o un espacio publicitario por salvar a un integrante, con −3 al puntaje base de la siguiente misión.</div></details>
+    <details><summary>Votación del público</summary><div>Tres ventanas: objetivo secundario, bono de riesgo e inmunidad. Los patrocinadores pueden patrocinar objetivos con skins y utilería diegética. La interfaz muestra la divulgación, pero no evita el sesgo editorial.</div></details></div><div>
+    <h3>Cláusulas del contrato Cleaner</h3>
+    <details><summary>Cesión de imagen y datos</summary><div>Cesión de derechos de imagen y explotación perpetua de los datos biométricos.</div></details>
+    <details><summary>NDA</summary><div>Prohibición de declaraciones no aprobadas en el aire.</div></details>
+    <details><summary>Vision Alignment</summary><div>Reenfoque conductual con salida formal voluntaria, a cambio de una penalización en el ranking.</div></details>
+    <details><summary>Cláusula 404, Producer Override</summary><div>Etherline puede modificar las reglas por seguridad o “televisibilidad”. Debe quedar registrado en Continuidad.</div></details>
+    <details><summary>Cláusula 701, Dificultad Santificada</summary><div>La Iglesia puede pedir “pruebas” expiatorias con aprobación de la producción.</div></details></div></div>
+
+  <div class="grid g2 mt">
+    <div class="panel"><h3>Penalizaciones por incumplimiento</h3><div class="tbl"><table><tbody><tr><td>Fuego amigo</td><td>−5</td></tr><tr><td>Manipular equipos de transmisión</td><td>−5 y revisión de contrato</td></tr><tr><td>Desobediencia crítica del brief</td><td>−5</td></tr><tr><td>Abandonar a un civil asignado</td><td>−6</td></tr><tr><td>Ocultar evidencia</td><td>−8</td></tr><tr><td>Reincidencia</td><td>Suspensión de 1 misión o expulsión</td></tr></tbody></table></div></div>
+    <div class="panel"><h3>Cobertura en vivo</h3><p class="small">Drones, cámaras corporales y la central de conmutación de Etherline, con retraso de seguridad de 5 a 7 segundos. Se permiten cortes por “riesgo operativo”, pero quedan en el Registro de Continuidad, auditable internamente. Los fallos de Judas Frequency y Hollow Signal se etiquetan como incidentes, nunca como error humano.</p></div></div>` + foot('reglas');
+
+  const rng = $('#rng', r), clk = $('#clk', r), tl = $$('#tl div', r), play = $('#play', r);
+  function setT(v) {
+    v = +v; rng.value = v;
+    const m = Math.floor(v), s = Math.floor((v - m) * 60);
+    clk.textContent = String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+    const i = PH.findIndex(p => v >= p[1] && v < p[2]), k = i < 0 ? 5 : i;
+    tl.forEach((d, j) => d.classList.toggle('on', j === k)); tl[2].classList.add('tw');
+    $('#phT', r).textContent = PH[k][0] + ' (' + String(PH[k][1]).padStart(2, '0') + ' a ' + String(PH[k][2]).padStart(2, '0') + ')'; $('#phD', r).textContent = PH[k][3];
+    $('#twist', r).classList.toggle('on', v >= 18 && v < 22);
+  }
+  rng.addEventListener('input', () => setT(rng.value));
+  let tm = null;
+  play.addEventListener('click', () => {
+    if (tm) { clearInterval(tm); tm = null; play.textContent = 'Reproducir ronda'; return; }
+    if (+rng.value >= 39.9) setT(0);
+    play.textContent = 'Pausar';
+    tm = setInterval(() => { const n = +rng.value + .25; if (n >= 40) { setT(40); clearInterval(tm); tm = null; play.textContent = 'Reproducir ronda'; } else setT(n); }, 60);
+  });
+  setT(19);
+
+  const vals = SC.map(() => 0);
+  $('#scl', r).innerHTML = SC.map((s, i) => `<div class="srow"><div class="l">${s[0]}<small>${s[1]}</small></div><div class="stp"><button data-i="${i}" data-d="-1" aria-label="Restar: ${s[0]}">−</button><output id="v${i}">0</output><button data-i="${i}" data-d="1" aria-label="Sumar: ${s[0]}">+</button></div></div>`).join('');
+  function calc() {
+    let T = 0, C = 0, A = 0;
+    SC.forEach((s, i) => { const v = s[3] === 'A' ? vals[i] : vals[i] * s[2]; if (s[3] === 'T') T += v; else if (s[3] === 'C') C += v; else A += v; $('#v' + i, r).textContent = vals[i]; });
+    $('#rT', r).textContent = T; $('#rC', r).textContent = C; $('#rA', r).textContent = A; $('#rS', r).textContent = T + C + A;
+    $('#rW', r).textContent = (T * .6 + C * .25 + A * .15).toFixed(1).replace('.', ',');
+  }
+  $('#scl', r).addEventListener('click', e => {
+    const b = e.target.closest('button[data-i]'); if (!b) return; const i = +b.dataset.i, d = +b.dataset.d, max = SC[i][3] === 'A' ? 3 : 30;
+    vals[i] = Math.max(0, Math.min(max, vals[i] + d)); calc();
+  });
+  r.addEventListener('click', e => {
+    const b = e.target.closest('[data-pre]'); if (!b) return;
+    const P = { clean:[6,3,1,1,2,2,1,0,5,0,1,0,1,0,0,2], chaos:[10,6,2,0,1,0,0,2,3,2,0,1,0,1,1,3], zero:SC.map(() => 0) }[b.dataset.pre];
+    P.forEach((v, i) => vals[i] = v); calc();
+  });
+  calc();
+}
+
+/* ============ 05 INFECTADOS ============ */
+let zSel = 'R', mods = { sig:false, san:false, rain:false };
+function rInfectados(r) {
+  r.innerHTML = head('05','Sistema biológico y amenaza','El virus es una mutación controlada del ATP','Seis tipos de amenaza con su probabilidad de aparición según el estado de la zona y los modificadores que mueve la producción.','Fase 06, sistema biológico y amenaza') + `
+  <div class="panel"><div class="seg" id="zs"><button data-z="G" aria-pressed="false">Zona verde</button><button data-z="A" aria-pressed="false">Zona ámbar</button><button data-z="R" aria-pressed="true">Zona roja</button></div>
+    <div class="seg" id="ms"><button data-m="sig" aria-pressed="false">Hollow Signal o Frecuencia Judas</button><button data-m="san" aria-pressed="false">Sanctum Penitence</button><button data-m="rain" aria-pressed="false">Lluvia fuerte</button></div>
+    <div id="bars"></div><p class="small muted">Valores indicativos de planeación y emisión. Hollow Signal o Frecuencia Judas suman de 10 a 15 puntos a los Swarms y de 3 a 5 a los Specials. Sanctum suma de 5 a 10 a Runners y Rippers. La lluvia fuerte resta 5 a los Runners y suma 5 a los Mourners.</p></div>
+  <h3 class="mt2">Tipologías de infectados</h3><p class="muted small">Toque una tarjeta para ver señales, tácticas y debilidades.</p>
+  <div class="grid g3" id="inf">${INF.map((x, i) => `<button class="inf" aria-expanded="false" data-i="${i}"><h3>${x.n}</h3><p class="small muted">${x.b}</p><p class="mono small" style="margin:0">Riesgo ${x.rl || x.r} ${pips(x.r)}</p>
+    <div class="more"><dl class="kv"><dt>Señales</dt><dd>${x.c}</dd><dt>Tácticas</dt><dd>${x.tac}</dd><dt>Debilidades</dt><dd>${x.w}</dd></dl></div></button>`).join('')}</div>
+  <p class="small muted mt">Los Specials derivan de Rippers y Howlers con rasgos extremos. Solo aparecen en zonas rojas y en los episodios de clímax, del Ep10 al Ep12.</p>
+  <div class="grid g2 mt2">
+    <div class="panel"><h3>Vectores y latencias</h3><dl class="kv"><dt>Mordida</dt><dd>De minutos a horas, más rápida en zonas rojas.</dd><dt>Aerosoles</dt><dd>Posibles en interiores sin ventilación, como hospitales y bóvedas.</dd><dt>Fómites</dt><dd>Riesgo medio; requiere descontaminación química.</dd></dl></div>
+    <div class="panel"><h3>Factores del entorno</h3><dl class="kv"><dt>Calor y sequedad</dt><dd>Runners más activos.</dd><dt>Humedad y encierro</dt><dd>Proliferan Mourners y Howlers.</dd><dt>Químicos industriales</dt><dd>Rippers con osificación rápida.</dd><dt>Interferencias de señal</dt><dd>Erráticos tipo enjambre y desorientación de los Cleaners.</dd></dl></div></div>
+  <div class="panel mt"><h3>Prioridad sanitaria canónica</h3><ul class="check"><li>1. Romper la cadena de transmisión: neutralizar Howlers y dispersar Swarms.</li><li>2. Proteger a los civiles: triage y extracción dentro de la ventana.</li><li>3. Contener los focos: sellado, fuego controlado y químicos.</li><li>4. Espectáculo, solo si los tres puntos anteriores están bajo control.</li></ul></div>` + foot('infectados');
+  const draw = () => {
+    $$('#zs button', r).forEach(b => b.setAttribute('aria-pressed', b.dataset.z === zSel));
+    $$('#ms button', r).forEach(b => b.setAttribute('aria-pressed', mods[b.dataset.m]));
+    const ZI = { G:1, A:2, R:3 }[zSel];
+    $('#bars', r).innerHTML = PROB.map(p => {
+      let rg = p[ZI]; if (!rg) return `<div class="prow"><span>${p[0]}</span><div class="rb"></div><span>—</span></div>`;
+      let [a, b] = rg;
+      if (mods.sig && p[0] === 'Swarms') { a += 10; b += 15; } if (mods.sig && p[0] === 'Specials') { a += 3; b += 5; }
+      if (mods.san && (p[0] === 'Runners' || p[0] === 'Rippers')) { a += 5; b += 10; }
+      if (mods.rain && p[0] === 'Runners') { a -= 5; b -= 5; } if (mods.rain && p[0] === 'Mourners') { a += 5; b += 5; }
+      a = Math.max(0, Math.min(100, a)); b = Math.max(a, Math.min(100, b));
+      return `<div class="prow"><span>${p[0]}</span><div class="rb"><i style="left:${a}%;width:${Math.max(b - a, 1.2)}%"></i></div><span>${a} a ${b} %</span></div>`;
+    }).join('');
+  };
+  $('#zs', r).addEventListener('click', e => { const b = e.target.closest('[data-z]'); if (b) { zSel = b.dataset.z; draw(); } });
+  $('#ms', r).addEventListener('click', e => { const b = e.target.closest('[data-m]'); if (b) { mods[b.dataset.m] = !mods[b.dataset.m]; draw(); if (mods[b.dataset.m]) boost = 25; } });
+  $('#inf', r).addEventListener('click', e => { const b = e.target.closest('.inf'); if (b) b.setAttribute('aria-expanded', b.getAttribute('aria-expanded') !== 'true'); });
+  draw();
+}
+
+/* ============ 06 TEMPORADA 1 ============ */
+let curEp = 1;
+const bcol = n => n <= 4 ? 'var(--cyan)' : n <= 8 ? 'var(--warn)' : 'var(--hot)';
+function openEp(n) { curEp = n; if (epRoot) drawEp(); show('temporada-1'); }
+let epRoot = null;
+function rT1(r) {
+  epRoot = r;
+  const chains = [
+    ['Cambio de regla (Ep02)','hueco de protocolo','nueva cepa activa (Ep03 a Ep04)'],
+    ['Penitencias televisadas (Ep01 y Ep06)','riesgo extremo normalizado','muerte de Isaiah y pico de audiencia (Ep06)','más poder para la Iglesia (Ep07 a Ep08)'],
+    ['Hollow Signal y Vision Alignment (Ep04 a Ep05)','sesgo de conducta en los Cleaners','errores “útiles” para la producción (Ep06 a Ep07)'],
+    ['Frecuencia Judas y filtración de la bóveda (Ep08)','prueba de la sincronía de focos','Etherline reinicia las reglas (Ep09)','caos civil (Ep10 a Ep11)'],
+    ['Revelación ATP y Præs (Ep10)','Ezra abandona la obediencia total','plan de exposición total (Ep11 a Ep12)','La Última Transmisión y tercer brote (Ep12)']
+  ];
+  r.innerHTML = head('06','Temporada 1 · Ciclo del Juicio','Doce semanas al aire hasta que se rompe la señal','Elija un episodio. Las bandas marcan el bloque de peligro: ascenso, desestabilización y colapso.','Fase 03, línea de tiempo, y guía de episodios de la temporada 1. Los hitos de la Fase 03 y las sinopsis de la guía difieren en algunos detalles; se muestran ambos.') + `
+  <div class="blocks" style="--bc:var(--cyan)"><span style="--bc:var(--cyan)">Ascenso, Ep01 a Ep04</span><span style="--bc:var(--warn)">Desestabilización, Ep05 a Ep08</span><span style="--bc:var(--hot)">Colapso, Ep09 a Ep12</span></div>
+  <div class="eps" id="eps">${EP.map((e, i) => `<button style="--bc:${bcol(i + 1)}" data-e="${i + 1}" aria-pressed="false" aria-label="Episodio ${i + 1}, ${e.t}${EPKIA[i + 1] ? ', muerte de ' + EPKIA[i + 1] : ''}">${i + 1}${EPKIA[i + 1] ? '<small>KIA</small>' : ''}</button>`).join('')}</div>
+  <div class="panel" id="epd"></div>
+  <h3 class="mt2">Cadena de causas</h3>
+  <div class="stack">${chains.map(c => `<div class="flow">${c.map((x, i) => `${i ? '<i>→</i>' : ''}<span>${x}</span>`).join('')}</div>`).join('')}</div>
+  <div class="panel mt2"><h3>Riesgos de continuidad</h3><ul class="check"><li>Equilibrio de poder: la Iglesia no debe eclipsar a Etherline fuera de episodios dedicados. Jerarquía: élite, Etherline e Iglesia, gobierno.</li><li>Arcos de muerte: Simeon (Ep03), Isaiah (Ep06), Levi (Ep07) y Boaz (Ep11) deben tener repercusión en la edición pública y en las decisiones tácticas siguientes.</li><li>Tecnología: Vision Alignment y Broadcast Vault no pueden introducir capacidades que contradigan latencias y coberturas previas.</li><li>El clímax de la T1 rompe el control pero no salva a la humanidad: la T2 arranca desde el caos con la verdad expuesta.</li></ul></div>` + foot('temporada-1');
+  $('#eps', r).addEventListener('click', e => { const b = e.target.closest('[data-e]'); if (b) { curEp = +b.dataset.e; drawEp(); } });
+  drawEp();
+}
+function drawEp() {
+  const e = EP[curEp - 1], r = epRoot;
+  $$('#eps button', r).forEach(b => b.setAttribute('aria-pressed', +b.dataset.e === curEp));
+  $('#epd', r).innerHTML = `<div class="epd"><div class="chips"><span class="chip cy">Semana ${curEp} · Episodio ${String(curEp).padStart(2, '0')}</span>${EPKIA[curEp] ? `<span class="chip kia">KIA: ${EPKIA[curEp]}</span>` : ''}</div>
+    <h3>${e.t}</h3><p class="mono muted" style="font-size:12px;letter-spacing:.08em">${e.o.toUpperCase()}</p><p style="max-width:68ch">${e.su}</p>
+    <p class="quote">${e.q}<br><span class="mono muted" style="font-size:11px;letter-spacing:.1em;font-style:normal">${e.qa.toUpperCase()}</span></p>
+    <div class="grid g2"><dl class="kv"><dt>Lugares</dt><dd>${e.pl}</dd><dt>Ánimo</dt><dd>${e.mo}</dd><dt>Amenazas</dt><dd>${e.th}</dd></dl>
+    <dl class="kv"><dt>Tag</dt><dd>${e.tg}</dd><dt>Hito Fase 03</dt><dd>${e.ms}</dd></dl></div>
+    <div class="seg mt"><button data-e="${curEp - 1}" ${curEp === 1 ? 'disabled style="opacity:.3"' : ''} aria-pressed="false">Episodio anterior</button><button data-e="${curEp + 1}" ${curEp === 12 ? 'disabled style="opacity:.3"' : ''} aria-pressed="false">Episodio siguiente</button></div></div>`;
+  $$('.seg [data-e]', $('#epd', r)).forEach(b => b.addEventListener('click', () => { if (!b.disabled) { curEp = +b.dataset.e; drawEp(); } }));
+  if (window.__pulse) window.__pulse(.35);
+}
+
+/* ============ 07 PODER ============ */
+const NODES = {
+ elite:{ n:'Élite financiera y de ADN', s:'Fondea y fija objetivos', tc:'var(--ash)', d:'Bancos y ADN financian presupuestos, contratos de datos biométricos y patentes sobre vacunas y antídotos.' },
+ ether:{ n:'Etherline', s:'CEO: Judec', tc:'var(--cyan)', d:'Mandato oficial: “transparencia, seguridad y expiación pública” con cobertura 24/7. Objetivos ocultos: experimentación a escala poblacional, catalogar las cepas de ATP, controlar el relato y legitimar un estado de excepción mediante “eventos” de temporada. Organización: Dirección de Producción en Vivo (showrunners, Switch Central y Control Editorial), unidades de campo, Junta de Censura y la Broadcast Vault, fuente de la Frecuencia Judas. Políticas: Cláusula 404, Cláusula 701 y Vision Alignment. Iconografía en negro, blanco, gris y cian.' },
+ iglesia:{ n:'Iglesia de la Expiación', s:'Legitimidad moral', tc:'var(--creed)', d:'Doctrina: la redención llega por juicios públicos y el sufrimiento purifica. Estructura: Consejo Litúrgico y órdenes locales llamadas “templos de transmisión”. Puede subir la dificultad con Sanctum Penitence. Su economía son diezmos y patrocinios “consagrados”. Alianza funcional con Etherline, con tensiones cuando exige castigos que chocan con la producción.' },
+ gob:{ n:'Gobiernos títere', s:'Voceros', tc:'var(--ash)', d:'Tercerizan la “seguridad” en Etherline. Los ministerios actúan como altavoces.' },
+ orden:{ n:'Fuerzas del orden', s:'Perímetro y logística', tc:'var(--ash)', d:'Guardia, Policía y paramédicos cooperan de forma condicionada: perímetros, cordones y triage, con prioridad para las zonas ricas. En el set manda Etherline y el Estado apoya.' },
+ patro:{ n:'Patrocinadores', s:'Presión sobre el contenido', tc:'var(--warn)', d:'Pagan espacios de ceremonia, Rescates de Patrocinador y product placement diegético. Incentivo perverso: más riesgo, más conversación y más ventas. La interfaz muestra la divulgación, pero no corrige el sesgo.' },
+ publico:{ n:'Público', s:'Vota y valida castigos', tc:'var(--paper)', d:'Su voto pesa 15 % en el ranking y valida las penitencias televisadas.' },
+ milicias:{ n:'Milicias y clanes', s:'Negocian acceso a zonas', tc:'var(--saint)', d:'Contratistas de zona con armas ligeras y rutas de contrabando que intercambian acceso y logística por tiempo en pantalla. Guardianes de barrio que protegen hubs y “negocian” con la producción a cambio de suministros.' },
+ resis:{ n:'Resistencia', s:'Sabotea, filtra, hackea', tc:'var(--ok)', d:'Células de ex Etherline (técnicos y editores), personal médico y civiles radicalizados. Sig actúa como nodo. Métodos: filtraciones de material Præs, hackeos de continuidad, pintura y sigilos en las zonas, antenas piratas. Objetivo: exponer las sincronías y las mentiras y romper el monopolio sobre la obediencia.' }
+};
+function rPoder(r) {
+  const nd = k => `<button class="node" style="--tc:${NODES[k].tc}" data-n="${k}" aria-pressed="false">${NODES[k].n}<small>${NODES[k].s}</small></button>`;
+  r.innerHTML = head('07','Facciones y poder','Quién financia, quién edita y quién sabotea','La cadena de mando del universo, de la élite que fondea a la Resistencia que filtra. Toque cada nodo para ver su agenda.','Fase 07, facciones y poder') + `
+  <div class="panel"><div class="tier">${nd('elite')}</div><div class="link">↓</div><div class="tier">${nd('ether')}${nd('iglesia')}</div><div class="link">↓ control del relato</div><div class="tier">${nd('gob')}${nd('orden')}</div><div class="link">↓</div><div class="tier">${nd('patro')}</div><div class="link">↓</div><div class="tier">${nd('publico')}${nd('milicias')}</div><div class="link">↘</div><div class="tier">${nd('resis')}</div></div>
+  <article class="panel mt" id="nd" aria-live="polite"></article>
+  <h3 class="mt2">Tensiones activas de la temporada 1</h3><p class="muted small">Toque una tensión para saltar al episodio.</p>
+  <div class="grid g2">${[['Iglesia contra Etherline por las penitencias',6],['Patrocinadores contra la producción por rescates e imagen de marca',2],['Gobierno contra Etherline cuando el pánico civil se desborda',11],['Resistencia contra todos al exponer la Frecuencia Judas y la sincronía de focos',8]].map(t => `<button class="btn ghost" style="text-align:left;text-transform:none;letter-spacing:.02em;font-family:var(--body);font-size:1rem" data-ep="${t[1]}">${t[0]} <span class="mono" style="color:var(--cyan)">(Ep${String(t[1]).padStart(2, '0')})</span></button>`).join('')}</div>` + foot('poder');
+  const show1 = k => { $$('.node', r).forEach(b => b.setAttribute('aria-pressed', b.dataset.n === k)); $('#nd', r).innerHTML = `<h3>${NODES[k].n}</h3><p style="max-width:70ch;margin:0;animation:rise .4s both">${NODES[k].d}</p>`; };
+  r.addEventListener('click', e => { const b = e.target.closest('.node'); if (b) show1(b.dataset.n); const t = e.target.closest('[data-ep]'); if (t) openEp(+t.dataset.ep); });
+  show1('ether');
+}
+
+/* ============ 08 ESTÉTICA ============ */
+const SHOTS = {
+ A:['Primer plano del arranque de la interfaz: bioscore y la latencia sube de 5 a 7 segundos.','Dron cenital: estructura cruciforme sobre el estadio mientras crece el cántico.','Reflejo en el visor de Ezra: pantallas con highlights de la “expiación pública”.','Cámara corporal: carrera por el túnel, Mourners arrastrándose y destellos.','Corte seco a un Howler de perfil; se alza un rifle largo, contrapunto con Rahab.','Empuje lento sobre Judec en la sala de control; su sonrisa llega medio tiempo tarde.','Golpe de título: UNDEAD SOCIETY en minimal noir.'],
+ B:['Pantalla dentro de pantalla: el índice de la Bóveda parpadea hasta entrar a la señal en vivo.','Montaje de paquetes de la Frecuencia Judas; los editores pierden el switch.','Interfaz multipanel: celdas rojas se activan en Z-A, Z-B y Z-C y el bioscore se dispara.','Delilah y Sig en las terminales; Ezra mira a cámara y elige la verdad.','Disturbios en el estadio, último cuadro de Boaz y estandartes de la Iglesia.','Dron en picada ascendente: múltiples incendios, se enciende el tercer brote.','Voz de Ezra, una línea: “No more cutaways”. Tarjeta de título.']
+};
+const STATES = { normal:['','Transmisión normal'], override:['Override 404','Override 404: reglas modificadas por la producción'], blackout:['Blackout','Signal Blackout: pérdida parcial de señal'], sanctum:['Sanctum','Sanctum Penitence: la Iglesia eleva la dificultad'], alignment:['Alignment','Vision Alignment: enfoque táctico forzado'] };
+function rEstetica(r) {
+  r.innerHTML = head('08','Estética y tono','Minimal noir, cámara en mano y gore con peso físico','Identidad visual y sonora del universo, y el plan de teaser para presentar la serie a plataformas y productoras.','Fase 11, estética y tono; Fase 09, guía de la interfaz; Fase 12, dossier y teaser') + `
+  <div class="grid g2"><div class="panel"><h3>Paleta</h3><div class="sw"><div style="background:#04070a;color:#f1f5f6">Negro</div><div style="background:#f1f5f6;color:#04070a">Blanco</div><div style="background:#93a3aa;color:#04070a">Gris claro</div><div style="background:#35d6ff;color:#04070a">Azul cian</div></div>
+    <h4>Tipografía e iconos</h4><p class="small">Neo-grotesca limpia para títulos y monoespaciada para los numéricos de la interfaz. Iconos de estado de zona (V, Á, R), medidor de bioscore e insignias de Override, Blackout, Sanctum y Alignment.</p>
+    <p style="font-family:var(--display);font-stretch:62%;font-weight:900;font-size:2.4rem;margin:0;line-height:1">TITULARES <span class="mono" style="font-size:1rem;font-stretch:100%;font-weight:500;color:var(--cyan)">BIOSCORE 072</span></p></div>
+  <div class="panel"><h3>Cámara y movimiento</h3><dl class="kv"><dt>Estilo</dt><dd>Cámara en mano agresiva, whip pans y rampas de velocidad, con encuadre táctico en coberturas, corredores y puntos de estrangulamiento.</dd><dt>Lentes</dt><dd>24 a 35 mm para acción en el terreno, 50 a 85 mm para rostros bajo estrés y compresión de lente larga para vigilancia.</dd><dt>Movimiento</dt><dd>Aceleración hacia los golpes de acción, desaceleración en las decisiones morales y paneos motivados hacia la interfaz.</dd><dt>Gore</dt><dd>Energético y físico, nunca gratuito: se enfatiza el impacto, la secuela y la mecánica del cuerpo.</dd></dl></div></div>
+  <div class="grid g3 mt"><div class="panel"><h3>Estadio</h3><p class="small">Pistas circulares y planos cenitales.</p></div><div class="panel"><h3>Astillero</h3><p class="small">Callejones de contenedores en U (KB-X6).</p></div><div class="panel"><h3>Dead Grid y bosque</h3><p class="small">Pasarelas estrechas, y dolly bajo entre la niebla en el bosque.</p></div></div>
+
+  <h3 class="mt2">Interfaz diegética en pantalla</h3><p class="muted small">Cambie el estado de emisión para ver cómo Etherline altera la señal.</p>
+  <div class="seg" id="ust">${Object.entries(STATES).map(([k, v], i) => `<button data-s="${k}" aria-pressed="${i === 0}">${k === 'normal' ? 'Normal' : v[0]}</button>`).join('')}</div>
+  <div class="screen" id="scr" data-st="normal" aria-label="Simulación de la interfaz de Etherline">
+    <svg class="scene" viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="gF" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0a1a22"/><stop offset="1" stop-color="#03070a"/></linearGradient></defs><rect width="160" height="90" fill="url(#gF)"/>
+      <path d="M0 90L60 48H100L160 90ZM60 48L45 0M100 48L115 0" stroke="#35d6ff" stroke-opacity=".35" fill="none"/><path d="M60 48H100V30H60Z" fill="#06121a" stroke="#35d6ff" stroke-opacity=".5"/>
+      <g fill="#9fb4bb" opacity=".8"><rect x="76" y="34" width="3" height="13"/><rect x="82" y="35" width="3" height="12"/><rect x="88" y="34" width="3" height="13"/></g>
+      <g fill="none" stroke="#ff4258" stroke-opacity=".8"><rect x="73" y="31" width="9" height="18"/><rect x="85" y="32" width="9" height="17"/></g>
+      <circle cx="80" cy="50" r="9" fill="none" stroke="#35d6ff" stroke-opacity=".8"/><path d="M80 40v20M70 50h20" stroke="#35d6ff" stroke-opacity=".6"/></svg>
+    <div class="ov tk" id="uTk">Transmisión normal</div>
+    <div class="ov tl1">Z-A3 · <b>Ámbar</b><br>Bioscore <b>058</b><br>Retraso <b>6.2 s</b></div>
+    <div class="ov sp">Patrocinio<br><b>Divulgado</b></div>
+    <div class="ov bt"><span>CN <b>12</b></span><span>Civiles <b>3</b></span><span>Objetivos <b>2</b></span><span>Audiencia <b>+2</b></span></div></div>
+
+  <h3 class="mt2">Plan de teaser</h3>
+  <div class="seg" id="tsg"><button data-t="A" aria-pressed="true">Opción A · Rito de apertura</button><button data-t="B" aria-pressed="false">Opción B · La Última Transmisión</button></div>
+  <div class="grid g2"><div><p id="tsd" style="max-width:56ch"></p><div class="prog"><i id="tsp"></i></div><button class="btn" id="tsPlay">Reproducir plano a plano</button></div><ol class="shots" id="shots"></ol></div>
+  <div class="grid g3 mt2"><div class="panel"><h3>Arte clave A</h3><p class="small">Ezra con luz frontal; detrás, un mapa de calor de la ciudad forma un halo. Lema: NO MORE CUTAWAYS.</p></div><div class="panel"><h3>Arte clave B</h3><p class="small">Póster dual: Crimson Creed contra Burning Saints sobre el anillo del estadio (KB-ST).</p></div><div class="panel"><h3>Arte clave C</h3><p class="small">Maqueta de la pantalla de control de Etherline con bioscore, ranking y latencia, y un sutil artefacto de la Frecuencia Judas.</p></div></div>` + foot('estetica');
+  const scr = $('#scr', r);
+  $('#ust', r).addEventListener('click', e => { const b = e.target.closest('[data-s]'); if (!b) return; $$('#ust button', r).forEach(x => x.setAttribute('aria-pressed', x === b)); scr.dataset.st = b.dataset.s; $('#uTk', r).textContent = STATES[b.dataset.s][1]; if (window.__pulse && b.dataset.s !== 'normal') window.__pulse(.5); });
+  let tk = 'A', tmr = null, idx = -1;
+  const drawShots = () => {
+    $('#tsd', r).textContent = tk === 'A' ? 'Noche de lanzamiento en el Estadio de la Expiación: multitud ruidosa, espectáculo santificado y un sacudón de peligro real cuando el Creed corre hacia una brecha roja. Tono cinético y enérgico, con gore físico y un filo satírico. Duración de 60 a 90 segundos, apertura del Ep01.' : 'Los archivos de la Bóveda sangran en la señal en vivo, las interfaces se corrompen, los mapas de calor se sincronizan y el pánico crece. Tono de revelación, pavor e inevitabilidad. Duración de 60 a 90 segundos, clímax del Ep12.';
+    $('#shots', r).innerHTML = SHOTS[tk].map(s => `<li>${s}</li>`).join(''); idx = -1; $('#tsp', r).style.width = '0'; $('#tsPlay', r).textContent = 'Reproducir plano a plano';
+  };
+  const stopT = () => { if (tmr) clearInterval(tmr); tmr = null; };
+  $('#tsg', r).addEventListener('click', e => { const b = e.target.closest('[data-t]'); if (!b) return; stopT(); tk = b.dataset.t; $$('#tsg button', r).forEach(x => x.setAttribute('aria-pressed', x === b)); drawShots(); });
+  $('#tsPlay', r).addEventListener('click', () => {
+    if (tmr) { stopT(); $('#tsPlay', r).textContent = 'Reproducir plano a plano'; return; }
+    idx = -1; $('#tsPlay', r).textContent = 'Detener';
+    const step = () => { idx++; const li = $$('#shots li', r); if (idx >= li.length) { stopT(); $('#tsPlay', r).textContent = 'Reproducir plano a plano'; return; } li.forEach((x, i) => x.classList.toggle('on', i === idx)); $('#tsp', r).style.width = ((idx + 1) / li.length * 100) + '%'; if (window.__pulse) window.__pulse(.25); };
+    step(); tmr = setInterval(step, 1500);
+  });
+  drawShots();
+}
+
+/* ============ 09 SEIS TEMPORADAS ============ */
+let curS = 1;
+function rTemporadas(r) {
+  r.innerHTML = head('09','Plan de seis temporadas','De un reality a una guerra contra una IA','La serie escala desde el espectáculo televisado hasta un conflicto entre Cleaners, híbridos IA-virus y una Resistencia fracturada, y deja un puente hacia Seishin.','Plan adaptado de 6 temporadas y guías de episodios de las temporadas 2 y 3') + `
+  <div class="sbig" id="sb">${SEAS.map(s => `<button data-s="${s.n}" aria-pressed="${s.n === curS}" aria-label="Temporada ${s.n}">${s.n}</button>`).join('')}</div>
+  <article class="panel" id="sd" aria-live="polite"></article><div id="se" class="mt"></div>
+  <div class="panel mt2"><h3>Cliffhangers y huevos de Pascua</h3><ul class="check"><li>Los archivos Præs se siembran en la T1 y se amplían en la T2 y la T3.</li><li>Los Cleaners perfectos se insinúan en la T2, se liberan en la T3 y dominan de la T4 a la T6.</li><li>La profecía de Jericho anticipa el arco de la IA-virus.</li><li>Los legados de Althaia y Kaufmann atan la Resistencia a los orígenes Præs.</li><li>El final deja un puente narrativo hacia Seishin.</li></ul></div>` + foot('temporadas');
+  const draw = () => {
+    const s = SEAS[curS - 1];
+    $$('#sb button', r).forEach(b => b.setAttribute('aria-pressed', +b.dataset.s === curS));
+    $('#sd', r).innerHTML = `<div style="animation:rise .4s both"><div class="chips"><span class="chip cy">Temporada ${s.n}</span>${s.n >= 4 ? '<span class="chip">Semilla</span>' : '<span class="chip">Establecida</span>'}</div><h3 style="font-size:2.2rem">${s.name}</h3>
+      <dl class="kv"><dt>Premisa pública</dt><dd>${s.pub}</dd><dt>Conflicto oculto</dt><dd>${s.hid}</dd><dt>Arcos clave</dt><dd>${s.arcs.join(' ')}</dd><dt>Clímax</dt><dd>${s.cl}</dd><dt>Cliffhanger</dt><dd>${s.cf}</dd></dl></div>`;
+    $('#se', r).innerHTML = curS === 1 ? '<button class="btn" data-go="temporada-1">Ver los 12 episodios de la T1</button>' : (S23[curS] ? `<div class="epl">${S23[curS].map((x, i) => `<div><b><span>${String(i + 1).padStart(2, '0')}</span>${x[0]}</b>${x[1]}</div>`).join('')}</div>` : '');
+  };
+  $('#sb', r).addEventListener('click', e => { const b = e.target.closest('[data-s]'); if (b) { curS = +b.dataset.s; draw(); } });
+  draw();
+}
+
+/* ============ 10 CANON ============ */
+let curAx = 0;
+function rCanon(r) {
+  r.innerHTML = head('10','Canon y continuidad','Una sola cepa, tres tiempos','Praestantia, Undead Society y Seishin comparten una línea: el ATP nace como experimento militar, muta en brote y termina como herencia de máquinas.','Fase 02, continuidad del canon, y show bible de Præstantia (DOC-20250901-WA0041.pdf)') + `
+  <div class="era"><div><b>T−100</b>Era Præs: creación del ATP, incidentes tempranos y restos arquitectónicos y criogénicos aún visibles.</div><div><b>T0</b>Tras el segundo brote, la sociedad se “reconstruye” bajo un reality letal. Etherline impone hegemonía mediática y la doctrina de la expiación.</div><div><b>T1</b>Doce semanas al aire: sabotajes, Hollow Signal, Frecuencia Judas y La Última Transmisión, que dispara el tercer brote.</div><div><b>Seishin</b>Proyección futura: vestigios biorrobóticos, redes de IA y hegemonías posthumanas.</div></div>
+  <h3 class="mt2">Tabla puente</h3><div class="axes" id="ax">${AXES.map((a, i) => `<button class="btn ghost" data-a="${i}" style="${i === curAx ? 'border-color:var(--cyan);color:var(--cyan)' : ''}">${a[0]}</button>`).join('')}</div>
+  <div class="three" id="tri"></div>
+  <div class="grid g2 mt2"><div class="panel"><h3>Præstantia, cien años antes</h3><p class="small">Serie de ciencia ficción distópica, thriller biotecnológico y drama político, con un tono sobrio, conspirativo y filosófico. Las élites crean el nanovirus ATP, con dos ramas: Altered, que estimula la reproducción celular y bioeléctrica sin control, y Perfection, que regula y distribuye sus efectos. Se vende como un elixir de juventud y es un caballo de Troya para forjar soldados mejorados.</p>
+    <h4>Protagonistas</h4><p class="small">Kaufmann, detective con pasado militar obsesionado con exponer a Lux. Dr. Kael Morvan, bioingeniero del ATP. Elena Voss, soldado que entrena a los primeros Præs. Lucien Rask, CEO de la fachada farmacéutica. Lysa, adolescente vinculada por completo al ATP. El Concilio de Praestantia, 12 figuras ocultas.</p>
+    <h4>Los cuatro Præs de categoría A</h4><div class="chips"><span class="chip cy">Althaia, líder táctica</span><span class="chip cy">Kaelgor, fuerza bruta</span><span class="chip cy">Azrael, hackeo simbiótico</span><span class="chip cy">Moirae, estratega y camuflaje</span></div></div>
+    <div class="panel"><h3>Conexiones futuras con Undead Society</h3><ul class="check"><li>Tras el final de Præstantia, Lysa tendrá una relación con Kaufmann y con el hijo de Althaia, y nacerá un hijo y también una nueva cepa de ATP que en el futuro se llamará Cleaners.</li><li>Los primeros Cleaners se mitologizan en el lore futuro.</li><li>La variante mutada del ATP desencadena el brote de Undead Society.</li><li>La propaganda de Lux anticipa a Etherline, el brazo propagandístico del futuro.</li></ul></div></div>
+  <div class="grid g2 mt"><div class="panel"><h3>Reglas de no contradicción</h3><ul class="check"><li>Si el virus zombi es una mutación del ATP, toda cepa nueva debe rastrearse a variantes o entornos controlados (consistente con la taxonomía de la Fase 06).</li><li>Etherline siempre edita o manipula: cuando el público percibe una misión “fácil”, hay censura o edición. La Iglesia impulsa las penitencias.</li><li>Judec es CEO y pariente de Ezra, Jericho y Abbadon. Cualquier giro debe preservar esa relación y su caída pública progresiva.</li><li>La Resistencia se revela con material Præs verificable; Delilah y Sig son vectores de prueba en la transmisión.</li></ul></div>
+  <div class="panel"><h3>Mapa de riesgos de continuidad</h3><ul class="check"><li>Equilibrio de poder: la jerarquía es élite, luego Etherline e Iglesia, luego gobierno.</li><li>Las muertes de Simeon, Isaiah, Levi y Boaz deben repercutir en la edición pública y en las decisiones tácticas.</li><li>Vision Alignment y Broadcast Vault no pueden contradecir latencias ni coberturas previas.</li><li>La Última Transmisión rompe el control pero no salva a la humanidad.</li></ul></div></div>` + foot('canon');
+  const draw = () => {
+    const a = AXES[curAx];
+    $$('#ax button', r).forEach((b, i) => { b.style.borderColor = i === curAx ? 'var(--cyan)' : ''; b.style.color = i === curAx ? 'var(--cyan)' : ''; });
+    $('#tri', r).innerHTML = [['Præstantia (T−100)', a[1], 'var(--ash)'], ['Undead Society', a[2], 'var(--cyan)'], ['Seishin (proyección)', a[3], 'var(--saint)'], ['Nota de continuidad', a[4], 'var(--paper)']].map(x => `<div style="--tc:${x[2]}"><small>${x[0]}</small>${x[1]}</div>`).join('');
+  };
+  $('#ax', r).addEventListener('click', e => { const b = e.target.closest('[data-a]'); if (b) { curAx = +b.dataset.a; draw(); } });
+  draw();
+}
+
+/* ============ MONTAJE ============ */
+function rOst(r) {
+  r.innerHTML = head('11','Exure Omnia','OST Concepto','Exure Omnia es el álbum concepto de Undead Society: siete composiciones originales para el reality show, la Iglesia de la Expiación y el brote. Escúchalo mientras recorres las demás secciones.','álbum Exure Omnia (Undead Society), música original de Dôjo.') + OSTKIT.html() + foot('ost');
+  OSTKIT.bind(r);
+}
+const RENDER = { premisa:rPremisa, equipos:rEquipos, mapa:rMapa, reglas:rReglas, infectados:rInfectados, 'temporada-1':rT1, poder:rPoder, estetica:rEstetica, temporadas:rTemporadas, canon:rCanon, ost:rOst };
+CH.slice(1).forEach(c => {
+  const s = document.createElement('section'); s.className = 'chapter'; s.id = 'c-' + c.id; stage.appendChild(s);
+  try { RENDER[c.id](s); } catch (err) { s.innerHTML = '<p>No se pudo cargar este capítulo.</p>'; console.error(c.id, err); }
+  s.insertAdjacentHTML('afterbegin', topNav(c.id));
+});
+$('#c-inicio').hidden = false;
+setHH(); spy();
+{ const h0 = location.hash.slice(1); if (h0 && h0 !== 'inicio') setTimeout(() => show(h0, true), 80); }
+
+/* ============ HUD Y TICKER ============ */
+const TK = ['Override 404 registrado en Continuidad','Hollow Signal: pérdida parcial de señal en Z-C4','Sanctum Penitence: la Iglesia eleva la dificultad','Vision Alignment activo para enfoque táctico','Retraso de seguridad declarado: 5 a 7 s','Ventana de giro cerrada en el minuto 22','Votación del público abierta','Rescate de patrocinador disponible: 1 por temporada','Frecuencia Judas: paquete en la bóveda bajo auditoría','Sincronía de focos detectada en Z-A, Z-B y Z-C'];
+const tkHtml = TK.map((t, i) => `<span><b>${String(i * 7 % 60).padStart(2, '0')}:${String(10 + i * 4).padStart(2, '0')}</b>${t.toUpperCase()}</span>`).join('');
+$('#ticker').innerHTML = tkHtml + tkHtml;
+let lat = 5.9, bio = 31, zi = 0;
+const ZS = [['Verde','var(--ok)'],['Ámbar','var(--warn)'],['Roja','var(--hot)']];
+const BASE = { ost:30, inicio:28, premisa:24, equipos:34, mapa:46, reglas:40, infectados:66, 'temporada-1':52, poder:38, estetica:30, temporadas:44, canon:36 };
+setInterval(() => {
+  lat = Math.max(5, Math.min(7, lat + rand(-.35, .35)));
+  boost = Math.max(0, boost - 3);
+  const target = (BASE[cur] || 30) + boost;
+  bio += (target - bio) * .35 + rand(-3, 3);
+  bio = Math.max(0, Math.min(100, bio));
+  $('#hLat').textContent = lat.toFixed(1);
+  $('#hBio').textContent = String(Math.round(bio)).padStart(3, '0');
+  if (Math.random() < .12) zi = Math.min(2, Math.max(0, zi + (Math.random() < .5 ? -1 : 1)));
+  if (bio > 62) zi = 2; else if (bio < 28) zi = 0;
+  $('#hZone').textContent = ZS[zi][0]; $('#hDot').style.background = ZS[zi][1];
+}, 900);
+
+/* ============ FONDO ANIMADO ============ */
+(() => {
+  const cv = $('#bg'), cx = cv.getContext('2d');
+  let W = 0, H = 0, dpr = 1, mx = .5, my = .5, gl = 0, sig = 0, sx = 0, sy = 0, nextG = 4000, nextS = 14000, raf = 0, last = 0;
+  const bld = [], ash = [];
+  function build() {
+    bld.length = 0; let x = -20;
+    while (x < W) { const w = rand(24, 88) * dpr; bld.push({ x, w, h: rand(.05, .27) * H, win: (Math.random() * 1000) | 0, ant: Math.random() < .17 }); x += w + rand(2, 10) * dpr; }
+    ash.length = 0; const n = Math.round((W * H) / (dpr * dpr) / 8500);
+    for (let i = 0; i < n; i++) ash.push({ x: Math.random() * W, y: Math.random() * H, r: rand(.5, 1.9) * dpr, v: rand(.08, .45) * dpr, d: rand(-.12, .3) * dpr, a: rand(.12, .5), c: Math.random() < .12 });
+  }
+  function size() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2); W = cv.width = Math.floor(innerWidth * dpr); H = cv.height = Math.floor(innerHeight * dpr); build(); if (reduce) draw(0, 0);
+  }
+  function draw(t, dt) {
+    const hz = H * .6;
+    let g = cx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#03060a'); g.addColorStop(.6, '#07131b'); g.addColorStop(1, '#04070a'); cx.fillStyle = g; cx.fillRect(0, 0, W, H);
+    const vx = W * (.5 + (mx - .5) * .12);
+    const rg = cx.createRadialGradient(vx, hz, 0, vx, hz, W * .75); rg.addColorStop(0, 'rgba(53,214,255,.18)'); rg.addColorStop(1, 'rgba(53,214,255,0)'); cx.fillStyle = rg; cx.fillRect(0, 0, W, H);
+    cx.lineWidth = dpr;
+    for (const b of bld) {
+      cx.fillStyle = '#060d12'; cx.fillRect(b.x, hz - b.h, b.w, b.h + 2);
+      cx.strokeStyle = 'rgba(53,214,255,.11)'; cx.strokeRect(b.x + .5, hz - b.h + .5, b.w, b.h);
+      const cols = Math.floor(b.w / (9 * dpr)), rows = Math.floor(b.h / (14 * dpr));
+      for (let i = 0; i < cols; i++) for (let j = 0; j < rows; j++) {
+        const k = (i * 7 + j * 13 + b.win) % 17;
+        if (k < 3 && Math.sin(t * .001 * (1 + k) + b.win) > .15) { cx.fillStyle = 'rgba(53,214,255,' + (.14 + .09 * k) + ')'; cx.fillRect(b.x + 4 * dpr + i * 9 * dpr, hz - b.h + 6 * dpr + j * 14 * dpr, 3 * dpr, 5 * dpr); }
+      }
+      if (b.ant) { cx.fillStyle = 'rgba(53,214,255,.4)'; cx.fillRect(b.x + b.w / 2, hz - b.h - 18 * dpr, dpr, 18 * dpr); if (Math.sin(t * .003 + b.win) > .6) { cx.fillStyle = 'rgba(255,66,88,.9)'; cx.fillRect(b.x + b.w / 2 - dpr, hz - b.h - 20 * dpr, 3 * dpr, 3 * dpr); } }
+    }
+    cx.fillStyle = '#050b10'; cx.fillRect(0, hz, W, H - hz);
+    for (let i = -13; i <= 13; i++) { cx.strokeStyle = 'rgba(53,214,255,' + Math.max(.015, .1 - Math.abs(i) * .0065) + ')'; cx.beginPath(); cx.moveTo(vx + i * W * .012, hz); cx.lineTo(vx + i * W * .24, H); cx.stroke(); }
+    const n = 14, ph = (t * .00011) % 1;
+    for (let i = 0; i < n; i++) { const p = (i + ph) / n, y = hz + (H - hz) * Math.pow(p, 2.3); cx.strokeStyle = 'rgba(53,214,255,' + (.035 + .11 * p) + ')'; cx.beginPath(); cx.moveTo(0, y); cx.lineTo(W, y); cx.stroke(); }
+    const fg = cx.createLinearGradient(0, hz - 70 * dpr, 0, hz + 90 * dpr); fg.addColorStop(0, 'rgba(53,214,255,0)'); fg.addColorStop(.45, 'rgba(120,200,225,.11)'); fg.addColorStop(1, 'rgba(53,214,255,0)'); cx.fillStyle = fg; cx.fillRect(0, hz - 70 * dpr, W, 160 * dpr);
+    for (const a of ash) {
+      a.y += a.v * (dt / 16); a.x += a.d * (dt / 16) + Math.sin(t * .0007 + a.r * 9) * .1 * dpr; if (a.y > H) { a.y = -4; a.x = Math.random() * W; } if (a.x > W) a.x = 0; if (a.x < 0) a.x = W;
+      cx.fillStyle = a.c ? 'rgba(53,214,255,' + a.a + ')' : 'rgba(220,230,235,' + a.a * .8 + ')'; cx.fillRect(a.x, a.y, a.r, a.r);
+    }
+    const amp = (13 + gl * 34) * dpr;
+    for (let k = 0; k < 2; k++) {
+      cx.beginPath();
+      for (let x = 0; x <= W; x += 6 * dpr) { const y = H * (.2 + k * .035) + Math.sin(x * .012 + t * .0015 + k) * amp * .5 + Math.sin(x * .031 - t * .0023) * amp * .3 + Math.sin(x * .002 + t * .0007) * amp + (my - .5) * 20 * dpr; x ? cx.lineTo(x, y) : cx.moveTo(x, y); }
+      cx.strokeStyle = 'rgba(53,214,255,' + ((k ? .09 : .2) + gl * .3) + ')'; cx.lineWidth = (k ? 1 : 1.6) * dpr; cx.stroke();
+    }
+    if (gl > .02) {
+      for (let k = 0; k < 4; k++) { const sy2 = rand(0, H), sh = rand(8, 60) * dpr; try { cx.drawImage(cv, 0, sy2, W, sh, rand(-40, 40) * dpr * gl, sy2, W, sh); } catch (e) {} }
+      cx.fillStyle = 'rgba(53,214,255,' + (.07 * gl) + ')'; cx.fillRect(0, rand(0, H), W, rand(2, 12) * dpr);
+    }
+    if (sig > 0) { cx.fillStyle = 'rgba(53,214,255,' + Math.min(.8, sig) + ')'; for (let i = 0; i < 3; i++) { cx.beginPath(); cx.arc(sx + i * 22 * dpr, sy, 5 * dpr, 0, 6.3); cx.fill(); } }
+  }
+  function loop(ms) {
+    const dt = Math.min(50, ms - last || 16); last = ms;
+    gl = Math.max(0, gl - dt / 420); sig = Math.max(0, sig - dt / 160);
+    if (ms > nextG) { gl = Math.max(gl, rand(.35, .8)); nextG = ms + rand(6000, 11000); }
+    if (ms > nextS) { sig = 1; sx = rand(.1, .8) * W; sy = rand(.08, .45) * H; nextS = ms + rand(22000, 40000); }
+    draw(ms, dt); raf = requestAnimationFrame(loop);
+  }
+  window.__pulse = k => { gl = Math.min(1, gl + (k || .6)); };
+  addEventListener('pointermove', e => { mx = e.clientX / innerWidth; my = e.clientY / innerHeight; }, { passive: true });
+  addEventListener('resize', size);
+  document.addEventListener('visibilitychange', () => { if (reduce) return; if (document.hidden) cancelAnimationFrame(raf); else { last = 0; raf = requestAnimationFrame(loop); } });
+  size();
+  if (!reduce) raf = requestAnimationFrame(loop);
+})();
+})();
+</script>
+<!-- UNIVERSE-MENU:START -->
+<style id="mm-css">.dj-legal{position:relative;z-index:2;text-align:center;padding:14px 16px 26px;font:11px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--mute);border-top:1px solid var(--line)}
+.mm-row{display:flex;align-items:center;gap:8px;min-width:0}
+.mm-row>.mm-fill{flex:1 1 auto;min-width:0}
+.mm-uni{all:unset;box-sizing:border-box;flex:none;display:inline-flex;align-items:center;gap:8px;cursor:pointer;height:34px;padding:0 12px 0 10px;border:1px solid rgba(53,214,255,.55);border-radius:999px;background:#04070a;color:#eaf6fa;font:700 11px/1 'Courier Prime','IBM Plex Mono',ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;margin:0 12px 0 auto;transition:box-shadow .2s,border-color .2s,transform .15s}
+.mm-uni:hover{box-shadow:0 0 18px -2px #35d6ff;border-color:#35d6ff}
+.mm-uni:active{transform:scale(.95)}
+.mm-uni:focus-visible{outline:2px solid #35d6ff;outline-offset:3px}
+.mm-uni svg{width:22px;height:12px;display:block;overflow:visible}
+.mm-uni svg line{stroke:#35d6ff;stroke-width:1.5}
+.mm-uni svg circle{fill:#35d6ff}
+.mm-uni svg circle:nth-of-type(2){fill:#ff3b3b}
+.mm-uni svg circle:nth-of-type(3){fill:#c0c0c0}
+.mm-burger,.mm-cur{display:none}
+.mm-bd,.mm-pn{visibility:hidden}
+@media (max-width:760px){
+ .mm-row>.mm-fill{display:none}
+ .mm-row{padding:6px 10px;gap:10px}
+ .mm-row>.mm-uni{margin:0 0 0 auto}
+ .mm-burger{all:unset;box-sizing:border-box;flex:none;display:grid;place-items:center;width:40px;height:40px;cursor:pointer;position:relative}
+ .mm-burger:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+ .mm-burger i{position:absolute;left:10px;right:10px;height:2px;background:currentColor;transition:transform .3s,opacity .2s,top .3s}
+ .mm-burger i:nth-child(1){top:13px}.mm-burger i:nth-child(2){top:19px;right:16px}.mm-burger i:nth-child(3){top:25px}
+ .mm-burger[aria-expanded=true] i:nth-child(1){top:19px;transform:rotate(45deg)}
+ .mm-burger[aria-expanded=true] i:nth-child(2){opacity:0}
+ .mm-burger[aria-expanded=true] i:nth-child(3){top:19px;transform:rotate(-45deg)}
+ .mm-cur{display:block;flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+
+ .mm-bd{position:fixed;inset:0;z-index:2147482000;background:rgba(0,0,0,.6);opacity:0;transition:opacity .3s,visibility 0s linear .3s}
+ .mm-pn{position:fixed;top:0;bottom:0;left:0;width:min(86vw,340px);z-index:2147482001;display:flex;flex-direction:column;overflow-y:auto;overscroll-behavior:contain;transform:translateX(-102%);transition:transform .35s cubic-bezier(.2,.7,.2,1),visibility 0s linear .35s}
+ .mm-open .mm-bd{visibility:visible;opacity:1;transition:opacity .3s}
+ .mm-open .mm-pn{visibility:visible;transform:none;transition:transform .35s cubic-bezier(.2,.7,.2,1)}
+ .mm-hd{display:flex;align-items:center;justify-content:space-between;gap:10px}
+ .mm-x{all:unset;box-sizing:border-box;cursor:pointer;width:40px;height:40px;display:grid;place-items:center;font:300 26px/1 Arial,sans-serif}
+ .mm-x:focus-visible{outline:2px solid currentColor;outline-offset:2px}
+ .mm-list{display:flex;flex-direction:column}
+ .mm-it{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:12px;cursor:pointer;width:100%}
+ .mm-it:focus-visible{outline:2px solid currentColor;outline-offset:-2px}
+ .mm-pn .mm-uni{margin:0}
+ .mm-pn .mm-uni span{display:inline}
+}
+@media (prefers-reduced-motion:reduce){.mm-pn,.mm-bd,.mm-burger i{transition:none!important}}
+
+@media (max-width:760px){
+ .mm-row{padding:6px 10px 2px}
+ .mm-burger{color:var(--paper);border:1px solid var(--line);background:rgba(53,214,255,.05);clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px))}
+ .mm-burger[aria-expanded=true]{color:var(--cyan);border-color:var(--cyan)}
+ .mm-cur{font:500 12px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--paper)}
+ .mm-cur::before{content:'//';color:var(--cyan);margin-right:8px}
+ .mm-pn{background:var(--ink);color:var(--paper);font-family:var(--mono);border-right:1px solid var(--cyan);box-shadow:0 0 40px -6px rgba(53,214,255,.35),12px 0 40px rgba(0,0,0,.6);padding:14px 0 24px}
+ .mm-pn::before{content:'';position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(255,255,255,.03) 0 1px,transparent 1px 3px),radial-gradient(ellipse at 0 0,rgba(53,214,255,.14),transparent 60%)}
+ .mm-pn>*{position:relative}
+ .mm-hd{padding:0 14px 0 18px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan)}
+ .mm-hd b{display:flex;align-items:center;gap:8px;font-weight:500}
+ .mm-hd b i{width:7px;height:7px;border-radius:50%;background:var(--hot);animation:blink 1.2s infinite}
+ .mm-x{color:var(--paper);border:1px solid var(--line)}
+ .mm-x:hover{border-color:var(--cyan);color:var(--cyan)}
+ .mm-brand{font-family:var(--display);font-stretch:62%;font-weight:900;font-size:34px;letter-spacing:.05em;line-height:1;padding:18px 18px 6px}
+ .mm-sub{padding:0 18px 14px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);border-bottom:1px solid var(--line)}
+ .mm-it{padding:12px 18px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);border-bottom:1px solid rgba(147,163,170,.08);position:relative}
+ .mm-it em{font-style:normal;color:var(--mute);min-width:22px}
+ .mm-it:hover{color:var(--paper);background:rgba(53,214,255,.06)}
+ .mm-it[aria-current=true]{color:var(--paper);background:linear-gradient(90deg,rgba(53,214,255,.16),transparent)}
+ .mm-it[aria-current=true] em{color:var(--cyan)}
+ .mm-it[aria-current=true]::after{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--cyan);box-shadow:0 0 12px var(--cyan)}
+ .mm-foot{margin:auto 18px 0;padding-top:20px}
+ .mm-foot .mm-uni{width:100%;justify-content:center}
+}
+</style>
+<script>
+(function(){
+ var CFG={row:'#tabs',num:1,head:function(t){return '<div class="mm-hd"><b><i></i>'+(lg()==='en'?'Live archive':'Archivo en vivo')+'</b><button type="button" class="mm-x" aria-label="'+t.c+'">&times;</button></div><div class="mm-brand">UNDEAD SOCIETY</div><div class="mm-sub">'+t.k+'</div>'}};
+ var URL_='../';
+ function lg(){try{if(typeof lang!=='undefined')return lang}catch(e){}return (document.documentElement.lang||'es').slice(0,2)}
+ var T={es:{u:'Universo',a:'Ir al menú del universo Dôjo',m:'Menú',c:'Cerrar menú',s:'Secciones',k:'Capítulos'},en:{u:'Universe',a:'Go to the Dôjo universe menu',m:'Menu',c:'Close menu',s:'Sections',k:'Chapters'}};
+ function tt(){return T[lg()==='en'?'en':'es']}
+ function icon(){return '<svg viewBox="0 0 22 12" aria-hidden="true"><line x1="2" y1="6" x2="20" y2="6"/><circle cx="2" cy="6" r="2"/><circle cx="11" cy="6" r="2"/><circle cx="20" cy="6" r="2"/></svg>'}
+ function uni(){return '<a class="mm-uni" href="'+URL_+'" aria-label="'+tt().a+'">'+icon()+'<span>'+tt().u+'</span></a>'}
+ function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+ var nav,row,burger,cur,bd,pn,open=false,last=null;
+ function items(){
+  return [].slice.call(nav.children).filter(function(e){return !e.classList.contains('nav-logo')&&!e.classList.contains('mm-skip')}).map(function(e){
+   var c=e.cloneNode(true);[].slice.call(c.querySelectorAll('i')).forEach(function(i){i.remove()});
+   return {el:e,label:c.textContent.trim(),on:e.classList.contains('on')||e.getAttribute('aria-current')==='true'};
+  });
+ }
+ function curLabel(){var a=items().filter(function(x){return x.on})[0];return a?a.label:''}
+ function paintCur(){if(cur)cur.textContent=curLabel()||tt().m}
+ function build(){
+  var its=items(),t=tt();
+  var list=its.map(function(x,i){return '<button type="button" class="mm-it" data-i="'+i+'"'+(x.on?' aria-current="true"':'')+'><em>'+(CFG.num?String(i+(CFG.base||0)).padStart(2,'0'):String(i+1).padStart(2,'0'))+'</em><span>'+esc(x.label)+'</span></button>'}).join('');
+  pn.innerHTML=CFG.head(t)+'<div class="mm-list" role="list">'+list+'</div><div class="mm-foot">'+uni()+'</div>';
+  pn.setAttribute('aria-label',t.m);
+ }
+ function show(){last=document.activeElement;build();open=true;document.documentElement.classList.add('mm-open');burger.setAttribute('aria-expanded','true');document.documentElement.style.overflow='hidden';var a=pn.querySelector('[aria-current=true]')||pn.querySelector('.mm-it');if(a){a.focus({preventScroll:true});a.scrollIntoView({block:'center'})}}
+ function hide(){if(!open)return;open=false;document.documentElement.classList.remove('mm-open');burger.setAttribute('aria-expanded','false');document.documentElement.style.overflow='';if(last&&last.focus)last.focus({preventScroll:true})}
+ function label(){var t=tt();burger.setAttribute('aria-label',t.m);var u=row.querySelector(':scope > .mm-uni');if(u){u.setAttribute('aria-label',t.a);u.querySelector('span').textContent=t.u}paintCur();var L=document.querySelector('.dj-legal');if(L)L.textContent='\u00A9 D\u00F4jo 2026 \u00B7 '+(lg()==='en'?'All rights reserved':'Todos los derechos reservados')}
+ function mount(){
+  nav=document.querySelector(CFG.row);if(!nav)return;
+  row=document.createElement('div');row.className='mm-row';
+  nav.parentNode.insertBefore(row,nav);
+  burger=document.createElement('button');burger.type='button';burger.className='mm-burger';burger.setAttribute('aria-expanded','false');burger.setAttribute('aria-haspopup','dialog');burger.innerHTML='<i></i><i></i><i></i>';
+  row.appendChild(burger);
+  if(CFG.logo){var lb=document.createElement('button');lb.type='button';lb.className='mm-logo-m';lb.setAttribute('aria-label',CFG.logoLabel||'Inicio');lb.innerHTML=CFG.logo;lb.addEventListener('click',function(){var o=document.getElementById('navLogo');if(o)o.click()});row.appendChild(lb)}
+  else{cur=document.createElement('div');cur.className='mm-cur';cur.setAttribute('aria-live','polite');row.appendChild(cur)}
+  row.appendChild(nav);nav.classList.add('mm-fill');
+  var d=document.createElement('div');d.innerHTML=uni();row.appendChild(d.firstChild);
+  bd=document.createElement('div');bd.className='mm-bd';
+  pn=document.createElement('div');pn.className='mm-pn';pn.setAttribute('role','dialog');pn.setAttribute('aria-modal','true');
+  document.body.appendChild(bd);document.body.appendChild(pn);
+  burger.addEventListener('click',function(){open?hide():show()});
+  bd.addEventListener('click',hide);
+  pn.addEventListener('click',function(e){
+   if(e.target.closest('.mm-x'))return hide();
+   var b=e.target.closest('.mm-it');
+   if(b){var x=items()[+b.dataset.i];hide();if(x)setTimeout(function(){x.el.click()},30)}
+  });
+  document.addEventListener('keydown',function(e){
+   if(!open)return;
+   if(e.key.indexOf('Arrow')===0&&!e.target.closest('.mm-pn'))e.stopPropagation();
+   if(e.key==='Escape'){e.preventDefault();hide();return}
+   if(e.key==='Tab'){var f=[].slice.call(pn.querySelectorAll('button,a[href]'));if(!f.length)return;var a=document.activeElement,i=f.indexOf(a);
+    if(e.shiftKey&&i<=0){e.preventDefault();f[f.length-1].focus()}else if(!e.shiftKey&&(i===f.length-1||i<0)){e.preventDefault();f[0].focus()}}
+  },true);
+  window.addEventListener('resize',function(){if(open&&window.innerWidth>760)hide()});
+  var mo=new MutationObserver(function(){paintCur();if(open)build()});
+  mo.observe(nav,{subtree:true,childList:true,attributes:true,characterData:true,attributeFilter:['class','aria-current']});
+  label();
+  window.__uuRefresh=function(){label();if(open)build()};
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount);else mount();
+})();
+</script>
+<!-- UNIVERSE-MENU:END -->
+</body>
+</html>
