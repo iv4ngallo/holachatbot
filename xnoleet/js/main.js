@@ -42,16 +42,23 @@
     applyMotion();
   });
   // Con movimiento apagado los valores saltan directo al destino; con movimiento van suavizados.
-  function L(cur, tar, f) { return motion ? cur + (tar - cur) * f : tar; }
+  var dtS = 1; // escala de tiempo del cuadro (1 = 60 fps): el suavizado no depende de los fps
+  function L(cur, tar, f) { return motion ? cur + (tar - cur) * (1 - Math.pow(1 - f, dtS)) : tar; }
 
   /* ---------- Lienzo de fondo ---------- */
-  var cv = $('#bg'), cx = cv.getContext('2d');
-  var W = 0, H = 0, DPR = 1;
+  // Optimizaciones: capa de bandas en cache (solo se redibuja mientras mutan),
+  // lienzo opaco, suavizado independiente de los fps, lotes de trazos,
+  // calidad adaptable segun la fluidez y 30 fps cuando no hay interaccion.
+  var cv = $('#bg'), cx = cv.getContext('2d', { alpha: false });
+  var bl = document.createElement('canvas'), bx = bl.getContext('2d');
+  var W = 0, H = 0, DPR = Math.min(window.devicePixelRatio || 1, 2);
   var mouse = { x: 0, y: 0 }, disk = { x: 0, y: 0 }, ang = -35, ang0 = -35;
   var down = false, taps = 0, ripples = [], ripId = 0, looping = false;
+  var sY = window.scrollY || 0, bandsDirty = true, lastInput = 0, lastT = 0, skip = false, ema = 16.7, slow = 0;
+  function touch() { lastInput = performance.now(); }
 
   /* Campo de modulos + y x: tiras horizontales y verticales aleatorias */
-  var CELL = 40, cols = 0, rows = 0, cells = {}, strips = [];
+  var CELL = 40, cols = 0, rows = 0, cells = {}, cellList = [], strips = [], hotList = [];
   function addStrip() {
     strips.push({
       h: Math.random() < 0.5, len: 3 + Math.floor(Math.random() * 8),
@@ -71,13 +78,16 @@
     for (k in cells) if (!want[k]) cells[k].ta = 0;
     for (k in want) {
       if (cells[k]) cells[k].ta = 1;
-      else cells[k] = { c: want[k].c, r: want[k].r, t: want[k].t, rot: want[k].t * Math.PI / 4, sc: 1, a: 0, ta: 1, rid: 0 };
+      else {
+        var g = { k: k, c: want[k].c, r: want[k].r, t: want[k].t, rot: want[k].t * Math.PI / 4, sc: 1, a: 0, ta: 1, rid: 0 };
+        cells[k] = g; cellList.push(g);
+      }
     }
   }
   function buildGlyphs() {
     CELL = Math.max(34, Math.min(48, Math.round(W / 30)));
     cols = Math.ceil(W / CELL) + 1; rows = Math.ceil(H / CELL) + 2;
-    strips = []; cells = {};
+    strips = []; cells = {}; cellList = [];
     var n = Math.round(cols * rows / 22);
     for (var i = 0; i < n; i++) addStrip();
     syncCells();
@@ -88,37 +98,49 @@
     for (i = 0; i < n; i++) addStrip();
     syncCells();
   }
-  function drawGlyphs(t, sy) {
-    var gy = (sy * 0.18) % CELL, k, g, i;
-    for (k in cells) {
-      g = cells[k];
+  function drawGlyphs(t) {
+    var gy = (sY * 0.18) % CELL, i, g, w = 0, nrip = ripples.length, hl = 0;
+    cx.lineWidth = 1.8; cx.strokeStyle = DK; cx.globalAlpha = 0.2; cx.beginPath();
+    for (i = 0; i < cellList.length; i++) {
+      g = cellList[i];
       g.a = L(g.a, g.ta, 0.08);
-      if (g.ta === 0 && g.a < 0.02) { delete cells[k]; continue; }
+      if (g.ta === 0 && g.a < 0.02) { delete cells[g.k]; continue; }
+      cellList[w++] = g;
       var x = g.c * CELL + CELL / 2, y = g.r * CELL + CELL / 2 - gy - CELL;
-      var dx = x - disk.x, dy = y - disk.y, d = Math.sqrt(dx * dx + dy * dy), near = Math.max(0, 1 - d / 160);
-      for (i = 0; i < ripples.length; i++) {
-        var rp = ripples[i], rx = x - rp.x, ry = y - rp.y;
-        var rd = Math.sqrt(rx * rx + ry * ry), rr = 10 + (t - rp.t) / 1000 * 260;
+      if (y < -CELL || y > H + CELL) continue;
+      var dx = x - disk.x, dy = y - disk.y, d2 = dx * dx + dy * dy, near = d2 < 25600 ? 1 - Math.sqrt(d2) / 160 : 0;
+      for (var j = 0; j < nrip; j++) {
+        var rp = ripples[j], rx = x - rp.x, ry = y - rp.y, rd = Math.sqrt(rx * rx + ry * ry), rr = 10 + (t - rp.t) / 1000 * 260;
         if (g.rid !== rp.id && Math.abs(rd - rr) < 26) { g.t = 1 - g.t; g.rid = rp.id; }
       }
-      var want = near > 0.45 ? 1 - g.t : g.t;
-      g.rot = L(g.rot, want * Math.PI / 4, 0.14);
+      g.rot = L(g.rot, (near > 0.45 ? 1 - g.t : g.t) * Math.PI / 4, 0.14);
       g.sc = L(g.sc, 1 + near * 0.9, 0.14);
-      var s = CELL * 0.2 * g.sc, c = Math.cos(g.rot) * s, sn = Math.sin(g.rot) * s;
-      if (near > 0.3) {
-        cx.fillStyle = 'rgba(57,255,20,' + (near * g.a).toFixed(3) + ')';
-        cx.beginPath(); cx.arc(x, y, s * 1.7, 0, PI2); cx.fill();
+      g.x = x; g.y = y; g.near = near;
+      if (near < 0.02 && g.a > 0.97) { // la mayoria: un solo trazo por lote
+        var s = CELL * 0.2 * g.sc, c = Math.cos(g.rot) * s, sn = Math.sin(g.rot) * s;
+        cx.moveTo(x - c, y - sn); cx.lineTo(x + c, y + sn);
+        cx.moveTo(x + sn, y - c); cx.lineTo(x - sn, y + c);
+      } else hotList[hl++] = g;
+    }
+    cellList.length = w;
+    cx.stroke();
+    for (i = 0; i < hl; i++) {
+      g = hotList[i];
+      var s2 = CELL * 0.2 * g.sc, c2 = Math.cos(g.rot) * s2, sn2 = Math.sin(g.rot) * s2;
+      if (g.near > 0.3) {
+        cx.globalAlpha = g.near * g.a; cx.fillStyle = G;
+        cx.beginPath(); cx.arc(g.x, g.y, s2 * 1.7, 0, PI2); cx.fill();
       }
-      cx.strokeStyle = 'rgba(31,35,38,' + ((0.2 + 0.7 * near) * g.a).toFixed(3) + ')';
-      cx.lineWidth = 1.8;
+      cx.globalAlpha = (0.2 + 0.7 * g.near) * g.a;
       cx.beginPath();
-      cx.moveTo(x - c, y - sn); cx.lineTo(x + c, y + sn);
-      cx.moveTo(x + sn, y - c); cx.lineTo(x - sn, y + c);
+      cx.moveTo(g.x - c2, g.y - sn2); cx.lineTo(g.x + c2, g.y + sn2);
+      cx.moveTo(g.x + sn2, g.y - c2); cx.lineTo(g.x - sn2, g.y + c2);
       cx.stroke();
     }
+    cx.globalAlpha = 1;
   }
 
-  /* Bandas diagonales texturizadas que mutan al tocar */
+  /* Bandas diagonales texturizadas que mutan al tocar (capa en cache) */
   var BASE = [
     { a: -36, o: -40, w: 190, c: 70, s: 8, h: 18, ph: 0.6 },
     { a: -44, o: 270, w: 120, c: -50, s: 7, h: 62, ph: 2 },
@@ -135,39 +157,56 @@
   }
   function morph() { bands.forEach(function (b, i) { b.tar = randBand(i); }); }
   function stepBands() {
-    bands.forEach(function (b) { for (var k in b.tar) b.cur[k] = L(b.cur[k], b.tar[k], 0.045); });
+    var maxd = 0;
+    bands.forEach(function (b) {
+      for (var k in b.tar) {
+        var nv = L(b.cur[k], b.tar[k], 0.045), dd = Math.abs(nv - b.cur[k]);
+        if (dd > maxd) maxd = dd;
+        b.cur[k] = nv;
+      }
+    });
+    if (maxd > 0.002) bandsDirty = true; // solo se redibuja la capa mientras hay cambio
   }
-  function trace(b) {
+  function drawBand(b, idx) {
     var p = b.cur, a = p.a * Math.PI / 180, dx = Math.cos(a), dy = Math.sin(a), nx = -dy, ny = dx;
-    var mx = W / 2 + nx * p.o, my = H / 2 + ny * p.o, len = Math.sqrt(W * W + H * H) * 1.15, N = 26, left = [], right = [], i;
+    var mx = W / 2 + nx * p.o, my = H / 2 + ny * p.o, len = Math.sqrt(W * W + H * H) * 1.15, N = 26, i;
+    var left = [], right = [], path = new Path2D();
     for (i = 0; i <= N; i++) {
       var s = i / N, t = (s - 0.5) * len, off = p.c * Math.sin(s * Math.PI * 1.4 + p.ph);
       var hw = p.w / 2 * (1 + 0.45 * Math.sin(s * Math.PI * 2 + p.ph * 0.7));
-      var bx = mx + dx * t + nx * off, by = my + dy * t + ny * off;
-      left.push([bx + nx * hw, by + ny * hw]); right.push([bx - nx * hw, by - ny * hw]);
+      var qx = mx + dx * t + nx * off, qy = my + dy * t + ny * off;
+      left.push([qx + nx * hw, qy + ny * hw]); right.push([qx - nx * hw, qy - ny * hw]);
     }
-    cx.beginPath(); cx.moveTo(left[0][0], left[0][1]);
-    for (i = 1; i <= N; i++) cx.lineTo(left[i][0], left[i][1]);
-    for (i = N; i >= 0; i--) cx.lineTo(right[i][0], right[i][1]);
-    cx.closePath();
-    return len;
+    path.moveTo(left[0][0], left[0][1]);
+    for (i = 1; i <= N; i++) path.lineTo(left[i][0], left[i][1]);
+    for (i = N; i >= 0; i--) path.lineTo(right[i][0], right[i][1]);
+    path.closePath();
+
+    // la trama se dibuja solo dentro de la caja orientada de la banda
+    var ha = p.h * Math.PI / 180, hx = Math.cos(ha), hy = Math.sin(ha), gx = -hy, gy = hx;
+    var kmin = 1e9, kmax = -1e9, tmin = 1e9, tmax = -1e9, pts = left.concat(right);
+    for (i = 0; i < pts.length; i++) {
+      var ux = pts[i][0] - W / 2, uy = pts[i][1] - H / 2, kk = ux * gx + uy * gy, tt = ux * hx + uy * hy;
+      if (kk < kmin) kmin = kk; if (kk > kmax) kmax = kk;
+      if (tt < tmin) tmin = tt; if (tt > tmax) tmax = tt;
+    }
+    bx.save(); bx.clip(path);
+    bx.beginPath();
+    for (var k = Math.floor(kmin / p.s); k <= Math.ceil(kmax / p.s); k++) {
+      var ox = W / 2 + gx * k * p.s, oy = H / 2 + gy * k * p.s;
+      bx.moveTo(ox + hx * (tmin - 4), oy + hy * (tmin - 4)); bx.lineTo(ox + hx * (tmax + 4), oy + hy * (tmax + 4));
+    }
+    if (idx === 0) { bx.strokeStyle = 'rgba(57,255,20,.8)'; bx.lineWidth = 1.8; }
+    else if (idx === 1) { bx.strokeStyle = 'rgba(31,35,38,.42)'; bx.lineWidth = 1; }
+    else { bx.strokeStyle = 'rgba(31,35,38,.3)'; bx.lineWidth = 0.8; }
+    bx.stroke(); bx.restore();
+    bx.strokeStyle = 'rgba(31,35,38,' + (idx === 0 ? 0.85 : 0.35) + ')'; bx.lineWidth = idx === 0 ? 1.4 : 1;
+    bx.stroke(path);
   }
-  function drawBand(b, idx, m) {
-    var p = b.cur, len = trace(b);
-    cx.save(); cx.clip();
-    var ha = p.h * Math.PI / 180, hx = Math.cos(ha), hy = Math.sin(ha), nx = -hy, ny = hx, n = Math.ceil(len / p.s / 2);
-    cx.beginPath();
-    for (var k = -n; k < n; k++) {
-      var ox = W / 2 + nx * k * p.s, oy = H / 2 + ny * k * p.s;
-      cx.moveTo(ox - hx * len, oy - hy * len); cx.lineTo(ox + hx * len, oy + hy * len);
-    }
-    if (idx === 0) { cx.strokeStyle = 'rgba(57,255,20,' + (0.8 * m) + ')'; cx.lineWidth = 1.8; }
-    else if (idx === 1) { cx.strokeStyle = 'rgba(31,35,38,' + (0.42 * m) + ')'; cx.lineWidth = 1; }
-    else { cx.strokeStyle = 'rgba(31,35,38,' + (0.3 * m) + ')'; cx.lineWidth = 0.8; }
-    cx.stroke(); cx.restore();
-    trace(b);
-    cx.strokeStyle = 'rgba(31,35,38,' + ((idx === 0 ? 0.85 : 0.35) * m) + ')'; cx.lineWidth = idx === 0 ? 1.4 : 1;
-    cx.stroke();
+  function renderBands() {
+    bx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    bx.clearRect(0, 0, W, H);
+    bands.forEach(function (b, i) { drawBand(b, i); });
   }
 
   /* Formas geometricas flotantes: repelen el cursor y saltan al tocar */
@@ -189,13 +228,14 @@
       if (d < 180) { var f = (1 - d / 180) * 90; px += dx / d * f; py += dy / d * f; }
       if (!s.init) { s.x = px; s.y = py; s.init = true; }
       s.x = L(s.x, px, 0.09); s.y = L(s.y, py, 0.09);
-      if (motion) { s.vr += (s.vr0 - s.vr) * 0.04; s.rot += s.vr; }
+      if (motion) { s.vr = L(s.vr, s.vr0, 0.04); s.rot += s.vr * dtS; }
     });
   }
   function drawShapes(m) {
+    cx.globalAlpha = m; cx.lineWidth = 1.8; cx.strokeStyle = DK;
     shapes.forEach(function (s) {
       cx.save(); cx.translate(s.x, s.y); cx.rotate(s.rot);
-      cx.globalAlpha = m; cx.lineWidth = 1.8; cx.strokeStyle = DK; cx.fillStyle = DK;
+      cx.fillStyle = DK;
       var r = s.r;
       if (s.k === 'tri' || s.k === 'tri0') {
         cx.beginPath(); cx.moveTo(0, -r); cx.lineTo(r * 0.9, r * 0.7); cx.lineTo(-r * 0.9, r * 0.7); cx.closePath();
@@ -214,45 +254,53 @@
       }
       cx.restore();
     });
+    cx.globalAlpha = 1;
   }
 
-  /* Dibujo principal */
-  function resize() {
-    DPR = Math.min(window.devicePixelRatio || 1, 2);
-    W = window.innerWidth; H = window.innerHeight;
-    cv.width = W * DPR; cv.height = H * DPR;
+  /* Tamano y calidad */
+  function applyDPR() {
+    cv.width = bl.width = Math.round(W * DPR); cv.height = bl.height = Math.round(H * DPR);
     cx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    bandsDirty = true;
+  }
+  function resize() {
+    W = window.innerWidth; H = window.innerHeight;
+    applyDPR();
     if (!mouse.x) { mouse.x = disk.x = W * 0.72; mouse.y = disk.y = H * 0.4; }
     buildGlyphs(); placeShapes();
     if (!motion) drawStatic();
   }
 
+  /* Dibujo principal */
   function draw(t) {
-    cx.clearRect(0, 0, W, H);
-    var sy = window.scrollY || 0, hero = Math.max(0.3, 1 - sy / (H * 0.9)), m = 0.45 + 0.55 * hero;
-    var sp = 26, off = (sy * 0.15) % sp, x0;
+    if (bandsDirty) { renderBands(); bandsDirty = false; }
+    cx.fillStyle = '#fff'; cx.fillRect(0, 0, W, H);
+    var hero = Math.max(0.3, 1 - sY / (H * 0.9)), m = 0.45 + 0.55 * hero;
+    var sp = 26, off = (sY * 0.15) % sp, x0, base = -H - sp + off;
 
     // trama base y lineas que se encienden cerca del cursor
     cx.lineWidth = 1; cx.strokeStyle = 'rgba(31,35,38,.07)'; cx.beginPath();
-    for (x0 = -H - sp + off; x0 < W; x0 += sp) { cx.moveTo(x0, H); cx.lineTo(x0 + H, 0); }
+    for (x0 = base; x0 < W; x0 += sp) { cx.moveTo(x0, H); cx.lineTo(x0 + H, 0); }
     cx.stroke();
-    for (x0 = -H - sp + off; x0 < W; x0 += sp) {
-      var d = Math.abs((disk.x - x0) + (disk.y - H)) / 1.4142;
-      if (d < 190) {
-        var k = 1 - d / 190;
-        cx.strokeStyle = 'rgba(57,255,20,' + (k * 0.95).toFixed(3) + ')'; cx.lineWidth = 1 + k * 2.2;
+    var c0 = disk.x + disk.y - H, lo = c0 - 190 * 1.4142, hi = c0 + 190 * 1.4142;
+    cx.strokeStyle = G;
+    for (x0 = base + Math.max(0, Math.ceil((lo - base) / sp)) * sp; x0 <= hi && x0 < W; x0 += sp) {
+      var k = 1 - Math.abs((disk.x - x0) + (disk.y - H)) / 1.4142 / 190;
+      if (k > 0) {
+        cx.globalAlpha = k * 0.95; cx.lineWidth = 1 + k * 2.2;
         cx.beginPath(); cx.moveTo(x0, H); cx.lineTo(x0 + H, 0); cx.stroke();
       }
     }
+    cx.globalAlpha = 1;
 
-    drawGlyphs(t, sy);
+    drawGlyphs(t);
 
-    bands.forEach(function (b, i) { drawBand(b, i, m); });
+    cx.globalAlpha = m; cx.drawImage(bl, 0, 0, W, H); cx.globalAlpha = 1; // capa de bandas en cache
 
     // circulo grande de contorno con paralaje
     var R = Math.min(W, H) * 0.34;
     cx.lineWidth = 1; cx.strokeStyle = 'rgba(31,35,38,' + (0.22 * hero + 0.06) + ')';
-    cx.beginPath(); cx.arc(W * 0.76 - (disk.x - W / 2) * 0.05, H * 0.42 - (disk.y - H / 2) * 0.05 - sy * 0.12, R, 0, PI2); cx.stroke();
+    cx.beginPath(); cx.arc(W * 0.76 - (disk.x - W / 2) * 0.05, H * 0.42 - (disk.y - H / 2) * 0.05 - sY * 0.12, R, 0, PI2); cx.stroke();
 
     drawShapes(Math.max(0.55, hero));
 
@@ -289,23 +337,32 @@
   }
   function frame(t) {
     if (!motion || document.hidden) { looping = false; return; }
+    var idle = t - lastInput > 3000;
+    if (idle) { skip = !skip; if (skip) { requestAnimationFrame(frame); return; } } // 30 fps en reposo
+    var dt = lastT ? Math.min(t - lastT, 50) : 16.7;
+    lastT = t; dtS = dt / 16.667;
+    if (!idle) { // calidad adaptable: si cuesta mucho, baja la resolucion del lienzo
+      ema += (dt - ema) * 0.05;
+      if (ema > 24 && DPR > 1) { if (++slow > 90) { DPR = Math.max(1, DPR - 0.25); applyDPR(); slow = 0; ema = 16.7; } }
+      else slow = 0;
+    }
     step(); draw(t);
     requestAnimationFrame(frame);
   }
-  function startLoop() { if (!looping) { looping = true; requestAnimationFrame(frame); } }
-  function drawStatic() { step(); draw(performance.now()); }
+  function startLoop() { if (!looping) { looping = true; lastT = 0; requestAnimationFrame(frame); } }
+  function drawStatic() { dtS = 1; step(); draw(performance.now()); }
   document.addEventListener('visibilitychange', function () { if (!document.hidden && motion) startLoop(); });
 
   var rx = $('#rx'), ry = $('#ry'), ra = $('#ra'), ticking = false;
   window.addEventListener('pointermove', function (e) {
-    mouse.x = e.clientX; mouse.y = e.clientY;
+    mouse.x = e.clientX; mouse.y = e.clientY; touch();
     if (down) { // arrastrar deforma la banda verde
       bands[0].tar.c = (mouse.y / H - 0.5) * 520;
       bands[0].tar.a = -62 + (mouse.x / W) * 48;
       bands[1].tar.o = (mouse.x / W - 0.5) * W * 0.9;
     }
     if (!motion) drawStatic();
-    if (!ticking) {
+    if (!ticking && sY < H) {
       ticking = true;
       requestAnimationFrame(function () {
         rx.textContent = String(Math.round(mouse.x)).padStart(4, '0');
@@ -317,7 +374,7 @@
   }, { passive: true });
   window.addEventListener('pointerdown', function (e) {
     if (e.target.closest('dialog')) return;
-    down = true; taps++;
+    down = true; taps++; touch();
     mouse.x = e.clientX; mouse.y = e.clientY;
     morph(); reshuffle(); jumpShapes();
     if (!e.target.closest('a,button,.card,.mod')) ripples.push({ x: e.clientX, y: e.clientY, t: performance.now(), id: ++ripId });
@@ -326,8 +383,8 @@
   function up() { down = false; }
   window.addEventListener('pointerup', up, { passive: true });
   window.addEventListener('pointercancel', up, { passive: true });
-  window.addEventListener('resize', function () { resize(); clearTimeout(resize.t); resize.t = setTimeout(buildMods, 150); });
-  window.addEventListener('scroll', function () { if (!motion) drawStatic(); }, { passive: true });
+  window.addEventListener('resize', function () { touch(); resize(); clearTimeout(resize.t); resize.t = setTimeout(buildMods, 150); });
+  window.addEventListener('scroll', function () { sY = window.scrollY; touch(); if (!motion) drawStatic(); }, { passive: true });
 
   /* ---------- Tiras de modulos + y x en el contenido ---------- */
   function buildMods() {
