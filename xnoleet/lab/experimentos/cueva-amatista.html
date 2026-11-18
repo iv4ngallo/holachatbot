@@ -192,7 +192,7 @@ vec3 hue(vec3 c,float a){
 float crystal(vec3 p,float ia,float iz,float N,float zc,float k,float lay){
  float iam=mod(ia,N);
  vec4 h=h42(vec2(iam+lay*101.,iz));
- float dens=min(.95,uP.z+lay*.25);
+ float dens=uP.z+lay*.08;
  if(h.w>dens)return 1e3;
  float ac=(ia+.5+(h.x-.5)*.55)*(TAU/N)-PI;
  float z0=(iz+.5+(h.y-.5)*.55)*zc;
@@ -236,14 +236,14 @@ float map(vec3 p){
  float d=(cr0-r+(vn(np*.62)-.5)*1.25)*.8;
  gCD=1e3;gGlow=1e3;gGl=0.;
  if(r<1.35){gMat=-1.;return d;}
- float N=9.,zc=2.1;
+ float N=8.,zc=2.7;
  float fa=(a+PI)/TAU*N,ia=floor(fa),sa=fract(fa)<.5?-1.:1.;
  float fz=p.z/zc,iz=floor(fz),sz=fract(fz)<.5?-1.:1.;
  float dc=crystal(p,ia,iz,N,zc,1.,0.);
  dc=min(dc,crystal(p,ia+sa,iz,N,zc,1.,0.));
  dc=min(dc,crystal(p,ia,iz+sz,N,zc,1.,0.));
  dc=min(dc,crystal(p,ia+sa,iz+sz,N,zc,1.,0.));
- if(uQ>.5&&d<1.6){
+ if(uQ>1.5&&d<1.6){
   N=21.;zc=.8;
   fa=(a+PI)/TAU*N;ia=floor(fa);sa=fract(fa)<.5?-1.:1.;
   fz=p.z/zc;iz=floor(fz);sz=fract(fz)<.5?-1.:1.;
@@ -442,7 +442,7 @@ function rng(str){
 let seed='',P=null;
 function params(s){
  const r=rng(s);
- return{S:[r(),r(),r(),r()],P:[1.1+1.5*r(),.9+1.4*r(),.42+.26*r(),.12+.14*r()],hue:(r()-.5)*.42};
+ return{S:[r(),r(),r(),r()],P:[1.1+1.5*r(),.9+1.4*r(),.2+.12*r(),.14+.14*r()],hue:(r()-.5)*.42};
 }
 function readHash(){const m=location.hash.match(/semilla=([A-Za-z0-9]{1,12})/);return m?cleanSeed(m[1]):''}
 function writeHash(s){try{history.replaceState(null,'','#semilla='+s)}catch(e){location.hash='semilla='+s}}
