@@ -46,7 +46,7 @@ html.gated .log{height:58px}
 #gForm{animation:spi .8s cubic-bezier(.2,.7,.2,1) 2.1s backwards}
 @media(max-width:560px){#gForm .gr{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){#gForm{animation:none!important}}
-#cdn{right:20px;top:calc(70px + var(--sat));display:flex;align-items:center;gap:10px;padding:6px 12px;border:1px solid var(--line);border-right:2px solid var(--y);background:rgba(3,10,40,.7);backdrop-filter:blur(8px);pointer-events:none;z-index:6}
+#cdn{right:20px;top:calc(100px + var(--sat));display:flex;align-items:center;gap:10px;padding:6px 12px;border:1px solid var(--line);border-right:2px solid var(--y);background:rgba(3,10,40,.7);backdrop-filter:blur(8px);pointer-events:none;z-index:6}
 #cdn .cdp{width:7px;height:7px;background:var(--y);transform:rotate(45deg);flex:none;animation:cdp 2.4s ease-in-out infinite}
 @keyframes cdp{0%,100%{opacity:.5}50%{opacity:1;box-shadow:0 0 8px var(--y)}}
 #cdL{font:600 9px/1 var(--cond);letter-spacing:.24em;text-transform:uppercase;color:var(--dim)}
@@ -54,6 +54,10 @@ html.gated .log{height:58px}
 #cdT{font:800 20px/1 var(--cond);letter-spacing:.08em;color:var(--y);font-variant-numeric:tabular-nums;min-width:56px;text-align:right}
 #cdn.soon #cdT{color:var(--r);animation:cdp 1s ease-in-out infinite}
 #cdn.run{border-right-color:#2EF2FF}#cdn.run .cdp{background:#2EF2FF}#cdn.run #cdT{color:#2EF2FF}
+#cdGo{all:unset;box-sizing:border-box;pointer-events:auto;cursor:pointer;width:28px;height:28px;flex:none;display:inline-flex;align-items:center;justify-content:center;color:var(--y);border:1px solid rgba(255,199,0,.55);transition:background .2s,color .2s}
+#cdGo:hover,#cdGo:focus-visible{background:var(--y);color:#02081f;outline:none}
+#cdGo:disabled{opacity:.35;cursor:default;background:none;color:var(--dim);border-color:var(--line)}
+#cdn.run #cdGo{color:#2EF2FF;border-color:rgba(46,242,255,.5)}
 #aur{position:fixed;left:0;right:0;top:0;height:54vh;z-index:0;pointer-events:none;overflow:hidden;opacity:0;transition:opacity 3s ease 1.2s;-webkit-mask-image:linear-gradient(180deg,#000 0,#000 55%,transparent 100%);mask-image:linear-gradient(180deg,#000 0,#000 55%,transparent 100%)}
 body.live #aur{opacity:.9}
 body:not(.live) #aur i,body.hid #aur i{animation-play-state:paused}
@@ -452,7 +456,7 @@ label.f textarea{min-height:76px;resize:vertical}
   <div class="sn">Viaje al núcleo de TEGC Sky Port · mundo 3D y audio ambiental</div>
  </div>
 </div>
-<div id="cdn" class="hud" aria-live="off"><span class="cdp"></span><div class="cdx"><div id="cdL">Próximo fenómeno natural</div><div id="cdK">&nbsp;</div></div><b id="cdT">--:--</b></div>
+<div id="cdn" class="hud" aria-live="off"><span class="cdp"></span><div class="cdx"><div id="cdL">Próximo fenómeno natural</div><div id="cdK">&nbsp;</div></div><b id="cdT">--:--</b><button type="button" id="cdGo" aria-label="Acelerar evento" title="Acelerar evento"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M4 5l8 7-8 7zM12 5l8 7-8 7z" fill="currentColor"/></svg></button></div>
 <div id="flash"></div>
 <div id="toast" role="status"></div>
 
@@ -1079,7 +1083,7 @@ function phErupt(){
   q.v.copy(pv).multiplyScalar(sz*(.5+Math.random()*1.1)).add(new THREE.Vector3((Math.random()-.5)*sz*.5,(Math.random()-.5)*sz*.5,(Math.random()-.5)*sz*.5));
   q.sp.position.copy(pw);q.sp.material.color.copy(o.col).lerp(new THREE.Color(1,1,1),Math.random()*.55);q.sp.visible=true}
 }
-var cdE=null,cdL='',cdK='',cdT='',cdS=-1;
+var cdE=null,cdL='',cdK='',cdT='',cdS=-1;var cdB=$('#cdGo');if(cdB)cdB.addEventListener('click',function(){if(PH.ready&&PH.st==='wait')PH.next=time});
 function phName(k){return k==='met'?'Lluvia de meteoritos':'Erupciones de gas estelar'}
 function phCd(){
  if(!cdE){cdE=$('#cdn');cdL=$('#cdL');cdK=$('#cdK');cdT=$('#cdT')}
@@ -1087,7 +1091,7 @@ function phCd(){
  var run=PH.st==='run',s=Math.max(0,Math.ceil((run?PH.end:PH.next)-time));
  if(s===cdS&&cdE.classList.contains('run')===run)return;cdS=s;
  var m=Math.floor(s/60),ss=s%60,tx=(m<10?'0':'')+m+':'+(ss<10?'0':'')+ss;
- cdE.classList.toggle('run',run);cdE.classList.toggle('soon',!run&&s<=30);
+ cdE.classList.toggle('run',run);cdE.classList.toggle('soon',!run&&s<=30);if(cdB)cdB.disabled=run;
  cdL.textContent=run?'Fenómeno en curso':'Próximo fenómeno natural';cdK.textContent=phName(run?PH.kind:PH.nk);cdT.textContent=tx;
 }
 function phUpdate(dt){
@@ -1417,7 +1421,7 @@ adm.addEventListener('change',function(e){if(e.target.id==='fG'){var m={core:'su
 })();
 </script>
 <style>
-#nx{right:20px;top:calc(112px + var(--sat));width:272px;z-index:7;border:1px solid var(--line);border-top:2px solid var(--y);background:rgba(3,10,40,.74);backdrop-filter:blur(10px)}
+#nx{right:20px;top:calc(150px + var(--sat));width:272px;z-index:7;border:1px solid var(--line);border-top:2px solid var(--y);background:rgba(3,10,40,.74);backdrop-filter:blur(10px)}
 #nx header{margin:0}
 #nxT{all:unset;box-sizing:border-box;width:100%;display:flex;align-items:center;gap:10px;padding:9px 12px;cursor:pointer;font:700 12px/1 var(--cond);letter-spacing:.2em;text-transform:uppercase;font-style:italic;color:#fff}
 #nxT:focus-visible{outline:1px solid var(--y);outline-offset:-3px}
