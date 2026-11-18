@@ -146,6 +146,9 @@
     { a: -44, o: 270, w: 120, c: -50, s: 7, h: 62, ph: 2 },
     { a: -28, o: -310, w: 80, c: 30, s: 12, h: -30, ph: 4 }
   ];
+  // Deriva hacia arriba en loop: la capa en cache es mas alta que la pantalla (margen BM) y solo se
+  // desplaza; se redibuja cuando se agota el margen o cuando una banda sale y reaparece por abajo.
+  var DRIFT = 26, BM = 260, driftY = 0, driftY0 = 0, wrapOff = [0, 0, 0];
   var bands = BASE.map(function (b) { return { cur: Object.assign({}, b), tar: Object.assign({}, b) }; });
   var WRANGE = [[110, 260], [70, 170], [40, 110]];
   function randBand(i) {
@@ -167,13 +170,14 @@
     });
     if (maxd > 0.002) bandsDirty = true; // solo se redibuja la capa mientras hay cambio
   }
-  function drawBand(b, idx) {
+  function drawBand(b, idx, yo) {
     var p = b.cur, a = p.a * Math.PI / 180, dx = Math.cos(a), dy = Math.sin(a), nx = -dy, ny = dx;
-    var mx = W / 2 + nx * p.o, my = H / 2 + ny * p.o, len = Math.sqrt(W * W + H * H) * 1.15, N = 26, i;
+    var po = p.o + yo * dx; // la banda sube en perpendicular; la parte a lo largo desliza la onda
+    var mx = W / 2 + nx * po, my = H / 2 + ny * po, len = Math.sqrt(W * W + H * H) * 1.15, N = 26, i, os = yo * dy / len;
     var left = [], right = [], path = new Path2D();
     for (i = 0; i <= N; i++) {
-      var s = i / N, t = (s - 0.5) * len, off = p.c * Math.sin(s * Math.PI * 1.4 + p.ph);
-      var hw = p.w / 2 * (1 + 0.45 * Math.sin(s * Math.PI * 2 + p.ph * 0.7));
+      var s = i / N, t = (s - 0.5) * len, ss = s - os, off = p.c * Math.sin(ss * Math.PI * 1.4 + p.ph);
+      var hw = p.w / 2 * (1 + 0.45 * Math.sin(ss * Math.PI * 2 + p.ph * 0.7));
       var qx = mx + dx * t + nx * off, qy = my + dy * t + ny * off;
       left.push([qx + nx * hw, qy + ny * hw]); right.push([qx - nx * hw, qy - ny * hw]);
     }
@@ -186,14 +190,14 @@
     var ha = p.h * Math.PI / 180, hx = Math.cos(ha), hy = Math.sin(ha), gx = -hy, gy = hx;
     var kmin = 1e9, kmax = -1e9, tmin = 1e9, tmax = -1e9, pts = left.concat(right);
     for (i = 0; i < pts.length; i++) {
-      var ux = pts[i][0] - W / 2, uy = pts[i][1] - H / 2, kk = ux * gx + uy * gy, tt = ux * hx + uy * hy;
+      var ux = pts[i][0] - W / 2, uy = pts[i][1] - (H / 2 + yo), kk = ux * gx + uy * gy, tt = ux * hx + uy * hy;
       if (kk < kmin) kmin = kk; if (kk > kmax) kmax = kk;
       if (tt < tmin) tmin = tt; if (tt > tmax) tmax = tt;
     }
     bx.save(); bx.clip(path);
     bx.beginPath();
     for (var k = Math.floor(kmin / p.s); k <= Math.ceil(kmax / p.s); k++) {
-      var ox = W / 2 + gx * k * p.s, oy = H / 2 + gy * k * p.s;
+      var ox = W / 2 + gx * k * p.s, oy = H / 2 + yo + gy * k * p.s;
       bx.moveTo(ox + hx * (tmin - 4), oy + hy * (tmin - 4)); bx.lineTo(ox + hx * (tmax + 4), oy + hy * (tmax + 4));
     }
     if (idx === 0) { bx.strokeStyle = 'rgba(57,255,20,.8)'; bx.lineWidth = 1.8; }
@@ -204,9 +208,9 @@
     bx.stroke(path);
   }
   function renderBands() {
-    bx.setTransform(DPR, 0, 0, DPR, 0, 0);
-    bx.clearRect(0, 0, W, H);
-    bands.forEach(function (b, i) { drawBand(b, i); });
+    bx.setTransform(DPR, 0, 0, DPR, 0, BM * DPR);
+    bx.clearRect(0, -BM, W, H + 2 * BM);
+    bands.forEach(function (b, i) { drawBand(b, i, driftY0 + wrapOff[i]); });
   }
 
   /* Formas geometricas flotantes: repelen el cursor y saltan al tocar */
@@ -259,7 +263,7 @@
 
   /* Tamano y calidad */
   function applyDPR() {
-    cv.width = bl.width = Math.round(W * DPR); cv.height = bl.height = Math.round(H * DPR);
+    cv.width = bl.width = Math.round(W * DPR); cv.height = Math.round(H * DPR); bl.height = Math.round((H + 2 * BM) * DPR);
     cx.setTransform(DPR, 0, 0, DPR, 0, 0);
     bandsDirty = true;
   }
@@ -295,7 +299,7 @@
 
     drawGlyphs(t);
 
-    cx.globalAlpha = m; cx.drawImage(bl, 0, 0, W, H); cx.globalAlpha = 1; // capa de bandas en cache
+    cx.globalAlpha = m; cx.drawImage(bl, 0, -BM + (driftY - driftY0), W, H + 2 * BM); cx.globalAlpha = 1; // capa de bandas en cache
 
     // circulo grande de contorno con paralaje
     var R = Math.min(W, H) * 0.34;
@@ -330,10 +334,19 @@
     }
   }
 
+  function stepDrift() {
+    if (motion) driftY -= DRIFT * dtS / 60;
+    bands.forEach(function (b, i) {
+      var p = b.cur, a = p.a * Math.PI / 180, cs = Math.cos(a), sn = Math.sin(a);
+      var E = Math.abs(W * sn) + Math.abs(H * cs), ext = p.w * 0.73 + Math.abs(p.c) + 60;
+      if (p.o + (driftY + wrapOff[i]) * cs < -(E / 2 + ext)) { wrapOff[i] += (E + 2 * ext) / cs; bandsDirty = true; } // sale arriba, reaparece abajo
+    });
+    if (Math.abs(driftY - driftY0) > BM * 0.8) { driftY0 = driftY; bandsDirty = true; }
+  }
   function step() {
     disk.x = L(disk.x, mouse.x, 0.09); disk.y = L(disk.y, mouse.y, 0.09);
     ang = L(ang, ang0 + (mouse.x / W - 0.5) * 18 + (mouse.y / H - 0.5) * 10, 0.06);
-    stepBands(); stepShapes();
+    stepBands(); stepDrift(); stepShapes();
   }
   function frame(t) {
     if (!motion || document.hidden) { looping = false; return; }
