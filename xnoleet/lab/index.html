@@ -190,6 +190,10 @@ body.hud-on .dock{transform:translate(-50%,0);opacity:1}
 .thumb.pirata::before{content:"";position:absolute;inset:8px 0;background:url(experimentos/pirata.svg) center/contain no-repeat;filter:drop-shadow(3px 2px 0 #2a170d) drop-shadow(3px 2px 0 #2a170d) drop-shadow(2px 1px 0 #1a0e08);transform:perspective(300px) rotateY(-18deg);animation:pz 4s ease-in-out infinite alternate}
 @keyframes pz{to{transform:perspective(300px) rotateY(18deg)}}
 @media (prefers-reduced-motion:reduce){.thumb.pirata::before{animation:none}}
+.thumb.planta{background:radial-gradient(circle at 78% 30%,rgba(255,47,208,.55) 0,transparent 24%),radial-gradient(circle at 26% 74%,rgba(25,233,255,.45) 0,transparent 26%),linear-gradient(rgba(25,233,255,.14) 1px,transparent 1px) 0 0/22px 22px,linear-gradient(90deg,rgba(25,233,255,.14) 1px,transparent 1px) 0 0/22px 22px,#07060d}
+.thumb.planta::before{content:"";position:absolute;left:18%;right:18%;top:20%;bottom:20%;border:2px solid var(--cy);box-shadow:0 0 12px var(--cy),inset 0 0 12px rgba(25,233,255,.5),inset 34px 0 0 -32px var(--mg),inset 0 -26px 0 -24px var(--mg);transform:perspective(260px) rotateX(58deg) rotateZ(-14deg);animation:pn 5s ease-in-out infinite alternate}
+@keyframes pn{to{transform:perspective(260px) rotateX(58deg) rotateZ(16deg)}}
+@media (prefers-reduced-motion:reduce){.thumb.planta::before{animation:none}}
 .thumb.colmena::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,transparent 20%,rgba(0,0,0,.7))}
 .xact{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px}
 a.btn{text-decoration:none;display:inline-block;color:inherit}
@@ -633,7 +637,10 @@ const EXPDATA={
   t:['Three.js','Web Audio','Suspenso'],k:['Entre 1 y 5 puertas malditas por hexágono','Elige tocando la puerta o con las teclas 1 a 6','Contiene sustos, sonidos fuertes y destellos']},
  pirata:{id:'EXP-03',n:'Pirata en Relieve',src:'experimentos/pirata-3d.html',orig:'experimentos/pirata-3d.html',tag:'Vector a 3D',
   d:'Una ilustración vectorial plana convertida en un sólido 3D. Cada color del SVG se extruye como una pieza y sube un escalón sobre las piezas que tapa, como un relieve de papel recortado.',
-  t:['Three.js','SVG','Sombreado plano'],k:['34 capas de color repartidas en 8 niveles de relieve','Ajusta el relieve y el grosor de la base en vivo','Arrastra para girar, Espacio pausa el balanceo y R restablece']}
+  t:['Three.js','SVG','Sombreado plano'],k:['34 capas de color repartidas en 8 niveles de relieve','Ajusta el relieve y el grosor de la base en vivo','Arrastra para girar, Espacio pausa el balanceo y R restablece']},
+ planta:{id:'EXP-04',n:'Planta Neón 3D',src:'experimentos/planta-neon-3d.html',orig:'experimentos/planta-neon-3d.html',tag:'Arte generativo',
+  d:'Cada recorrido del cursor o del dedo levanta una planta arquitectónica aleatoria en 3D, con muros, puertas, ventanas y muebles, mientras cae pintura de neón sobre el piso. La cámara te sigue y mantiene el dibujo centrado.',
+  t:['Three.js','Generativo','Cyberpunk'],k:['Desliza el dedo o el cursor para trazar; dos dedos o clic derecho giran la vista','Pausa con Espacio, cambia de cámara con R y activa o no el seguimiento con F','Exporta lo que ves en JPG de alta calidad, hasta 4096 px']}
 };
 const vw={el:$('#viewer'),fr:$('#vwFrame'),gate:$('#vwGate')};
 function openExp(k){
@@ -670,7 +677,7 @@ const SECS={
    <p class="rv" style="--d:2">El nombre es una clave y se lee <b>Experimental</b>. La "x" suena a "Ex", "periment" queda igual y el "41" es "al" escrito en leet. Es un recordatorio de que aquí nada es definitivo.</p>
   </div>
   <div class="stats rv" style="--d:3">
-   <div class="card stat"><b data-count="3">0</b><span>Experimentos cargados</span></div>
+   <div class="card stat"><b data-count="4">0</b><span>Experimentos cargados</span></div>
    <div class="card stat"><b data-count="5">0</b><span>Niveles de lava</span></div>
    <div class="card stat"><b data-count="3">0</b><span>Colmenas por cruzar</span></div>
    <div class="card stat"><b data-count="100" data-suf="%">0</b><span>Espíritu experimental</span></div>
@@ -725,7 +732,7 @@ const SECS={
   }},
  'experimentos':{n:'04',t:'Experimentos',r:()=>`
   <h2 class="rv" style="--d:0">Experimentos</h2>
-  <p class="rv" style="--d:1">Tres experimentos cargados en el laboratorio. Pulsa cargar para abrirlos aquí mismo.</p>
+  <p class="rv" style="--d:1">Cuatro experimentos cargados en el laboratorio. Pulsa cargar para abrirlos aquí mismo.</p>
   <div class="xgrid">${Object.entries(EXPDATA).map(([k,e],i)=>`
    <article class="card xcard rv" style="--d:${i+2}">
     <div class="thumb ${k}" aria-hidden="true"></div>
@@ -830,7 +837,7 @@ function drawSkill(c,t){const{g,w,h}=c,cx=w/2,cy=h/2+4,r=Math.min(w,h)/2-30,n=SK
   SKILLS.forEach((s,i)=>{const a=-Math.PI/2+i*6.283/n,k=s[1]/100*p;g.fillStyle=skill.hl===i?'#ff2fd0':'#fff';g.beginPath();g.arc(cx+Math.cos(a)*r*k,cy+Math.sin(a)*r*k,skill.hl===i?6:3.5,0,6.283);g.fill();});}
 function setupCanvases(){W.scope=fit($('#cScope'));W.gauge=fit($('#cGauge'));W.radar=fit($('#cRadar'));W.spec=fit($('#cSpec'));}
 const sysEl=$('#sys');let sysT=0,logT=0;
-const LOGS=[['OK','Bus de energía estable'],['INFO','Sincronizando holograma con el núcleo'],['WARN','Pilas: fluctuación leve en el sector 4'],['OK','Enfriamiento activo, todo en orden'],['INFO','Telemetría recibida desde el reactor'],['INFO','Calibrando campo magnético'],['OK','Latido del núcleo: normal'],['INFO','Nuevo experimento en cola: EXP-04'],['WARN','Ojo: temperatura subiendo en la cámara B'],['OK','Escaneo de perímetro completado']];
+const LOGS=[['OK','Bus de energía estable'],['INFO','Sincronizando holograma con el núcleo'],['WARN','Pilas: fluctuación leve en el sector 4'],['OK','Enfriamiento activo, todo en orden'],['INFO','Telemetría recibida desde el reactor'],['INFO','Calibrando campo magnético'],['OK','Latido del núcleo: normal'],['INFO','Nuevo experimento en cola: EXP-05'],['WARN','Ojo: temperatura subiendo en la cámara B'],['OK','Escaneo de perímetro completado']];
 function hudTick(t,dt){
   const ck=$('#clock');try{ck.textContent='BOG '+new Date().toLocaleTimeString('es-CO',{timeZone:'America/Bogota',hour12:false});}catch(e){}
   if(!state.hud)return;
