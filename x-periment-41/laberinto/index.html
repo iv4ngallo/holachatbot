@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Laberinto de Lava 3D</title>
+<style>
+  :root{--bg:#07060b;--ink:#f3ece4;--mut:#a89d92;--ora:#ff6a1a;--safe:#2fd1bf;--gold:#ffc933;--red:#ff3b30}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden;touch-action:none}
+  #game{position:fixed;inset:0}
+  #game canvas{display:block;width:100%;height:100%}
+  .hud{position:fixed;pointer-events:none;z-index:5}
+  #tl{top:max(10px,env(safe-area-inset-top));left:10px;display:flex;flex-direction:column;gap:6px}
+  #tr{top:max(10px,env(safe-area-inset-top));right:10px;width:170px;text-align:right}
+  .card{background:rgba(10,8,14,.72);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:8px 12px;backdrop-filter:blur(4px)}
+  .lbl{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut)}
+  .big{font-size:26px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1}
+  #total.low{color:var(--red);animation:blink 1s steps(2) infinite}
+  @keyframes blink{50%{opacity:.35}}
+  #lava{transition:border-color .2s,background .2s}
+  #lavaVal{font-size:34px}
+  #lava.warn{border-color:#ffb347}
+  #lava.warn #lavaVal{color:#ffb347}
+  #lava.danger{border-color:var(--red);background:rgba(70,10,6,.8)}
+  #lava.danger #lavaVal{color:var(--red)}
+  #lava.burn{border-color:var(--red);background:rgba(120,14,6,.88)}
+  #lava.burn #lavaVal{color:#fff}
+  #lava.cool #lavaVal{color:var(--safe)}
+  #bar{height:5px;border-radius:3px;background:rgba(255,255,255,.12);margin-top:6px;overflow:hidden}
+  #barIn{height:100%;width:0;background:linear-gradient(90deg,#ffb347,#ff3b30)}
+  #sub{font-size:11px;color:var(--mut);margin-top:4px}
+  #keyst{font-size:13px;font-weight:600}
+  #keyst.ok{color:var(--gold)}
+  #mini{left:10px;bottom:max(10px,env(safe-area-inset-bottom));padding:4px}
+  #mini canvas{display:block;width:132px;height:132px;border-radius:8px}
+  #msg{left:50%;top:22%;transform:translateX(-50%);max-width:86vw;text-align:center;font-size:15px;font-weight:600;padding:10px 16px;opacity:0;transition:opacity .25s}
+  #msg.on{opacity:1}
+  #warnTxt{left:50%;bottom:26%;transform:translateX(-50%);max-width:88vw;text-align:center;font-size:14px;font-weight:700;color:#fff;background:rgba(190,30,10,.85);border-radius:10px;padding:8px 14px;opacity:0;transition:opacity .15s}
+  #warnTxt.on{opacity:1}
+  #vig{position:fixed;inset:0;pointer-events:none;z-index:4;opacity:0;background:radial-gradient(ellipse at center,rgba(255,60,0,0) 40%,rgba(255,50,0,.75) 100%)}
+  #flash{position:fixed;inset:0;pointer-events:none;z-index:6;opacity:0;background:#ff2a00;transition:opacity .5s}
+  #joy{position:fixed;width:110px;height:110px;margin:-55px 0 0 -55px;border-radius:50%;border:2px solid rgba(255,255,255,.35);background:rgba(255,255,255,.06);display:none;z-index:5;pointer-events:none}
+  #knob{position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;background:rgba(255,255,255,.4)}
+  #ov{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;padding:18px;background:radial-gradient(ellipse at 50% 30%,#2a0f06 0%,#07060b 70%)}
+  #ov.hide{display:none}
+  .panel{max-width:440px;width:100%;text-align:center}
+  h1{font-size:30px;margin:0 0 6px;letter-spacing:-.01em}
+  h1 span{color:var(--ora)}
+  p{color:var(--mut);font-size:14px;line-height:1.5;margin:6px 0}
+  .opts{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:12px 0 6px}
+  .opt{min-width:62px;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.05);color:var(--ink);font-size:15px;font-weight:600;cursor:pointer}
+  .opt.sel{background:var(--ora);border-color:var(--ora);color:#1a0a02}
+  #go{margin-top:14px;width:100%;padding:14px;border:0;border-radius:12px;background:var(--ora);color:#1a0a02;font-size:17px;font-weight:800;cursor:pointer}
+  .legend{display:flex;gap:14px;justify-content:center;margin-top:12px;font-size:12px;color:var(--mut)}
+  .sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-2px;margin-right:5px}
+</style>
+</head>
+<body>
+<div id="game"></div>
+<div id="vig"></div><div id="flash"></div>
+
+<div class="hud" id="tl">
+  <div class="card"><div class="lbl">Tiempo total</div><div class="big" id="total">08:00</div></div>
+  <div class="card"><div class="lbl" id="lvl">Nivel 1 de 5</div><div id="keyst">Llave: pendiente</div></div>
+</div>
+
+<div class="hud" id="tr">
+  <div class="card" id="lava">
+    <div class="lbl" id="lavaLbl">Lava se enciende en</div>
+    <div class="big" id="lavaVal">0.0 s</div>
+    <div id="bar"><div id="barIn"></div></div>
+    <div id="sub">Ve a una zona segura</div>
+  </div>
+</div>
+
+<div class="hud card" id="mini"><canvas id="mm" width="132" height="132"></canvas></div>
+<div class="hud card" id="msg"></div>
+<div class="hud" id="warnTxt"></div>
+<div id="joy"><div id="knob"></div></div>
+
+<div id="ov">
+  <div class="panel" id="panel">
+    <h1>Laberinto de <span>Lava</span></h1>
+    <p>Encuentra la llave secreta y abre la puerta mágica para pasar al siguiente laberinto. Cada nivel superado suma 40 segundos al reloj.</p>
+    <p>Algunos segmentos del piso se encienden en lava cada cierto tiempo. El contador de la esquina superior derecha te dice cuánto falta para que se enciendan por completo: antes de que llegue a cero debes estar en una zona segura.</p>
+    <div class="legend"><span><i class="sw" style="background:#2a8f84"></i>Zona siempre segura</span><span><i class="sw" style="background:#ff6a1a"></i>Puede encenderse</span></div>
+    <p style="margin-top:14px">Tiempo total de la partida</p>
+    <div class="opts" id="opts"></div>
+    <p>Mover: joystick izquierdo o teclas W A S D. Mirar: arrastra el lado derecho o el mouse.</p>
+    <button id="go">Empezar</button>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+const TILE=4, WALL_H=3.4, EYE=1.6, PR=0.65, ZS=3, MAX_LEVEL=5, BONUS=40, PENALTY=15;
+const SIZES=[6,7,8,9,10];
+const isTouch=('ontouchstart' in window)||navigator.maxTouchPoints>0;
+
+/* ---------- escena ---------- */
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+renderer.outputEncoding=THREE.sRGBEncoding;
+$('game').appendChild(renderer.domElement);
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x07060b);
+scene.fog=new THREE.FogExp2(0x07060b,0.05);
+const camera=new THREE.PerspectiveCamera(72,1,0.1,200);
+camera.rotation.order='YXZ';
+scene.add(camera);
+scene.add(new THREE.AmbientLight(0x6a6a90,0.55));
+const torch=new THREE.PointLight(0xffd9a8,1.15,20,1.6);
+camera.add(torch);
+
+function resize(){
+  const w=window.innerWidth,h=window.innerHeight;
+  renderer.setSize(w,h);camera.aspect=w/h;camera.updateProjectionMatrix();
+}
+window.addEventListener('resize',resize);resize();
+
+/* ---------- texturas procedurales ---------- */
+function mkCanvas(s){const c=document.createElement('canvas');c.width=c.height=s;return c}
+function tex(c,srgb){const t=new THREE.CanvasTexture(c);t.encoding=srgb?THREE.sRGBEncoding:THREE.LinearEncoding;t.anisotropy=4;return t}
+const brickTex=(function(){
+  const c=mkCanvas(128),g=c.getContext('2d');
+  g.fillStyle='#2a2430';g.fillRect(0,0,128,128);
+  const rows=8,bh=128/rows;
+  for(let r=0;r<rows;r++){
+    const off=(r%2)*16;
+    for(let i=-1;i<5;i++){
+      const x=i*32+off,l=38+Math.random()*16;
+      g.fillStyle='hsl(18,'+(12+Math.random()*10)+'%,'+l+'%)';
+      g.fillRect(x+1,r*bh+1,30,bh-2);
+    }
+  }
+  for(let i=0;i<500;i++){g.fillStyle='rgba(0,0,0,'+(Math.random()*.18)+')';g.fillRect(Math.random()*128,Math.random()*128,2,2)}
+  return tex(c,true);
+})();
+const stoneTex=(function(){
+  const c=mkCanvas(128),g=c.getContext('2d');
+  g.fillStyle='#7d7469';g.fillRect(0,0,128,128);
+  for(let i=0;i<900;i++){const v=90+Math.random()*60;g.fillStyle='rgba('+v+','+(v-8)+','+(v-16)+',.35)';g.fillRect(Math.random()*128,Math.random()*128,3,3)}
+  g.strokeStyle='rgba(0,0,0,.55)';g.lineWidth=3;g.strokeRect(1.5,1.5,125,125);
+  return tex(c,true);
+})();
+const lavaTex=(function(){
+  const c=mkCanvas(128),g=c.getContext('2d');
+  g.fillStyle='#5a1a00';g.fillRect(0,0,128,128);
+  for(let i=0;i<26;i++){
+    const x=Math.random()*128,y=Math.random()*128,r=10+Math.random()*26;
+    const gr=g.createRadialGradient(x,y,0,x,y,r);
+    gr.addColorStop(0,'rgba(255,230,120,1)');gr.addColorStop(.5,'rgba(255,100,10,.8)');gr.addColorStop(1,'rgba(255,60,0,0)');
+    g.fillStyle=gr;g.fillRect(x-r,y-r,r*2,r*2);
+  }
+  g.strokeStyle='rgba(20,5,0,.7)';g.lineWidth=2;
+  for(let i=0;i<8;i++){g.beginPath();g.moveTo(Math.random()*128,Math.random()*128);g.lineTo(Math.random()*128,Math.random()*128);g.stroke()}
+  return tex(c,true);
+})();
+const portalTex=(function(){
+  const c=mkCanvas(256),g=c.getContext('2d');
+  const gr=g.createRadialGradient(128,128,4,128,128,128);
+  gr.addColorStop(0,'#ffffff');gr.addColorStop(.25,'#8be9ff');gr.addColorStop(.6,'#7a3cff');gr.addColorStop(1,'#1a0838');
+  g.fillStyle=gr;g.fillRect(0,0,256,256);
+  g.strokeStyle='rgba(255,255,255,.7)';g.lineWidth=5;g.lineCap='round';
+  for(let a=0;a<4;a++){
+    g.beginPath();
+    for(let t=0;t<5;t+=.08){const r=8+t*24,ang=t*1.3+a*Math.PI/2;const x=128+Math.cos(ang)*r,y=128+Math.sin(ang)*r;t===0?g.moveTo(x,y):g.lineTo(x,y)}
+    g.stroke();
+  }
+  return tex(c,true);
+})();
+
+const floorGeo=new THREE.PlaneGeometry(TILE,TILE);
+const wallGeo=new THREE.BoxGeometry(TILE,WALL_H,TILE);
+const wallMat=new THREE.MeshStandardMaterial({map:brickTex,roughness:.92,metalness:0});
+const ceilMat=new THREE.MeshStandardMaterial({color:0x0e0c14,roughness:1,side:THREE.DoubleSide});
+
+/* ---------- estado ---------- */
+let level=1,G=0,grid=null,zones=[],zoneOf=null,explored=null;
+let levelGroup=null,keyObj=null,doorObj=null,doorTile=null,keyTile=null,startTile=[1,1];
+let hasKey=false,running=false,timeLeft=480,chosenMin=8,clock=0,cycleStart=0;
+let burnT=0,lastToast=0,lastDoorMsg=0;
+let P={warn:5.5,ign:3,burn:3,cool:1.2,period:12.7};
+const player={x:0,z:0,yaw:0,pitch:0};
+const LAVA_C=new THREE.Color(0xff4a08);
+const keys={};
+let joy={id:null,ox:0,oy:0,x:0,y:0}, look={id:null,lx:0,ly:0}, mouseDown=false;
+
+function rnd(n){return Math.floor(Math.random()*n)}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]]}return a}
+function fmt(t){t=Math.max(0,Math.ceil(t));return String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0')}
+function isWall(gx,gz){return gx<0||gz<0||gx>=G||gz>=G||grid[gz][gx]===1}
+function toast(txt,ms){const m=$('msg');m.textContent=txt;m.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>m.classList.remove('on'),ms||2400)}
+
+/* ---------- generación del laberinto ---------- */
+function bfs(sx,sy){
+  const d=new Int16Array(G*G).fill(-1);d[sy*G+sx]=0;const q=[[sx,sy]];
+  for(let i=0;i<q.length;i++){
+    const [x,y]=q[i];
+    for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){
+      const nx=x+dx,ny=y+dy;
+      if(!isWall(nx,ny)&&d[ny*G+nx]<0){d[ny*G+nx]=d[y*G+x]+1;q.push([nx,ny])}
+    }
+  }
+  return d;
+}
+
+function buildLevel(){
+  if(levelGroup){
+    scene.remove(levelGroup);
+    levelGroup.traverse(o=>{if(o.isInstancedMesh)o.dispose()});
+    zones.forEach(z=>z.mat.dispose());
+  }
+  levelGroup=new THREE.Group();scene.add(levelGroup);
+  const n=SIZES[level-1];G=2*n+1;
+  grid=[];for(let y=0;y<G;y++)grid.push(new Array(G).fill(1));
+  grid[1][1]=0;const st=[[1,1]];
+  while(st.length){
+    const [x,y]=st[st.length-1];
+    const ds=shuffle([[2,0],[-2,0],[0,2],[0,-2]]).filter(([dx,dy])=>{const nx=x+dx,ny=y+dy;return nx>0&&ny>0&&nx<G-1&&ny<G-1&&grid[ny][nx]===1});
+    if(!ds.length){st.pop();continue}
+    const [dx,dy]=ds[0];grid[y+dy/2][x+dx/2]=0;grid[y+dy][x+dx]=0;st.push([x+dx,y+dy]);
+  }
+  let extra=n+level;
+  for(let i=0;i<n*8&&extra>0;i++){
+    const x=1+rnd(G-2),y=1+rnd(G-2);
+    if(grid[y][x]===1&&((x%2===0&&y%2===1)||(x%2===1&&y%2===0))){grid[y][x]=0;extra--}
+  }
+
+  // llave y puerta
+  const dS=bfs(1,1);
+  let best=-1;keyTile=[1,1];
+  for(let y=0;y<G;y++)for(let x=0;x<G;x++)if(dS[y*G+x]>best){best=dS[y*G+x];keyTile=[x,y]}
+  const dK=bfs(keyTile[0],keyTile[1]);
+  best=-1;doorTile=[1,1];
+  for(let y=0;y<G;y++)for(let x=0;x<G;x++){
+    const a=dS[y*G+x],b=dK[y*G+x];
+    if(a<0||b<0)continue;
+    const m=Math.min(a,b);
+    if(m>best){best=m;doorTile=[x,y]}
+  }
+
+  // zonas de piso
+  const ZC=Math.ceil(G/ZS);zones=[];zoneOf=new Int16Array(G*G).fill(-1);
+  const zmap=new Map();
+  const forced=new Set([Math.floor(1/ZS)+Math.floor(1/ZS)*ZC,
+    Math.floor(keyTile[0]/ZS)+Math.floor(keyTile[1]/ZS)*ZC,
+    Math.floor(doorTile[0]/ZS)+Math.floor(doorTile[1]/ZS)*ZC]);
+  for(let y=0;y<G;y++)for(let x=0;x<G;x++){
+    if(grid[y][x]===1)continue;
+    const zx=Math.floor(x/ZS),zy=Math.floor(y/ZS),id=zx+zy*ZC;
+    let z=zmap.get(id);
+    if(!z){
+      const safe=((zx+zy)%3===0)||forced.has(id);
+      const mat=new THREE.MeshStandardMaterial(safe?
+        {map:stoneTex,color:0x2f9c92,emissive:0x0b4a44,emissiveIntensity:.7,roughness:.85}:
+        {map:stoneTex,color:0x6a5648,emissive:0xff5a00,emissiveMap:lavaTex,emissiveIntensity:.04,roughness:.9});
+      z={id,safe,target:false,L:0,c:0,mat,base:new THREE.Color(safe?0x2f9c92:0x6a5648),cx:0,cy:0,n:0};
+      zmap.set(id,z);zones.push(z);
+    }
+    zoneOf[y*G+x]=zones.indexOf(z);
+    const m=new THREE.Mesh(floorGeo,z.mat);
+    m.rotation.x=-Math.PI/2;m.position.set((x+.5)*TILE,0,(y+.5)*TILE);
+    levelGroup.add(m);
+  }
+
+  // muros
+  const list=[];
+  for(let y=0;y<G;y++)for(let x=0;x<G;x++){
+    if(grid[y][x]!==1)continue;
+    let near=false;
+    for(let dy=-1;dy<=1&&!near;dy++)for(let dx=-1;dx<=1;dx++){
+      if(!isWall(x+dx,y+dy)){near=true;break}
+    }
+    if(near)list.push([x,y]);
+  }
+  const inst=new THREE.InstancedMesh(wallGeo,wallMat,list.length);
+  const dm=new THREE.Matrix4();
+  list.forEach(([x,y],i)=>{dm.makeTranslation((x+.5)*TILE,WALL_H/2,(y+.5)*TILE);inst.setMatrixAt(i,dm)});
+  levelGroup.add(inst);
+  const ceil=new THREE.Mesh(new THREE.PlaneGeometry(G*TILE,G*TILE),ceilMat);
+  ceil.rotation.x=Math.PI/2;ceil.position.set(G*TILE/2,WALL_H,G*TILE/2);
+  levelGroup.add(ceil);
+
+  buildKey();buildDoor();
+
+  // parámetros de ciclo según nivel
+  P.warn=Math.max(3.4,5.6-0.45*level);P.ign=3;P.burn=3;P.cool=1.2;P.period=P.warn+P.ign+P.burn+P.cool;
+  cycleStart=clock;pickTargets();
+
+  explored=new Uint8Array(G*G);hasKey=false;
+  player.x=(startTile[0]+.5)*TILE;player.z=(startTile[1]+.5)*TILE;
+  player.yaw=grid[1][2]===0?-Math.PI/2:Math.PI;player.pitch=0;
+  $('lvl').textContent='Nivel '+level+' de '+MAX_LEVEL;
+  setKeyUI();
+}
+
+function pickTargets(){
+  const cyc=zones.filter(z=>!z.safe);
+  shuffle(cyc);
+  const frac=Math.min(0.78,0.5+0.06*level);
+  const k=Math.max(1,Math.ceil(cyc.length*frac));
+  cyc.forEach((z,i)=>{z.target=i<k});
+}
+
+function buildKey(){
+  const g=new THREE.Group();
+  const gold=new THREE.MeshStandardMaterial({color:0xffc933,emissive:0xb07a00,emissiveIntensity:.9,metalness:.8,roughness:.3});
+  const ring=new THREE.Mesh(new THREE.TorusGeometry(.28,.07,12,24),gold);ring.position.y=.55;g.add(ring);
+  const shaft=new THREE.Mesh(new THREE.CylinderGeometry(.055,.055,.95,10),gold);shaft.position.y=-.1;g.add(shaft);
+  [[-.38,.2],[-.2,.15]].forEach(([y,w])=>{const t=new THREE.Mesh(new THREE.BoxGeometry(w,.09,.09),gold);t.position.set(w/2+.03,y,0);g.add(t)});
+  const l=new THREE.PointLight(0xffd36a,1.4,10);g.add(l);
+  const beam=new THREE.Mesh(new THREE.CylinderGeometry(.22,.22,7,16,1,true),
+    new THREE.MeshBasicMaterial({color:0xffd36a,transparent:true,opacity:.14,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide}));
+  beam.position.y=3;g.add(beam);
+  g.scale.setScalar(1.25);
+  g.position.set((keyTile[0]+.5)*TILE,1.3,(keyTile[1]+.5)*TILE);
+  levelGroup.add(g);keyObj=g;
+}
+
+function buildDoor(){
+  const g=new THREE.Group();
+  const cx=(doorTile[0]+.5)*TILE,cz=(doorTile[1]+.5)*TILE;
+  let d=[0,0];
+  for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){if(isWall(doorTile[0]+dx,doorTile[1]+dy)){d=[dx,dy];break}}
+  g.position.set(cx+d[0]*(TILE/2-.2),0,cz+d[1]*(TILE/2-.2));
+  g.rotation.y=Math.atan2(-d[0],-d[1]);
+  const disc=new THREE.Mesh(new THREE.CircleGeometry(1.35,48),
+    new THREE.MeshBasicMaterial({map:portalTex,transparent:true,side:THREE.DoubleSide,color:0x774455}));
+  disc.position.y=1.55;g.add(disc);
+  const frame=new THREE.Mesh(new THREE.TorusGeometry(1.45,.13,12,40),
+    new THREE.MeshStandardMaterial({color:0x3a3340,emissive:0x331166,emissiveIntensity:.8,roughness:.5,metalness:.6}));
+  frame.position.y=1.55;g.add(frame);
+  const l=new THREE.PointLight(0x7a5cff,1.2,12);l.position.set(0,1.6,.8);g.add(l);
+  levelGroup.add(g);doorObj={g,disc,light:l,locked:true};
+}
+
+function setKeyUI(){
+  const k=$('keyst');
+  k.textContent=hasKey?'Llave: conseguida':'Llave: pendiente';
+  k.className=hasKey?'ok':'';
+}
+
+/* ---------- ciclo de lava ---------- */
+function zoneState(z,t){
+  if(!z.target){z.L=0;z.c=0;return .04}
+  if(t<P.warn){
+    const f=t/P.warn,pulse=.5+.5*Math.sin(t*(4+5*f));
+    z.L=0;z.c=.08+.14*pulse*f;return .12+.4*pulse*(.35+.65*f);
+  }
+  t-=P.warn;
+  if(t<P.ign){const p=t/P.ign;z.L=p;z.c=.2+.8*p;return .5+1.2*p}
+  t-=P.ign;
+  if(t<P.burn){z.L=1;z.c=1;return 1.7+.3*Math.sin(clock*9+z.id)}
+  t-=P.burn;
+  const p=Math.min(1,t/P.cool);z.L=1-p;z.c=1-p;return 1.7*(1-p)+.08;
+}
+
+function updateZones(){
+  let t=clock-cycleStart;
+  if(t>=P.period){cycleStart+=P.period;t-=P.period;pickTargets()}
+  for(const z of zones){
+    const e=zoneState(z,t);
+    z.mat.emissiveIntensity=e;
+    if(!z.safe)z.mat.color.copy(z.base).lerp(LAVA_C,z.c);
+  }
+  return t;
+}
+
+/* ---------- entrada ---------- */
+window.addEventListener('keydown',e=>{keys[e.code]=true;if(e.code.startsWith('Arrow'))e.preventDefault()});
+window.addEventListener('keyup',e=>{keys[e.code]=false});
+const cv=renderer.domElement;
+cv.addEventListener('mousedown',e=>{
+  mouseDown=true;
+  if(!isTouch&&running){try{const p=cv.requestPointerLock();if(p&&p.catch)p.catch(()=>{})}catch(_){}}
+});
+window.addEventListener('mouseup',()=>{mouseDown=false});
+window.addEventListener('mousemove',e=>{
+  if(!running)return;
+  if(document.pointerLockElement===cv||mouseDown){player.yaw-=e.movementX*.0032;player.pitch=Math.max(-1.2,Math.min(1.2,player.pitch-e.movementY*.0032))}
+});
+const joyEl=$('joy'),knob=$('knob');
+cv.addEventListener('touchstart',e=>{
+  e.preventDefault();
+  for(const t of e.changedTouches){
+    if(t.clientX<window.innerWidth*.5&&joy.id===null){
+      joy.id=t.identifier;joy.ox=t.clientX;joy.oy=t.clientY;joy.x=joy.y=0;
+      joyEl.style.display='block';joyEl.style.left=t.clientX+'px';joyEl.style.top=t.clientY+'px';knob.style.transform='translate(0,0)';
+    }else if(look.id===null){look.id=t.identifier;look.lx=t.clientX;look.ly=t.clientY}
+  }
+},{passive:false});
+cv.addEventListener('touchmove',e=>{
+  e.preventDefault();
+  for(const t of e.changedTouches){
+    if(t.identifier===joy.id){
+      let dx=t.clientX-joy.ox,dy=t.clientY-joy.oy;const m=Math.hypot(dx,dy),R=48;
+      if(m>R){dx=dx/m*R;dy=dy/m*R}
+      joy.x=dx/R;joy.y=dy/R;knob.style.transform='translate('+dx+'px,'+dy+'px)';
+    }else if(t.identifier===look.id){
+      player.yaw-=(t.clientX-look.lx)*.0065;
+      player.pitch=Math.max(-1.2,Math.min(1.2,player.pitch-(t.clientY-look.ly)*.0055));
+      look.lx=t.clientX;look.ly=t.clientY;
+    }
+  }
+},{passive:false});
+function endTouch(e){
+  for(const t of e.changedTouches){
+    if(t.identifier===joy.id){joy.id=null;joy.x=joy.y=0;joyEl.style.display='none'}
+    if(t.identifier===look.id)look.id=null;
+  }
+}
+cv.addEventListener('touchend',endTouch);cv.addEventListener('touchcancel',endTouch);
+
+/* ---------- actualización ---------- */
+const mm=$('mm'),mg=mm.getContext('2d');
+function drawMini(){
+  const S=132,c=S/G;
+  mg.fillStyle='#0a0810';mg.fillRect(0,0,S,S);
+  for(let y=0;y<G;y++)for(let x=0;x<G;x++){
+    if(!explored[y*G+x])continue;
+    if(grid[y][x]===1){mg.fillStyle='#34303d'}
+    else{
+      const z=zones[zoneOf[y*G+x]];
+      if(z.safe)mg.fillStyle='#2a8f84';
+      else{
+        const k=Math.max(z.c,z.target?.12:0);
+        const r=Math.round(74+(255-74)*k),g=Math.round(58+(90-58)*k),b=Math.round(51+(16-51)*k);
+        mg.fillStyle='rgb('+r+','+g+','+b+')';
+      }
+    }
+    mg.fillRect(x*c,y*c,c+.5,c+.5);
+  }
+  if(!hasKey&&explored[keyTile[1]*G+keyTile[0]]){mg.fillStyle='#ffc933';mg.beginPath();mg.arc((keyTile[0]+.5)*c,(keyTile[1]+.5)*c,c*.8,0,7);mg.fill()}
+  if(explored[doorTile[1]*G+doorTile[0]]){mg.fillStyle=hasKey?'#b99bff':'#7a5a8a';mg.fillRect(doorTile[0]*c-1,doorTile[1]*c-1,c+2,c+2)}
+  const px=player.x/TILE*c,py=player.z/TILE*c;
+  mg.save();mg.translate(px,py);mg.rotate(-player.yaw);
+  mg.fillStyle='#fff';mg.beginPath();mg.moveTo(0,-c*1.1);mg.lineTo(c*.8,c*.8);mg.lineTo(-c*.8,c*.8);mg.closePath();mg.fill();
+  mg.restore();
+}
+
+function update(dt){
+  clock+=dt;timeLeft-=dt;
+  if(timeLeft<=0){timeLeft=0;endGame(false);return}
+
+  // giro con teclado
+  const turn=(keys.ArrowLeft||keys.KeyQ?1:0)-(keys.ArrowRight||keys.KeyE?1:0);
+  player.yaw+=turn*1.9*dt;
+
+  // movimiento
+  let f=(keys.KeyW||keys.ArrowUp?1:0)-(keys.KeyS||keys.ArrowDown?1:0);
+  let s=(keys.KeyD?1:0)-(keys.KeyA?1:0);
+  f+=-joy.y;s+=joy.x;
+  const m=Math.hypot(f,s);if(m>1){f/=m;s/=m}
+  const sp=5.2*dt,sy=Math.sin(player.yaw),cy=Math.cos(player.yaw);
+  const vx=(-sy*f+cy*s)*sp,vz=(-cy*f-sy*s)*sp;
+  tryMove(vx,0);tryMove(0,vz);
+
+  camera.position.set(player.x,EYE+Math.sin(clock*9)*(m>.1?.035:0),player.z);
+  camera.rotation.set(player.pitch,player.yaw,0);
+
+  // explorado
+  const tx=Math.floor(player.x/TILE),tz=Math.floor(player.z/TILE);
+  for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++){
+    const x=tx+dx,y=tz+dy;if(x>=0&&y>=0&&x<G&&y<G)explored[y*G+x]=1;
+  }
+
+  // lava
+  const t=updateZones();
+  const zi=zoneOf[tz*G+tx],pz=zi>=0?zones[zi]:null;
+  const vig=$('vig'),wt=$('warnTxt');
+  if(pz&&pz.target&&!pz.safe){
+    vig.style.opacity=Math.min(1,pz.c*.95);
+    if(pz.L>=.95){
+      burnT+=dt;
+      if(burnT>.3)burn();
+    }else burnT=0;
+    if(pz.L<.95&&t<P.warn+P.ign){wt.textContent='Esta zona se está encendiendo. Corre a una zona segura (verde azulada).';wt.classList.add('on')}
+    else wt.classList.remove('on');
+  }else{burnT=0;vig.style.opacity=0;wt.classList.remove('on')}
+
+  // llave y puerta
+  if(!hasKey){
+    keyObj.rotation.y+=dt*2.2;keyObj.position.y=1.3+Math.sin(clock*2.4)*.15;
+    if(Math.hypot(player.x-keyObj.position.x,player.z-keyObj.position.z)<1.7){
+      hasKey=true;keyObj.visible=false;setKeyUI();
+      doorObj.disc.material.color.set(0xffffff);doorObj.light.intensity=2.4;
+      toast('Tienes la llave secreta. Busca la puerta mágica.',3200);
+    }
+  }
+  doorObj.disc.rotation.z+=dt*(hasKey?2.4:.4);
+  const dc=[(doorTile[0]+.5)*TILE,(doorTile[1]+.5)*TILE];
+  if(Math.hypot(player.x-dc[0],player.z-dc[1])<2.3){
+    if(hasKey)nextLevel();
+    else if(clock-lastDoorMsg>3){lastDoorMsg=clock;toast('La puerta mágica está sellada. Encuentra la llave secreta.',2600)}
+  }
+
+  updateHUD(t);drawMini();
+}
+
+function tryMove(dx,dz){
+  const nx=player.x+dx,nz=player.z+dz;
+  const x0=Math.floor((nx-PR)/TILE),x1=Math.floor((nx+PR)/TILE),z0=Math.floor((nz-PR)/TILE),z1=Math.floor((nz+PR)/TILE);
+  for(let z=z0;z<=z1;z++)for(let x=x0;x<=x1;x++)if(isWall(x,z))return;
+  player.x=nx;player.z=nz;
+}
+
+function updateHUD(t){
+  const tt=$('total');tt.textContent=fmt(timeLeft);tt.classList.toggle('low',timeLeft<60);
+  const lv=$('lava'),val=$('lavaVal'),lbl=$('lavaLbl'),sub=$('sub'),bar=$('barIn');
+  const full=P.warn+P.ign,burnEnd=full+P.burn;
+  lv.className='card';
+  if(t<full){
+    const rem=full-t;
+    lbl.textContent='Lava se enciende en';val.textContent=rem.toFixed(1)+' s';
+    bar.style.width=(t/full*100)+'%';
+    if(rem<=P.ign){lv.classList.add('danger');sub.textContent='Encendiéndose. Ve a una zona segura'}
+    else{lv.classList.add('warn');sub.textContent='Zonas naranjas en aviso'}
+  }else if(t<burnEnd){
+    lbl.textContent='Lava activa';val.textContent=(burnEnd-t).toFixed(1)+' s';
+    bar.style.width='100%';lv.classList.add('burn');sub.textContent='No pises zonas naranjas';
+  }else{
+    lbl.textContent='Enfriando';val.textContent=(P.period-t).toFixed(1)+' s';
+    bar.style.width='0%';lv.classList.add('cool');sub.textContent='Prepárate para el próximo ciclo';
+  }
+}
+
+function burn(){
+  burnT=0;timeLeft=Math.max(0,timeLeft-PENALTY);
+  player.x=(startTile[0]+.5)*TILE;player.z=(startTile[1]+.5)*TILE;
+  const f=$('flash');f.style.transition='none';f.style.opacity=.85;
+  requestAnimationFrame(()=>{f.style.transition='opacity .6s';f.style.opacity=0});
+  toast('Te quemaste en la lava. Pierdes '+PENALTY+' s y vuelves al inicio.',3000);
+}
+
+function nextLevel(){
+  if(level>=MAX_LEVEL){endGame(true);return}
+  level++;timeLeft+=BONUS;
+  buildLevel();
+  toast('Puerta abierta. Nivel '+level+': +'+BONUS+' s al reloj.',3200);
+}
+
+/* ---------- menús ---------- */
+const optsEl=$('opts');
+[5,6,7,8,9,10].forEach(m=>{
+  const b=document.createElement('button');b.className='opt'+(m===chosenMin?' sel':'');b.textContent=m+' min';
+  b.onclick=()=>{chosenMin=m;[...optsEl.children].forEach(c=>c.classList.remove('sel'));b.classList.add('sel')};
+  optsEl.appendChild(b);
+});
+
+function startGame(){
+  level=1;clock=0;timeLeft=chosenMin*60;burnT=0;
+  buildLevel();
+  $('ov').classList.add('hide');running=true;
+  toast('Busca la llave secreta. Vigila el contador de lava.',3200);
+}
+function endGame(win){
+  running=false;
+  if(document.pointerLockElement)try{document.exitPointerLock()}catch(_){}
+  $('vig').style.opacity=0;$('warnTxt').classList.remove('on');
+  const p=$('panel');
+  p.innerHTML=win?
+    '<h1>Lo <span>lograste</span></h1><p>Atravesaste la última puerta mágica y escapaste de los cinco laberintos.</p><p>Tiempo restante: <b style="color:#fff">'+fmt(timeLeft)+'</b></p><button id="go">Jugar de nuevo</button>':
+    '<h1>Se acabó el <span>tiempo</span></h1><p>Llegaste hasta el nivel '+level+' de '+MAX_LEVEL+'. Inténtalo otra vez.</p><button id="go">Reintentar</button>';
+  p.querySelector('#go').onclick=()=>{location.reload()};
+  $('ov').classList.remove('hide');
+}
+$('go').onclick=startGame;
+
+/* ---------- bucle ---------- */
+let last=performance.now();
+function loop(ts){
+  requestAnimationFrame(loop);
+  const dt=Math.min((ts-last)/1000,.05);last=ts;
+  if(running&&!document.hidden)update(dt);
+  renderer.render(scene,camera);
+}
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
