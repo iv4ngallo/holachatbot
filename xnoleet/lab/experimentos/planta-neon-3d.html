@@ -45,6 +45,7 @@ button:focus-visible{outline:2px solid var(--ye);outline-offset:2px}
 button:disabled{opacity:.6;cursor:progress}
 #bPause[aria-pressed=true]{border-color:var(--ye);color:var(--ye)}
 #bPaint[aria-pressed=false],#bFollow[aria-pressed=false]{color:var(--mut);border-style:dashed}
+#bBack{margin-top:12px;border-color:var(--cy)}
 #bExp{border-color:var(--mg);color:#fff;box-shadow:0 0 14px rgba(255,42,109,.3)}
 #bExp:hover{border-color:var(--ye);box-shadow:0 0 18px rgba(252,238,10,.4)}
 kbd{font:500 13px "Chakra Petch",sans-serif;color:var(--mut);border:1px solid rgba(209,247,255,.22);padding:1px 7px}
@@ -79,7 +80,7 @@ body.noui .top>*,body.noui .hint,body.noui .ctrl button:not(.keep){opacity:0;poi
 <div class="fx" aria-hidden="true"></div>
 
 <header class="ui top">
- <div class="brand"><h1>Planta Neón 3D</h1><p>x-periment-41 · Experimento 03</p></div>
+ <div class="brand"><h1>Planta Neón 3D</h1><p>x-periment-41 · Experimento 04</p><button id="bBack" hidden aria-label="Volver al laboratorio"><span>Volver al laboratorio</span></button></div>
  <dl class="stats">
   <div><dt>Plantas</dt><dd id="sPlans">0</dd></div>
   <div><dt>Manchas</dt><dd id="sSplats">0</dd></div>
@@ -121,6 +122,17 @@ body.noui .top>*,body.noui .hint,body.noui .ctrl button:not(.keep){opacity:0;poi
  <button class="ok" id="bOk">Entendido</button>
 </div>
 
+<script>
+/* Regresar al laboratorio: solo aparece cuando el experimento vive en /xnoleet/ */
+{const b=document.getElementById('bBack');
+ if(b&&location.pathname.indexOf('/xnoleet/')>-1){
+  b.hidden=false;
+  b.addEventListener('click',()=>{
+   if(window.parent!==window)window.parent.postMessage({lab:'cerrar-experimento'},'*');
+   else location.href='../';
+  });
+ }}
+</script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script>

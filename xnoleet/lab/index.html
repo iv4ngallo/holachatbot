@@ -660,6 +660,7 @@ function closeExp(){
   $('#reticle').style.display='';logLine('OK','Experimento cerrado');
 }
 $('#vwClose').addEventListener('click',closeExp);
+addEventListener('message',e=>{if(e.source===vw.fr.contentWindow&&e.data&&e.data.lab==='cerrar-experimento')closeExp();});
 const PROJS=[
  {n:'Núcleo UI',d:'Un kit de componentes HUD reutilizable: marcos, medidores, radares y paneles con estética industrial futurista.',t:['Componentes','Sistema de diseño'],s:'Prototipo funcional',p:72},
  {n:'Radar de Ideas',d:'Tablero para clasificar ideas según riesgo y potencial, con un radar que prioriza qué experimento sigue.',t:['Producto','Visualización'],s:'En construcción',p:45},
