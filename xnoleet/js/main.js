@@ -34,7 +34,7 @@
     document.documentElement.classList.toggle('no-motion', !motion);
     motionBtn.setAttribute('aria-pressed', String(motion));
     motionBtn.textContent = 'Movimiento: ' + (motion ? 'sí' : 'no');
-    if (motion) startLoop(); else drawStatic();
+    if (motion) { startLoop(); startFx(); } else { drawStatic(); clearFx(); }
   }
   motionBtn.addEventListener('click', function () {
     motion = !motion;
@@ -432,6 +432,138 @@
     word.appendChild(el);
     return el;
   });
+  /* ---------- Nodos sobre los bordes de las letras ---------- */
+  // Se extrae el contorno real de cada letra (render fuera de pantalla + trazado de borde)
+  // y por esos contornos viajan cuadrados con esquinas en diagonal que aparecen y se desvanecen.
+  var fx = document.createElement('canvas'), fxc = fx.getContext('2d');
+  fx.className = 'wordfx'; fx.setAttribute('aria-hidden', 'true'); word.appendChild(fx);
+  var contours = [], nodes = [], fxLoop = false, fxVisible = true, wordBusy = false, fxLast = 0, fxDPR = 1;
+  var DX = [1, 1, 0, -1, -1, -1, 0, 1], DY = [0, 1, 1, 1, 0, -1, -1, -1]; // sentido horario, y hacia abajo
+
+  function traceLoops(fg, w, h) {
+    var loops = [], seen = new Uint8Array(w * h), x, y, k;
+    function F(a, b) { return a >= 0 && b >= 0 && a < w && b < h && fg[b * w + a] === 1; }
+    for (y = 0; y < h; y++) for (x = 0; x < w; x++) {
+      if (!F(x, y) || seen[y * w + x]) continue;
+      var bk = -1;
+      for (k = 0; k < 8; k += 2) if (!F(x + DX[k], y + DY[k])) { bk = k; break; }
+      if (bk < 0) continue; // pixel interior
+      var cx0 = x, cy0 = y, pts = [[x, y]], guard = 0;
+      seen[y * w + x] = 1;
+      do {
+        var found = -1;
+        for (k = 1; k <= 8; k++) { var d = (bk + k) & 7; if (F(cx0 + DX[d], cy0 + DY[d])) { found = d; break; } }
+        if (found < 0) break;
+        var pd = (found + 7) & 7, px = cx0 + DX[pd], py = cy0 + DY[pd];
+        cx0 += DX[found]; cy0 += DY[found];
+        for (k = 0; k < 8; k++) if (DX[k] === px - cx0 && DY[k] === py - cy0) { bk = k; break; }
+        pts.push([cx0, cy0]); seen[cy0 * w + cx0] = 1; guard++;
+      } while ((cx0 !== x || cy0 !== y) && guard < w * h);
+      if (pts.length > 24) loops.push(pts);
+    }
+    return loops;
+  }
+  function smoothLoop(pts, ox, oy) {
+    var n = pts.length, R = 4, X = new Float32Array(n), Y = new Float32Array(n), i, j;
+    for (i = 0; i < n; i++) {
+      var sx = 0, sy = 0;
+      for (j = -R; j <= R; j++) { var q = pts[(i + j + n) % n]; sx += q[0]; sy += q[1]; }
+      X[i] = ox + sx / (2 * R + 1) + 0.5; Y[i] = oy + sy / (2 * R + 1) + 0.5;
+    }
+    var cum = new Float32Array(n + 1);
+    for (i = 0; i < n; i++) { var a = (i + 1) % n; cum[i + 1] = cum[i] + Math.hypot(X[a] - X[i], Y[a] - Y[i]); }
+    return { X: X, Y: Y, cum: cum, n: n, len: cum[n] };
+  }
+  function buildContours() {
+    fxDPR = Math.min(window.devicePixelRatio || 1, 2);
+    fx.width = Math.round(word.offsetWidth * fxDPR); fx.height = Math.round(word.offsetHeight * fxDPR);
+    fxc.setTransform(fxDPR, 0, 0, fxDPR, 0, 0);
+    contours = tiles.map(function (el) {
+      var span = el.firstChild, cs = getComputedStyle(span), fs = parseFloat(cs.fontSize), ch = el.dataset.ch, m = 8;
+      var off = document.createElement('canvas'), oc = off.getContext('2d');
+      oc.font = cs.fontWeight + ' ' + fs + 'px ' + cs.fontFamily;
+      var mt = oc.measureText(ch), asc = mt.fontBoundingBoxAscent, des = mt.fontBoundingBoxDescent;
+      var w = Math.ceil(mt.width) + m * 2, h = Math.ceil(asc + des) + m * 2;
+      off.width = w; off.height = h;
+      oc.font = cs.fontWeight + ' ' + fs + 'px ' + cs.fontFamily; oc.textBaseline = 'alphabetic'; oc.fillStyle = '#000';
+      oc.fillText(ch, m, m + asc);
+      var data = oc.getImageData(0, 0, w, h).data, fg = new Uint8Array(w * h), i;
+      for (i = 0; i < w * h; i++) fg[i] = data[i * 4 + 3] > 127 ? 1 : 0;
+      // origen: borde izquierdo del texto y linea base dentro del bloque (sin depender de transformaciones)
+      var left = el.offsetLeft + span.offsetLeft + parseFloat(cs.paddingLeft);
+      var base = el.offsetTop + span.offsetTop + parseFloat(cs.paddingTop) + (fs - (asc + des)) / 2 + asc;
+      return traceLoops(fg, w, h).map(function (l) { return smoothLoop(l, left - m, base - (m + asc)); });
+    });
+  }
+
+  function spawnNode(ti) {
+    var loops = contours[ti]; if (!loops || !loops.length) return;
+    var tot = 0, i; loops.forEach(function (l) { tot += l.len; });
+    var r = Math.random() * tot, lp = loops[0];
+    for (i = 0; i < loops.length; i++) { if (r < loops[i].len) { lp = loops[i]; break; } r -= loops[i].len; }
+    nodes.push({
+      t: ti, lp: lp, s: Math.random() * lp.len, v: rnd(45, 130) * (Math.random() < 0.5 ? 1 : -1),
+      age: 0, life: rnd(1.6, 3.4), sz: rnd(10, 16), x: 0, y: 0
+    });
+  }
+  function pointAt(lp, s) {
+    s = ((s % lp.len) + lp.len) % lp.len;
+    var lo = 0, hi = lp.n;
+    while (hi - lo > 1) { var mid = (lo + hi) >> 1; if (lp.cum[mid] <= s) lo = mid; else hi = mid; }
+    var a = lo % lp.n, b = (lo + 1) % lp.n, f = (s - lp.cum[lo]) / ((lp.cum[lo + 1] - lp.cum[lo]) || 1);
+    return [lp.X[a] + (lp.X[b] - lp.X[a]) * f, lp.Y[a] + (lp.Y[b] - lp.Y[a]) * f];
+  }
+  function chamfer(x, y, sz, c) {
+    var h = sz / 2;
+    fxc.beginPath();
+    fxc.moveTo(x - h + c, y - h); fxc.lineTo(x + h - c, y - h); fxc.lineTo(x + h, y - h + c); fxc.lineTo(x + h, y + h - c);
+    fxc.lineTo(x + h - c, y + h); fxc.lineTo(x - h + c, y + h); fxc.lineTo(x - h, y + h - c); fxc.lineTo(x - h, y - h + c);
+    fxc.closePath();
+  }
+  function fxFrame(t) {
+    if (!motion || document.hidden || !fxVisible || wordBusy) { fxLoop = false; fxc.clearRect(0, 0, fx.width, fx.height); return; }
+    var dt = Math.min((t - (fxLast || t)) / 1000, 0.05); fxLast = t;
+    var W0 = word.offsetWidth, H0 = word.offsetHeight, i, j, nd;
+    fxc.clearRect(0, 0, W0, H0);
+    // aparicion aleatoria por letra
+    var perTile = [];
+    nodes.forEach(function (n) { perTile[n.t] = (perTile[n.t] || 0) + 1; });
+    for (i = 0; i < contours.length; i++) if ((perTile[i] || 0) < 3 && Math.random() < 1.1 * dt) spawnNode(i);
+    for (i = nodes.length - 1; i >= 0; i--) {
+      nd = nodes[i]; nd.age += dt;
+      if (nd.age >= nd.life) { nodes.splice(i, 1); continue; }
+      nd.s += nd.v * dt;
+      var p = pointAt(nd.lp, nd.s), u = nd.age / nd.life;
+      nd.x = p[0]; nd.y = p[1];
+      nd.a = Math.min(1, u / 0.18, (1 - u) / 0.3);
+    }
+    // hilos entre nodos de una misma letra
+    fxc.lineWidth = 1; fxc.strokeStyle = DK;
+    for (i = 0; i < nodes.length; i++) for (j = i + 1; j < nodes.length; j++) {
+      if (nodes[i].t !== nodes[j].t) continue;
+      var dd = Math.hypot(nodes[i].x - nodes[j].x, nodes[i].y - nodes[j].y);
+      if (dd < 110) {
+        fxc.globalAlpha = 0.5 * Math.min(nodes[i].a, nodes[j].a) * (1 - dd / 110);
+        fxc.beginPath(); fxc.moveTo(nodes[i].x, nodes[i].y); fxc.lineTo(nodes[j].x, nodes[j].y); fxc.stroke();
+      }
+    }
+    // cuadrados con esquinas en diagonal
+    fxc.lineWidth = 1.4;
+    nodes.forEach(function (n) {
+      var sz = n.sz * (0.45 + 0.55 * n.a);
+      fxc.globalAlpha = n.a; fxc.fillStyle = G; fxc.strokeStyle = DK;
+      chamfer(n.x, n.y, sz, sz * 0.24); fxc.fill(); fxc.stroke();
+    });
+    fxc.globalAlpha = 1;
+    requestAnimationFrame(fxFrame);
+  }
+  function startFx() { if (!fxLoop && motion && fxVisible && !wordBusy && contours.length) { fxLoop = true; fxLast = 0; requestAnimationFrame(fxFrame); } }
+  function clearFx() { nodes = []; fxc.clearRect(0, 0, word.offsetWidth, word.offsetHeight); }
+  new IntersectionObserver(function (es) { fxVisible = es[0].isIntersecting; if (fxVisible) startFx(); }, { threshold: 0 }).observe(word);
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) startFx(); });
+  window.addEventListener('resize', function () { clearTimeout(buildContours.t); buildContours.t = setTimeout(function () { nodes = []; buildContours(); startFx(); }, 200); });
+  (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(function () { buildContours(); startFx(); });
+
   function scramble(el) {
     if (!motion || el.busy) return;
     el.busy = true; el.classList.add('hot');
@@ -443,6 +575,8 @@
     }, 55);
   }
   function scatter(then) {
+    wordBusy = true; nodes = []; fxc.clearRect(0, 0, word.offsetWidth, word.offsetHeight);
+    setTimeout(function () { wordBusy = false; startFx(); }, 60 + tiles.length * 70 + 900);
     tiles.forEach(function (el) {
       el.style.transition = 'none';
       el.style.transform = 'translate(' + rnd(-210, 210) + 'px,' + rnd(-160, 160) + 'px) rotate(' + rnd(-35, 35) + 'deg) scale(.6)';
@@ -457,7 +591,10 @@
     });
   }
   tiles.forEach(function (el) {
-    el.addEventListener('pointerenter', function () { scramble(el); });
+    el.addEventListener('pointerenter', function () {
+      scramble(el);
+      if (motion && !wordBusy) { var ti = tiles.indexOf(el); for (var q = 0; q < 2 && nodes.length < 18; q++) spawnNode(ti); }
+    });
     el.addEventListener('click', function () { if (motion) scatter(true); });
   });
   if (motion) scatter(false);
