@@ -3,13 +3,149 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>x-periment-41 | xNoleet's Experimental Lab</title>
-<meta http-equiv="refresh" content="0; url=lab/">
-<link rel="canonical" href="https://holaibague.co/xnoleet/lab/">
-<link rel="icon" type="image/svg+xml" href="lab/favicon.svg">
-<script>location.replace('lab/'+location.hash);</script>
+<title>xNoleet | Artista gráfico</title>
+<meta name="description" content="Portafolio de xNoleet, artista gráfico. Trama, círculos, diagonales y tipografía modular. Entra también al laboratorio x-periment-41.">
+<meta name="theme-color" content="#16181a">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="canonical" href="https://holaibague.co/xnoleet/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
 </head>
-<body style="background:#0c1820;color:#d3eef5;font-family:sans-serif;padding:2rem">
-<p>El laboratorio se mudó a <a href="lab/" style="color:#19e9ff">holaibague.co/xnoleet/lab</a>.</p>
+<body>
+<a class="skip" href="#obra">Saltar al contenido</a>
+<div id="progress" aria-hidden="true"></div>
+<canvas id="bg" aria-hidden="true"></canvas>
+
+<header class="top">
+  <a class="brand" href="#inicio" aria-label="xNoleet, ir al inicio">x<i>N</i>oleet</a>
+  <nav aria-label="Principal">
+    <ul>
+      <li><a href="#inicio">Inicio</a></li>
+      <li><a href="#obra">Obra</a></li>
+      <li><a href="#laboratorio">Laboratorio</a></li>
+      <li><a href="#sobre">Sobre</a></li>
+    </ul>
+  </nav>
+  <div class="tools">
+    <button class="chip" id="motion" type="button" aria-pressed="true" title="Activa o desactiva las animaciones">Movimiento: sí</button>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero" id="inicio" aria-label="Inicio">
+    <div class="hero-top">
+      <p class="micro"><b>[x]</b> Artista gráfico</p>
+      <p class="micro">Trama / Círculo / Diagonal</p>
+    </div>
+
+    <div>
+      <div class="word" id="word" role="img" aria-label="xNoleet"></div>
+      <p class="micro" style="margin-top:14px">Pasa el cursor o toca una letra. Haz clic en el fondo para lanzar ondas.</p>
+    </div>
+
+    <div class="hero-bottom">
+      <div class="hero-copy">
+        <h1>Composición con <em>trama</em>, color plano y estructuras que se cruzan.</h1>
+        <p>Obra gráfica de xNoleet y un laboratorio donde las piezas se vuelven experimentos jugables.</p>
+        <div class="hero-cta" style="margin-top:22px">
+          <a class="btn primary" href="#obra">Ver la obra</a>
+          <a class="btn ghost" href="lab/">Entrar al laboratorio</a>
+        </div>
+      </div>
+      <p class="micro readout" aria-hidden="true">X <b id="rx">0000</b><br>Y <b id="ry">0000</b><br>Ángulo <b id="ra">-35°</b></p>
+    </div>
+  </section>
+
+  <section id="obra" aria-labelledby="t-obra">
+    <div class="sec-head rv">
+      <h2 id="t-obra">Obra<sup>01</sup></h2>
+      <p class="sec-intro">Estudios en series. Mueve el cursor sobre una pieza para abrir la trama y haz clic para verla en grande.</p>
+    </div>
+    <div class="filters rv" role="group" aria-label="Filtrar por serie" id="filters"></div>
+    <p class="micro status" id="status" role="status" aria-live="polite"></p>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <section class="lab" id="laboratorio" aria-labelledby="t-lab">
+    <div class="sec-head rv">
+      <h2 id="t-lab">Laboratorio<sup>02</sup></h2>
+      <p class="sec-intro">x-periment-41 es el espacio de experimentación gráfica de xNoleet: mundos 3D, juegos e interfaces.</p>
+    </div>
+    <div class="lab-grid rv">
+      <a class="exp" href="lab/experimentos/lava-3d.html">
+        <span class="id">EXP-01</span>
+        <div><h3>Laberinto de Lava 3D</h3><p>Recorrido en primera persona.</p></div>
+      </a>
+      <a class="exp" href="lab/experimentos/colmena.html">
+        <span class="id">EXP-02</span>
+        <div><h3>La Colmena</h3><p>Puertas y suspenso. Contiene escenas de tensión.</p></div>
+      </a>
+      <a class="exp" href="lab/experimentos/pirata-3d.html">
+        <span class="id">EXP-03</span>
+        <div><h3>Pirata en Relieve</h3><p>Una ilustración vectorial convertida en sólido 3D.</p></div>
+      </a>
+    </div>
+    <a class="btn primary rv" href="lab/">Abrir x-periment-41</a>
+    <p class="lab-name rv">x = <b>Ex</b> &nbsp;/&nbsp; periment &nbsp;/&nbsp; 41 = <b>al</b> &nbsp;=&nbsp; Experimental</p>
+  </section>
+
+  <section id="sobre" aria-labelledby="t-sobre">
+    <div class="sec-head rv">
+      <h2 id="t-sobre">Sobre<sup>03</sup></h2>
+    </div>
+    <div class="about">
+      <div class="rv">
+        <p><strong>xNoleet es artista gráfico.</strong> Su trabajo parte de la composición: un círculo que ancla, una diagonal que atraviesa y una trama de líneas que deja ver o esconde lo que hay debajo.</p>
+        <p>Cuando una pieza pide más, la lleva al laboratorio y la convierte en experimento.</p>
+        <p class="micro" style="margin-top:26px">Atajos del sitio</p>
+        <div class="keys">
+          <span><kbd>Clic</kbd> pieza para ampliar</span>
+          <span><kbd>←</kbd> <kbd>→</kbd> cambiar pieza</span>
+          <span><kbd>Esc</kbd> cerrar visor</span>
+          <span><kbd>T</kbd> abrir o cerrar trama</span>
+        </div>
+      </div>
+      <ul class="traits rv" aria-label="Rasgos del estilo">
+        <li>Trama diagonal <span>01</span></li>
+        <li>Color plano <span>02</span></li>
+        <li>Círculo y diagonal <span>03</span></li>
+        <li>Tipografía modular <span>04</span></li>
+        <li>Estructuras industriales <span>05</span></li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <p class="micro">xNoleet &copy; <span id="year">2026</span></p>
+  <p class="micro"><a href="lab/">x-periment-41</a> / Laboratorio experimental</p>
+</footer>
+
+<dialog id="viewer" aria-labelledby="v-title">
+  <div class="v-bar">
+    <span class="micro" id="v-count"></span>
+    <button class="chip" type="button" id="v-close">Cerrar (Esc)</button>
+  </div>
+  <div class="viewer">
+    <div class="art big" id="v-art"></div>
+    <div class="v-info">
+      <p class="micro" id="v-series"></p>
+      <h3 id="v-title"></h3>
+      <p id="v-desc"></p>
+      <div class="v-actions">
+        <button class="chip" type="button" id="v-hatch" aria-pressed="false">Trama: puesta</button>
+        <button class="chip" type="button" id="v-vary">Variar composición</button>
+      </div>
+      <div class="v-nav">
+        <button class="chip" type="button" id="v-prev" aria-label="Pieza anterior">&larr; Anterior</button>
+        <button class="chip" type="button" id="v-next" aria-label="Pieza siguiente">Siguiente &rarr;</button>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<script src="js/main.js"></script>
 </body>
 </html>
