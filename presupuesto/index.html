@@ -7,6 +7,7 @@
 <meta name="description" content="Tu presupuesto mensual en pesos colombianos: ingresos, pagos, fechas y balance, mes a mes. Parte de Hola Apps.">
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#3D3A86">
+<link rel="stylesheet" href="../suite/suite.css?v=6">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -74,11 +75,10 @@
 html { scroll-behavior: smooth; }
 body {
   margin: 0; background: var(--surface); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.6;
-  padding-left: max(16px, env(safe-area-inset-left, 0px));
-  padding-right: max(16px, env(safe-area-inset-right, 0px));
-  padding-block: 0 var(--space-12);
+  padding: 0 0 var(--space-12);
 }
-.wrap { max-width: 1080px; margin: 0 auto; }
+.wrap { max-width: 1080px; margin: 0 auto; padding-inline: max(16px, env(safe-area-inset-left, 0px)) max(16px, env(safe-area-inset-right, 0px)); }
+.top .wrap { padding-inline: 0; }
 button, input, select { font: inherit; color: inherit; }
 button { cursor: pointer; }
 :focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 2px; }
@@ -88,7 +88,6 @@ button { cursor: pointer; }
 /* Encabezado: bloque sólido de marca */
 .top {
   background: var(--brand); color: var(--on-brand);
-  margin-inline: calc(-1 * max(16px, env(safe-area-inset-left, 0px))) calc(-1 * max(16px, env(safe-area-inset-right, 0px)));
   padding-inline: max(16px, env(safe-area-inset-left, 0px)) max(16px, env(safe-area-inset-right, 0px));
   padding-block: var(--space-6) var(--space-4);
 }
@@ -97,11 +96,8 @@ button { cursor: pointer; }
 h1 { font-family: var(--font-display); font-weight: 400; font-size: 36px; line-height: 42px; margin: 0; text-transform: uppercase; overflow-wrap: anywhere; }
 .brand small { display: block; font-weight: 400; font-size: 14px; line-height: 22px; }
 .top-ctls { display: flex; flex-wrap: wrap; gap: var(--space-3) var(--space-6); align-items: center; min-width: 0; }
-.month-ctl, .acct-ctl { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-3); align-items: center; }
+.month-ctl { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-3); align-items: center; }
 .month-ctl label { font-weight: 600; font-size: 14px; }
-.acct-ctl { font-size: 14px; }
-.acct-ctl .who { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.modechip { border: 1px solid currentColor; border-radius: var(--radius-pill); padding: 0 var(--space-3); font-size: 14px; font-weight: 600; line-height: 22px; }
 select#mes, select#tema {
   background: var(--surface); color: var(--ink); border: 2px solid var(--control-border); border-radius: var(--radius-md);
   padding: 7px 12px; font-weight: 600; font-size: 14px; min-width: 170px;
@@ -202,7 +198,7 @@ ul.rows { list-style: none; margin: 0; padding: 0; }
 .row .chip { grid-area: chip; justify-self: start; }
 .row .edit { grid-area: edit; }
 .mini { display: block; font-size: 14px; font-weight: 600; color: var(--ink-muted); margin-bottom: 2px; }
-.field input[type="text"], .field input[type="date"], .modal input[type="text"], .modal input[type="number"], .modal input[type="email"], .modal input[type="password"], .modal select, .filters select, .authcard input {
+.field input[type="text"], .field input[type="date"], .modal input[type="text"], .modal input[type="number"], .modal input[type="email"], .modal input[type="password"], .modal select, .filters select {
   width: 100%; min-width: 0; background: var(--surface); color: var(--ink); border: 2px solid var(--control-border); border-radius: var(--radius-md); padding: 6px 12px; font-weight: 500; font-size: 16px; line-height: 24px;
 }
 .field input[type="text"] { text-align: right; font-variant-numeric: tabular-nums; }
@@ -371,13 +367,7 @@ tr.cur td { background: var(--brand-tint); }
 .warnbox { border: 1px solid var(--warn); background: var(--warn-soft); border-radius: var(--radius-md); padding: var(--space-3); font-size: 14px; line-height: 22px; }
 
 /* Acceso (Supabase) */
-.authcard { max-width: 440px; margin: var(--space-8) auto 0; padding: var(--space-6); display: grid; gap: var(--space-4); }
-.authcard form { display: grid; gap: var(--space-3); }
-.authcard label { display: grid; gap: var(--space-1); font-weight: 600; font-size: 14px; }
-.authcard .alt { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4); font-size: 14px; }
 .linkbtn { background: none; border: 0; padding: 0; color: var(--brand); font-weight: 600; font-size: 14px; text-decoration: underline; }
-.authmsg { margin: 0; font-size: 14px; line-height: 22px; }
-.authmsg.err { color: var(--warn); }
 
 @media (max-width: 640px) {
   h1 { font-size: 28px; line-height: 34px; }
@@ -420,7 +410,6 @@ body.dragging { -webkit-user-select: none; user-select: none; cursor: grabbing; 
       <small>Hola Apps · Pesos colombianos (COP)</small>
     </div>
     <div class="top-ctls">
-      <div class="acct-ctl" id="acctCtl"></div>
       <div class="theme-ctl"><label for="tema">Tema</label><select id="tema" aria-label="Tema de color"></select></div>
       <div class="month-ctl" id="monthCtl"></div>
     </div>
@@ -433,7 +422,8 @@ body.dragging { -webkit-user-select: none; user-select: none; cursor: grabbing; 
 <div id="modalRoot"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="config.js"></script>
+<script src="../suite/config.js?v=2"></script>
+<script src="../suite/suite.js?v=6"></script>
 <script>
 (function () {
   "use strict";
@@ -444,7 +434,6 @@ body.dragging { -webkit-user-select: none; user-select: none; cursor: grabbing; 
   var DIAS = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
   var DOW = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];  var app = document.getElementById("app");
   var monthCtl = document.getElementById("monthCtl");
-  var acctCtl = document.getElementById("acctCtl");
   var THEMES = [["", "Automático"], ["light", "Claro"], ["dark", "Oscuro"]];
   var temaSel = document.getElementById("tema");
   function applyTheme(id) {
@@ -458,7 +447,7 @@ body.dragging { -webkit-user-select: none; user-select: none; cursor: grabbing; 
   var toastEl = document.getElementById("toast");
 
   var db = null, canWrite = true, dbMissing = false;
-  var sb = null, session = null, mode = "", authView = "login", authMsg = null, recovering = false;
+  var sb = null, session = null;
   var months = [], items = [], cats = [], catMap = {};
   var sel = null, busy = false, loadedM = false, loadedI = false, loadedC = false, slow = false, modal = null;
   var dragState = null, dragDirty = false, unlocked = {}, lastDragEnd = 0;
@@ -1138,8 +1127,7 @@ body.dragging { -webkit-user-select: none; user-select: none; cursor: grabbing; 
 
   function render() {
     if (dragState) { dragDirty = true; return; }
-    acctCtl.innerHTML = acctHTML();
-    if (mode === "nube" && (!session || recovering)) { monthCtl.innerHTML = ""; app.innerHTML = authHTML(); return; }
+    if (!session) { monthCtl.innerHTML = ""; app.innerHTML = '<section class="card state"><h2>Inicia sesión</h2><p>Accede con tu cuenta de Hola Apps para ver tu presupuesto.</p></section>'; return; }
     var opts = months.map(function (m) { return '<option value="' + m.id + '"' + (m.id === sel ? " selected" : "") + ">" + monthLabel(m.id) + "</option>"; }).join("");
     monthCtl.innerHTML = (months.length ? '<label for="mes">Mes</label><select id="mes" aria-label="Mes del presupuesto">' + opts + "</select>" + (canWrite && sel ? '<button class="btn" data-act="editmonth"' + (busy ? " disabled" : "") + ">Editar o eliminar mes</button>" : "") : "") +
       (canWrite && db && loadedM ? '<button class="btn" data-act="newmonth"' + (busy ? " disabled" : "") + ">" + (busy ? "Creando..." : months.length ? "Nuevo mes" : "Crear primer mes") + "</button>" : "");
@@ -1308,8 +1296,6 @@ body.dragging { -webkit-user-select: none; user-select: none; cursor: grabbing; 
     var a = t.getAttribute("data-act");
     if (a === "scrim") return;
     if (a === "toggle") return;
-    if (a === "auth-view") { authView = t.getAttribute("data-v"); authMsg = null; render(); }
-    else if (a === "signout") { if (sb) sb.auth.signOut(); }
     else if (a === "view") { view = t.getAttribute("data-v"); menuOpen = false; store("pp-vista", view); render(); var vb = document.getElementById("vistas-btn"); if (vb) vb.focus(); }
     else if (a === "menu") { menuOpen = !menuOpen; render(); if (menuOpen) { var cv = document.getElementById("tab-" + view); if (cv) cv.focus(); } }
     else if (a === "collapse") { var g = t.getAttribute("data-g"); if (collapsed[g]) delete collapsed[g]; else collapsed[g] = true; store("pp-colapsadas", JSON.stringify(collapsed)); render(); }
@@ -1527,85 +1513,20 @@ body.dragging { -webkit-user-select: none; user-select: none; cursor: grabbing; 
   var theStore = null;
   /* Refresca cuando vuelves a la pestaña (por si editaste en otro dispositivo) */
   document.addEventListener("visibilitychange", function () {
-    if (document.visibilityState !== "visible" || mode !== "nube" || !session || !theStore || modal || dragState || busy) return;
+    if (document.visibilityState !== "visible" || !session || !theStore || modal || dragState || busy) return;
     if (Date.now() - lastLoad < 30000) return;
     lastLoad = Date.now();
     theStore.load().catch(function () { /* se conserva lo que ya se ve */ });
   });
 
-  /* Acceso con Supabase (cuenta por usuario) */
-  function authHTML() {
-    var v = authView, t = v === "signup" ? "Crea tu cuenta" : v === "reset" ? "Recupera tu acceso" : v === "newpass" ? "Elige una contraseña nueva" : "Ingresa a tu presupuesto";
-    var msg = authMsg ? '<p class="authmsg' + (authMsg.err ? " err" : "") + '" role="status">' + esc(authMsg.text) + "</p>" : "";
-    var f = '<label>Correo<input type="email" id="au-mail" autocomplete="email" required></label>';
-    if (v === "login") f += '<label>Contraseña<input type="password" id="au-pass" autocomplete="current-password" required></label>';
-    if (v === "signup") f += '<label>Contraseña<input type="password" id="au-pass" autocomplete="new-password" minlength="8" required></label>';
-    if (v === "newpass") f = '<label>Contraseña nueva<input type="password" id="au-pass" autocomplete="new-password" minlength="8" required></label>';
-    var btn = v === "signup" ? "Crear cuenta" : v === "reset" ? "Enviar enlace" : v === "newpass" ? "Guardar contraseña" : "Ingresar";
-    var alt = v === "login" ? '<button type="button" class="linkbtn" data-act="auth-view" data-v="signup">Crear cuenta</button><button type="button" class="linkbtn" data-act="auth-view" data-v="reset">Olvidé mi contraseña</button>'
-      : v === "newpass" ? "" : '<button type="button" class="linkbtn" data-act="auth-view" data-v="login">Ya tengo cuenta</button>';
-    return '<section class="card authcard"><h2>' + t + '</h2><p class="muted" style="margin:0">Tus pagos quedan guardados en tu cuenta de Hola Apps y solo tú los ves.</p>' +
-      '<form id="authform" data-auth="' + v + '" novalidate>' + f + '<button class="btn primary" type="submit"' + (busy ? " disabled" : "") + ">" + (busy ? "Un momento..." : btn) + "</button></form>" + msg + '<div class="alt">' + alt + "</div></section>";
+  /* Acceso compartido de Hola Apps: lo gestiona Suite (barra negra superior + login único) */
+  function onUser(user, client) {
+    sb = client; session = { user: user };
+    connect(cloudPersist(user.id));
   }
-  function authErr(e) {
-    var m = String((e && e.message) || "").toLowerCase();
-    if (m.indexOf("invalid login") >= 0) return "El correo o la contraseña no coinciden.";
-    if (m.indexOf("already registered") >= 0 || m.indexOf("already been registered") >= 0) return "Ese correo ya tiene una cuenta. Intenta ingresar.";
-    if (m.indexOf("password") >= 0 && m.indexOf("least") >= 0) return "La contraseña debe tener mínimo 8 caracteres.";
-    if (m.indexOf("rate") >= 0) return "Demasiados intentos. Espera un momento y vuelve a intentar.";
-    if (m.indexOf("email not confirmed") >= 0) return "Confirma tu correo con el enlace que te enviamos antes de ingresar.";
-    return "No pudimos completar la acción. Revisa tus datos e intenta de nuevo.";
-  }
-  async function submitAuth(form) {
-    if (busy) return;
-    var v = form.getAttribute("data-auth"), mail = (document.getElementById("au-mail") || {}).value || "", pass = (document.getElementById("au-pass") || {}).value || "";
-    mail = mail.trim();
-    if (v !== "newpass" && !/^\S+@\S+\.\S+$/.test(mail)) { authMsg = { err: true, text: "Escribe un correo válido." }; render(); return; }
-    if ((v === "signup" || v === "newpass") && pass.length < 8) { authMsg = { err: true, text: "La contraseña debe tener mínimo 8 caracteres." }; render(); return; }
-    if (v === "login" && !pass) { authMsg = { err: true, text: "Escribe tu contraseña." }; render(); return; }
-    busy = true; authMsg = null; render();
-    try {
-      var r;
-      if (v === "login") r = await sb.auth.signInWithPassword({ email: mail, password: pass });
-      else if (v === "signup") r = await sb.auth.signUp({ email: mail, password: pass, options: { emailRedirectTo: location.origin + location.pathname } });
-      else if (v === "reset") r = await sb.auth.resetPasswordForEmail(mail, { redirectTo: location.origin + location.pathname });
-      else r = await sb.auth.updateUser({ password: pass });
-      if (r.error) throw r.error;
-      if (v === "signup" && !(r.data && r.data.session)) { authView = "login"; authMsg = { text: "Te enviamos un enlace de confirmación. Ábrelo y luego ingresa." }; }
-      else if (v === "reset") { authMsg = { text: "Si ese correo tiene cuenta, te llegará un enlace para elegir una contraseña nueva." }; }
-      else if (v === "newpass") { recovering = false; authView = "login"; toast("Contraseña actualizada."); }
-    } catch (e) { authMsg = { err: true, text: authErr(e) }; }
-    busy = false; render();
-  }
-  function onSession(s, event) {
-    var prev = session && session.user && session.user.id;
-    session = s || null;
-    if (event === "PASSWORD_RECOVERY") { recovering = true; authView = "newpass"; authMsg = null; render(); return; }
-    if (recovering) { render(); return; }
-    if (session) { if (prev !== session.user.id || !theStore) connect(cloudPersist(session.user.id)); else render(); }
-    else { disconnect(); authView = "login"; render(); }
-  }
-  function acctHTML() {
-    if (mode === "nube" && session) return '<span class="who" title="' + esc(session.user.email) + '">' + esc(session.user.email) + '</span><button class="btn small" data-act="signout">Salir</button>';
-    if (mode === "local") return '<span class="modechip" title="Sin cuenta: los datos se guardan solo en este navegador.">Modo local</span>';
-    return "";
-  }
-
-  document.addEventListener("submit", function (e) { var f = e.target; if (f && f.id === "authform") { e.preventDefault(); submitAuth(f); } });
-
-  async function start() {
-    loadPrefs(); render();
-    var cfg = window.PRESUPUESTO_CFG;
-    if (cfg && cfg.url && cfg.anon && window.supabase && window.supabase.createClient) {
-      mode = "nube";
-      sb = window.supabase.createClient(cfg.url, cfg.anon, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } });
-      sb.auth.onAuthStateChange(function (ev, s) { setTimeout(function () { onSession(s, ev); }, 0); });
-      try { var r = await sb.auth.getSession(); if (!session) onSession(r.data && r.data.session, "INITIAL"); } catch (e) { onSession(null, "INITIAL"); }
-    } else {
-      mode = "local"; connect(localPersist());
-    }
-  }
-  start();
+  function onLogout() { session = null; sb = null; disconnect(); render(); }
+  loadPrefs(); render();
+  Suite.init({ app: "presupuesto", gate: true, onUser: onUser, onLogout: onLogout });
 })();
 </script>
 </body>
