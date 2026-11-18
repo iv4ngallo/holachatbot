@@ -12,12 +12,14 @@
     { t: 'Estudio 04', s: 'Tipografía', type: 'tipo',     seed: 41, d: 'Bloques recortados con relleno de líneas. Cuatro módulos que forman una palabra.' },
     { t: 'Estudio 05', s: 'Trama',      type: 'diagonal', seed: 58, d: 'Salpicaduras pequeñas sobre diagonales paralelas. El ruido controlado rompe la rejilla.' },
     { t: 'Estudio 06', s: 'Círculo',    type: 'circulo',  seed: 64, d: 'Dos círculos a distinta escala y una diagonal estructural que los une.' },
-    { t: 'Estudio 07', s: 'Estructura', type: 'torre',    seed: 79, d: 'Estructura metálica con plataforma y antenas, recortada contra un círculo blanco.' },
+    { t: 'Estudio 07', s: 'Estructura', type: 'torre',    seed: 79, d: 'Estructura metálica con plataforma y antenas, recortada contra un círculo verde.' },
     { t: 'Estudio 08', s: 'Tipografía', type: 'tipo',     seed: 86, d: 'Módulos tipográficos con cruces x como marcas de corte.' }
   ];
 
+  var DK = '#1f2326', G = '#39ff14', PI2 = Math.PI * 2;
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  var rnd = function (a, b) { return a + Math.random() * (b - a); };
   var reduceMQ = window.matchMedia('(prefers-reduced-motion: reduce)');
 
   /* ---------- Movimiento (control del usuario) ---------- */
@@ -39,97 +41,270 @@
     try { localStorage.setItem('xn-motion', motion ? '1' : '0'); } catch (e) {}
     applyMotion();
   });
+  // Con movimiento apagado los valores saltan directo al destino; con movimiento van suavizados.
+  function L(cur, tar, f) { return motion ? cur + (tar - cur) * f : tar; }
 
-  /* ---------- Fondo: diagonales y circulos reactivos ---------- */
+  /* ---------- Lienzo de fondo ---------- */
   var cv = $('#bg'), cx = cv.getContext('2d');
   var W = 0, H = 0, DPR = 1;
-  var mouse = { x: 0, y: 0 }, disk = { x: 0, y: 0 }, ang = -35;
-  var ripples = [], looping = false, lastT = 0;
+  var mouse = { x: 0, y: 0 }, disk = { x: 0, y: 0 }, ang = -35, ang0 = -35;
+  var down = false, taps = 0, ripples = [], ripId = 0, looping = false;
 
+  /* Campo de modulos + y x: tiras horizontales y verticales aleatorias */
+  var CELL = 40, cols = 0, rows = 0, cells = {}, strips = [];
+  function addStrip() {
+    strips.push({
+      h: Math.random() < 0.5, len: 3 + Math.floor(Math.random() * 8),
+      c: Math.floor(Math.random() * cols), r: Math.floor(Math.random() * rows),
+      t: Math.random() < 0.5 ? 0 : 1, alt: Math.random() < 0.3
+    });
+  }
+  function syncCells() {
+    var want = {}, k;
+    strips.forEach(function (s) {
+      for (var i = 0; i < s.len; i++) {
+        var c = s.c + (s.h ? i : 0), r = s.r + (s.h ? 0 : i);
+        if (c >= cols || r >= rows) break;
+        want[c + ',' + r] = { c: c, r: r, t: s.alt ? (s.t + i) % 2 : s.t };
+      }
+    });
+    for (k in cells) if (!want[k]) cells[k].ta = 0;
+    for (k in want) {
+      if (cells[k]) cells[k].ta = 1;
+      else cells[k] = { c: want[k].c, r: want[k].r, t: want[k].t, rot: want[k].t * Math.PI / 4, sc: 1, a: 0, ta: 1, rid: 0 };
+    }
+  }
+  function buildGlyphs() {
+    CELL = Math.max(34, Math.min(48, Math.round(W / 30)));
+    cols = Math.ceil(W / CELL) + 1; rows = Math.ceil(H / CELL) + 2;
+    strips = []; cells = {};
+    var n = Math.round(cols * rows / 22);
+    for (var i = 0; i < n; i++) addStrip();
+    syncCells();
+  }
+  function reshuffle() {
+    var n = Math.max(3, Math.round(strips.length / 6)), i;
+    for (i = 0; i < n && strips.length; i++) strips.splice(Math.floor(Math.random() * strips.length), 1);
+    for (i = 0; i < n; i++) addStrip();
+    syncCells();
+  }
+  function drawGlyphs(t, sy) {
+    var gy = (sy * 0.18) % CELL, k, g, i;
+    for (k in cells) {
+      g = cells[k];
+      g.a = L(g.a, g.ta, 0.08);
+      if (g.ta === 0 && g.a < 0.02) { delete cells[k]; continue; }
+      var x = g.c * CELL + CELL / 2, y = g.r * CELL + CELL / 2 - gy - CELL;
+      var dx = x - disk.x, dy = y - disk.y, d = Math.sqrt(dx * dx + dy * dy), near = Math.max(0, 1 - d / 160);
+      for (i = 0; i < ripples.length; i++) {
+        var rp = ripples[i], rx = x - rp.x, ry = y - rp.y;
+        var rd = Math.sqrt(rx * rx + ry * ry), rr = 10 + (t - rp.t) / 1000 * 260;
+        if (g.rid !== rp.id && Math.abs(rd - rr) < 26) { g.t = 1 - g.t; g.rid = rp.id; }
+      }
+      var want = near > 0.45 ? 1 - g.t : g.t;
+      g.rot = L(g.rot, want * Math.PI / 4, 0.14);
+      g.sc = L(g.sc, 1 + near * 0.9, 0.14);
+      var s = CELL * 0.2 * g.sc, c = Math.cos(g.rot) * s, sn = Math.sin(g.rot) * s;
+      if (near > 0.3) {
+        cx.fillStyle = 'rgba(57,255,20,' + (near * g.a).toFixed(3) + ')';
+        cx.beginPath(); cx.arc(x, y, s * 1.7, 0, PI2); cx.fill();
+      }
+      cx.strokeStyle = 'rgba(31,35,38,' + ((0.2 + 0.7 * near) * g.a).toFixed(3) + ')';
+      cx.lineWidth = 1.8;
+      cx.beginPath();
+      cx.moveTo(x - c, y - sn); cx.lineTo(x + c, y + sn);
+      cx.moveTo(x + sn, y - c); cx.lineTo(x - sn, y + c);
+      cx.stroke();
+    }
+  }
+
+  /* Bandas diagonales texturizadas que mutan al tocar */
+  var BASE = [
+    { a: -36, o: -40, w: 190, c: 70, s: 8, h: 18, ph: 0.6 },
+    { a: -44, o: 270, w: 120, c: -50, s: 7, h: 62, ph: 2 },
+    { a: -28, o: -310, w: 80, c: 30, s: 12, h: -30, ph: 4 }
+  ];
+  var bands = BASE.map(function (b) { return { cur: Object.assign({}, b), tar: Object.assign({}, b) }; });
+  var WRANGE = [[110, 260], [70, 170], [40, 110]];
+  function randBand(i) {
+    var a = rnd(-62, -14), side = Math.random() < 0.5 ? 1 : -1;
+    return {
+      a: a, o: rnd(-0.5, 0.5) * Math.min(W, H) * (i === 0 ? 0.7 : 1.15), w: rnd(WRANGE[i][0], WRANGE[i][1]),
+      c: rnd(-200, 200), s: rnd(i === 1 ? 7 : 6, 15), h: a + side * rnd(15, 80), ph: rnd(0, 6.28)
+    };
+  }
+  function morph() { bands.forEach(function (b, i) { b.tar = randBand(i); }); }
+  function stepBands() {
+    bands.forEach(function (b) { for (var k in b.tar) b.cur[k] = L(b.cur[k], b.tar[k], 0.045); });
+  }
+  function trace(b) {
+    var p = b.cur, a = p.a * Math.PI / 180, dx = Math.cos(a), dy = Math.sin(a), nx = -dy, ny = dx;
+    var mx = W / 2 + nx * p.o, my = H / 2 + ny * p.o, len = Math.sqrt(W * W + H * H) * 1.15, N = 26, left = [], right = [], i;
+    for (i = 0; i <= N; i++) {
+      var s = i / N, t = (s - 0.5) * len, off = p.c * Math.sin(s * Math.PI * 1.4 + p.ph);
+      var hw = p.w / 2 * (1 + 0.45 * Math.sin(s * Math.PI * 2 + p.ph * 0.7));
+      var bx = mx + dx * t + nx * off, by = my + dy * t + ny * off;
+      left.push([bx + nx * hw, by + ny * hw]); right.push([bx - nx * hw, by - ny * hw]);
+    }
+    cx.beginPath(); cx.moveTo(left[0][0], left[0][1]);
+    for (i = 1; i <= N; i++) cx.lineTo(left[i][0], left[i][1]);
+    for (i = N; i >= 0; i--) cx.lineTo(right[i][0], right[i][1]);
+    cx.closePath();
+    return len;
+  }
+  function drawBand(b, idx, m) {
+    var p = b.cur, len = trace(b);
+    cx.save(); cx.clip();
+    var ha = p.h * Math.PI / 180, hx = Math.cos(ha), hy = Math.sin(ha), nx = -hy, ny = hx, n = Math.ceil(len / p.s / 2);
+    cx.beginPath();
+    for (var k = -n; k < n; k++) {
+      var ox = W / 2 + nx * k * p.s, oy = H / 2 + ny * k * p.s;
+      cx.moveTo(ox - hx * len, oy - hy * len); cx.lineTo(ox + hx * len, oy + hy * len);
+    }
+    if (idx === 0) { cx.strokeStyle = 'rgba(57,255,20,' + (0.8 * m) + ')'; cx.lineWidth = 1.8; }
+    else if (idx === 1) { cx.strokeStyle = 'rgba(31,35,38,' + (0.42 * m) + ')'; cx.lineWidth = 1; }
+    else { cx.strokeStyle = 'rgba(31,35,38,' + (0.3 * m) + ')'; cx.lineWidth = 0.8; }
+    cx.stroke(); cx.restore();
+    trace(b);
+    cx.strokeStyle = 'rgba(31,35,38,' + ((idx === 0 ? 0.85 : 0.35) * m) + ')'; cx.lineWidth = idx === 0 ? 1.4 : 1;
+    cx.stroke();
+  }
+
+  /* Formas geometricas flotantes: repelen el cursor y saltan al tocar */
+  var shapes = [
+    { k: 'tri', u: 0.1, v: 0.34, r: 34 }, { k: 'ring', u: 0.9, v: 0.72, r: 30 },
+    { k: 'semi', u: 0.52, v: 0.9, r: 44 }, { k: 'sq', u: 0.3, v: 0.62, r: 20 },
+    { k: 'dot', u: 0.62, v: 0.18, r: 10 }, { k: 'tri0', u: 0.84, v: 0.16, r: 28 },
+    { k: 'ring', u: 0.18, v: 0.82, r: 14 }
+  ];
+  shapes.forEach(function (s, i) { s.x = s.y = 0; s.rot = rnd(0, 6.28); s.vr0 = (i % 2 ? 1 : -1) * 0.004; s.vr = s.vr0; s.init = false; });
+  function placeShapes() { shapes.forEach(function (s) { s.init = false; }); }
+  function jumpShapes() {
+    shapes.forEach(function (s) { s.u = rnd(0.06, 0.94); s.v = rnd(0.1, 0.9); s.vr += rnd(-0.14, 0.14); });
+  }
+  function stepShapes() {
+    shapes.forEach(function (s, i) {
+      var dep = 0.06 + i * 0.024, px = s.u * W - (disk.x - W / 2) * dep, py = s.v * H - (disk.y - H / 2) * dep;
+      var dx = px - disk.x, dy = py - disk.y, d = Math.sqrt(dx * dx + dy * dy) || 1;
+      if (d < 180) { var f = (1 - d / 180) * 90; px += dx / d * f; py += dy / d * f; }
+      if (!s.init) { s.x = px; s.y = py; s.init = true; }
+      s.x = L(s.x, px, 0.09); s.y = L(s.y, py, 0.09);
+      if (motion) { s.vr += (s.vr0 - s.vr) * 0.04; s.rot += s.vr; }
+    });
+  }
+  function drawShapes(m) {
+    shapes.forEach(function (s) {
+      cx.save(); cx.translate(s.x, s.y); cx.rotate(s.rot);
+      cx.globalAlpha = m; cx.lineWidth = 1.8; cx.strokeStyle = DK; cx.fillStyle = DK;
+      var r = s.r;
+      if (s.k === 'tri' || s.k === 'tri0') {
+        cx.beginPath(); cx.moveTo(0, -r); cx.lineTo(r * 0.9, r * 0.7); cx.lineTo(-r * 0.9, r * 0.7); cx.closePath();
+        if (s.k === 'tri') { cx.fillStyle = G; cx.fill(); }
+        cx.stroke();
+      } else if (s.k === 'ring') {
+        cx.beginPath(); cx.arc(0, 0, r, 0, PI2); cx.stroke();
+        cx.beginPath(); cx.arc(r, 0, 3.5, 0, PI2); cx.fill();
+      } else if (s.k === 'semi') {
+        cx.beginPath(); cx.arc(0, 0, r, 0, Math.PI); cx.closePath(); cx.fill();
+      } else if (s.k === 'sq') {
+        cx.strokeRect(-r, -r, r * 2, r * 2);
+        cx.beginPath(); cx.moveTo(-r, 0); cx.lineTo(r, 0); cx.moveTo(0, -r); cx.lineTo(0, r); cx.stroke();
+      } else {
+        cx.beginPath(); cx.arc(0, 0, r, 0, PI2); cx.fill();
+      }
+      cx.restore();
+    });
+  }
+
+  /* Dibujo principal */
   function resize() {
     DPR = Math.min(window.devicePixelRatio || 1, 2);
     W = window.innerWidth; H = window.innerHeight;
     cv.width = W * DPR; cv.height = H * DPR;
     cx.setTransform(DPR, 0, 0, DPR, 0, 0);
     if (!mouse.x) { mouse.x = disk.x = W * 0.72; mouse.y = disk.y = H * 0.4; }
+    buildGlyphs(); placeShapes();
     if (!motion) drawStatic();
   }
 
   function draw(t) {
     cx.clearRect(0, 0, W, H);
-    var sy = window.scrollY || 0;
-    var hero = Math.max(0.3, 1 - sy / (H * 0.9));
-    var sp = 26, off = (sy * 0.15) % sp;
+    var sy = window.scrollY || 0, hero = Math.max(0.3, 1 - sy / (H * 0.9)), m = 0.45 + 0.55 * hero;
+    var sp = 26, off = (sy * 0.15) % sp, x0;
 
-    // trama base
-    cx.lineWidth = 1;
-    cx.strokeStyle = 'rgba(243,246,244,.055)';
-    cx.beginPath();
-    for (var x0 = -H - sp + off; x0 < W; x0 += sp) { cx.moveTo(x0, H); cx.lineTo(x0 + H, 0); }
+    // trama base y lineas que se encienden cerca del cursor
+    cx.lineWidth = 1; cx.strokeStyle = 'rgba(31,35,38,.07)'; cx.beginPath();
+    for (x0 = -H - sp + off; x0 < W; x0 += sp) { cx.moveTo(x0, H); cx.lineTo(x0 + H, 0); }
     cx.stroke();
-
-    // lineas cercanas al cursor se encienden
-    var D = 190;
-    for (var x1 = -H - sp + off; x1 < W; x1 += sp) {
-      var d = Math.abs((disk.x - x1) + (disk.y - H)) / 1.4142;
-      if (d < D) {
-        var k = 1 - d / D;
-        cx.strokeStyle = 'rgba(57,255,20,' + (k * 0.85).toFixed(3) + ')';
-        cx.lineWidth = 1 + k * 1.6;
-        cx.beginPath(); cx.moveTo(x1, H); cx.lineTo(x1 + H, 0); cx.stroke();
+    for (x0 = -H - sp + off; x0 < W; x0 += sp) {
+      var d = Math.abs((disk.x - x0) + (disk.y - H)) / 1.4142;
+      if (d < 190) {
+        var k = 1 - d / 190;
+        cx.strokeStyle = 'rgba(57,255,20,' + (k * 0.95).toFixed(3) + ')'; cx.lineWidth = 1 + k * 2.2;
+        cx.beginPath(); cx.moveTo(x0, H); cx.lineTo(x0 + H, 0); cx.stroke();
       }
     }
 
+    drawGlyphs(t, sy);
+
+    bands.forEach(function (b, i) { drawBand(b, i, m); });
+
     // circulo grande de contorno con paralaje
     var R = Math.min(W, H) * 0.34;
-    var px = W * 0.76 - (disk.x - W / 2) * 0.05, py = H * 0.42 - (disk.y - H / 2) * 0.05 - sy * 0.12;
-    cx.lineWidth = 1;
-    cx.strokeStyle = 'rgba(243,246,244,' + (0.16 * hero + 0.04) + ')';
-    cx.beginPath(); cx.arc(px, py, R, 0, 6.2832); cx.stroke();
+    cx.lineWidth = 1; cx.strokeStyle = 'rgba(31,35,38,' + (0.22 * hero + 0.06) + ')';
+    cx.beginPath(); cx.arc(W * 0.76 - (disk.x - W / 2) * 0.05, H * 0.42 - (disk.y - H / 2) * 0.05 - sy * 0.12, R, 0, PI2); cx.stroke();
+
+    drawShapes(Math.max(0.55, hero));
 
     // diagonal estructural que sigue al cursor
-    var a = ang * Math.PI / 180, L = Math.max(W, H) * 1.6;
-    cx.strokeStyle = 'rgba(243,246,244,' + (0.38 * hero + 0.08) + ')';
-    cx.lineWidth = 1;
+    var a = ang * Math.PI / 180, len = Math.max(W, H) * 1.6;
+    cx.strokeStyle = 'rgba(31,35,38,' + (0.5 * hero + 0.12) + ')'; cx.lineWidth = 1;
     cx.beginPath();
-    cx.moveTo(disk.x - Math.cos(a) * L, disk.y - Math.sin(a) * L);
-    cx.lineTo(disk.x + Math.cos(a) * L, disk.y + Math.sin(a) * L);
+    cx.moveTo(disk.x - Math.cos(a) * len, disk.y - Math.sin(a) * len);
+    cx.lineTo(disk.x + Math.cos(a) * len, disk.y + Math.sin(a) * len);
     cx.stroke();
 
     // disco verde y anillo
     var pulse = motion ? Math.sin(t / 520) * 4 : 0;
-    cx.fillStyle = 'rgba(57,255,20,' + (0.35 + 0.65 * hero) + ')';
-    cx.beginPath(); cx.arc(disk.x, disk.y, 15, 0, 6.2832); cx.fill();
-    cx.strokeStyle = 'rgba(57,255,20,.55)';
-    cx.beginPath(); cx.arc(disk.x, disk.y, 30 + pulse, 0, 6.2832); cx.stroke();
+    cx.fillStyle = G; cx.strokeStyle = DK; cx.lineWidth = 1.6;
+    cx.beginPath(); cx.arc(disk.x, disk.y, 15, 0, PI2); cx.fill(); cx.stroke();
+    cx.lineWidth = 1; cx.strokeStyle = 'rgba(31,35,38,.55)';
+    cx.beginPath(); cx.arc(disk.x, disk.y, 30 + pulse, 0, PI2); cx.stroke();
 
     // ondas por clic
     for (var i = ripples.length - 1; i >= 0; i--) {
       var rp = ripples[i], age = (t - rp.t) / 1000;
       if (age > 1.1) { ripples.splice(i, 1); continue; }
-      cx.strokeStyle = 'rgba(57,255,20,' + (1 - age / 1.1).toFixed(3) + ')';
-      cx.lineWidth = 1.5;
-      cx.beginPath(); cx.arc(rp.x, rp.y, 10 + age * 260, 0, 6.2832); cx.stroke();
+      cx.strokeStyle = 'rgba(31,35,38,' + (1 - age / 1.1).toFixed(3) + ')'; cx.lineWidth = 1.6;
+      cx.beginPath(); cx.arc(rp.x, rp.y, 10 + age * 260, 0, PI2); cx.stroke();
+      cx.strokeStyle = 'rgba(57,255,20,' + (1 - age / 1.1).toFixed(3) + ')'; cx.lineWidth = 4;
+      cx.beginPath(); cx.arc(rp.x, rp.y, 6 + age * 260, 0, PI2); cx.stroke();
     }
   }
 
+  function step() {
+    disk.x = L(disk.x, mouse.x, 0.09); disk.y = L(disk.y, mouse.y, 0.09);
+    ang = L(ang, ang0 + (mouse.x / W - 0.5) * 18 + (mouse.y / H - 0.5) * 10, 0.06);
+    stepBands(); stepShapes();
+  }
   function frame(t) {
     if (!motion || document.hidden) { looping = false; return; }
-    disk.x += (mouse.x - disk.x) * 0.09;
-    disk.y += (mouse.y - disk.y) * 0.09;
-    var target = -35 + (mouse.x / W - 0.5) * 18 + (mouse.y / H - 0.5) * 10;
-    ang += (target - ang) * 0.06;
-    draw(t);
+    step(); draw(t);
     requestAnimationFrame(frame);
   }
   function startLoop() { if (!looping) { looping = true; requestAnimationFrame(frame); } }
-  function drawStatic() { disk.x = mouse.x; disk.y = mouse.y; draw(performance.now()); }
+  function drawStatic() { step(); draw(performance.now()); }
   document.addEventListener('visibilitychange', function () { if (!document.hidden && motion) startLoop(); });
 
   var rx = $('#rx'), ry = $('#ry'), ra = $('#ra'), ticking = false;
   window.addEventListener('pointermove', function (e) {
     mouse.x = e.clientX; mouse.y = e.clientY;
-    if (!motion) { ang = -35 + (mouse.x / W - 0.5) * 18; drawStatic(); }
+    if (down) { // arrastrar deforma la banda verde
+      bands[0].tar.c = (mouse.y / H - 0.5) * 520;
+      bands[0].tar.a = -62 + (mouse.x / W) * 48;
+      bands[1].tar.o = (mouse.x / W - 0.5) * W * 0.9;
+    }
+    if (!motion) drawStatic();
     if (!ticking) {
       ticking = true;
       requestAnimationFrame(function () {
@@ -141,18 +316,58 @@
     }
   }, { passive: true });
   window.addEventListener('pointerdown', function (e) {
-    if (e.target.closest('a,button,.card,dialog')) return;
-    ripples.push({ x: e.clientX, y: e.clientY, t: performance.now() });
+    if (e.target.closest('dialog')) return;
+    down = true; taps++;
+    mouse.x = e.clientX; mouse.y = e.clientY;
+    morph(); reshuffle(); jumpShapes();
+    if (!e.target.closest('a,button,.card,.mod')) ripples.push({ x: e.clientX, y: e.clientY, t: performance.now(), id: ++ripId });
     if (!motion) drawStatic();
   }, { passive: true });
-  window.addEventListener('resize', resize);
+  function up() { down = false; }
+  window.addEventListener('pointerup', up, { passive: true });
+  window.addEventListener('pointercancel', up, { passive: true });
+  window.addEventListener('resize', function () { resize(); clearTimeout(resize.t); resize.t = setTimeout(buildMods, 150); });
   window.addEventListener('scroll', function () { if (!motion) drawStatic(); }, { passive: true });
+
+  /* ---------- Tiras de modulos + y x en el contenido ---------- */
+  function buildMods() {
+    $$('.mods').forEach(function (box) {
+      var vertical = box.classList.contains('v'), size = window.innerWidth <= 520 ? 28 : 32;
+      var n = vertical ? 14 : Math.max(6, Math.floor(box.clientWidth / size)), mods = [], t = Math.random() < 0.5 ? 1 : 0, run = 0, i;
+      box.innerHTML = '';
+      for (i = 0; i < n; i++) {
+        if (run <= 0) { t = 1 - t; run = 2 + Math.floor(Math.random() * 5); }
+        run--;
+        var el = document.createElement('span');
+        el.className = 'mod' + (t ? ' x' : '');
+        mods.push(el); box.appendChild(el);
+      }
+      function flip(el) {
+        el.classList.toggle('x'); el.classList.add('hot');
+        setTimeout(function () { el.classList.remove('hot'); }, 650);
+      }
+      mods.forEach(function (el, idx) {
+        function wave() {
+          for (var d = 0; d <= 3; d++) {
+            (function (dd) {
+              setTimeout(function () {
+                if (mods[idx - dd]) flip(mods[idx - dd]);
+                if (dd && mods[idx + dd]) flip(mods[idx + dd]);
+              }, motion ? dd * 70 : 0);
+            })(d);
+          }
+        }
+        el.addEventListener('pointerenter', function (e) { if (e.pointerType !== 'touch') wave(); });
+        el.addEventListener('pointerdown', wave);
+      });
+    });
+  }
 
   /* ---------- Palabra xNoleet: bloques tipograficos ---------- */
   var word = $('#word');
   var LET = ['x', 'N', 'O', 'L', 'E', 'E', 'T', '×'];
   var GLYPHS = 'XNOLET41/+#<>';
-  var tiles = LET.map(function (ch, i) {
+  var tiles = LET.map(function (ch) {
     var el = document.createElement('div');
     el.className = 'tile' + (ch === '×' ? ' deco' : '');
     el.innerHTML = '<span>' + ch + '</span>';
@@ -172,17 +387,14 @@
   }
   function scatter(then) {
     tiles.forEach(function (el) {
-      var dx = (Math.random() - 0.5) * 420, dy = (Math.random() - 0.5) * 320, r = (Math.random() - 0.5) * 70;
       el.style.transition = 'none';
-      el.style.transform = 'translate(' + dx + 'px,' + dy + 'px) rotate(' + r + 'deg) scale(.6)';
+      el.style.transform = 'translate(' + rnd(-210, 210) + 'px,' + rnd(-160, 160) + 'px) rotate(' + rnd(-35, 35) + 'deg) scale(.6)';
       el.classList.add('away');
     });
     void word.offsetWidth;
     tiles.forEach(function (el, i) {
       setTimeout(function () {
-        el.style.transition = '';
-        el.style.transform = '';
-        el.classList.remove('away');
+        el.style.transition = ''; el.style.transform = ''; el.classList.remove('away');
         if (then) scramble(el);
       }, 60 + i * 70);
     });
@@ -206,60 +418,56 @@
       return ((t ^ t >>> 14) >>> 0) / 4294967296;
     };
   }
-  var uid = 0, G = '#39ff14', WH = '#f3f6f4';
-  function tower(bx, top, wb, wt, rr) {
+  var uid = 0;
+  function tower(bx, top, wb, wt, rr, ink) {
     var s = '', h = 420 - top, n = 7, i;
-    s += '<path d="M' + (bx - wb) + ' 420L' + (bx - wt) + ' ' + top + 'M' + (bx + wb) + ' 420L' + (bx + wt) + ' ' + top + '" stroke="' + WH + '" stroke-width="3" fill="none"/>';
+    s += '<path d="M' + (bx - wb) + ' 420L' + (bx - wt) + ' ' + top + 'M' + (bx + wb) + ' 420L' + (bx + wt) + ' ' + top + '" stroke="' + ink + '" stroke-width="3" fill="none"/>';
     for (i = 0; i < n; i++) {
       var y1 = 420 - h * i / n, y2 = 420 - h * (i + 1) / n;
       var w1 = wb + (wt - wb) * i / n, w2 = wb + (wt - wb) * (i + 1) / n;
       s += '<path d="M' + (bx - w1) + ' ' + y1 + 'L' + (bx + w2) + ' ' + y2 + 'M' + (bx + w1) + ' ' + y1 + 'L' + (bx - w2) + ' ' + y2 +
-           'M' + (bx - w2) + ' ' + y2 + 'H' + (bx + w2) + '" stroke="' + WH + '" stroke-width="1.4" fill="none"/>';
+           'M' + (bx - w2) + ' ' + y2 + 'H' + (bx + w2) + '" stroke="' + ink + '" stroke-width="1.4" fill="none"/>';
     }
-    s += '<ellipse cx="' + bx + '" cy="' + (top + 26) + '" rx="' + (wt + 20) + '" ry="7" fill="none" stroke="' + WH + '" stroke-width="2"/>';
+    s += '<ellipse cx="' + bx + '" cy="' + (top + 26) + '" rx="' + (wt + 20) + '" ry="7" fill="none" stroke="' + ink + '" stroke-width="2"/>';
     var d = rr() > 0.5 ? 1 : -1;
-    s += '<path d="M' + bx + ' ' + (top + 4) + 'l' + (d * 36) + ' -26 v30z M' + bx + ' ' + (top + 4) + 'l' + (-d * 22) + ' -18 v22z" fill="' + WH + '"/>';
+    s += '<path d="M' + bx + ' ' + (top + 4) + 'l' + (d * 36) + ' -26 v30z M' + bx + ' ' + (top + 4) + 'l' + (-d * 22) + ' -18 v22z" fill="' + ink + '"/>';
     return s;
   }
   function gen(type, seed) {
-    var r = rng(seed), id = 'p' + (++uid), bg = r() > 0.5 ? '#1d2022' : '#272b2e', s = '', i;
+    var r = rng(seed), id = 'p' + (++uid), inv = r() > 0.66, s = '', i;
+    var bg = inv ? DK : (r() > 0.5 ? '#f3f5f4' : '#e6eae8'), INK = inv ? '#f3f6f4' : DK;
     s += '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid slice" aria-hidden="true">';
-    s += '<defs><pattern id="' + id + '" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="7" stroke="' + WH + '" stroke-width="1.6"/></pattern>' +
-         '<clipPath id="' + id + 'c"><path d="M32 0H128V0L160 32V128H0V32Z"/></clipPath></defs>';
+    s += '<defs><pattern id="' + id + '" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="7" stroke="' + INK + '" stroke-width="1.6"/></pattern></defs>';
     s += '<rect width="400" height="400" fill="' + bg + '"/>';
     var cx0 = 110 + r() * 180, cy0 = 120 + r() * 160, R = 60 + r() * 70, green = r() > 0.4;
     if (type === 'circulo') {
-      s += '<circle cx="' + cx0 + '" cy="' + cy0 + '" r="' + R + '" fill="' + (green ? G : WH) + '"/>';
-      s += '<circle cx="' + (400 - cx0) + '" cy="' + (400 - cy0) + '" r="' + (R * 0.45) + '" fill="none" stroke="' + (green ? WH : G) + '" stroke-width="2"/>';
-      s += '<path d="M-20 ' + (330 + r() * 40) + 'L420 ' + (40 + r() * 60) + '" stroke="' + WH + '" stroke-width="1.5"/>';
+      s += '<circle cx="' + cx0 + '" cy="' + cy0 + '" r="' + R + '" fill="' + (green ? G : INK) + '"/>';
+      s += '<circle cx="' + (400 - cx0) + '" cy="' + (400 - cy0) + '" r="' + (R * 0.45) + '" fill="none" stroke="' + (green ? INK : G) + '" stroke-width="2.4"/>';
+      s += '<path d="M-20 ' + (330 + r() * 40) + 'L420 ' + (40 + r() * 60) + '" stroke="' + INK + '" stroke-width="1.5"/>';
       s += '<path d="M' + (300 + r() * 60) + ' ' + (300 + r() * 40) + 'l24 24h-24z" fill="' + G + '"/>';
     } else if (type === 'torre') {
       s += '<circle cx="' + cx0 + '" cy="' + (cy0 + 20) + '" r="' + (R + 10) + '" fill="' + G + '"/>';
-      s += tower(140 + r() * 120, 50 + r() * 70, 74, 18, r);
-      s += '<path d="M-20 ' + (380 - r() * 40) + 'L420 ' + (120 + r() * 60) + '" stroke="' + WH + '" stroke-width="1.2" opacity=".7"/>';
+      s += tower(140 + r() * 120, 50 + r() * 70, 74, 18, r, inv ? '#f3f6f4' : DK);
+      s += '<path d="M-20 ' + (380 - r() * 40) + 'L420 ' + (120 + r() * 60) + '" stroke="' + INK + '" stroke-width="1.2" opacity=".7"/>';
     } else if (type === 'tipo') {
       var words = ['NO', 'ER', '41', 'XN', 'LT', 'EX'], w = words[Math.floor(r() * words.length)], k = 0;
       for (var row = 0; row < 2; row++) for (var col = 0; col < 2; col++) {
-        var x = 70 + col * 138 + (row ? 14 : 0), y = 70 + row * 138, ch = w.charAt(col);
-        s += '<g transform="translate(' + x + ' ' + y + ')"><path d="M26 0H126V100L100 126H0V26Z" fill="url(#' + id + ')" stroke="' + WH + '" stroke-width="1.5"/>' +
-             '<text x="63" y="92" text-anchor="middle" font-family="Syne,sans-serif" font-weight="800" font-size="86" fill="' + (k % 3 === 0 && green ? G : bg) + '" stroke="' + WH + '" stroke-width="' + (k % 3 === 0 && green ? 0 : 1.4) + '">' + (row ? (col ? w.charAt(0) : w.charAt(1)) : ch) + '</text></g>';
+        var x = 70 + col * 138 + (row ? 14 : 0), y = 70 + row * 138, hot = k % 3 === 0 && green;
+        s += '<g transform="translate(' + x + ' ' + y + ')"><path d="M26 0H126V100L100 126H0V26Z" fill="url(#' + id + ')" stroke="' + INK + '" stroke-width="1.5"/>' +
+             '<text x="63" y="92" text-anchor="middle" font-family="Syne,sans-serif" font-weight="800" font-size="86" fill="' + (hot ? G : bg) + '" stroke="' + INK + '" stroke-width="' + (hot ? 2 : 1.4) + '">' + (row ? (col ? w.charAt(0) : w.charAt(1)) : w.charAt(col)) + '</text></g>';
         k++;
       }
-      s += '<path d="M-20 ' + (360 - r() * 60) + 'L420 ' + (60 + r() * 60) + '" stroke="' + WH + '" stroke-width="2"/>';
+      s += '<path d="M-20 ' + (360 - r() * 60) + 'L420 ' + (60 + r() * 60) + '" stroke="' + INK + '" stroke-width="2"/>';
       s += '<circle cx="' + (330 + r() * 40) + '" cy="' + (50 + r() * 30) + '" r="16" fill="' + G + '"/>';
-      s += '<text x="372" y="392" text-anchor="end" font-family="Space Mono,monospace" font-size="11" fill="' + WH + '" opacity=".7">x x x</text>';
+      s += '<text x="372" y="392" text-anchor="end" font-family="Space Mono,monospace" font-size="11" fill="' + INK + '" opacity=".7">x x x</text>';
     } else {
-      for (i = -4; i < 34; i++) {
-        s += '<path d="M' + (i * 14) + ' 420L' + (i * 14 + 420) + ' 0" stroke="' + WH + '" stroke-width="1" opacity=".28"/>';
-      }
+      for (i = -4; i < 34; i++) s += '<path d="M' + (i * 14) + ' 420L' + (i * 14 + 420) + ' 0" stroke="' + INK + '" stroke-width="1" opacity=".3"/>';
       var bandX = 80 + r() * 160;
-      s += '<path d="M' + bandX + ' 420L' + (bandX + 420) + ' 0" stroke="' + G + '" stroke-width="' + (22 + r() * 26) + '" opacity=".95"/>';
-      s += '<circle cx="' + cx0 + '" cy="' + cy0 + '" r="' + (R * 0.7) + '" fill="none" stroke="' + WH + '" stroke-width="1.6"/>';
-      for (i = 0; i < 16; i++) {
-        s += '<circle cx="' + (r() * 400) + '" cy="' + (r() * 400) + '" r="' + (1.5 + r() * 5) + '" fill="' + (r() > 0.5 ? G : WH) + '"/>';
-      }
+      s += '<path d="M' + bandX + ' 420L' + (bandX + 420) + ' 0" stroke="' + G + '" stroke-width="' + (22 + r() * 26) + '"/>';
+      s += '<circle cx="' + cx0 + '" cy="' + cy0 + '" r="' + (R * 0.7) + '" fill="none" stroke="' + INK + '" stroke-width="1.8"/>';
+      for (i = 0; i < 16; i++) s += '<circle cx="' + (r() * 400) + '" cy="' + (r() * 400) + '" r="' + (1.5 + r() * 5) + '" fill="' + (r() > 0.5 ? G : INK) + '"/>';
     }
-    s += '<text x="14" y="388" font-family="Space Mono,monospace" font-size="11" fill="' + WH + '" opacity=".75">' + String(seed).padStart(3, '0') + ' / x41</text>';
+    s += '<text x="14" y="388" font-family="Space Mono,monospace" font-size="11" fill="' + INK + '" opacity=".75">' + String(seed).padStart(3, '0') + ' / x41</text>';
     return s + '</svg>';
   }
 
@@ -326,7 +534,7 @@
     $('#v-desc').textContent = p.d;
     $('#v-count').textContent = String(pos).padStart(2, '0') + ' / ' + String(list.length).padStart(2, '0');
   }
-  function step(dir) {
+  function stepViewer(dir) {
     var list = visible(), pos = list.indexOf(idx);
     idx = list[(pos + dir + list.length) % list.length];
     render();
@@ -334,8 +542,8 @@
   function openViewer(i) { idx = i; render(); if (!dlg.open) dlg.showModal(); }
   revealOn(vArt);
   $('#v-close').addEventListener('click', function () { dlg.close(); });
-  $('#v-prev').addEventListener('click', function () { step(-1); });
-  $('#v-next').addEventListener('click', function () { step(1); });
+  $('#v-prev').addEventListener('click', function () { stepViewer(-1); });
+  $('#v-next').addEventListener('click', function () { stepViewer(1); });
   vHatch.addEventListener('click', function () {
     var on = vArt.classList.toggle('open');
     vHatch.setAttribute('aria-pressed', String(on));
@@ -353,12 +561,12 @@
   dlg.addEventListener('touchstart', function (e) { tx = e.changedTouches[0].clientX; }, { passive: true });
   dlg.addEventListener('touchend', function (e) {
     var dx = e.changedTouches[0].clientX - tx;
-    if (Math.abs(dx) > 60) step(dx < 0 ? 1 : -1);
+    if (Math.abs(dx) > 60) stepViewer(dx < 0 ? 1 : -1);
   }, { passive: true });
   document.addEventListener('keydown', function (e) {
     if (!dlg.open) return;
-    if (e.key === 'ArrowRight') step(1);
-    else if (e.key === 'ArrowLeft') step(-1);
+    if (e.key === 'ArrowRight') stepViewer(1);
+    else if (e.key === 'ArrowLeft') stepViewer(-1);
     else if (e.key === 't' || e.key === 'T') vHatch.click();
   });
 
@@ -383,5 +591,6 @@
 
   $('#year').textContent = new Date().getFullYear();
   resize();
+  buildMods();
   applyMotion();
 })();
