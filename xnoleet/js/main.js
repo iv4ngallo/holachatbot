@@ -502,8 +502,8 @@
     var r = Math.random() * tot, lp = loops[0];
     for (i = 0; i < loops.length; i++) { if (r < loops[i].len) { lp = loops[i]; break; } r -= loops[i].len; }
     nodes.push({
-      t: ti, lp: lp, s: Math.random() * lp.len, v: rnd(45, 130) * (Math.random() < 0.5 ? 1 : -1),
-      age: 0, life: rnd(1.6, 3.4), sz: rnd(10, 16), x: 0, y: 0
+      t: ti, lp: lp, s: Math.random() * lp.len, v: rnd(14, 38) * (Math.random() < 0.5 ? 1 : -1),
+      age: 0, life: rnd(3.2, 6), sz: rnd(6, 10), ph: Math.random() * 6.28, hz: rnd(0.7, 1.1), x: 0, y: 0
     });
   }
   function pointAt(lp, s) {
@@ -513,11 +513,11 @@
     var a = lo % lp.n, b = (lo + 1) % lp.n, f = (s - lp.cum[lo]) / ((lp.cum[lo + 1] - lp.cum[lo]) || 1);
     return [lp.X[a] + (lp.X[b] - lp.X[a]) * f, lp.Y[a] + (lp.Y[b] - lp.Y[a]) * f];
   }
-  function chamfer(x, y, sz, c) {
+  function chamfer(x, y, sz, c) { // solo se cortan la esquina superior izquierda y la inferior derecha
     var h = sz / 2;
     fxc.beginPath();
-    fxc.moveTo(x - h + c, y - h); fxc.lineTo(x + h - c, y - h); fxc.lineTo(x + h, y - h + c); fxc.lineTo(x + h, y + h - c);
-    fxc.lineTo(x + h - c, y + h); fxc.lineTo(x - h + c, y + h); fxc.lineTo(x - h, y + h - c); fxc.lineTo(x - h, y - h + c);
+    fxc.moveTo(x - h + c, y - h); fxc.lineTo(x + h, y - h); fxc.lineTo(x + h, y + h - c);
+    fxc.lineTo(x + h - c, y + h); fxc.lineTo(x - h, y + h); fxc.lineTo(x - h, y - h + c);
     fxc.closePath();
   }
   function fxFrame(t) {
@@ -528,14 +528,15 @@
     // aparicion aleatoria por letra
     var perTile = [];
     nodes.forEach(function (n) { perTile[n.t] = (perTile[n.t] || 0) + 1; });
-    for (i = 0; i < contours.length; i++) if ((perTile[i] || 0) < 3 && Math.random() < 1.1 * dt) spawnNode(i);
+    for (i = 0; i < contours.length; i++) if ((perTile[i] || 0) < 3 && Math.random() < 0.8 * dt) spawnNode(i);
     for (i = nodes.length - 1; i >= 0; i--) {
       nd = nodes[i]; nd.age += dt;
       if (nd.age >= nd.life) { nodes.splice(i, 1); continue; }
       nd.s += nd.v * dt;
       var p = pointAt(nd.lp, nd.s), u = nd.age / nd.life;
       nd.x = p[0]; nd.y = p[1];
-      nd.a = Math.min(1, u / 0.18, (1 - u) / 0.3);
+      nd.a = Math.min(1, u / 0.2, (1 - u) / 0.3);
+      nd.pulse = 0.5 + 0.5 * Math.sin(nd.age * nd.hz * 6.283 + nd.ph); // 0..1
     }
     // hilos entre nodos de una misma letra
     fxc.lineWidth = 1; fxc.strokeStyle = DK;
@@ -543,17 +544,20 @@
       if (nodes[i].t !== nodes[j].t) continue;
       var dd = Math.hypot(nodes[i].x - nodes[j].x, nodes[i].y - nodes[j].y);
       if (dd < 110) {
-        fxc.globalAlpha = 0.5 * Math.min(nodes[i].a, nodes[j].a) * (1 - dd / 110);
+        fxc.globalAlpha = 0.28 * Math.min(nodes[i].a, nodes[j].a) * (1 - dd / 110);
         fxc.beginPath(); fxc.moveTo(nodes[i].x, nodes[i].y); fxc.lineTo(nodes[j].x, nodes[j].y); fxc.stroke();
       }
     }
-    // cuadrados con esquinas en diagonal
-    fxc.lineWidth = 1.4;
+    // solo borde con glow pulsante
     nodes.forEach(function (n) {
-      var sz = n.sz * (0.45 + 0.55 * n.a);
-      fxc.globalAlpha = n.a; fxc.fillStyle = G; fxc.strokeStyle = DK;
-      chamfer(n.x, n.y, sz, sz * 0.24); fxc.fill(); fxc.stroke();
+      var sz = n.sz * (0.8 + 0.4 * n.pulse) * (0.6 + 0.4 * n.a), c = sz * 0.3;
+      chamfer(n.x, n.y, sz, c);
+      fxc.globalAlpha = 0.55 * n.a; fxc.shadowBlur = 0; fxc.strokeStyle = DK; fxc.lineWidth = 0.7; fxc.stroke(); // filo oscuro para que se lea sobre blanco
+      fxc.shadowColor = G; fxc.shadowBlur = (6 + 12 * n.pulse) * fxDPR;
+      fxc.strokeStyle = G; fxc.lineWidth = 1.7;
+      fxc.globalAlpha = n.a * (0.6 + 0.4 * n.pulse); fxc.stroke(); fxc.stroke();
     });
+    fxc.shadowBlur = 0; fxc.shadowColor = 'transparent';
     fxc.globalAlpha = 1;
     requestAnimationFrame(fxFrame);
   }
