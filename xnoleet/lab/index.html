@@ -199,6 +199,11 @@ body.hud-on .dock{transform:translate(-50%,0);opacity:1}
 .thumb.cueva::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 18% 30%,#fff 0 1px,transparent 2px),radial-gradient(circle at 72% 22%,#fff 0 1px,transparent 2px),radial-gradient(circle at 84% 70%,#ffd6fb 0 1px,transparent 2px),radial-gradient(circle at 30% 78%,#fff 0 1px,transparent 2px),radial-gradient(circle at 58% 60%,#e9d4ff 0 1px,transparent 2px)}
 @keyframes cz{from{transform:translateX(0)}to{transform:translateX(-25%)}}
 @media (prefers-reduced-motion:reduce){.thumb.cueva::before{animation:none}}
+.thumb.counters{background:radial-gradient(circle at 26% 30%,rgba(74,168,255,.5) 0 5px,transparent 6px),radial-gradient(circle at 70% 26%,rgba(255,106,77,.6) 0 5px,transparent 6px),radial-gradient(circle at 52% 72%,rgba(92,230,168,.55) 0 5px,transparent 6px),radial-gradient(circle at 84% 64%,rgba(255,106,77,.5) 0 4px,transparent 5px),radial-gradient(circle at 14% 70%,rgba(92,230,168,.5) 0 4px,transparent 5px),radial-gradient(120% 90% at 50% 20%,#16233f,#060a14)}
+.thumb.counters::before{content:"";position:absolute;inset:0;background:linear-gradient(12deg,transparent 49%,rgba(249,158,26,.8) 49.5% 50.5%,transparent 51%),linear-gradient(-58deg,transparent 49%,rgba(143,195,255,.6) 49.5% 50.5%,transparent 51%),linear-gradient(118deg,transparent 49%,rgba(180,140,255,.7) 49.5% 50.5%,transparent 51%);animation:ct 3.2s ease-in-out infinite alternate}
+.thumb.counters::after{content:"";position:absolute;left:0;right:0;bottom:0;height:40%;background:linear-gradient(rgba(42,65,112,.5) 1px,transparent 1px) 0 0/100% 10px,linear-gradient(90deg,rgba(42,65,112,.5) 1px,transparent 1px) 0 0/16px 100%;transform:perspective(120px) rotateX(55deg);transform-origin:bottom}
+@keyframes ct{to{opacity:.45}}
+@media (prefers-reduced-motion:reduce){.thumb.counters::before{animation:none}}
 .thumb.colmena::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,transparent 20%,rgba(0,0,0,.7))}
 .xact{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px}
 a.btn{text-decoration:none;display:inline-block;color:inherit}
@@ -648,7 +653,10 @@ const EXPDATA={
   t:['Three.js','Generativo','Cyberpunk'],k:['Desliza el dedo o el cursor para trazar; dos dedos o clic derecho giran la vista','Pausa con Espacio, cambia de cámara con R y activa o no el seguimiento con F','Exporta lo que ves en JPG de alta calidad, hasta 4096 px']},
  cueva:{id:'EXP-05',n:'Cueva de Amatista',src:'experimentos/cueva-amatista.html',orig:'experimentos/cueva-amatista.html',tag:'Paneo infinito',
   d:'Un paneo lateral sin fin por la pared de una cueva de amatistas que se genera mientras la cámara se desliza. Cada cristal guarda un cosmos por dentro y algunos laten con luz propia.',
-  t:['WebGL','Raymarching','Procedural'],k:['El deslizamiento es automático; tú diriges la mirada con el cursor o el dedo','Cada cueva sale de una semilla que puedes compartir para repetir el recorrido','Exporta lo que ves en JPG de alta calidad, hasta 3840 px']}
+  t:['WebGL','Raymarching','Procedural'],k:['El deslizamiento es automático; tú diriges la mirada con el cursor o el dedo','Cada cueva sale de una semilla que puedes compartir para repetir el recorrido','Exporta lo que ves en JPG de alta calidad, hasta 3840 px']},
+ counters:{id:'EXP-06',n:'Mapa de Counters',src:'experimentos/mapa-counters.html',orig:'experimentos/mapa-counters.html',tag:'Grafo 3D',
+  d:'Los 54 héroes de Overwatch 2 flotan en un grafo 3D repartido en tres zonas: tanques, daño y apoyo. Toca uno y se encienden quién le hace counter, a quién se lo hace y con quién tiene sinergia.',
+  t:['Three.js','Grafos','Web Audio'],k:['Filtra por rol y por counter duro, counter suave o sinergia','Un dedo gira la vista; dos dedos desplazan y pellizcan para hacer zoom','Busca un héroe y pulsa Enter para saltar a él']}
 };
 const vw={el:$('#viewer'),fr:$('#vwFrame'),gate:$('#vwGate')};
 function openExp(k){
@@ -685,7 +693,7 @@ const SECS={
    <p class="rv" style="--d:2">El nombre es una clave y se lee <b>Experimental</b>. La "x" suena a "Ex", "periment" queda igual y el "41" es "al" escrito en leet. Es un recordatorio de que aquí nada es definitivo.</p>
   </div>
   <div class="stats rv" style="--d:3">
-   <div class="card stat"><b data-count="5">0</b><span>Experimentos cargados</span></div>
+   <div class="card stat"><b data-count="6">0</b><span>Experimentos cargados</span></div>
    <div class="card stat"><b data-count="5">0</b><span>Niveles de lava</span></div>
    <div class="card stat"><b data-count="3">0</b><span>Colmenas por cruzar</span></div>
    <div class="card stat"><b data-count="100" data-suf="%">0</b><span>Espíritu experimental</span></div>
@@ -740,7 +748,7 @@ const SECS={
   }},
  'experimentos':{n:'04',t:'Experimentos',r:()=>`
   <h2 class="rv" style="--d:0">Experimentos</h2>
-  <p class="rv" style="--d:1">Cinco experimentos cargados en el laboratorio. Pulsa cargar para abrirlos aquí mismo.</p>
+  <p class="rv" style="--d:1">Seis experimentos cargados en el laboratorio. Pulsa cargar para abrirlos aquí mismo.</p>
   <div class="xgrid">${Object.entries(EXPDATA).map(([k,e],i)=>`
    <article class="card xcard rv" style="--d:${i+2}">
     <div class="thumb ${k}" aria-hidden="true"></div>
@@ -845,7 +853,7 @@ function drawSkill(c,t){const{g,w,h}=c,cx=w/2,cy=h/2+4,r=Math.min(w,h)/2-30,n=SK
   SKILLS.forEach((s,i)=>{const a=-Math.PI/2+i*6.283/n,k=s[1]/100*p;g.fillStyle=skill.hl===i?'#ff2fd0':'#fff';g.beginPath();g.arc(cx+Math.cos(a)*r*k,cy+Math.sin(a)*r*k,skill.hl===i?6:3.5,0,6.283);g.fill();});}
 function setupCanvases(){W.scope=fit($('#cScope'));W.gauge=fit($('#cGauge'));W.radar=fit($('#cRadar'));W.spec=fit($('#cSpec'));}
 const sysEl=$('#sys');let sysT=0,logT=0;
-const LOGS=[['OK','Bus de energía estable'],['INFO','Sincronizando holograma con el núcleo'],['WARN','Pilas: fluctuación leve en el sector 4'],['OK','Enfriamiento activo, todo en orden'],['INFO','Telemetría recibida desde el reactor'],['INFO','Calibrando campo magnético'],['OK','Latido del núcleo: normal'],['INFO','Nuevo experimento en cola: EXP-06'],['WARN','Ojo: temperatura subiendo en la cámara B'],['OK','Escaneo de perímetro completado']];
+const LOGS=[['OK','Bus de energía estable'],['INFO','Sincronizando holograma con el núcleo'],['WARN','Pilas: fluctuación leve en el sector 4'],['OK','Enfriamiento activo, todo en orden'],['INFO','Telemetría recibida desde el reactor'],['INFO','Calibrando campo magnético'],['OK','Latido del núcleo: normal'],['INFO','Nuevo experimento en cola: EXP-07'],['WARN','Ojo: temperatura subiendo en la cámara B'],['OK','Escaneo de perímetro completado']];
 function hudTick(t,dt){
   const ck=$('#clock');try{ck.textContent='BOG '+new Date().toLocaleTimeString('es-CO',{timeZone:'America/Bogota',hour12:false});}catch(e){}
   if(!state.hud)return;
