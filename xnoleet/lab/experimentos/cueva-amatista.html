@@ -387,7 +387,7 @@ function readHash(){const m=location.hash.match(/semilla=([A-Za-z0-9]{1,12})/);r
 function writeHash(s){try{history.replaceState(null,'','#semilla='+s)}catch(e){location.hash='semilla='+s}}
 
 /* ---------- Estado ---------- */
-const SPEEDS=[1.5,3,5,7.5,11];
+const SPEEDS=[4.5,9,15,22,33];
 let spd=2,paused=false,z=0,vz=0,clock=0,fade=0,fadeTo=1,pending=null;
 const look={x:0,y:0,tx:0,ty:0},keysLook={x:0,y:0};
 let ptrActive=false;
