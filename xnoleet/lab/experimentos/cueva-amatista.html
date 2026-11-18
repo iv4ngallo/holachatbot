@@ -155,13 +155,15 @@ uniform vec4 uP;
 uniform float uHue;
 uniform float uFade;
 uniform float uSteps;
+uniform float uQ;
 
 #define PI 3.14159265
 #define TAU 6.28318531
-#define FAR 40.0
+#define FAR 30.0
 
 float gMat,gCD,gTT,gId,gGlow,gGId,gGl;
 vec3 gStar;
+vec4 gCell,gCellB;
 float gEdge;
 
 float h31(vec3 p){p=fract(p*.1031+uS.xyz*.7);p+=dot(p,p.zyx+31.32);return fract((p.x+p.y)*p.z);}
@@ -217,7 +219,7 @@ float crystal(vec3 p,float ia,float iz,float N,float zc,float k,float lay){
  d=max(d,(hd*kk+t-L)/sqrt(kk*kk+1.));
  float id=fract(h.w*57.3+iz*.013+lay*.37);
  bool lit=h.w<dens*uP.w;
- if(d<gCD){gCD=d;gTT=clamp(t/L,0.,1.);gId=id;gGl=lit?1.:0.;
+ if(d<gCD){gCD=d;gCell=vec4(ia,iz,N,zc);gCellB=vec4(k,lay,0.,0.);gTT=clamp(t/L,0.,1.);gId=id;gGl=lit?1.:0.;
   float e1=abs(ay.y-(ay.x*.8660254+ay.y*.5));
   float e2=abs((hd-w)-(hd*kk+t-L)/sqrt(kk*kk+1.));
   gEdge=1.-smoothstep(0.,.03*k+.008,min(e1,e2));}
@@ -230,9 +232,10 @@ float map(vec3 p){
  float r=length(c);
  float a=atan(c.y,c.x);
  vec3 np=p+uS.xyz*97.;
- float disp=(vn(np*.55)-.5)*1.2+(vn(np*1.7)-.5)*.35;
- float d=(caveR(p.z)-r+disp)*.75;
+ float cr0=caveR(p.z);
+ float d=(cr0-r+(vn(np*.62)-.5)*1.25)*.8;
  gCD=1e3;gGlow=1e3;gGl=0.;
+ if(r<1.35){gMat=-1.;return d;}
  float N=9.,zc=2.1;
  float fa=(a+PI)/TAU*N,ia=floor(fa),sa=fract(fa)<.5?-1.:1.;
  float fz=p.z/zc,iz=floor(fz),sz=fract(fz)<.5?-1.:1.;
@@ -240,33 +243,47 @@ float map(vec3 p){
  dc=min(dc,crystal(p,ia+sa,iz,N,zc,1.,0.));
  dc=min(dc,crystal(p,ia,iz+sz,N,zc,1.,0.));
  dc=min(dc,crystal(p,ia+sa,iz+sz,N,zc,1.,0.));
- N=21.;zc=.8;
- fa=(a+PI)/TAU*N;ia=floor(fa);sa=fract(fa)<.5?-1.:1.;
- fz=p.z/zc;iz=floor(fz);sz=fract(fz)<.5?-1.:1.;
- dc=min(dc,crystal(p,ia,iz,N,zc,.42,1.));
- dc=min(dc,crystal(p,ia+sa,iz,N,zc,.42,1.));
- dc=min(dc,crystal(p,ia,iz+sz,N,zc,.42,1.));
- dc=min(dc,crystal(p,ia+sa,iz+sz,N,zc,.42,1.));
- dc*=.72;
+ if(uQ>.5&&d<1.6){
+  N=21.;zc=.8;
+  fa=(a+PI)/TAU*N;ia=floor(fa);sa=fract(fa)<.5?-1.:1.;
+  fz=p.z/zc;iz=floor(fz);sz=fract(fz)<.5?-1.:1.;
+  dc=min(dc,crystal(p,ia,iz,N,zc,.42,1.));
+  dc=min(dc,crystal(p,ia+sa,iz,N,zc,.42,1.));
+  dc=min(dc,crystal(p,ia,iz+sz,N,zc,.42,1.));
+  dc=min(dc,crystal(p,ia+sa,iz+sz,N,zc,.42,1.));
+ }
+ dc*=.8;
  if(dc<d){gMat=1.;return dc;}
  gMat=-1.;
  return d;
 }
 
-vec3 calcN(vec3 p){
- const vec2 e=vec2(.0015,-.0015);
- return normalize(e.xyy*map(p+e.xyy)+e.yyx*map(p+e.yyx)+e.yxy*map(p+e.yxy)+e.xxx*map(p+e.xxx));
+float cDist(vec3 p){gCD=1e3;gGlow=1e3;return crystal(p,gCell.x,gCell.y,gCell.z,gCell.w,gCellB.x,gCellB.y);}
+float wDist(vec3 p){
+ vec2 c=p.xy-path(p.z);
+ return caveR(p.z)-length(c)+(vn(p*.62+uS.xyz*97.*.62)-.5)*1.25;
+}
+vec3 calcNC(vec3 p){
+ vec4 cl=gCell,cb=gCellB;
+ const vec2 e=vec2(.002,-.002);
+ vec3 n=normalize(e.xyy*cDist(p+e.xyy)+e.yyx*cDist(p+e.yyx)+e.yxy*cDist(p+e.yxy)+e.xxx*cDist(p+e.xxx));
+ gCell=cl;gCellB=cb;return n;
+}
+vec3 calcNW(vec3 p){
+ const vec2 e=vec2(.004,-.004);
+ return normalize(e.xyy*wDist(p+e.xyy)+e.yyx*wDist(p+e.yyx)+e.yxy*wDist(p+e.yxy)+e.xxx*wDist(p+e.xxx));
 }
 
 /* Un cosmos completo dentro de cada cristal: nebulosa y dos capas de estrellas. */
-vec3 cosmos(vec3 d,float id){
+vec3 cosmos(vec3 d,float id,float lv){
  vec3 q=d*2.3+vec3(id*37.,id*13.,-id*21.)+uS.zwx*20.;
- float n=vn(q)*.55+vn(q*2.03)*.28+vn(q*4.1)*.17;
+ float n=lv>.5?vn(q)*.62+vn(q*2.03)*.38:vn(q);
  float n2=vn(q*1.3+7.);
  n=smoothstep(.3,.78,n);
  vec3 neb=mix(vec3(.14,.03,.45),vec3(1.,.3,.8),n2)*n*1.35+vec3(.1,.3,.9)*smoothstep(.5,.9,n2)*n*.8;
  vec3 s=vec3(0.);
  for(int k=0;k<2;k++){
+  if(k==1&&lv<1.5)break;
   float sc=k==0?26.:64.;
   vec3 gp=d*sc+id*17.;
   vec3 ci=floor(gp),cf=fract(gp)-.5;
@@ -312,9 +329,9 @@ void main(){
   if(float(i)>=uSteps)break;
   vec3 p=ro+rd*t;
   d=map(p);
-  float pu=.55+.45*sin(pulseT+gGId*40.);
-  glow+=glowCol*pu*exp(-gGlow*5.)*.03*(1.-t/FAR);
-  if(d<.0012*t){hit=true;break;}
+  if(gGlow<1.1&&uQ>.5){float pu=.55+.45*sin(pulseT+gGId*40.);
+  glow+=glowCol*pu*exp(-gGlow*5.)*.03*(1.-t/FAR);}
+  if(d<.0018*t+.0005){hit=true;break;}
   t+=d;
   if(t>FAR)break;
  }
@@ -327,12 +344,9 @@ void main(){
  vec3 lc2=hue(vec3(.75,.35,1.),uHue)*(1.3+.3*sin(uT*.9));
  if(hit){
   vec3 p=ro+rd*t;
-  map(p);
   float mat=gMat,tt=gTT,id=gId,lit=gGl,edge=gEdge;
-  vec3 n=calcN(p);
-  float occ=0.;
-  for(int i=1;i<4;i++){float hh=.14*float(i);occ+=hh-map(p+n*hh);}
-  float ao=clamp(1.-occ*1.1,0.,1.);
+  vec3 n=mat>0.?calcNC(p):calcNW(p);
+  float ao=mat>0.?.55+.45*smoothstep(0.,.55,tt):.6+.4*smoothstep(1.2,3.4,length(p.xy-path(p.z)));
   vec3 L=lp-p;float ld=length(L);L/=ld;
   float att=1./(1.+ld*ld*.045);
   vec3 L2=lp2-p;float ld2=length(L2);L2/=ld2;
@@ -345,12 +359,12 @@ void main(){
    float fr=.04+.96*pow(1.-max(dot(n,-rd),0.),5.);
    vec3 rr=refract(rd,n,.65);
    if(dot(rr,rr)<.01)rr=reflect(rd,n);
-   vec3 inner=cosmos(normalize(rr*1.6+(p-ro)*.22),id)-gStar;
+   vec3 inner=cosmos(normalize(rr*1.6+(p-ro)*.22),id,uQ)-gStar;
    vec3 st=gStar;
    float thick=.6+.6*(1.-tt);
    vec3 c=body*body*inner*3.*thick+st*mix(body,vec3(1.),.55)*1.6+body*(dif*att*.42+dif2*att2*lc2*.5+.02);
    c+=body*body*pow(max(dot(rd,L2),0.),3.)*att2*.6;
-   vec3 env=cosmos(reflect(rd,n),id+.5)*.55+bg*.4;
+   vec3 env=(uQ>1.5?cosmos(reflect(rd,n),id+.5,0.)*.55:vec3(.16,.06,.3))+bg*.4;
    c=mix(c,env,fr*.6)+spe*att*lc*2.2+spe2*att2*lc2;
    if(lit>.5){
     float pu=.55+.45*sin(pulseT+id*40.);
@@ -370,10 +384,10 @@ void main(){
    float sp=step(.8,h31(ci+5.))*pow(max(dot(reflect(rd,n),normalize(h33(ci)-.5)),0.),18.);
    c+=hue(vec3(.85,.6,1.),uHue)*sp*(att*2.6+att2*1.2)*(.4+.6*smoothstep(.4,.8,vein));
    float fr=pow(1.-max(dot(n,-rd),0.),4.);
-   c+=cosmos(reflect(rd,n),.31)*.07*fr;
+   c+=vec3(.05,.02,.1)*fr;
    col=c*ao;
   }
-  col=mix(col,bg,1.-exp(-t*.052));
+  col=mix(col,bg,1.-exp(-t*.075));
  }
  col+=glow;
  col*=1.12;
@@ -411,7 +425,7 @@ if(!gl.getProgramParameter(pr,gl.LINK_STATUS)){fail('La tarjeta gráfica de este
 gl.useProgram(pr);
 const buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buf);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
 const aLoc=gl.getAttribLocation(pr,'a');gl.enableVertexAttribArray(aLoc);gl.vertexAttribPointer(aLoc,2,gl.FLOAT,false,0,0);
-const U={};['uRes','uT','uZ','uLook','uS','uP','uHue','uFade','uSteps'].forEach(n=>U[n]=gl.getUniformLocation(pr,n));
+const U={};['uRes','uT','uZ','uLook','uS','uP','uHue','uFade','uSteps','uQ'].forEach(n=>U[n]=gl.getUniformLocation(pr,n));
 let lost=false;
 cv.addEventListener('webglcontextlost',e=>{e.preventDefault();lost=true;toast('La tarjeta gráfica se reinició. Recarga la página para volver a la cueva.')});
 
@@ -452,21 +466,34 @@ function goSeed(s,msgPrev){
 function goBack(s,zz){pending=()=>{applySeed(s);z=zz;toast(`De vuelta en ${s}.`)};fadeTo=0}
 
 /* ---------- Tamaño y calidad adaptable ---------- */
+/* Escalera de calidad: resolución interna, nivel de efectos (q) y pasos máximos del rayo. */
+const LV=[
+ {s:.30,q:0,st:60},{s:.38,q:0,st:70},{s:.46,q:0,st:80},{s:.55,q:1,st:90},
+ {s:.65,q:1,st:100},{s:.75,q:2,st:110},{s:.9,q:2,st:120},{s:1,q:2,st:130}
+];
 const DPR=Math.min(devicePixelRatio||1,MOB?1.5:1.75);
-const FIXED=/[?&]fijo\b/.test(location.search);
-let scale=FIXED?1:(MOB?.5:.75),W=0,H=0,steps=MOB?96:120;
+const NV=location.search.match(/[?&]nivel=(\d)/);
+const FIXED=/[?&]fijo\b/.test(location.search)||!!NV;
+let lvl=NV?clamp(+NV[1],0,LV.length-1):FIXED?LV.length-1:(MOB?3:5),W=0,H=0;
+const block=LV.map(()=>0);
+const Q=()=>LV[lvl];
 function resize(){
- const w=Math.max(1,Math.round(innerWidth*DPR*scale)),h=Math.max(1,Math.round(innerHeight*DPR*scale));
+ const sc=Q().s;
+ const w=Math.max(1,Math.round(innerWidth*DPR*sc)),h=Math.max(1,Math.round(innerHeight*DPR*sc));
  if(w!==cv.width||h!==cv.height){cv.width=w;cv.height=h}
  W=w;H=h;
 }
 addEventListener('resize',resize);resize();
-let ema=16.7,lastAdj=0;
+/* Mide el tiempo real entre cuadros: baja un nivel si se pasa de 24 ms y sube uno si sobra margen.
+   Si un nivel falló al subir, no se vuelve a intentar durante 20 s (evita oscilar). */
+let ema=16.7,lastAdj=0,warm=0;
 function adapt(dt,now){
- ema+=(dt-ema)*.05;
- if(FIXED||now-lastAdj<1200||busy)return;
- if(ema>22&&scale>.34){scale=Math.max(.34,scale*.85);if(scale<.45)steps=Math.max(80,steps-10);resize();lastAdj=now}
- else if(ema<17.6&&scale<1){scale=Math.min(1,scale*1.07);steps=Math.min(MOB?110:130,steps+4);resize();lastAdj=now}
+ if(FIXED||busy)return;
+ if(++warm<20){return}
+ ema+=(dt-ema)*.08;
+ if(now-lastAdj<900)return;
+ if(ema>24&&lvl>0){block[lvl]=now+20000;lvl--;resize();lastAdj=now;ema=16.7}
+ else if(ema<17.4&&lvl<LV.length-1&&now>block[lvl+1]){lvl++;resize();lastAdj=now}
 }
 
 /* ---------- Mirada ---------- */
@@ -532,10 +559,10 @@ const useAnchor=()=>{dl=anchorDl;bExp.hidden=false};
 if(window.claude&&window.claude.use)window.claude.use('downloads').then(d=>{dl=d||anchorDl;bExp.hidden=false}).catch(useAnchor);
 else useAnchor();
 
-function uniforms(w,h,stp){
+function uniforms(w,h,stp,q){
  gl.uniform2f(U.uRes,w,h);gl.uniform1f(U.uT,clock/1000);gl.uniform1f(U.uZ,z);
  gl.uniform2f(U.uLook,look.x,look.y);gl.uniform4fv(U.uS,P.S);gl.uniform4fv(U.uP,P.P);
- gl.uniform1f(U.uHue,P.hue);gl.uniform1f(U.uFade,fade);gl.uniform1f(U.uSteps,stp);
+ gl.uniform1f(U.uHue,P.hue);gl.uniform1f(U.uFade,fade);gl.uniform1f(U.uSteps,stp);gl.uniform1f(U.uQ,q);
 }
 async function exportJpg(){
  if(busy||!dl||lost)return;busy=true;bExp.disabled=true;
@@ -547,7 +574,7 @@ async function exportJpg(){
  let blob=null;
  try{
   cv.width=pw;cv.height=ph;gl.viewport(0,0,pw,ph);
-  const f0=fade;fade=1;uniforms(pw,ph,140);fade=f0;
+  const f0=fade;fade=1;uniforms(pw,ph,140,2);fade=f0;
   gl.enable(gl.SCISSOR_TEST);
   const bands=Math.ceil(ph/256);
   for(let i=0;i<bands;i++){gl.scissor(0,i*256,pw,256);gl.drawArrays(gl.TRIANGLES,0,3);gl.finish()}
@@ -617,7 +644,7 @@ function frame(now){
  fade+=(fadeTo-fade)*(1-Math.exp(-s*7));
  if(fadeTo===0&&fade<.02&&pending){pending();pending=null;fadeTo=1}
  $('#sDepth').textContent=fmt.format(z)+' m';
- gl.viewport(0,0,W,H);uniforms(W,H,steps);gl.drawArrays(gl.TRIANGLES,0,3);
+ gl.viewport(0,0,W,H);uniforms(W,H,Q().st,Q().q);gl.drawArrays(gl.TRIANGLES,0,3);
 }
 
 /* ---------- Arranque ---------- */
