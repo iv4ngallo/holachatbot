@@ -1054,13 +1054,15 @@ addEventListener('keyup',function(e){if(SC.on)skyKey(e,false)});
 addEventListener('blur',function(){SC.keys={}});
 
 /* ---------- fenómenos naturales ---------- */
-var PH={st:'wait',next:0,end:0,t0:0,kind:'',ready:false,nk:'met',spn:0,gn:0,mi:0,ni:0,gi:0,dir:new THREE.Vector3(),m:[],p:[],fl:null},pv=new THREE.Vector3(),pw=new THREE.Vector3();
+var PH={st:'wait',next:0,end:0,t0:0,kind:'',ready:false,nk:'met',spn:0,gn:0,mi:0,ni:0,gi:0,dir:new THREE.Vector3(),m:[],p:[],fl:null},pv=new THREE.Vector3(),pw=new THREE.Vector3(),mvF=new THREE.Vector3(),mvR=new THREE.Vector3(),mvU=new THREE.Vector3();
 (function(){
  if(!renderer||rm)return;
  var NM=MOB?14:32,NP=MOB?36:84,i;
  for(i=0;i<NM;i++){var ge=new THREE.BufferGeometry();ge.setAttribute('position',new THREE.BufferAttribute(new Float32Array(6),3));ge.setAttribute('color',new THREE.BufferAttribute(new Float32Array([.85,.97,1,0,0,0]),3));
   var ln=new THREE.Line(ge,new THREE.LineBasicMaterial({vertexColors:true,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false}));ln.frustumCulled=false;ln.visible=false;scene.add(ln);
-  PH.m.push({ln:ln,life:0,age:0,h:new THREE.Vector3(),v:new THREE.Vector3(),L:1})}
+  var hd=new THREE.Sprite(new THREE.SpriteMaterial({map:GLOW,color:0xD6F7FF,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false})),tr=[],ti;hd.visible=false;scene.add(hd);
+  for(ti=0;ti<3;ti++){var ts=new THREE.Sprite(new THREE.SpriteMaterial({map:GLOW,color:0xBFEFFF,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false}));ts.visible=false;scene.add(ts);tr.push(ts)}
+  PH.m.push({ln:ln,hd:hd,tr:tr,life:0,age:0,h:new THREE.Vector3(),v:new THREE.Vector3(),d:new THREE.Vector3(),L:1})}
  for(i=0;i<NP;i++){var sp=new THREE.Sprite(new THREE.SpriteMaterial({map:GLOW,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false}));sp.visible=false;scene.add(sp);
   PH.p.push({sp:sp,life:0,age:0,v:new THREE.Vector3(),s:1})}
  PH.fl=[];for(i=0;i<4;i++){var f=new THREE.Sprite(new THREE.SpriteMaterial({map:GLOW,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false}));f.visible=false;scene.add(f);PH.fl.push({sp:f,life:0,s:1})}
@@ -1068,7 +1070,7 @@ var PH={st:'wait',next:0,end:0,t0:0,kind:'',ready:false,nk:'met',spn:0,gn:0,mi:0
 })();
 if(!PH.ok){var cd0=$('#cdn');if(cd0)cd0.style.display='none'}
 function phStart(){
- PH.st='run';PH.t0=time;PH.end=time+300;PH.kind=PH.nk||(Math.random()<.5?'met':'gas');PH.spn=0;PH.gn=2;
+ PH.st='run';PH.t0=time;PH.end=time+300;PH.kind=PH.nk||(Math.random()<.5?'met':'gas');PH.spn=0;PH.gn=1;PH.sx=Math.random()<.5?-1:1;PH.an=.6+Math.random()*.35;
  PH.dir.set(Math.random()*2-1,-(.25+Math.random()*.35),Math.random()*2-1).normalize();
  toast(PH.kind==='met'?'Fenómeno natural: lluvia de meteoritos':'Fenómeno natural: erupciones de gas estelar');
 }
@@ -1076,8 +1078,8 @@ function phErupt(){
  var c=[],i,o;for(i=0;i<ORDER.length;i++){o=ORDER[i];if((o.body==='planet'||o.body==='star'||o.body==='giant')&&o.vis>.7&&o.pos.distanceTo(camera.position)<dist*2.6)c.push(o)}
  if(!c.length)return;o=c[Math.floor(Math.random()*c.length)];
  pv.set(Math.random()*2-1,Math.random()*2-.6,Math.random()*2-1).normalize();
- var sz=Math.max(.35,o.size),n=MOB?7:14,j,q,fl=PH.fl[PH.gi=(PH.gi+1)%PH.fl.length];
- pw.copy(o.pos).addScaledVector(pv,sz*1.05);
+ var so=Math.max(.35,o.size),sz=Math.max(so,dist*.022),n=MOB?9:18,j,q,fl=PH.fl[PH.gi=(PH.gi+1)%PH.fl.length];
+ pw.copy(o.pos).addScaledVector(pv,so*1.05);
  fl.sp.position.copy(pw);fl.sp.material.color.copy(o.col).lerp(new THREE.Color(1,1,1),.5);fl.life=1;fl.s=sz*4.2;fl.sp.visible=true;
  for(j=0;j<n;j++){q=PH.p[PH.mi=(PH.mi+1)%PH.p.length];q.life=1;q.age=0;q.dur=2.4+Math.random()*2;q.s=sz*(.55+Math.random()*.7);
   q.v.copy(pv).multiplyScalar(sz*(.5+Math.random()*1.1)).add(new THREE.Vector3((Math.random()-.5)*sz*.5,(Math.random()-.5)*sz*.5,(Math.random()-.5)*sz*.5));
@@ -1102,21 +1104,24 @@ function phUpdate(dt){
  if(PH.st==='wait'&&time>=PH.next)phStart();
  if(PH.st==='run'){
   if(time>=PH.end){PH.st='wait';PH.next=time+900;PH.nk=Math.random()<.5?'met':'gas'}
-  else inten=Math.max(0,Math.min(1,(time-PH.t0)/25,(PH.end-time)/25))}
+  else inten=Math.max(0,Math.min(1,(time-PH.t0)/6,(PH.end-time)/10))}
  if(PH.st==='run'&&PH.kind==='met'){
-  PH.spn+=dt*(MOB?2.6:5)*inten;
+  PH.spn+=dt*(MOB?4:8)*inten;
   while(PH.spn>=1){PH.spn-=1;m=PH.m[PH.ni=(PH.ni+1)%PH.m.length];if(m.life>0)continue;
-   var R=dist*1.15;m.h.set(tgt.x+(Math.random()*2-1)*R,tgt.y+(Math.random()*2-1)*R*.6+R*.7,tgt.z+(Math.random()*2-1)*R).addScaledVector(PH.dir,-R*.5);
-   m.v.copy(PH.dir).multiplyScalar(dist*(1.4+Math.random()*1.2));m.L=dist*(.1+Math.random()*.12);m.life=1;m.age=0;m.dur=.9+Math.random()*.9;m.ln.visible=true}
+   var hh=Math.tan(camera.fov*.00872665)*dist,hw=hh*camera.aspect,f=camera.getWorldDirection(mvF),r=mvR.crossVectors(f,camera.up).normalize(),u=mvU.crossVectors(r,f).normalize(),ja=PH.an+(Math.random()-.5)*.25,tk;
+   m.h.copy(camera.position).addScaledVector(f,dist*(.8+Math.random()*.4)).addScaledVector(r,(Math.random()*2-1)*hw*1.15).addScaledVector(u,(.4+Math.random()*.7)*hh);
+   m.d.copy(r).multiplyScalar(PH.sx*Math.cos(ja)).addScaledVector(u,-Math.sin(ja)).normalize();
+   m.v.copy(m.d).multiplyScalar(dist*(1.1+Math.random()*.8));m.L=dist*(.18+Math.random()*.14);m.life=1;m.age=0;m.dur=.8+Math.random()*.7;m.ln.visible=true;m.hd.visible=true;for(tk=0;tk<3;tk++)m.tr[tk].visible=true}
  }
- for(i=0;i<PH.m.length;i++){m=PH.m[i];if(m.life<=0)continue;m.age+=dt;if(m.age>=m.dur){m.life=0;m.ln.visible=false;continue}
+ for(i=0;i<PH.m.length;i++){m=PH.m[i];if(m.life<=0)continue;m.age+=dt;if(m.age>=m.dur){m.life=0;m.ln.visible=false;m.hd.visible=false;m.tr[0].visible=m.tr[1].visible=m.tr[2].visible=false;continue}
   m.h.addScaledVector(m.v,dt);var pa=m.ln.geometry.attributes.position,tl=Math.min(1,m.age*5);
-  pa.setXYZ(0,m.h.x,m.h.y,m.h.z);pa.setXYZ(1,m.h.x-PH.dir.x*m.L*tl,m.h.y-PH.dir.y*m.L*tl,m.h.z-PH.dir.z*m.L*tl);pa.needsUpdate=true;
-  m.ln.material.opacity=Math.sin(Math.PI*m.age/m.dur)}
- if(PH.st==='run'&&PH.kind==='gas'){PH.gn-=dt*inten;if(PH.gn<=0){PH.gn=3+Math.random()*4;phErupt()}}
+  pa.setXYZ(0,m.h.x,m.h.y,m.h.z);pa.setXYZ(1,m.h.x-m.d.x*m.L*tl,m.h.y-m.d.y*m.L*tl,m.h.z-m.d.z*m.L*tl);pa.needsUpdate=true;
+  var oo=Math.sin(Math.PI*m.age/m.dur),tj;m.ln.material.opacity=oo;m.hd.position.copy(m.h);m.hd.scale.setScalar(dist*.03);m.hd.material.opacity=oo;
+  for(tj=0;tj<3;tj++){var sp2=m.tr[tj];sp2.position.copy(m.h).addScaledVector(m.d,-m.L*tl*(.2+tj*.22));sp2.scale.setScalar(dist*(.022-tj*.006));sp2.material.opacity=oo*(.7-tj*.2)}}
+ if(PH.st==='run'&&PH.kind==='gas'){PH.gn-=dt*inten;if(PH.gn<=0){PH.gn=1.4+Math.random()*2.2;phErupt()}}
  for(i=0;i<PH.p.length;i++){q=PH.p[i];if(q.life<=0)continue;q.age+=dt;var u=q.age/q.dur;if(u>=1){q.life=0;q.sp.visible=false;continue}
   q.v.multiplyScalar(Math.exp(-dt*.7));q.sp.position.addScaledVector(q.v,dt);q.sp.scale.setScalar(q.s*(1+u*2.2));q.sp.material.opacity=Math.min(1,u*8)*(1-u)*.8}
- for(i=0;i<PH.fl.length;i++){q=PH.fl[i];if(q.life<=0)continue;q.life-=dt*1.6;if(q.life<=0){q.sp.visible=false;continue}q.sp.scale.setScalar(q.s*(1.3-q.life*.4));q.sp.material.opacity=q.life*.9}
+ for(i=0;i<PH.fl.length;i++){q=PH.fl[i];if(q.life<=0)continue;q.life-=dt*.9;if(q.life<=0){q.sp.visible=false;continue}q.sp.scale.setScalar(q.s*(1.3-q.life*.4));q.sp.material.opacity=q.life*.9}
 }
 
 /* ---------- bucle ---------- */
