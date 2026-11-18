@@ -88,7 +88,7 @@ body.noui .top>*,body.noui .hint,body.noui .ctrl button:not(.keep){opacity:0;poi
 </header>
 
 <footer class="ui bot">
- <p class="hint" id="hint">Mueve el cursor o desliza el dedo: la cámara te sigue y cada recorrido levanta una planta en 3D con pintura sobre el piso. Dos dedos o clic derecho giran la vista.</p>
+ <p class="hint" id="hint">Mueve el cursor o desliza el dedo: la cámara te sigue y cada recorrido levanta una planta en 3D con pintura. Deja el dedo quieto y el plano crece en edificio. Dos dedos giran la vista.</p>
  <nav class="ctrl" aria-label="Controles del experimento">
   <button id="bPause" aria-pressed="false"><span>Pausar</span><kbd>Espacio</kbd></button>
   <button id="bPaint" aria-pressed="true"><span>Pintura: sí</span><kbd>P</kbd></button>
@@ -110,6 +110,7 @@ body.noui .top>*,body.noui .hint,body.noui .ctrl button:not(.keep){opacity:0;poi
  <ul>
   <li><kbd>Espacio</kbd><span>Pausar o reanudar</span></li>
   <li><kbd>R</kbd><span>Cambiar cámara: órbita, fija o cenital</span></li>
+  <li><kbd>Mantener</kbd><span>Dedo o clic quieto sobre una planta: crece en edificio de hasta 9 pisos</span></li>
   <li><kbd>F</kbd><span>La cámara sigue o no el punto donde dibujas</span></li>
   <li><kbd>Clic der.</kbd><span>Arrastrar para girar; rueda para acercar</span></li>
   <li><kbd>P</kbd><span>Activar o desactivar la pintura</span></li>
@@ -210,7 +211,7 @@ const beam=new THREE.Mesh(new THREE.CylinderGeometry(.05,.05,10,6),cm2);beam.pos
 cur.add(ring,beam);cur.children.forEach(o=>o.renderOrder=4);cur.visible=false;scene.add(cur);
 
 /* ---------- Cámara ---------- */
-let th=.6,ph=.8,phT=.8,dist=90,distT=90,camMode=RM?1:0,paused=false,follow=true;const ct={x:0,z:0};
+let th=.6,ph=.8,phT=.8,dist=90,distT=90,camMode=RM?1:0,paused=false,follow=true,hgt=0,curDt=16;const ct={x:0,z:0};const HMAX=9;
 const camNames=['Cámara: órbita','Cámara: fija','Cámara: cenital'];
 const baseDist=()=>W/H<.8?135:90;
 distT=dist=baseDist();
@@ -221,8 +222,9 @@ function updCam(dt){
  if(follow){if(ptr.has){tx=ptr.wx;tz=ptr.wz}else{tx=ct.x;tz=ct.z}}
  const rr=Math.hypot(tx,tz),mm=RAD*.85;if(rr>mm){tx*=mm/rr;tz*=mm/rr}
  const kt=Math.min(1,dt*.005);ct.x+=(tx-ct.x)*kt;ct.z+=(tz-ct.z)*kt;
- camera.position.set(ct.x+Math.sin(th)*Math.cos(ph)*dist,Math.sin(ph)*dist,ct.z+Math.cos(th)*Math.cos(ph)*dist);
- camera.lookAt(ct.x,2,ct.z);camera.updateMatrixWorld();
+ const dd=dist+hgt*2.8,ly=2+hgt*HW*.5;
+ camera.position.set(ct.x+Math.sin(th)*Math.cos(ph)*dd,Math.sin(ph)*dd+hgt*HW*.35,ct.z+Math.cos(th)*Math.cos(ph)*dd);
+ camera.lookAt(ct.x,ly,ct.z);camera.updateMatrixWorld();
 }
 function resize(){
  W=innerWidth;H=innerHeight;DPR=Math.min(devicePixelRatio||1,2);
@@ -325,7 +327,7 @@ function buildPlan(){
  A(nx,ny,g,0,Math.PI*2,S.t,.8,.7);L(nx,ny+.8*g,nx,ny-.8*g,S.t,1);L(nx,ny-.8*g,nx-.35*g,ny-.2*g,S.t,1);T(nx,ny-1.8*g,'N',S.t,g*.85);
  const n=P.length,D=RM?.5:clamp(n*.03,1.4,2.8),d=RM?.12:.5;
  P.forEach((q,i)=>{q.st=i/n*D;q.d=d});
- return{prims:P,boxes:B,E:Math.max(w,h)+16*g,dur:D+d+.3};
+ return{prims:P,boxes:B,E:Math.max(w,h)+16*g,dur:D+d+.3,rect:[x0,y0,w,h],col:S.w};
 }
 function makePlan(wx,wz){
  const d=buildPlan(),p={prims:d.prims,dur:d.dur,N:SN,SC:SN/d.E,done:false,die:null,dead:false,born:clock};
@@ -350,7 +352,14 @@ function makePlan(wx,wz){
  p.fmat=new THREE.MeshBasicMaterial({vertexColors:true,transparent:true,opacity:.055,blending:AM,depthWrite:false,side:THREE.DoubleSide});
  p.faces=new THREE.Mesh(p.geoF,p.fmat);p.faces.frustumCulled=false;p.faces.renderOrder=3;
  p.solid=new THREE.Group();p.solid.add(p.faces,p.lines);p.solid.scale.y=.001;
- p.group=new THREE.Group();p.group.add(p.sheet,p.solid);
+ p.hm=1;p.hmT=1;
+ {const[rx,ry,rw,rh]=d.rect,q=[[rx,ry],[rx+rw,ry],[rx+rw,ry+rh],[rx,ry+rh]],c2=rgb(d.col).map(v=>Math.min(1,v*1.1)),a2=[],b2=[];
+  for(let k=1;k<=HMAX;k++){const yy=k*HW;for(let i=0;i<4;i++){const u=q[i],v=q[(i+1)%4];a2.push(u[0],yy,u[1],v[0],yy,v[1]);b2.push(...c2,...c2)}}
+  p.geoFl=new THREE.LineSegmentsGeometry();p.geoFl.setPositions(a2);p.geoFl.setColors(b2);
+  p.flmat=new THREE.LineMaterial({color:0xffffff,linewidth:LW*DPR,vertexColors:true,transparent:true,blending:AM,depthWrite:false,opacity:.7});
+  p.flmat.fog=true;p.flmat.resolution.set(W*DPR,H*DPR);lmats.add(p.flmat);
+  p.floors=new THREE.LineSegments2(p.geoFl,p.flmat);p.floors.frustumCulled=false;p.floors.renderOrder=3;p.geoFl.instanceCount=0}
+ p.group=new THREE.Group();p.group.add(p.sheet,p.solid,p.floors);
  const s=2.4;p.group.position.set(Math.round(wx/s)*s,0,Math.round(wz/s)*s);
  p.group.rotation.y=Math.random()<.7?0:pick([-1,1])*pick([Math.PI/12,Math.PI/6,Math.PI/2]);
  scene.add(p.group);return p;
@@ -387,13 +396,15 @@ function drawSheet(p,age){
 function updatePlan(p){
  const age=(clock-p.born)/1000;let a=1;
  if(p.die!==null){a=1-(clock-p.die)/FADE;if(a<=0){p.dead=true;return}}
- p.solid.scale.y=Math.max(.001,ease(clamp(age/1.7,0,1))*a);
+ p.hm+=(p.hmT-p.hm)*Math.min(1,curDt*.006);
+ p.solid.scale.y=Math.max(.001,ease(clamp(age/1.7,0,1))*p.hm*a);
+ p.geoFl.instanceCount=4*Math.min(HMAX,Math.max(0,Math.floor(p.solid.scale.y-.001)));p.flmat.opacity=.7*a;
  p.lmat.opacity=.8*a;p.fmat.opacity=.055*a;p.smat.opacity=Math.min(.85,age*1.4)*a;
  p.geoL.instanceCount=Math.floor(p.nSeg*clamp(age/2.2,0,1));
  if(!p.done){drawSheet(p,age);p.tex.needsUpdate=true;if(age>p.dur)p.done=true}
 }
 function disposePlan(p){
- scene.remove(p.group);lmats.delete(p.lmat);
+ scene.remove(p.group);lmats.delete(p.lmat);lmats.delete(p.flmat);p.geoFl.dispose();p.flmat.dispose();
  p.geoL.dispose();p.lmat.dispose();p.geoF.dispose();p.fmat.dispose();p.tex.dispose();p.smat.dispose();p.sheet.geometry.dispose();
 }
 
@@ -473,6 +484,7 @@ function moveTo(wx,wz){
  ptr.wx=wx;ptr.wz=wz;ptr.last=performance.now();
 }
 function movePointer(sx,sy){
+ if(Math.hypot(sx-anch.x,sy-anch.y)>14){anch.x=sx;anch.y=sy;anch.t=performance.now()}
  /* con seguimiento, el punto avanza lo que avanza el dedo y la cámara lo mantiene centrado */
  if(follow&&ptr.has&&ptr.sv&&toWorld(ptr.sx,ptr.sy,tmpA,true)&&toWorld(sx,sy,tmp,true)){
   let dx=tmp.x-tmpA.x,dz=tmp.z-tmpA.z;const m=Math.hypot(dx,dz);if(m>30){dx*=30/m;dz*=30/m}
@@ -487,14 +499,14 @@ function manual(){
  if(auto){auto=false;setMode();stage.classList.add('manual')}
  if(!hintTimer)hintTimer=setTimeout(()=>hint.classList.add('gone'),3500);
 }
-const touches=new Map();let drag=null;
+const touches=new Map();let drag=null,down=false;const anch={x:0,y:0,t:0};
 const onUi=e=>e.target.closest&&e.target.closest('.ui,.help,.toast');
 addEventListener('pointerdown',e=>{
  if(e.target!==renderer.domElement)return;
  manual();
- if(e.pointerType==='touch'){touches.set(e.pointerId,[e.clientX,e.clientY]);if(touches.size>=2){ptr.has=false;return}}
+ if(e.pointerType==='touch'){touches.set(e.pointerId,[e.clientX,e.clientY]);if(touches.size>=2){ptr.has=false;down=false;return}}
  if(e.pointerType==='mouse'&&e.button!==0){drag=[e.clientX,e.clientY];return}
- ptr.sx=e.clientX;ptr.sy=e.clientY;ptr.sv=true;
+ ptr.sx=e.clientX;ptr.sy=e.clientY;ptr.sv=true;down=true;anch.x=e.clientX;anch.y=e.clientY;anch.t=performance.now();
  if(toWorld(e.clientX,e.clientY,tmp)){ptr.wx=tmp.x;ptr.wz=tmp.z;ptr.has=true;ptr.last=performance.now();if(!paused){spawn(tmp.x,tmp.z);splat(tmp.x,tmp.z,0,0,true)}}
 });
 addEventListener('pointermove',e=>{
@@ -517,7 +529,7 @@ addEventListener('pointermove',e=>{
  if(list.length)for(const c of list)movePointer(c.clientX,c.clientY);else movePointer(e.clientX,e.clientY);
 });
 function orbit(dx,dy){th-=dx*.006;if(camMode!==2){ph=clamp(ph+dy*.004,.12,1.3);phT=ph}}
-const endPtr=e=>{touches.delete(e.pointerId);if(e.pointerType==='mouse')drag=null;if(touches.size===0)ptr.has=ptr.has&&e.pointerType==='mouse'};
+const endPtr=e=>{touches.delete(e.pointerId);if(e.pointerType==='mouse')drag=null;if(e.pointerType==='mouse'||touches.size===0)down=false;if(touches.size===0)ptr.has=ptr.has&&e.pointerType==='mouse'};
 addEventListener('pointerup',endPtr);addEventListener('pointercancel',endPtr);
 renderer.domElement.addEventListener('contextmenu',e=>e.preventDefault());
 renderer.domElement.addEventListener('wheel',e=>{e.preventDefault();distT=clamp(distT*(1+e.deltaY*.001),40,150)},{passive:false});
@@ -611,7 +623,7 @@ addEventListener('keydown',e=>{
 let prev=performance.now(),tick=0;
 function frame(now){
  const dt=Math.min(now-prev,50);prev=now;
- if(!auto&&!RM&&now-lastManual>IDLE){auto=true;setMode();stage.classList.remove('manual')}
+ if(!auto&&!RM&&!down&&now-lastManual>IDLE){auto=true;setMode();stage.classList.remove('manual')}
  if(!paused&&!busy){
   clock+=dt;
   if(auto){ptr.sv=false;const t=clock/1000;moveTo(42*Math.sin(t*.43)+8*Math.sin(t*1.31+.7),34*Math.sin(t*.31+1.2)+8*Math.cos(t*1.07))}
@@ -623,6 +635,13 @@ function frame(now){
   mg.attributes.position.needsUpdate=true;
  }
  if(!busy){
+  curDt=dt;
+  let hp=1,near=null,nd=26;
+  if(ptr.has)for(const q of plans)if(q.die===null){const dq=Math.hypot(q.group.position.x-ptr.wx,q.group.position.z-ptr.wz);if(dq<nd){nd=dq;near=q}}
+  const holding=down&&now-anch.t>250,pulse=auto&&(clock/1000)%16>11;
+  if(near&&!paused&&(holding||pulse))near.hmT=Math.min(HMAX,near.hmT+dt*.0017);
+  if(near)hp=near.hm;
+  hgt+=(hp-1-hgt)*Math.min(1,dt*.004);
   updCam(dt);
   for(const p of plans)updatePlan(p);
   plans=plans.filter(p=>{if(p.dead)disposePlan(p);return!p.dead});
@@ -633,7 +652,7 @@ function frame(now){
   else if(ptr.has&&toWorld(ptr.sx,ptr.sy,tmp)){x=tmp.x;z=tmp.z;ok=true}
   const al=auto?.55:clamp(1-(now-ptr.last-1500)/1000,0,1);
   cur.visible=ok&&al>0;
-  if(cur.visible){cur.position.set(x,0,z);cm1.opacity=al;cm2.opacity=al*.55;ring.scale.setScalar(1+.12*Math.sin(now*.006))}
+  if(cur.visible){cur.position.set(x,0,z);cm1.opacity=al;cm2.opacity=al*.55;ring.scale.setScalar(1+.12*Math.sin(now*.006));const bs=Math.max(1,(hp*HW+2)/10);beam.scale.y=bs;beam.position.y=5*bs}
   composer.render();
  }
  requestAnimationFrame(frame);
