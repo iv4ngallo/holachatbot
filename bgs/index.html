@@ -751,7 +751,9 @@ html.reveal .hero .stage { animation: spZoom .9s .2s cubic-bezier(.2, .8, .2, 1)
     cargar: function () { return listo().then(function (s) { return leer('bgs-hechas-' + s.user.id); }).then(function (d) { return d.hechas || {}; }); },
     guardar: function (obj) { return listo().then(function (s) { return escribir('bgs-hechas-' + s.user.id, function () { return { hechas: obj }; }); }); }
   };
-  window.BGSDB = { use: function (n) { return Promise.resolve(n === 'db' ? { doc: docRef, collection: colRef } : null); }, hechas: Hechas };
+  /* Próximas tareas primarias: Sky Port las lee de la fila "bgs-next" para mostrarlas en "Coming Next". */
+  var Proximas = { publicar: function (obj) { return escribir('bgs-next', function () { return obj; }); } };
+  window.BGSDB = { use: function (n) { return Promise.resolve(n === 'db' ? { doc: docRef, collection: colRef } : null); }, hechas: Hechas, proximas: Proximas };
 })();
 </script>
 <script>
@@ -1628,6 +1630,18 @@ html.reveal .hero .stage { animation: spZoom .9s .2s cubic-bezier(.2, .8, .2, 1)
   var tgrp = {}, tlocked = true, tdb = null, tHad = false, tDrag = null;
   function tDefault(i) { return taskVia(i) === '' ? 'p' : 's'; }
   function taskGroup(i) { return isVer(i) ? 'c' : (tgrp[i] || tDefault(i)); }
+  var nxLast = '', nxT = 0;
+  function publishNext() {
+    if (!window.BGSDB || !BGSDB.proximas) return;
+    clearTimeout(nxT);
+    nxT = setTimeout(function () {
+      var pend = [], tot = 0;
+      TODO.forEach(function (x, i) { if (taskGroup(i) !== 'p') return; tot++; if (!done[i]) pend.push({ i: i, l: String(x[0]).slice(0, 40), t: String(x[1]).slice(0, 160) }); });
+      var obj = { v: 1, p: tot, n: pend.length, pend: pend.slice(0, 8) }, sig = JSON.stringify(obj);
+      if (sig === nxLast) return; nxLast = sig; obj.upd = Date.now();
+      BGSDB.proximas.publicar(obj).catch(function () { nxLast = ''; });
+    }, 1500);
+  }
   function readTG(d) { var o = {}; if (d && d.g) Object.keys(d.g).forEach(function (k) { if (TODO[k] && (d.g[k] === 'p' || d.g[k] === 's')) o[k] = d.g[k]; }); return { g: o, locked: d && typeof d.locked === 'boolean' ? d.locked : true }; }
   (function () { var raw = null; try { raw = JSON.parse(store('hub-tgrupos') || 'null'); } catch (e) { } tHad = !!raw; var r = readTG(raw); tgrp = r.g; tlocked = r.locked; })();
   function saveTG() {
@@ -1695,7 +1709,7 @@ html.reveal .hero .stage { animation: spZoom .9s .2s cubic-bezier(.2, .8, .2, 1)
     $('#pfill').style.width = (vis.length ? n / vis.length * 100 : 0) + '%'; $('#pcount').textContent = n + ' de ' + vis.length;
     $('#ptot').textContent = vis.length; $('#pscope').textContent = (function () { var p = 0; TODO.forEach(function (x, i) { if (taskGroup(i) === 'p') p++; }); return p + ' tareas primarias y ' + (TODO.filter(function (x, i) { return taskGroup(i) === 's'; }).length) + ' secundarias abiertas y ' + (TODO.filter(function (x, i) { return taskGroup(i) === 'c'; }).length) + ' completadas. Por defecto, las primarias son las de las líneas primarias; las secundarias indican con qué línea primaria se conectan.'; })();
     var bd = dock.querySelector('.d-badge'); bd.textContent = left; bd.hidden = left === 0;
-    $('#ctaN').textContent = left; sideProg(n, left);
+    $('#ctaN').textContent = left; sideProg(n, left); publishNext();
     var nx; for (var q = 0; q < vis.length; q++) { if (!done[vis[q]]) { nx = vis[q]; break; } }
     $('#next').innerHTML = nx === undefined ? '<span class="txt2"><span class="mono">Estado</span><br>Todos los pendientes están listos.</span>' : '<span class="txt2"><span class="mono">Siguiente tarea</span><br>' + pad3(nx) + ' · ' + esc(TODO[nx][0]) + ': ' + esc(TODO[nx][1]) + '</span><button type="button" data-go="' + nx + '">Ver qué hacer</button>';
     if (pulse && !reduce) { $('#pcount').animate([{ transform: 'scale(1.3)' }, { transform: 'none' }], { duration: 280 }); bd.animate([{ transform: 'scale(1.5)' }, { transform: 'none' }], { duration: 320 }); }
