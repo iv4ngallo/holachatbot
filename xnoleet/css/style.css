@@ -131,7 +131,7 @@ dialog::backdrop{background:rgba(243,245,244,.95)}
 
 /* Laboratorio */
 .lab{background:rgba(243,245,244,.9);border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden}
-.lab-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(12px,1.6vw,22px);margin:34px 0}
+.lab-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:clamp(12px,1.6vw,22px);margin:34px 0}
 .exp{display:flex;flex-direction:column;justify-content:space-between;gap:48px;min-height:230px;padding:22px;border:1px solid var(--tx);text-decoration:none;background:var(--bg);position:relative;overflow:hidden;transition:transform .3s}
 .exp::before{content:"";position:absolute;right:-60px;top:-60px;width:170px;height:170px;border-radius:50%;border:1px solid var(--tx);transition:background .3s,transform .5s}
 .exp:hover{transform:translateY(-4px)}
