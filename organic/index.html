@@ -7,10 +7,10 @@
 <link rel="icon" type="image/svg+xml" href="favicon.svg?v=1">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=1">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=1">
-<link rel="stylesheet" href="../suite/suite.css?v=6">
+<link rel="stylesheet" href="../suite/suite.css?v=7">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Climate+Crisis&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* Lenguaje visual: formas totalmente redondeadas, negro como base y verde, azul y naranja como acentos.
    Layout: tres tarjetas (toolbox, lista, detalle) flotando sobre un lienzo. */
@@ -172,6 +172,37 @@ h1,h2,h3{font-family:var(--font-d);margin:0;font-weight:700;text-transform:upper
 .mh-btn[aria-expanded=true] .cv{transform:rotate(180deg)}
 .cap{margin-top:10px;min-height:44px;border-radius:18px}
 #xfmenu{width:240px}
+/* Sistema de diseño de PrecIA: tokens, tipografía (Climate Crisis solo en el título de marca) y radios 8/14/20 */
+:root{
+  --canvas:#F7F5FB; --bg:#FFFFFF; --panel:#EFEBF8; --raised:#FFFFFF; --ink:#1C1838; --ink2:#4F4A6E; --line:#E1DCF0; --rule:#1C1838;
+  --bar:#4B3FC4; --bar-ink:#FFFFFF; --on-color:#FFFFFF;
+  --orange:#C0398B; --orange-bar:#C0398B; --orange-soft:#FBE6F2;
+  --green:#1F7A4D; --green-soft:#E2F2E9; --blue:#4B3FC4; --blue-soft:#E9E6FB;
+  --red:#B3261E; --warn:#B3261E;
+  --font-d:"Work Sans",system-ui,-apple-system,"Segoe UI",sans-serif; --font-b:"Work Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --r-sm:8px; --r-md:14px; --r-lg:20px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --canvas:#14122B; --bg:#14122B; --panel:#2A2652; --raised:#1E1B3C; --ink:#EEECF8; --ink2:#B9B6D3; --line:#3A3665; --rule:#EEECF8;
+    --bar:#5B4FD6; --bar-ink:#FFFFFF; --on-color:#FFFFFF;
+    --orange:#F08CC6; --orange-bar:#C3589B; --orange-soft:#3F2038; --green:#74D6A4; --green-soft:#173328; --blue:#A79BFF; --blue-soft:#2D2870;
+    --red:#FF8E85; --warn:#FF8E85;
+  }
+}
+:root[data-theme="dark"]{
+  --canvas:#14122B; --bg:#14122B; --panel:#2A2652; --raised:#1E1B3C; --ink:#EEECF8; --ink2:#B9B6D3; --line:#3A3665; --rule:#EEECF8;
+  --bar:#5B4FD6; --bar-ink:#FFFFFF; --on-color:#FFFFFF;
+  --orange:#F08CC6; --orange-bar:#C3589B; --orange-soft:#3F2038; --green:#74D6A4; --green-soft:#173328; --blue:#A79BFF; --blue-soft:#2D2870;
+  --red:#FF8E85; --warn:#FF8E85;
+}
+h1,h2,h3{letter-spacing:.03em}
+.brand h1{font-family:"Climate Crisis","Work Sans",sans-serif;font-weight:400;font-size:17px;letter-spacing:0;text-transform:lowercase}
+.dock,.list,.detail{border-radius:var(--r-lg)}
+.mod{border-radius:var(--r-lg)}
+.row{border-radius:var(--r-md)}
+.cap{border-radius:var(--r-md)}
+:focus-visible{outline:3px solid var(--orange);outline-offset:2px;border-radius:6px}
 #xfmenu .mh{padding:8px 12px 4px}
 #xfmenu .mi svg{width:16px;height:16px;flex:none}
 #xfmenu .mi{gap:10px;justify-content:flex-start}
@@ -782,7 +813,7 @@ button:active:not(:disabled){transform:scale(.93)}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
-<script src="../suite/suite.js?v=6"></script>
+<script src="../suite/suite.js?v=7"></script>
 <script>
 (function(){
 "use strict";

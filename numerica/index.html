@@ -1,0 +1,1868 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>numérica. producido · Hola Apps</title>
+<meta name="description" content="Compositor de piezas para redes sociales con tu sistema de diseño. Parte de Hola Apps.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#C0398B">
+<link rel="stylesheet" href="../suite/suite.css?v=7">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Climate+Crisis&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: el lienzo ocupa todo el ancho; los controles viven en un toolbox flotante de formas redondeadas
+   (mismo lenguaje que el toolbox de Organic). La interfaz es neutra para que el único color sea el del sistema cargado. */
+:root{
+  /* Tokens de PrecIA */
+  --paper:#F7F5FB; --raised:#FFFFFF; --panel:#EFEBF8; --ink:#1C1838; --mute:#4F4A6E; --line:#E1DCF0;
+  --signal:#C0398B; --signal-ink:#FFFFFF; --stage:#E9E6FB; --bar:#4B3FC4; --bar-ink:#FFFFFF; --brand:#4B3FC4;
+  --r-sm:8px; --r-md:14px; --r-lg:20px;
+  --shadow:0 1px 2px rgba(29,27,58,.06),0 8px 24px rgba(29,27,58,.08);
+  --font-ui:'Work Sans',system-ui,-apple-system,'Segoe UI',sans-serif; --font-d:'Climate Crisis','Work Sans',system-ui,sans-serif; --font-mono:'Work Sans',system-ui,sans-serif;
+  --tbl:0px; --tbr:0px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root{
+  --paper:#14122B; --raised:#1E1B3C; --panel:#2A2652; --ink:#EEECF8; --mute:#B9B6D3; --line:#3A3665;
+  --signal:#F08CC6; --signal-ink:#14122B; --stage:#1E1B3C; --bar:#5B4FD6; --bar-ink:#FFFFFF; --brand:#A79BFF;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.35); color-scheme:dark;}}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--paper);color:var(--ink);font:14px/1.45 var(--font-ui);display:flex;flex-direction:column;overflow:hidden}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer}
+[hidden]{display:none !important}
+:focus-visible{outline:3px solid var(--signal);outline-offset:2px;border-radius:6px}
+.top{height:52px;flex:none;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 18px}
+.brand{display:flex;align-items:baseline;gap:10px}
+.wm{font:400 17px var(--font-d);letter-spacing:0;text-transform:lowercase}
+.wm i{font-style:normal;color:var(--signal)}
+.sub{font:500 12px var(--font-mono);color:var(--mute);letter-spacing:.04em}
+.keys{font:12px var(--font-mono);color:var(--mute);display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+kbd{font:inherit;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 5px;background:var(--raised);color:var(--ink)}
+.keys span{margin-right:8px}
+.app{flex:1;min-height:0;position:relative}
+.stagecol{position:absolute;inset:0;display:grid;grid-template-rows:minmax(0,1fr) auto auto;min-width:0;min-height:0;margin:0 12px 12px;border-radius:var(--r-lg);overflow:hidden;background:var(--stage)}
+.stage{position:relative;display:grid;place-items:center;min-height:0;overflow:hidden;background:var(--stage);cursor:crosshair;touch-action:none;outline-offset:-3px;padding-left:var(--tbl);padding-right:var(--tbr);transition:padding .2s}
+.stage canvas{box-shadow:0 1px 0 rgba(0,0,0,.08),0 12px 40px rgba(0,0,0,.18);background:#fff;display:block}
+.stage.locked{box-shadow:inset 0 0 0 3px var(--signal)}
+.state{position:absolute;left:14px;top:12px;display:flex;align-items:center;gap:8px;font:500 11px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;background:var(--raised);padding:5px 11px;border-radius:999px;pointer-events:none}
+.state .dot{width:8px;height:8px;border-radius:50%;background:var(--signal)}
+.stage:not(.locked) .state .dot{animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.25}}
+.tip{position:absolute;left:0;right:0;bottom:10px;text-align:center;font:11px var(--font-mono);color:var(--mute);pointer-events:none}
+#reticle{position:absolute;left:0;top:0;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;pointer-events:none;opacity:0;--p:0;
+  background:conic-gradient(var(--signal) calc(var(--p)*360deg),rgba(21,21,21,.22) 0);
+  -webkit-mask:radial-gradient(circle,transparent 18px,#000 19px);mask:radial-gradient(circle,transparent 18px,#000 19px)}
+.stage.hot #reticle{opacity:1}
+.stage.locked #reticle{opacity:0}
+.bar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;padding:10px 16px;background:var(--raised)}
+.read{font:12px var(--font-mono);color:var(--mute);display:flex;gap:6px 14px;flex-wrap:wrap}
+.read b{color:var(--ink);font-weight:500;font-variant-numeric:tabular-nums}
+.acts{display:flex;gap:8px;flex-wrap:wrap}
+.hist{display:flex;gap:8px;overflow-x:auto;padding:8px 16px 10px;background:var(--raised);border-top:1px solid var(--line);min-height:80px;align-items:center}
+.th{flex:none;padding:0;border:2px solid transparent;border-radius:6px;background:none;line-height:0}
+.th canvas{display:block;border-radius:3px;box-shadow:0 0 0 1px var(--line)}
+.th[aria-pressed="true"]{border-color:var(--signal)}
+.hist .none{font:12px var(--font-mono);color:var(--mute)}
+
+/* controles compartidos */
+.btn{padding:7px 15px;border:1.5px solid var(--bar);color:var(--bar);border-radius:999px;background:var(--raised);font:600 12px var(--font-ui);text-transform:uppercase;letter-spacing:.06em}
+.btn:hover{background:var(--bar);color:var(--bar-ink)}
+.btn.primary,.btn.ghost{color:inherit}
+.btn.primary{color:var(--bar-ink)}
+.btn.primary{background:var(--bar);border-color:var(--bar);color:var(--bar-ink)}
+.btn.primary:hover{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.btn.sm{padding:4px 11px;font-size:12px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.ghost{border-color:var(--line)}
+label{display:block;font-weight:600;font-size:12px;margin:10px 0 4px}
+label.first{margin-top:0}
+input[type=text],textarea{width:100%;padding:8px 14px;border:1.5px solid var(--line);border-radius:var(--r-md);background:var(--panel);resize:vertical}
+input[type=text]:focus,textarea:focus{outline:none;border-color:var(--ink)}
+textarea{min-height:56px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.seg{display:flex;gap:4px;flex-wrap:wrap}
+.seg button{flex:1;border:1.5px solid var(--line);background:none;border-radius:999px;padding:5px 8px;font:600 12px var(--font-ui);white-space:nowrap}
+.seg button:hover{border-color:var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--bar);color:var(--bar-ink);border-color:var(--bar)}
+.seg button:disabled{cursor:default}
+input[type=range]{width:100%;accent-color:var(--signal)}
+.rng{display:flex;justify-content:space-between;font:11px var(--font-mono);color:var(--mute)}
+.filerow{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.filerow .nm{flex:1;min-width:0;font:11px var(--font-mono);color:var(--mute);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sw{display:flex;height:16px;border-radius:999px;overflow:hidden;border:1px solid var(--line)}
+.sw i{flex:1}
+.pill{display:inline-block;background:var(--bar);color:var(--bar-ink);padding:2px 14px;line-height:1.35;border-radius:999px;font:700 12px var(--font-ui);text-transform:uppercase;letter-spacing:.08em}
+.tag{font:500 10px var(--font-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mute);border:1px solid var(--line);border-radius:999px;padding:0 8px}
+
+/* toolbox flotante */
+#tb{position:fixed;top:64px;left:auto;right:24px;width:340px;max-height:calc(100svh - 76px);display:flex;flex-direction:column;background:var(--raised);border-radius:var(--r-lg);box-shadow:var(--shadow);z-index:6;overflow:hidden}
+#tb[data-pos="left"]{left:24px;right:auto}
+#tb.dragging{transition:none;opacity:.94}
+.tbhead{display:flex;align-items:center;gap:6px;padding:10px 10px 8px 16px;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
+#tb.dragging .tbhead{cursor:grabbing}
+.tbhead .pill{margin-right:auto}
+.tbbtn{width:32px;height:32px;border-radius:50%;border:0;background:var(--panel);display:grid;place-items:center;flex:none;padding:0}
+.tbbtn:hover,.tbbtn[aria-pressed="true"]{background:var(--bar);color:var(--bar-ink)}
+.tbbtn svg{width:16px;height:16px}
+.tbtabs{display:flex;flex-wrap:wrap;gap:5px;padding:0 12px 8px}
+.tab{border:1.5px solid var(--line);background:none;border-radius:999px;padding:2px 12px;font:700 13px var(--font-ui);text-transform:uppercase;letter-spacing:.07em}
+.tab:hover{border-color:var(--ink)}
+.tab[aria-selected="true"]{background:var(--bar);color:var(--bar-ink);border-color:var(--bar)}
+.tbbody{overflow:auto;padding:4px 16px 18px;flex:1;min-height:0}
+#tb.min .tbtabs,#tb.min .tbbody{display:none}
+.h2{font:600 12px var(--font-ui);letter-spacing:.09em;text-transform:uppercase;color:var(--mute);margin:0 0 8px}
+.selwrap{position:relative;display:block}
+.selwrap select{appearance:none;-webkit-appearance:none;width:100%;background:var(--bar);color:var(--bar-ink);border:0;padding:10px 40px 10px 18px;font:700 15px var(--font-ui);text-transform:uppercase;letter-spacing:.08em;cursor:pointer;border-radius:999px}
+.selwrap select option,.selwrap select optgroup{background:var(--raised);color:var(--ink);font-family:var(--font-ui);text-transform:none;letter-spacing:0}
+.selwrap::after{content:"";position:absolute;right:17px;top:50%;border:5px solid transparent;border-top:6px solid var(--bar-ink);transform:translateY(-25%);pointer-events:none}
+.brief{background:var(--panel);border-radius:var(--r-md);padding:14px;margin-top:12px;display:grid;gap:10px}
+.brief .bh{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.brief .bh b{font:700 20px var(--font-ui);text-transform:uppercase;letter-spacing:.04em}
+.brief p{margin:0;font-size:13px;color:var(--ink)}
+.facts{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;margin:0;font-size:12px}
+.facts dt{color:var(--mute);font:500 11px var(--font-mono);padding-top:1px}
+.facts dd{margin:0;min-width:0;overflow-wrap:anywhere}
+.btnrow{display:flex;gap:6px;flex-wrap:wrap}
+.fmts{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.fmt{display:flex;gap:10px;align-items:center;padding:9px 12px;border:1.5px solid var(--line);border-radius:var(--r-md);background:none;text-align:left}
+.fmt:hover{border-color:var(--ink)}
+.fmt[aria-pressed="true"]{border-color:var(--ink);background:var(--panel)}
+.fmt .mini{border:1.5px solid var(--ink);border-radius:2px;flex:none}
+.fmt b{display:block;font:700 14px var(--font-ui);text-transform:uppercase;letter-spacing:.05em;line-height:1.1}
+.fmt small{font:10px var(--font-mono);color:var(--mute)}
+.elg{margin-bottom:14px}
+.elrow{display:flex;gap:6px;margin-bottom:8px;align-items:center}
+.elrow .h2{margin:0;flex:1}
+.el{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;padding:8px 12px 8px 10px;border:1.5px solid transparent;border-radius:var(--r-md);background:var(--panel);margin-bottom:5px}
+.el:hover{border-color:var(--ink)}
+.el .chk{width:20px;height:20px;border:1.5px solid var(--ink);border-radius:50%;flex:none;margin-top:1px;display:grid;place-content:center}
+.el[aria-pressed="true"] .chk{background:var(--ink)}
+.el[aria-pressed="true"] .chk::after{content:"";width:9px;height:5px;border:2px solid var(--bar-ink);border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px)}
+.el[aria-pressed="false"]{opacity:.55}
+.el b{display:block;font:700 14px var(--font-ui);text-transform:uppercase;letter-spacing:.05em;line-height:1.15}
+.el small{display:block;font-size:11.5px;color:var(--mute);line-height:1.3}
+.note{font-size:12px;color:var(--mute);margin:0 0 12px}
+
+/* vista de exploración */
+#explore{position:fixed;inset:0;background:var(--paper);z-index:9;overflow:auto}
+.xwrap{max-width:1080px;margin:0 auto;padding:0 18px 60px}
+.xhead{position:sticky;top:0;z-index:2;background:var(--paper);display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 0 12px}
+.xhead h2{font:400 24px var(--font-d);text-transform:uppercase;letter-spacing:.01em;margin:0 auto 0 0;line-height:1}
+.xcard{background:var(--raised);border-radius:var(--r-lg);padding:22px 24px;margin-bottom:14px}
+.xcard h3{font:700 15px var(--font-ui);text-transform:uppercase;letter-spacing:.09em;margin:0 0 12px;display:inline-block;background:var(--bar);color:var(--bar-ink);padding:1px 14px;border-radius:999px}
+.xcard p{margin:0 0 10px;max-width:70ch}
+.xcard ul{margin:0;padding-left:18px}
+.xcard li{margin-bottom:4px}
+.theme{margin-bottom:14px}
+.theme h4{margin:0 0 8px;font:600 12px var(--font-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mute)}
+.chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px}
+.cc{border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;background:var(--raised)}
+.cc i{display:block;height:46px}
+.cc span{display:block;padding:5px 9px 7px;font:11px var(--font-mono);line-height:1.3;overflow-wrap:anywhere}
+.cc span b{display:block;font:600 11px var(--font-ui)}
+.spec{border-bottom:1px solid var(--line);padding:10px 0;display:grid;gap:2px}
+.spec small{font:11px var(--font-mono);color:var(--mute)}
+.bars{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
+.bars div{display:grid;gap:4px;justify-items:center;font:11px var(--font-mono);color:var(--mute)}
+.bars i{display:block;background:var(--ink);min-width:6px}
+.radii div i{width:54px;height:54px;background:var(--panel);border:2px solid var(--ink)}
+.elgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.elcard{border:1.5px solid var(--line);border-radius:var(--r-lg);overflow:hidden;background:var(--raised)}
+.elcard canvas{display:block;width:100%;height:auto;background:var(--panel)}
+.elcard div{padding:9px 14px 12px}
+.elcard b{display:block;font:700 15px var(--font-ui);text-transform:uppercase;letter-spacing:.05em}
+.elcard small{display:block;font-size:12px;color:var(--mute);line-height:1.3}
+.elcard .tag{margin-top:6px;display:inline-block}
+.comps{display:flex;gap:6px;flex-wrap:wrap}
+.comps span{border:1.5px solid var(--line);border-radius:999px;padding:1px 12px;font:600 12px var(--font-mono)}
+
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(20,20,20,.55);display:grid;place-items:center;padding:16px;z-index:12}
+.dlg{background:var(--raised);border-radius:var(--r-lg);width:min(640px,100%);max-height:calc(100% - 8px);overflow:auto;padding:24px;box-shadow:0 24px 80px rgba(0,0,0,.35)}
+.dlg h3{margin:0 0 6px;font:400 20px var(--font-d);text-transform:uppercase;letter-spacing:.01em}
+.dlg p{margin:0 0 14px;color:var(--mute);max-width:60ch}
+.drop{display:grid;place-items:center;text-align:center;padding:22px 14px;border:2px dashed var(--line);border-radius:var(--r-md);background:var(--panel);cursor:pointer;margin-bottom:12px;font-weight:600}
+.drop.over,.drop:hover{border-color:var(--signal)}
+.drop small{display:block;font:11px var(--font-mono);color:var(--mute);font-weight:400;margin-top:4px}
+#impReport{margin:12px 0;font-size:13px}
+#impReport .sw{height:22px;margin-bottom:8px}
+#impReport ul{margin:0;padding-left:18px;color:var(--mute)}
+#impReport .err{color:var(--signal);margin:0}
+.dlgrow{display:flex;gap:8px;align-items:center;justify-content:flex-end;flex-wrap:wrap;margin-top:14px}
+.dlgrow input{flex:1;min-width:140px}
+.prev{display:grid;place-items:center;background:var(--stage);border-radius:var(--r-md);padding:12px;margin-bottom:12px}
+.prev img{max-width:100%;max-height:52vh;display:block}
+#toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:9px 16px;border-radius:999px;font-size:13px;max-width:calc(100% - 32px);opacity:0;pointer-events:none;transition:opacity .2s;z-index:20}
+#toast.on{opacity:1}
+@media (max-width:860px){
+  html,body{height:auto;overflow:auto}
+  body{display:block}
+  .top{position:sticky;top:0;z-index:5;background:var(--paper)}
+  .keys{display:none}
+  .app{height:auto}
+  .stagecol{position:static;display:block;margin:0 8px 8px;padding-bottom:0}
+  .stage{height:62svh;padding:0}
+  #tb,#tb[data-pos]{position:fixed;left:8px;right:8px;top:auto;bottom:8px;width:auto;max-height:52svh;border-radius:var(--r-lg)}
+  .tbhead{cursor:default}
+  #tb .tbbtn.posbtn{display:none}
+  .xcard{padding:18px}
+}
+@media (prefers-reduced-motion:reduce){.state .dot{animation:none!important}#toast,.stage{transition:none}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand"><span class="wm">numérica<i>.</i></span><span class="sub">producido</span></div>
+  <div class="keys" aria-hidden="true"><span><kbd>Espacio</kbd> fijar</span><span><kbd>R</kbd> mezclar</span><span><kbd>←</kbd><kbd>→</kbd> historial</span><span><kbd>E</kbd> exportar</span><span><kbd>T</kbd> toolbox</span></div>
+</header>
+<div class="app">
+  <main class="stagecol">
+    <div class="stage" id="stage" tabindex="0" aria-label="Lienzo. Mueve el cursor para generar composiciones. Espacio o clic para fijar.">
+      <canvas id="cv" width="800" height="1000"></canvas>
+      <div id="reticle"></div>
+      <div class="state" id="state"><span class="dot"></span><span id="stText">Generando</span></div>
+      <div class="tip" id="tip">Mueve el cursor sobre el lienzo. Clic para fijar.</div>
+    </div>
+    <div class="bar">
+      <div class="read" id="readout"></div>
+      <div class="acts">
+        <button class="btn" type="button" id="bPrev" aria-label="Composición anterior">←</button>
+        <button class="btn" type="button" id="bNext" aria-label="Composición siguiente">→</button>
+        <button class="btn" type="button" id="bShuffle">Mezclar</button>
+        <button class="btn" type="button" id="bLock" aria-pressed="false">Fijar</button>
+        <button class="btn" type="button" id="bCopy">Copiar</button>
+        <button class="btn primary" type="button" id="bExport">Exportar</button>
+      </div>
+    </div>
+    <div class="hist" id="hist" aria-label="Historial de composiciones"></div>
+  </main>
+
+  <aside id="tb" data-pos="right" aria-label="Toolbox">
+    <div class="tbhead" id="tbHead">
+      <span class="pill">Toolbox</span>
+      <button class="tbbtn posbtn" type="button" id="tbPos" aria-label="Cambiar posición del toolbox" title="Posición: derecha"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="1.5" y="2.5" width="13" height="11" rx="2"/><path d="M10 2.5v11" /></svg></button>
+      <button class="tbbtn" type="button" id="tbMin" aria-label="Contraer toolbox" aria-expanded="true" title="Contraer (T)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 10l5-5 5 5"/></svg></button>
+    </div>
+    <div class="tbtabs" role="tablist" id="tbTabs">
+      <button class="tab" role="tab" data-t="sys" type="button">Sistema</button>
+      <button class="tab" role="tab" data-t="el" type="button">Elementos</button>
+      <button class="tab" role="tab" data-t="fmt" type="button">Formato</button>
+      <button class="tab" role="tab" data-t="txt" type="button">Contenido</button>
+      <button class="tab" role="tab" data-t="img" type="button">Imagen</button>
+      <button class="tab" role="tab" data-t="out" type="button">Salida</button>
+    </div>
+    <div class="tbbody">
+      <section data-p="sys">
+        <div class="h2">Sistema de diseño</div>
+        <div class="selwrap"><select id="selSys" aria-label="Sistema de diseño"></select></div>
+        <div class="brief" id="brief"></div>
+        <div class="h2" style="margin-top:14px">Tema</div>
+        <div class="seg" id="segTheme"></div>
+      </section>
+      <section data-p="el" hidden>
+        <p class="note" id="elNote"></p>
+        <div id="elList"></div>
+      </section>
+      <section data-p="fmt" hidden>
+        <div class="h2">Formato de la pieza</div>
+        <div id="fmtList" class="fmts"></div>
+      </section>
+      <section data-p="txt" hidden>
+        <label class="first" for="fKicker">Antetítulo</label>
+        <input type="text" id="fKicker" autocomplete="off">
+        <label for="fTitle">Título</label>
+        <textarea id="fTitle" rows="2"></textarea>
+        <label for="fBody">Texto</label>
+        <textarea id="fBody" rows="3"></textarea>
+        <div class="two">
+          <div><label for="fCta">Botón</label><input type="text" id="fCta" autocomplete="off"></div>
+          <div><label for="fHandle">Usuario o web</label><input type="text" id="fHandle" autocomplete="off"></div>
+        </div>
+        <label for="fChips">Etiquetas o rasgos (separados por coma)</label>
+        <input type="text" id="fChips" autocomplete="off">
+        <label for="fReply">Respuesta del usuario (burbuja)</label>
+        <input type="text" id="fReply" autocomplete="off">
+        <label for="fBrand">Marca (si no hay logo)</label>
+        <input type="text" id="fBrand" autocomplete="off">
+      </section>
+      <section data-p="img" hidden>
+        <div class="h2">Imagen y logo</div>
+        <div class="filerow"><button class="btn sm" type="button" id="bImg">Subir imagen</button><span class="nm" id="nmImg">Sin imagen</span><button class="btn sm ghost" type="button" id="xImg" hidden>Quitar</button></div>
+        <div class="filerow"><button class="btn sm" type="button" id="bLogo">Subir logo</button><span class="nm" id="nmLogo">Logo del sistema</span><button class="btn sm ghost" type="button" id="xLogo" hidden>Quitar</button></div>
+        <input type="file" id="inImg" accept="image/*" hidden>
+        <input type="file" id="inLogo" accept="image/*" hidden>
+      </section>
+      <section data-p="out" hidden>
+        <label class="first">Fondo</label>
+        <div class="seg" id="segBg"></div>
+        <label for="rSens">Sensibilidad del cursor</label>
+        <input type="range" id="rSens" min="40" max="420" step="10">
+        <div class="rng"><span>más cambios</span><span id="vSens"></span><span>menos</span></div>
+        <div class="two">
+          <div><label>Escala</label><div class="seg" id="segScale"></div></div>
+          <div><label>Archivo</label><div class="seg" id="segType"></div></div>
+        </div>
+        <label>Posición del toolbox</label>
+        <div class="seg" id="segPos"></div>
+      </section>
+    </div>
+  </aside>
+</div>
+<section id="explore" hidden aria-label="Explorar sistema de diseño"></section>
+<div class="modal" id="modal" hidden><div class="dlg" id="dlg" role="dialog" aria-modal="true" aria-labelledby="dlgT"></div></div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="../suite/config.js?v=2"></script>
+<script src="../suite/suite.js?v=7"></script>
+<script>
+(() => {
+'use strict';
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const slug = s => String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'sistema';
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+
+/* ============ color ============ */
+const probe = document.createElement('canvas'); probe.width = probe.height = 1;
+const pc = probe.getContext('2d', {willReadFrequently: true});
+function parseColor(v){
+  if (typeof v !== 'string') return null; v = v.trim();
+  if (!/^(#[0-9a-f]{3,8}|(rgb|hsl|hwb|lab|lch|oklab|oklch|color)a?\([^()]*\))$/i.test(v)) return null;
+  pc.fillStyle = '#010203'; pc.fillStyle = v;
+  if (pc.fillStyle === '#010203' && v.toLowerCase() !== '#010203') return null;
+  pc.clearRect(0,0,1,1); pc.fillRect(0,0,1,1);
+  const d = pc.getImageData(0,0,1,1).data; return [d[0], d[1], d[2]];
+}
+const lin = c => { c /= 255; return c <= .03928 ? c / 12.92 : Math.pow((c + .055) / 1.055, 2.4); };
+function mk(rgb){
+  const [r,g,b] = rgb.map(x => clamp(Math.round(x), 0, 255));
+  const mx = Math.max(r,g,b), mn = Math.min(r,g,b);
+  return {r, g, b, L: .2126*lin(r) + .7152*lin(g) + .0722*lin(b), C: (mx - mn)/255, hex: '#' + [r,g,b].map(x => x.toString(16).padStart(2,'0')).join('')};
+}
+const hex2rgb = h => [1,3,5].map(i => parseInt(h.slice(i, i+2), 16));
+const contrast = (a, b) => (Math.max(a.L,b.L) + .05) / (Math.min(a.L,b.L) + .05);
+const mix = (a, b, t) => mk([a.r + (b.r-a.r)*t, a.g + (b.g-a.g)*t, a.b + (b.b-a.b)*t]);
+const WHITE = mk([255,255,255]), BLACK = mk([14,14,14]);
+
+/* ============ fonts ============ */
+const GENERIC = /^(serif|sans-serif|monospace|system-ui|ui-[\w-]+|cursive|fantasy|-apple-system|blinkmacsystemfont|georgia|arial|helvetica( neue)?|times( new roman)?|courier( new)?|verdana|tahoma|trebuchet ms)$/i;
+function primaryFamily(stack){
+  if (!stack) return null;
+  const m = String(stack).match(/^\s*(?:"([^"]+)"|'([^']+)'|([^,]+))/);
+  const n = m && (m[1] || m[2] || m[3] || '').trim();
+  return n && !GENERIC.test(n) ? n : null;
+}
+function stackOf(v, fallback){
+  v = String(v || '').trim(); if (!v) return fallback;
+  if (!/[",']/.test(v) && /\s/.test(v)) v = '"' + v + '"';
+  if (!/(serif|sans-serif|monospace|system-ui|cursive)\s*$/i.test(v)) v += ', system-ui, sans-serif';
+  return v;
+}
+const DEF_STACK = '"Work Sans", system-ui, sans-serif';
+function sysFonts(sys){
+  const f = sys.fonts || {}, d = f.display || f.body, b = f.body || f.display;
+  const dStack = stackOf(d, DEF_STACK), bStack = stackOf(b, DEF_STACK);
+  return {dStack, bStack, dName: primaryFamily(dStack), bName: primaryFamily(bStack)};
+}
+const fontState = {};
+function loadFamily(name){
+  if (fontState[name]) return fontState[name].p;
+  const st = fontState[name] = {ok: false, spec: ''};
+  const chain = [':wght@400;600;700', ':wght@400;700', ''];
+  st.p = (async () => {
+    for (const spec of chain){
+      const url = 'https://fonts.googleapis.com/css2?family=' + encodeURIComponent(name).replace(/%20/g, '+') + spec + '&display=swap';
+      const ok = await new Promise(res => {
+        const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = url;
+        l.onload = () => res(true); l.onerror = () => { l.remove(); res(false); };
+        document.head.appendChild(l); setTimeout(() => res(false), 4500);
+      });
+      if (ok){
+        st.ok = true; st.spec = spec;
+        try { await Promise.race([document.fonts.load((spec ? 700 : 400) + ' 20px "' + name + '"'), new Promise(r => setTimeout(r, 2500))]); } catch(e){}
+        break;
+      }
+    }
+    return st;
+  })();
+  return st.p;
+}
+async function ensureFonts(sys){
+  const f = sysFonts(sys);
+  await Promise.all([...new Set([f.dName, f.bName].filter(Boolean))].map(loadFamily));
+}
+async function registerFontFiles(sys){
+  for (const ff of (sys.fontFiles || [])){
+    try {
+      const face = new FontFace(ff.family, ff.buf, {weight: String(ff.weight || 400)});
+      await face.load(); document.fonts.add(face);
+      const st = fontState[ff.family] || (fontState[ff.family] = {ok: true, spec: '', p: Promise.resolve()});
+      st.ok = true; st.p = Promise.resolve(st);
+      if (ff.weight >= 600) st.spec = ':wght@400;600;700';
+    } catch(e){}
+  }
+}
+
+/* ============ elementos y fichas de los sistemas ============ */
+/* Cada sistema declara los elementos que el generador puede usar. Nada fuera de esta lista (ni de sus tokens) se dibuja. */
+const ELEMENTS = {
+  xnoleet: [
+    {id:'trama', n:'Trama', g:'Decoración', d:'Líneas diagonales finas sobre un bloque.'},
+    {id:'modulos', n:'Módulos + ×', g:'Decoración', d:'Rejilla de cruces y equis.'},
+    {id:'formas', n:'Formas', g:'Decoración', d:'Triángulo, anillo con punto, semicírculo, cuadrado con cruz y punto.'},
+    {id:'bandas', n:'Bandas', g:'Decoración', d:'Bandas diagonales onduladas con trama.'},
+    {id:'lineas', n:'Líneas de cursor', g:'Decoración', d:'Cruz de guías con coordenadas.'},
+    {id:'letra', n:'Ficha de letra', g:'Decoración', d:'Cuadrado con una letra grande.'},
+    {id:'chaflan', n:'Esquinas chaflán', g:'Forma', d:'Corta las esquinas de tarjetas y botones.'},
+    {id:'boton', n:'Botón', g:'Interfaz', d:'Primario o fantasma.'},
+    {id:'chip', n:'Chips', g:'Interfaz', d:'Etiquetas rectangulares en mayúsculas.'},
+    {id:'micro', n:'Micro etiqueta', g:'Interfaz', d:'Antetítulo con la primera palabra resaltada.'},
+    {id:'rasgos', n:'Lista de rasgos', g:'Interfaz', d:'Filas con regla fina.'},
+    {id:'wordmark', n:'Wordmark', g:'Marca', d:'Nombre con la N resaltada en el acento.'},
+    {id:'simbolo', n:'Símbolo', g:'Marca', d:'Logo del sistema o el que subas.'},
+    {id:'imagen', n:'Imagen subida', g:'Medios', d:'Permite usar tu foto en las composiciones.'}
+  ],
+  hola: [
+    {id:'hero', n:'Hero', g:'Bloques', d:'Bloque de marca con el título en grande.'},
+    {id:'burbuja', n:'Burbujas de chat', g:'Conversación', d:'Mensaje del bot y respuesta del usuario.'},
+    {id:'respuestas', n:'Respuestas rápidas', g:'Conversación', d:'Chips redondeados para responder.'},
+    {id:'patrocinado', n:'Tarjeta patrocinada', g:'Conversación', d:'Tarjeta con la etiqueta Patrocinado.'},
+    {id:'sello', n:'Sello verificado', g:'Conversación', d:'Sello con marca de verificación.'},
+    {id:'boton', n:'Botón', g:'Interfaz', d:'Botón de acción con los radios del sistema.'},
+    {id:'logo', n:'Logo', g:'Marca', d:'Logo del sistema o el que subas.'},
+    {id:'imagen', n:'Imagen subida', g:'Medios', d:'Permite usar tu foto en las composiciones.'}
+  ],
+  tokens: [
+    {id:'bloques', n:'Bloques de color', g:'Decoración', d:'Particiones planas con los colores del sistema.'},
+    {id:'cuadricula', n:'Módulos de color', g:'Decoración', d:'Cuadrícula de cuadros planos.'},
+    {id:'regla', n:'Reglas', g:'Decoración', d:'Líneas finas horizontales.'},
+    {id:'boton', n:'Botón', g:'Interfaz', d:'Botón con los radios del sistema.'},
+    {id:'chip', n:'Chips', g:'Interfaz', d:'Etiquetas redondeadas.'},
+    {id:'marca', n:'Marca o logo', g:'Marca', d:'Logo del sistema o nombre en su tipografía.'},
+    {id:'imagen', n:'Imagen subida', g:'Medios', d:'Permite usar tu foto en las composiciones.'}
+  ]
+};
+const KIT_IDS = {}; for (const kk in ELEMENTS) KIT_IDS[kk] = new Set(ELEMENTS[kk].map(e => e.id));
+const LOGO_EL = {xnoleet: 'simbolo', hola: 'logo', tokens: 'marca'};
+const INFO = {
+  xnoleet: {
+    brief: 'Identidad de laboratorio de experimentos: superficies planas, un solo color de identidad por pantalla, trama y módulos como textura, esquinas rectas con chaflán y cero sombras.',
+    rules: ['Un solo color de identidad por pantalla.', 'El acento nunca va como texto sobre la superficie.', 'Sin sombras ni degradados.', 'Esquinas rectas; el chaflán es la única curva permitida.'],
+    components: ['ArtCard', 'Bandas', 'Button', 'Chip', 'Cover', 'ExperimentCard', 'Fondo', 'Formas', 'Kbd', 'LetterTile', 'LineasCursor', 'MicroLabel', 'Modules', 'Nav', 'Portada', 'SectionHead', 'Temas', 'TraitList', 'Wordmark']
+  },
+  hola: {
+    brief: 'Chatbots para ciudades: bloques de marca púrpura, Climate Crisis solo para títulos cortos en mayúsculas, burbujas de chat, respuestas rápidas y sello de verificación.',
+    rules: ['Climate Crisis solo en H1 y H2, cortos y en mayúsculas; el resto va en Work Sans.', 'Sin degradados ni sombras.', 'Sobre fondos oscuros el logo va sobre una tarjeta blanca.', 'Usa los radios del sistema (8, 12, 20 y píldora).'],
+    components: ['Button', 'ChatBubble', 'Hero', 'QuickReplies', 'SponsorCard', 'TypeScale', 'VerifiedSeal']
+  }
+};
+function autoInfo(sys){
+  const f = sysFonts(sys), nc = Object.values(sys.colors || {})[0] ? Object.values(sys.colors)[0].length : 0;
+  return {
+    brief: 'Sistema importado con ' + nc + ' colores en ' + sys.themes.length + (sys.themes.length === 1 ? ' tema' : ' temas') + (f.dName ? ' y tipografía ' + f.dName : '') + '. No trae componentes definidos: el compositor solo usa sus tokens (bloques de color, reglas, botón, chips, marca e imagen).',
+    rules: [], components: []
+  };
+}
+/* ============ built-in systems ============ */
+/* Sistemas leídos de los artefactos Design System del usuario (project/tokens.json y logos). */
+const rowsToTokens = (ids, rows) => rows.map(([name, ...v]) => ({name, value: v.length === 1 ? v[0] : Object.fromEntries(ids.map((id, i) => [id, v[i]]))}));
+const XN = ['xnoleet', 'ivan-gallo'], HC = ['light', 'dark'];
+const ARTIFACT_SYSTEMS = [
+  {id:'art-xnoleet', kit:'xnoleet', info:INFO.xnoleet, name:'xNoleet', url:'https://claude.ai/artifact/D3xvci454hFYNgFjKX9Qba',
+   logo:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" fill="#16181a"/><circle cx="14" cy="17" r="8" fill="#39ff14"/><path d="M2 28L30 4" stroke="#f3f6f4" stroke-width="1.6"/></svg>',
+   tokens:{color:{themes:[{id:'xnoleet',name:'xNoleet'},{id:'ivan-gallo',name:'Iván Gallo'}], tokens: rowsToTokens(XN, [
+     ['surface','#ffffff','#f5f7fb'],['surface-2','#f3f5f4','#e6ebf4'],['surface-3','#e6eae8','#cdd6e6'],['line','#cdd3d0','#cdd6e6'],
+     ['text','#1f2326','#1e2838'],['text-muted','#586166','#4a566b'],['accent','#39ff14','#0037b3'],['on-accent','#0c0e0f','#ffffff'],
+     ['on-text','#ffffff','#ffffff'],['night','#16181a','#0f141d']])},
+    type:{families:{display:'Syne, system-ui, sans-serif', body:'"Space Grotesk", system-ui, sans-serif', mono:'"Space Mono", ui-monospace, monospace'}},
+    spacing:{tokens:[4,8,10,14,18,22,34,48,56,70,140].map(v => ({name:'space-' + v, value: v + 'px'}))},
+    radius:{tokens:[{name:'radius-none', value:'0'}]}}},
+  {id:'art-holachatbot', kit:'hola', info:INFO.hola, name:'Hola Chatbot', url:'https://claude.ai/artifact/F84eT58DN1KX7wd2nSnFQb', logo:null,
+   tokens:{color:{themes:[{id:'light',name:'Claro'},{id:'dark',name:'Oscuro'}], tokens: [
+     {name:'purple-primary',value:'#3D3A86'},{name:'purple-secondary',value:'#8C3F71'},{name:'gray-neutral',value:'#96989A'},{name:'white',value:'#FEFEFE'},
+     ...rowsToTokens(HC, [
+     ['surface','{white}','#15142E'],['surface-raised','#F1F0F8','#1F1D44'],['ink','#1E1C46','#F4F3FB'],['ink-muted','#5B5D60','#B4B6BA'],
+     ['brand','{purple-primary}','#B9B6F2'],['on-brand','{white}','#15142E'],['accent','{purple-secondary}','#E3A0CB'],['on-accent','{white}','#15142E'],
+     ['line','{gray-neutral}','#6A6C72'],['control-border','#767880','#8A8C92']])]},
+    type:{families:{display:'"Climate Crisis", Impact, "Arial Black", sans-serif', sans:'"Work Sans", system-ui, -apple-system, "Segoe UI", sans-serif'}},
+    spacing:{tokens:[4,8,12,16,24,32,48,64].map(v => ({name:'space-' + v, value: v + 'px'}))},
+    radius:{tokens:[8,12,20,999].map(v => ({name:'radius-' + v, value: v + 'px'}))}}}
+];
+function sysFromArtifact(a){
+  const r = fromTokensShape(a.tokens);
+  const uniq = arr => [...new Set(arr.filter(v => v != null && v >= 0))].sort((x, y) => x - y);
+  return {id: a.id, kit: a.kit, info: a.info, name: a.name, builtin: true, source: 'artifact', url: a.url, themes: r.themes, colors: r.colors, fonts: assignFonts(r.fonts),
+    radius: uniq(r.radius), spacing: uniq(r.spacing), logo: a.logo ? 'data:image/svg+xml;utf8,' + encodeURIComponent(a.logo) : null};
+}
+const BUILTIN = ARTIFACT_SYSTEMS.map(sysFromArtifact);
+
+/* ============ import / parsing ============ */
+function toPx(v){
+  if (typeof v === 'number') return v;
+  if (typeof v !== 'string') return null; v = v.trim();
+  if (/^(full|pill|round)/i.test(v)) return 999;
+  const m = v.match(/^(-?\d*\.?\d+)\s*(px|rem|em)?$/i); if (!m) return null;
+  let n = parseFloat(m[1]); if (/rem|em/i.test(m[2] || '')) n *= 16; return n;
+}
+function fromTokensShape(j){
+  const col = j.color;
+  const themes = (Array.isArray(col.themes) && col.themes.length ? col.themes : [{id:'light', name:'Claro'}])
+    .map(t => typeof t === 'string' ? {id:t, name:t} : {id: t.id || t.name, name: t.name || t.id});
+  const byName = new Map(col.tokens.filter(t => t && t.name).map(t => [t.name, t]));
+  const val = (t, th, d = 0) => {
+    let v = t.value;
+    if (v && typeof v === 'object') v = v[th] ?? v[themes[0].id] ?? Object.values(v)[0];
+    if (typeof v === 'string'){
+      const m = v.match(/^\{([^}]+)\}$/);
+      if (m && d < 8){ const o = byName.get(m[1]); return o ? val(o, th, d + 1) : null; }
+    }
+    return v;
+  };
+  const colors = {};
+  for (const th of themes){
+    colors[th.id] = [];
+    for (const t of col.tokens){ const rgb = parseColor(val(t, th.id)); if (rgb) colors[th.id].push({name: t.name, hex: mk(rgb).hex}); }
+  }
+  const fl = [], ty = j.type || {};
+  if (ty.families && typeof ty.families === 'object') for (const [k, v] of Object.entries(ty.families)) if (typeof v === 'string') fl.push({key: k, value: v});
+  if (Array.isArray(ty.fonts)) for (const f of ty.fonts) if (f && f.family) fl.push({key: 'font', value: f.family, file: f.file});
+  const list = x => ((x && x.tokens) || []).map(t => toPx(t.value)).filter(n => n != null);
+  return {name: j.name || j.title, themes, colors, fonts: fl, radius: list(j.radius), spacing: list(j.spacing)};
+}
+function deepScan(j){
+  const colors = {light: [], dark: []}, fl = [], radius = [], spacing = [];
+  const addColor = (path, v) => {
+    const rgb = parseColor(v); if (!rgb) return false;
+    const th = path.some(p => /dark|night/i.test(p)) ? 'dark' : 'light';
+    const nm = path.filter(p => !/^(light|dark|value|\$value|colors?|tokens?|themes?|\d+)$/i.test(p)).slice(-2).join('-') || ('color-' + (colors[th].length + 1));
+    colors[th].push({name: nm, hex: mk(rgb).hex}); return true;
+  };
+  const walk = (n, path) => {
+    if (path.length > 14) return;
+    if (typeof n === 'string'){
+      if (addColor(path, n)) return;
+      const p = path.join('.');
+      if (/radius|rounded|corner/i.test(p)){ const px = toPx(n); if (px != null){ radius.push(px); return; } }
+      if (/spac|gap/i.test(p)){ const px = toPx(n); if (px != null){ spacing.push(px); return; } }
+      if (/font|famil|typeface/i.test(p) && /[a-z]/i.test(n) && n.length < 120 && !/^(https?:|url\()|\.(woff2?|ttf|otf)$/i.test(n) && !/^[\d.]+(px|rem|em|%)?$/.test(n) && !/^(normal|bold|italic|\d{3})$/i.test(n))
+        fl.push({key: path[path.length - 1], value: n});
+      return;
+    }
+    if (typeof n === 'number'){
+      const p = path.join('.');
+      if (/radius|rounded|corner/i.test(p)) radius.push(n); else if (/spac|gap/i.test(p)) spacing.push(n);
+      return;
+    }
+    if (Array.isArray(n)){
+      n.forEach((x, i) => {
+        if (x && typeof x === 'object' && typeof x.name === 'string' && 'value' in x) walk(x.value, [...path, x.name]);
+        else walk(x, [...path, String(i)]);
+      });
+      return;
+    }
+    if (n && typeof n === 'object'){
+      if ('$value' in n){ walk(n.$value, path); return; }
+      for (const [k, v] of Object.entries(n)) walk(v, [...path, k]);
+    }
+  };
+  walk(j, []);
+  const themes = colors.dark.length ? [{id:'light', name:'Claro'}, {id:'dark', name:'Oscuro'}] : [{id:'light', name:'Claro'}];
+  if (!colors.light.length && colors.dark.length) colors.light = colors.dark;
+  return {name: j && (j.name || j.title), themes, colors, fonts: fl, radius, spacing};
+}
+function fromCSS(text){
+  const raw = [], fonts = [];
+  const src = text.replace(/\/\*[\s\S]*?\*\//g, '');
+  const gi = /fonts\.googleapis\.com\/css2?\?([^"')\s]+)/g; let gm;
+  while ((gm = gi.exec(src))){
+    for (const part of gm[1].split('&')) if (/^family=/.test(part)) fonts.push({key: 'import', value: decodeURIComponent(part.slice(7).split(':')[0].replace(/\+/g, ' '))});
+  }
+  const stack = []; let buf = '';
+  const flush = () => {
+    const i = buf.indexOf(':');
+    if (i > 0){
+      const name = buf.slice(0, i).trim(), value = buf.slice(i + 1).trim();
+      if (name.startsWith('--')) raw.push({name, value, theme: stack.some(s => /dark|night/i.test(s)) ? 'dark' : 'light'});
+    }
+    buf = '';
+  };
+  for (const ch of src){
+    if (ch === '{'){ stack.push(buf.trim()); buf = ''; }
+    else if (ch === '}'){ flush(); stack.pop(); }
+    else if (ch === ';') flush();
+    else buf += ch;
+  }
+  const find = (n, th) => raw.find(r => r.name === n && r.theme === th) || raw.find(r => r.name === n);
+  const res = (v, th, d = 0) => {
+    const m = String(v).match(/^var\(\s*(--[\w-]+)\s*(?:,[^)]*)?\)$/);
+    if (m && d < 8){ const o = find(m[1], th); return o ? res(o.value, th, d + 1) : null; }
+    return v;
+  };
+  const colors = {light: [], dark: []}, radius = [], spacing = [];
+  for (const r of raw){
+    const v = res(r.value, r.theme), nm = r.name.replace(/^--/, '');
+    const rgb = parseColor(v);
+    if (rgb){ colors[r.theme].push({name: nm, hex: mk(rgb).hex}); continue; }
+    if (/font|famil/i.test(nm) && !/size|weight|style|height|spacing|stretch|feature/i.test(nm) && typeof v === 'string' && /[a-z]/i.test(v)) fonts.push({key: nm, value: v});
+    else if (/radius|rounded/i.test(nm)){ const px = toPx(v); if (px != null) radius.push(px); }
+    else if (/^(space|spacing|gap|sp)\b|^(space|spacing)-/i.test(nm)){ const px = toPx(v); if (px != null) spacing.push(px); }
+  }
+  const uniq = a => { const s = new Set(); return a.filter(c => !s.has(c.name + c.hex) && s.add(c.name + c.hex)); };
+  colors.light = uniq(colors.light); colors.dark = uniq(colors.dark);
+  if (!colors.light.length && colors.dark.length) colors.light = colors.dark;
+  const themes = colors.dark.length ? [{id:'light', name:'Claro'}, {id:'dark', name:'Oscuro'}] : [{id:'light', name:'Claro'}];
+  return {themes, colors, fonts, radius, spacing};
+}
+function fromMD(text){
+  const out = [], seen = new Set();
+  const re = /([A-Za-zÁÉÍÓÚáéíóúñ][\w .-]{0,40}?)[`*|:\s=–-]+(#[0-9a-fA-F]{6}|#[0-9a-fA-F]{3})\b/g; let m;
+  while ((m = re.exec(text))){
+    const rgb = parseColor(m[2]); if (!rgb) continue;
+    const hex = mk(rgb).hex; if (seen.has(hex)) continue; seen.add(hex);
+    out.push({name: m[1].trim().replace(/\s+/g, '-').toLowerCase(), hex});
+  }
+  return {themes: [{id:'light', name:'Claro'}], colors: {light: out}, fonts: [], radius: [], spacing: []};
+}
+function assignFonts(list){
+  const pick = re => list.find(f => re.test(f.key || ''));
+  const dsp = pick(/display|head|title|brand|serif/i);
+  const body = pick(/body|text|sans|ui|base|primary|copy/i);
+  const d = dsp || list[0];
+  const b = (body && body !== d) ? body : (list.find(f => f !== d) || d);
+  return {display: d.value, body: b.value};
+}
+const IMG_EXT = ['png','jpg','jpeg','webp','svg','gif'], FONT_EXT = ['woff','woff2','ttf','otf'], TEXT_EXT = ['json','css','md','txt','svg'];
+function readAsDataURL(blob){ return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(blob); }); }
+function loadImg(src){ return new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error('No se pudo leer la imagen.')); i.src = src; }); }
+async function prepLogo(e){
+  if (e.ext === 'svg') return 'data:image/svg+xml;utf8,' + encodeURIComponent(e.text);
+  const mime = {png:'image/png', jpg:'image/jpeg', jpeg:'image/jpeg', webp:'image/webp', gif:'image/gif'}[e.ext] || 'image/png';
+  const img = await loadImg(await readAsDataURL(new Blob([e.buf], {type: mime})));
+  const s = Math.min(1, 600 / Math.max(img.naturalWidth, img.naturalHeight));
+  const c = document.createElement('canvas'); c.width = Math.max(1, Math.round(img.naturalWidth * s)); c.height = Math.max(1, Math.round(img.naturalHeight * s));
+  c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); return c.toDataURL('image/png');
+}
+let zipP = null;
+function loadJSZip(){
+  if (window.JSZip) return Promise.resolve(window.JSZip);
+  if (!zipP) zipP = new Promise((res, rej) => {
+    const s = document.createElement('script'); s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+    s.onload = () => res(window.JSZip); s.onerror = () => { zipP = null; rej(new Error('No se pudo cargar el lector de .zip. Suelta los archivos sueltos.')); };
+    document.head.appendChild(s);
+  });
+  return zipP;
+}
+const extOf = n => (String(n).split('.').pop() || '').toLowerCase();
+async function entryFrom(name, ext, getter){
+  if (TEXT_EXT.includes(ext)) return {name, ext, text: await getter('string')};
+  return {name, ext, buf: await getter('arraybuffer')};
+}
+async function readEntries(files){
+  const out = [];
+  for (const f of files){
+    const ext = extOf(f.name);
+    if (ext === 'zip'){
+      const Z = await loadJSZip(), z = await Z.loadAsync(await f.arrayBuffer());
+      for (const [p, ent] of Object.entries(z.files)){
+        if (ent.dir || /(^|\/)(\.|__MACOSX)/.test(p)) continue;
+        const e = extOf(p); if (![...TEXT_EXT, ...IMG_EXT, ...FONT_EXT].includes(e)) continue;
+        out.push(await entryFrom(p, e, t => ent.async(t)));
+      }
+    } else if ([...TEXT_EXT, ...IMG_EXT, ...FONT_EXT].includes(ext)){
+      out.push(await entryFrom(f.name, ext, t => t === 'string' ? f.text() : f.arrayBuffer()));
+    }
+  }
+  return out;
+}
+async function buildSystem(entries){
+  let title = null; const items = []; const queue = [...entries];
+  while (queue.length){
+    const e = queue.shift();
+    if (e.ext === 'json' && e.text != null){
+      let j; try { j = JSON.parse(e.text); } catch(_){ continue; }
+      const tbl = j && ((j.content && typeof j.content.files === 'object' && j.content.files) || (j.files && typeof j.files === 'object' && Object.keys(j.files).length && Object.values(j.files).every(v => typeof v === 'string') ? j.files : null));
+      if (tbl && !e.expanded){
+        if (j.title) title = title || j.title;
+        for (const [p, t] of Object.entries(tbl)) if (typeof t === 'string') queue.push({name: p, ext: extOf(p), text: t, expanded: true});
+        continue;
+      }
+      e.json = j;
+    }
+    items.push(e);
+  }
+  const rank = e => /tokens/i.test(e.name) && e.ext === 'json' ? 0 : e.ext === 'json' ? 1 : e.ext === 'css' ? 2 : 3;
+  const srcs = items.filter(e => e.text != null && ['json','css','md','txt'].includes(e.ext)).sort((a, b) => rank(a) - rank(b));
+  const sys = {id: 'sys-' + Date.now().toString(36), name: '', source: 'import', colors: {}, themes: [], fonts: {}, radius: [], spacing: [], logo: null, fontFiles: []};
+  let gotC = false, gotF = false;
+  for (const e of srcs){
+    let r = null;
+    if (e.ext === 'json'){
+      const j = e.json; if (!j) continue;
+      if (j.layout === 'files' || j.createdOnFiles){ title = title || j.title; continue; }
+      r = (j.color && Array.isArray(j.color.tokens)) ? fromTokensShape(j) : deepScan(j);
+    } else if (e.ext === 'css') r = fromCSS(e.text);
+    else r = fromMD(e.text);
+    if (!r) continue;
+    if (r.name && !title) title = r.name;
+    const n = Object.values(r.colors || {}).reduce((a, b) => a + b.length, 0);
+    if (n >= 2 && !gotC){ sys.themes = r.themes; sys.colors = r.colors; gotC = true; }
+    if (r.fonts && r.fonts.length && !gotF){ sys.fonts = assignFonts(r.fonts); gotF = true; }
+    if (r.radius && r.radius.length && !sys.radius.length) sys.radius = [...new Set(r.radius.filter(v => v >= 0))].sort((a, b) => a - b).slice(0, 8);
+    if (r.spacing && r.spacing.length && !sys.spacing.length) sys.spacing = [...new Set(r.spacing.filter(v => v > 0))].sort((a, b) => a - b).slice(0, 12);
+  }
+  const notes = [];
+  const imgs = items.filter(e => IMG_EXT.includes(e.ext));
+  const logoE = imgs.find(e => /logo|mark|wordmark|brand|isotipo/i.test(e.name)) || imgs[0];
+  if (logoE){ try { sys.logo = await prepLogo(logoE); } catch(e){ notes.push('No pude leer el logo.'); } }
+  for (const e of items.filter(e => FONT_EXT.includes(e.ext))){
+    const stem = e.name.split('/').pop().replace(/\.[^.]+$/, '');
+    const norm = s => String(s).toLowerCase().replace(/[^a-z0-9]/g, '');
+    const names = [primaryFamily(sys.fonts.display), primaryFamily(sys.fonts.body)].filter(Boolean);
+    const family = names.find(n => norm(stem).includes(norm(n))) || stem.split(/[-_ ]/)[0];
+    const weight = /bold|black|heavy|700|800|900/i.test(stem) ? 700 : /semibold|600/i.test(stem) ? 600 : 400;
+    sys.fontFiles.push({family, weight, buf: e.buf});
+    if (!sys.fonts.display){ sys.fonts.display = '"' + family + '"'; sys.fonts.body = sys.fonts.display; }
+  }
+  if (!gotC) return {sys: null, notes};
+  for (const t of sys.themes) if (!sys.colors[t.id] || sys.colors[t.id].length < 2) sys.colors[t.id] = sys.colors[sys.themes[0].id];
+  sys.name = (title || (entries.find(e => e.name) || {}).name || 'Sistema importado').toString().replace(/\.[a-z0-9]+$/i, '').replace(/^.*\//, '').slice(0, 40);
+  return {sys, notes};
+}
+
+function rrPath(ctx, x, y, w, h, r){
+  r = Math.max(0, Math.min(r, w / 2, h / 2)); ctx.beginPath();
+  if (r <= 0.5){ ctx.rect(x, y, w, h); return; }
+  ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+}
+const setLS = (ctx, px) => { if ('letterSpacing' in ctx) ctx.letterSpacing = px.toFixed(2) + 'px'; };
+function wrap(ctx, text, maxW){
+  const out = [];
+  for (const para of text.split(/\n/)){
+    const words = para.split(/\s+/).filter(Boolean); let line = '';
+    for (const w of words){
+      const t = line ? line + ' ' + w : w;
+      if (ctx.measureText(t).width <= maxW || !line) line = t; else { out.push(line); line = w; }
+    }
+    out.push(line);
+  }
+  return out;
+}
+function T(E, text, x, y, w, h, o = {}){
+  const ctx = E.ctx; text = String(text || '').trim(); if (o.upper) text = text.toUpperCase();
+  const lay = {x, y, w, h: 0, size: 0, lines: [], paint(){}};
+  if (!text || w <= 0 || h <= 0) return lay;
+  const role = o.role || 'body', weight = E.wmap(role, o.weight || (role === 'display' ? 700 : 400));
+  const lh = o.lh || (role === 'display' ? 1.02 : 1.38), min = o.min || 8 * E.k, maxLines = o.lines || 99, tr = o.track || 0;
+  let size = Math.max(min, o.max || h), lines = [], widest = 0;
+  ctx.save();
+  for (let n = 0; n < 80; n++){
+    ctx.font = E.font(role, size, weight); setLS(ctx, tr * size);
+    lines = wrap(ctx, text, w); widest = 0;
+    for (const l of lines) widest = Math.max(widest, ctx.measureText(l).width);
+    if (lines.length <= maxLines && lines.length * size * lh <= h + .5 && widest <= w + .5) break;
+    if (size <= min) break; size = Math.max(min, size * .95);
+  }
+  ctx.restore();
+  lay.size = size; lay.lines = lines; lay.widest = widest; lay.h = lines.length * size * lh; lay.align = o.align || 'left';
+  lay.y = o.va === 'middle' ? y + (h - lay.h) / 2 : o.va === 'bottom' ? y + h - lay.h : y;
+  lay.paint = color => {
+    ctx.save(); ctx.font = E.font(role, size, weight); setLS(ctx, tr * size);
+    ctx.fillStyle = color.hex || color; ctx.textAlign = lay.align; ctx.textBaseline = 'alphabetic';
+    const ax = lay.align === 'center' ? lay.x + lay.w / 2 : lay.align === 'right' ? lay.x + lay.w : lay.x;
+    lines.forEach((l, i) => ctx.fillText(l, ax, lay.y + i * size * lh + (size * lh - size) / 2 + size * .8));
+    ctx.restore();
+  };
+  return lay;
+}
+
+/* Todo lo que se dibuja sale de los tokens del sistema (colores, tipografías, radios, espacios) y de sus elementos.
+   El usuario activa o desactiva elementos desde el toolbox; lo desactivado no entra al generador. */
+function shapePath(E, x, y, w, h, cap){
+  const ctx = E.ctx;
+  if (E.cham){
+    const c = Math.max(0, Math.min(E.cut, (cap == null ? 999 : cap) * E.k * .5, w / 2.5, h / 2.5));
+    ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + w - c, y); ctx.lineTo(x + w, y + c); ctx.lineTo(x + w, y + h); ctx.lineTo(x + c, y + h); ctx.lineTo(x, y + h - c); ctx.closePath();
+  } else rrPath(ctx, x, y, w, h, E.rr(w, h, cap));
+}
+function itemsOf(c){ return String(c.chips || '').split(/[,;\n]/).map(s => s.trim()).filter(Boolean).slice(0, 4); }
+function titleStyle(E){
+  const t = String(E.c.title || ''), hola = E.kit === 'hola', long = t.trim().split(/\s+/).length > 7;
+  if (hola && long) return {role: 'body', weight: 800, upper: false};
+  return {role: 'display', weight: 700, upper: hola};
+}
+function microLay(E, text, x, y, w, align){
+  const {ctx, k, pal} = E, size = 10 * k, wt = E.wmap('body', 600), tr = .12 * size;
+  text = String(text).trim().toUpperCase(); const sp = text.indexOf(' '), first = sp > 0 ? text.slice(0, sp) : text, rest = sp > 0 ? text.slice(sp) : '';
+  ctx.save(); ctx.font = E.font('body', size, wt); setLS(ctx, tr);
+  const w1 = ctx.measureText(first).width + tr, w2 = ctx.measureText(rest).width, padX = 6 * k, h = 18 * k;
+  ctx.restore();
+  const tw = w1 + padX * 2 + w2, ox = align === 'center' ? x + (w - tw) / 2 : align === 'right' ? x + w - tw : x;
+  const lay = {x, y, w, h, paint(ink){
+    ctx.save(); ctx.font = E.font('body', size, wt); setLS(ctx, tr); ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
+    const ac = contrast(pal.accent, pal.ink) > 1.2 ? pal.accent : pal.tint;
+    ctx.fillStyle = ac.hex; ctx.fillRect(ox, lay.y, w1 + padX * 2, h);
+    ctx.fillStyle = onColor(E, ac).hex; ctx.fillText(first, ox + padX, lay.y + h / 2 + size * .04);
+    ctx.fillStyle = (ink.hex ? ink : pal.ink).hex; ctx.fillText(rest, ox + w1 + padX * 2, lay.y + h / 2 + size * .04);
+    ctx.restore();
+  }};
+  return lay;
+}
+function ctaLay(E, text, R, align){
+  const {ctx, k} = E, size = 12 * k, wt = E.wmap('body', 600);
+  ctx.save(); ctx.font = E.font('body', size, wt); const label = text.trim() + '  →'; const tw = ctx.measureText(label).width; ctx.restore();
+  const padX = 14 * k, padY = 9 * k, w = Math.min(tw + padX * 2, R.w), h = size + padY * 2;
+  const x = align === 'center' ? R.x + (R.w - w) / 2 : align === 'right' ? R.x + R.w - w : R.x;
+  const lay = {x, y: 0, w, h, ghost: E.kit === 'xnoleet' && E.chance(.35)};
+  lay.paint = (fill, txt) => {
+    ctx.save();
+    const gh = lay.ghost && fill !== E.pal.accent;
+    if (gh){ shapePath(E, lay.x + .75 * k, lay.y + .75 * k, w - 1.5 * k, h - 1.5 * k, 14); ctx.strokeStyle = fill.hex; ctx.lineWidth = 1.5 * k; ctx.stroke(); }
+    else { shapePath(E, lay.x, lay.y, w, h, 14); ctx.fillStyle = fill.hex; ctx.fill(); }
+    ctx.font = E.font('body', size, wt); ctx.fillStyle = (gh ? fill : txt).hex; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(label, lay.x + w / 2, lay.y + h / 2 + size * .04, w - padX); ctx.restore();
+  };
+  return lay;
+}
+function chipsLay(E, items, R, align){
+  const {ctx, k} = E, size = 10 * k, h = 22 * k, padX = 10 * k, gap = 6 * k, up = E.kit === 'xnoleet', wt = E.wmap('body', 600);
+  ctx.save(); ctx.font = E.font('body', size, wt); setLS(ctx, up ? size * .08 : 0);
+  const used = []; let tot = 0;
+  for (const it of items){ const t = up ? it.toUpperCase() : it, w = ctx.measureText(t).width + padX * 2; if (tot + w + (used.length ? gap : 0) > R.w) break; tot += w + (used.length ? gap : 0); used.push({t, w}); }
+  ctx.restore();
+  const x0 = align === 'center' ? R.x + (R.w - tot) / 2 : align === 'right' ? R.x + R.w - tot : R.x;
+  const lay = {x: x0, y: 0, w: tot, h, n: used.length};
+  lay.paint = ink => {
+    ctx.save(); ctx.font = E.font('body', size, wt); setLS(ctx, up ? size * .08 : 0); ctx.textBaseline = 'middle'; ctx.textAlign = 'center';
+    let x = lay.x;
+    for (const u of used){
+      if (up) shapePath(E, x + .6 * k, lay.y + .6 * k, u.w - 1.2 * k, h - 1.2 * k, 8); else rrPath(ctx, x + .6 * k, lay.y + .6 * k, u.w - 1.2 * k, h - 1.2 * k, Math.min(h / 2, Math.max(E.R, 4 * k)));
+      ctx.strokeStyle = ink.hex; ctx.lineWidth = 1.2 * k; ctx.stroke();
+      ctx.fillStyle = ink.hex; ctx.fillText(u.t, x + u.w / 2, lay.y + h / 2 + size * .04); x += u.w + gap;
+    }
+    ctx.restore();
+  };
+  return lay;
+}
+function listLay(E, items, R){
+  const {ctx, k} = E, size = 11 * k, rh = 20 * k, n = Math.min(3, items.length), wt = E.wmap('body', 500);
+  const lay = {x: R.x, y: 0, w: R.w, h: n * rh, n};
+  lay.paint = ink => {
+    ctx.save(); ctx.font = E.font('body', size, wt); ctx.textBaseline = 'middle'; ctx.textAlign = 'left'; ctx.strokeStyle = ink.hex; ctx.fillStyle = ink.hex; ctx.lineWidth = k;
+    for (let i = 0; i < n; i++){
+      const yy = lay.y + i * rh; ctx.beginPath(); ctx.moveTo(R.x, yy + .5 * k); ctx.lineTo(R.x + R.w, yy + .5 * k); ctx.stroke();
+      ctx.fillText('+', R.x, yy + rh / 2 + size * .04); ctx.fillText(items[i], R.x + 16 * k, yy + rh / 2 + size * .04, R.w - 18 * k);
+    }
+    ctx.restore();
+  };
+  return lay;
+}
+function wordLay(E, text, X, y, Wd, h){
+  const {ctx, k, pal} = E, size = 13 * k, wt = E.wmap('display', 700); text = String(text || '').trim();
+  let idx = -1; for (let i = 1; i < text.length; i++) if (/[A-Z]/.test(text[i])){ idx = i; break; } if (idx < 0 && text) idx = 0;
+  ctx.save(); ctx.font = E.font('display', size, wt);
+  const a = text.slice(0, idx), b = text.slice(idx, idx + 1), c2 = text.slice(idx + 1), wa = ctx.measureText(a).width, wb = ctx.measureText(b).width + 4 * k, wc = ctx.measureText(c2).width;
+  ctx.restore();
+  const tw = wa + wb + wc, x0 = X + Wd - Math.min(tw, Wd);
+  return {x: x0, w: tw, paint(col){
+    ctx.save(); ctx.font = E.font('display', size, wt); ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
+    const cy = y + h / 2 + size * .04, ac = pal.accent;
+    ctx.fillStyle = col.hex; ctx.fillText(a, x0, cy);
+    ctx.fillStyle = ac.hex; ctx.fillRect(x0 + wa - 1 * k, y + h * .5 - size * .62, wb, size * 1.24);
+    ctx.fillStyle = onColor(E, ac).hex; ctx.fillText(b, x0 + wa + 1 * k, cy);
+    ctx.fillStyle = col.hex; ctx.fillText(c2, x0 + wa + wb, cy); ctx.restore();
+  }};
+}
+function seal(E, cx, cy, r, c1, c2){
+  const {ctx, k} = E, n = 16; ctx.save(); ctx.fillStyle = c1.hex; ctx.beginPath();
+  for (let i = 0; i < n * 2; i++){ const a = i * Math.PI / n, rr = i % 2 ? r * .88 : r; ctx[i ? 'lineTo' : 'moveTo'](cx + Math.cos(a) * rr, cy + Math.sin(a) * rr); }
+  ctx.closePath(); ctx.fill();
+  ctx.strokeStyle = c2.hex; ctx.lineWidth = r * .16; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.beginPath(); ctx.moveTo(cx - r * .36, cy + r * .02); ctx.lineTo(cx - r * .08, cy + r * .3); ctx.lineTo(cx + r * .4, cy - r * .26); ctx.stroke(); ctx.restore();
+}
+function bubbleLay(E, text, side, maxW, fs){
+  const {k} = E, pad = 11 * k, t = T(E, text, 0, 0, maxW - 2 * pad, 600 * k, {max: fs, min: fs, lines: 5, lh: 1.35, role: 'body', weight: 400});
+  const w = Math.max(30 * k, Math.min(maxW, t.widest + 2 * pad)), h = t.h + 2 * pad;
+  return {w, h, x: 0, y: 0, side, paint(R, fill, ink){
+    const {ctx} = E, x = side === 'user' ? R.x + R.w - w : R.x, r = Math.min(E.R, 16 * k);
+    ctx.save(); ctx.fillStyle = fill.hex; rrPath(ctx, x, this.y, w, h, Math.max(r, 6 * k)); ctx.fill();
+    const q = Math.max(r, 6 * k); if (side === 'user') ctx.fillRect(x + w - q, this.y + h - q, q, q); else ctx.fillRect(x, this.y + h - q, q, q);
+    ctx.restore();
+    const tt = T(E, text, x + pad, this.y + pad, w - 2 * pad, h - 2 * pad, {max: fs, min: fs, lines: 5, lh: 1.35, role: 'body', weight: 400}); tt.paint(ink);
+  }};
+}
+function sponsorLay(E, w, fs){
+  const {ctx, k, pal} = E, pad = 12 * k, lab = 9 * k;
+  const t = T(E, E.c.title || E.c.brand, 0, 0, w - 2 * pad, 200 * k, {max: fs * .95, min: fs * .95, lines: 2, lh: 1.25, role: 'body', weight: 700});
+  const cta = E.c.cta && E.has('boton') ? ctaLay(E, E.c.cta, {x: 0, y: 0, w: w - 2 * pad}, 'left') : null;
+  const h = pad * 2 + lab * 1.6 + t.h + (cta ? cta.h + 8 * k : 0) + 6 * k;
+  return {w, h, x: 0, y: 0, paint(R){
+    const fill = pal.tint !== pal.bg ? pal.tint : pal.bg, ink = onColor(E, fill);
+    ctx.save(); shapePath(E, R.x, this.y, w, h, 20); ctx.fillStyle = fill.hex; ctx.fill();
+    if (fill === pal.bg){ ctx.strokeStyle = pal.ink.hex; ctx.lineWidth = 1.2 * k; ctx.stroke(); } ctx.restore();
+    ctx.save(); ctx.font = E.font('body', lab, E.wmap('body', 700)); setLS(ctx, lab * .12); ctx.fillStyle = ink.hex; ctx.textBaseline = 'top';
+    ctx.fillText('PATROCINADO', R.x + pad, this.y + pad); ctx.restore();
+    let yy = this.y + pad + lab * 1.6;
+    const tt = T(E, E.c.title || E.c.brand, R.x + pad, yy, w - 2 * pad, t.h + 2, {max: fs * .95, min: fs * .95, lines: 2, lh: 1.25, role: 'body', weight: 700}); tt.paint(ink); yy += t.h + 8 * k;
+    if (cta){ cta.x = R.x + pad; cta.y = yy; cta.paint(E.pal.accent !== fill && contrast(E.pal.accent, fill) >= 3 ? E.pal.accent : ink, E.pal.accent !== fill && contrast(E.pal.accent, fill) >= 3 ? onColor(E, E.pal.accent) : fill); }
+  }};
+}
+function stack(E, R, o = {}){
+  const {k, c, pal} = E, align = o.align || 'left', gap = 10 * k, ts = titleStyle(E);
+  const want = {k: o.kicker !== false && !!c.kicker, t: o.title !== false && !!c.title, b: o.body !== false && !!c.body, c: o.cta !== false && !!c.cta && E.has('boton')};
+  const items = itemsOf(c), wantX = o.extra !== false && items.length && E.extraMode;
+  /* si el espacio no alcanza, se sueltan primero las etiquetas, luego el antetítulo y al final el texto */
+  const tries = [{x: 1, k: 1, b: 1}, {x: 0, k: 1, b: 1}, {x: 0, k: 0, b: 1}, {x: 0, k: 0, b: 0}];
+  let L;
+  for (let ti = 0; ti < tries.length; ti++){
+    const tr = tries[ti]; L = {};
+    let top = R.y, bot = R.y + R.h;
+    if (want.k && tr.k){
+      L.kicker = (E.kit === 'xnoleet' && E.has('micro')) ? microLay(E, c.kicker, R.x, top, R.w, align) : T(E, c.kicker, R.x, top, R.w, 16 * k, {upper: true, track: .1, max: 11 * k, min: 8 * k, lines: 1, weight: 600, align});
+      top += L.kicker.h + gap * 1.2;
+    }
+    if (want.c){ L.cta = ctaLay(E, c.cta, R, align); L.cta.y = bot - L.cta.h; bot -= L.cta.h + gap * 1.3; }
+    if (wantX && tr.x){
+      const ex = E.extraMode === 'list' ? listLay(E, items, R) : chipsLay(E, items, R, align);
+      if (ex.n){ ex.y = bot - ex.h; bot -= ex.h + gap * 1.1; L.extra = ex; }
+    }
+    if (want.b && tr.b){
+      const bw = R.w * (o.bodyW || .86), bx = align === 'center' ? R.x + (R.w - bw) / 2 : align === 'right' ? R.x + R.w - bw : R.x;
+      L.body = T(E, c.body, bx, 0, bw, Math.max(12 * k, Math.min(R.h * .26, (bot - top) * .4)), {max: o.bodyMax || 15 * k, min: 9 * k, lh: 1.38, align});
+      L.body.y = bot - L.body.h; bot = L.body.y - gap * 1.1;
+    }
+    const room = bot - top;
+    if (want.t && room >= 30 * k || !want.t && room >= 0 || ti === tries.length - 1){
+      if (want.t) L.title = T(E, c.title, R.x, top, R.w, Math.max(24 * k, room), {role: ts.role, weight: ts.weight, max: o.tmax || 100 * k, min: 12 * k, lines: o.tlines || 6, align, va: o.titleVA || 'top', track: -.02, upper: o.upper || ts.upper});
+      break;
+    }
+  }
+  L.paint = col => {
+    col = col || {}; const ink = col.ink || pal.ink;
+    L.kicker && L.kicker.paint(col.kicker || ink); L.title && L.title.paint(col.title || ink); L.body && L.body.paint(col.body || ink);
+    L.extra && L.extra.paint(ink);
+    if (L.cta) L.cta.paint(col.ctaFill || ink, col.ctaText || pal.bg);
+  };
+  return L;
+}
+function footer(E, X = E.x1, Wd = E.cw, yb = E.y2){
+  const {ctx, k, c, P} = E, h = 16 * k, y = yb - h;
+  const hand = c.handle ? T(E, c.handle, X, y, Wd * .44, h, {max: 11 * k, min: 8 * k, lines: 1, weight: 500, va: 'middle', track: .02}) : null;
+  const lg = E.showLogo ? P.logo : null; let mark = null;
+  if (lg){
+    let hh = h * 1.25, lw = hh * lg.ratio; const maxw = Wd * .4;
+    if (lw > maxw){ hh = hh * maxw / lw; lw = maxw; } mark = {lw, hh};
+  } else if (E.kit === 'xnoleet' && E.has('wordmark')) mark = wordLay(E, c.brand || '', X + Wd * .5, y, Wd * .5, h);
+  else mark = T(E, c.brand || '', X + Wd * .5, y, Wd * .5, h, {role: E.kit === 'hola' ? 'body' : 'display', max: 13 * k, min: 8 * k, lines: 1, va: 'middle', align: 'right', weight: 700});
+  return {y, h, paint(col, under){
+    hand && hand.paint(col);
+    if (lg && mark){
+      const x = X + Wd - mark.lw, yy = y + (h - mark.hh) / 2;
+      if (Math.abs(lg.L - under.L) < .3){
+        ctx.save(); ctx.fillStyle = (under.L > .4 ? E.pal.dark : E.pal.light).hex;
+        shapePath(E, x - 5 * k, yy - 4 * k, mark.lw + 10 * k, mark.hh + 8 * k, 8); ctx.fill(); ctx.restore();
+      }
+      ctx.drawImage(lg.img, x, yy, mark.lw, mark.hh);
+    } else if (mark && mark.paint) mark.paint(col);
+  }};
+}
+function makePalette(sys, themeId, mode, E){
+  const base = (sys.colors[themeId] && sys.colors[themeId].length > 1 ? sys.colors[themeId] : sys.colors[sys.themes[0].id]) || [];
+  const seen = new Set(); let cols = base.map(c => mk(hex2rgb(c.hex))).filter(c => !seen.has(c.hex) && seen.add(c.hex));
+  if (cols.length < 2) cols = [WHITE, mk([17,17,17]), mk([207,58,18])];
+  const byL = [...cols].sort((a, b) => b.L - a.L);
+  const lights = byL.filter(c => c.L > .5 && c.C < .4), darks = [...byL].reverse().filter(c => c.L < .22);
+  const chroma = cols.filter(c => c.C > .25 && c.L > .04 && c.L < .85);
+  const light = lights[0] || WHITE, dark = darks[0] || BLACK;
+  let m = mode;
+  if (m === 'auto'){ const r = E.r(); m = r < .45 ? 'light' : r < .72 ? 'dark' : 'accent'; }
+  if (m === 'accent' && !chroma.length) m = 'light';
+  let bg;
+  if (m === 'light') bg = E.pick(lights.length ? lights.slice(0, 3) : [light]);
+  else if (m === 'dark') bg = E.pick(darks.length ? darks.slice(0, 3) : [dark]);
+  else bg = E.pick(chroma);
+  const inkC = cols.filter(c => c !== bg && contrast(c, bg) >= 7).sort((a, b) => a.C - b.C);
+  let ink = inkC[0]; if (!ink) ink = [light, dark, WHITE, BLACK].sort((a, b) => contrast(b, bg) - contrast(a, bg))[0];
+  const ac = chroma.filter(c => c !== bg && contrast(c, bg) >= 1.7);
+  const accent = ac.length ? E.pick(ac) : ink;
+  const ac2 = chroma.filter(c => c !== bg && c !== accent && contrast(c, bg) >= 1.4);
+  const accent2 = E.kit === 'xnoleet' ? accent : (ac2.length ? E.pick(ac2) : accent);
+  /* tint: un color real del sistema, suave frente al fondo (nunca una mezcla inventada) */
+  const soft = cols.filter(c => c !== bg && c.C < .35 && contrast(c, bg) >= 1.03 && contrast(c, bg) < 1.7).sort((a, b) => contrast(a, bg) - contrast(b, bg));
+  const tint = soft[0] || bg;
+  let safe = [accent, accent2, tint, ...cols].filter((c, i, a) => c !== bg && a.indexOf(c) === i && contrast(c, ink) >= 4.5 && contrast(c, bg) >= 1.12);
+  if (!safe.length) safe = [ink];
+  return {bg, ink, accent, accent2, tint, light, dark, safe, all: cols, mode: m};
+}
+function onColor(E, c){
+  const p = E.pal, cand = [p.ink, p.light, p.dark, p.bg, WHITE, BLACK];
+  return cand.find(x => contrast(x, c) >= 4.5) || cand.sort((a, b) => contrast(b, c) - contrast(a, c))[0];
+}
+function makeEnv(ctx, W, H, seed, P){
+  const rnd = mulberry32(seed >>> 0), E = {ctx, W, H, P, c: P.content, rnd, kit: P.kit};
+  E.r = (a = 0, b = 1) => a + rnd() * (b - a);
+  E.ri = (a, b) => Math.floor(a + rnd() * (b - a + 1));
+  E.chance = p => rnd() < p;
+  E.pick = a => a[Math.floor(rnd() * a.length)];
+  E.shuffle = a => { a = [...a]; for (let i = a.length - 1; i > 0; i--){ const j = Math.floor(rnd() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  E.has = id => KIT_IDS[E.kit].has(id) && !P.off.has(id);
+  const k = E.k = Math.min(W, H) / 360;
+  const sp = (P.sys.spacing || []).filter(v => v >= 12 && v <= 48);
+  E.m = clamp((sp.length ? E.pick(sp) : E.pick([16, 20, 24])) * k * 1.1, 16 * k, 34 * k);
+  const rad = (P.sys.radius || []).filter(v => v >= 0);
+  E.R = (rad.length ? E.pick(rad) : 8) * k;
+  E.cham = E.kit === 'xnoleet' && E.has('chaflan'); E.cut = E.pick([10, 14, 18]) * k;
+  const tall = H / W > 1.6;
+  E.x1 = E.m; E.x2 = W - E.m; E.y1 = E.m + (tall ? H * .07 : 0); E.y2 = H - E.m - (tall ? H * .1 : 0); E.cw = E.x2 - E.x1; E.ch = E.y2 - E.y1;
+  E.pal = makePalette(P.sys, P.themeId, P.bgMode, E);
+  E.fonts = P.fonts;
+  E.font = (role, size, weight) => weight + ' ' + size.toFixed(2) + 'px ' + (role === 'display' ? E.fonts.dStack : E.fonts.bStack);
+  E.wmap = (role, w) => {
+    const st = fontState[role === 'display' ? E.fonts.dName : E.fonts.bName];
+    if (st && st.ok){ if (!st.spec) return 400; if (w >= 600) return st.spec.includes('600') && w < 700 ? 600 : 700; return 400; }
+    return w;
+  };
+  E.rr = (w, h, cap) => Math.min(E.R, (cap == null ? 999 : cap) * k, w / 2, h / 2);
+  E.fill = c => { ctx.fillStyle = c.hex; ctx.fillRect(0, 0, W, H); };
+  E.box = (x, y, w, h, c, cap) => { ctx.fillStyle = c.hex; shapePath(E, x, y, w, h, cap); ctx.fill(); };
+  E.cover = (img, x, y, w, h, cap) => {
+    const iw = img.naturalWidth || img.width, ih = img.naturalHeight || img.height; if (!iw || !ih) return;
+    const s = Math.max(w / iw, h / ih), dw = iw * s, dh = ih * s;
+    ctx.save(); shapePath(E, x, y, w, h, cap); ctx.clip(); ctx.drawImage(img, x + (w - dw) / 2, y + (h - dh) / 2, dw, dh); ctx.restore();
+  };
+  E.cta = under => {
+    const p = E.pal;
+    if (contrast(p.accent, under) >= 2.2 && p.accent !== p.ink && E.chance(.6)) return {ctaFill: p.accent, ctaText: onColor(E, p.accent)};
+    const t = onColor(E, under); return {ctaFill: t, ctaText: under};
+  };
+  E.img = P.img && E.has('imagen') ? P.img : null;
+  E.showLogo = !!P.logo && E.has(LOGO_EL[E.kit]);
+  E.decorIds = Object.keys(DECOR[E.kit] || {}).filter(id => E.has(id));
+  /* decoración: pinta una región con un elemento activo del sistema (o un bloque plano si no hay ninguno) */
+  E.decor = (rc, base, id) => {
+    const ids = E.decorIds, use = id && ids.includes(id) ? id : (ids.length ? E.pick(ids) : null);
+    ctx.save(); shapePath(E, rc.x, rc.y, rc.w, rc.h, rc.cap); ctx.clip();
+    ctx.fillStyle = base.hex; ctx.fillRect(rc.x - 1, rc.y - 1, rc.w + 2, rc.h + 2);
+    if (use) DECOR[E.kit][use](E, rc, base);
+    ctx.restore();
+  };
+  E.art = (rc, base) => { if (E.img) E.cover(E.img, rc.x, rc.y, rc.w, rc.h, rc.cap); else E.decor(rc, base); };
+  const items = itemsOf(E.c), chipOn = E.has(E.kit === 'hola' ? 'respuestas' : 'chip'), listOn = E.has('rasgos');
+  E.extraMode = !items.length ? null : (chipOn && listOn) ? E.pick(['chips', 'list']) : chipOn ? 'chips' : listOn ? 'list' : null;
+  return E;
+}
+const hasContrast = (E, c, base) => c !== base && contrast(c, base) >= 1.5;
+const DECOR = {
+  xnoleet: {
+    trama(E, rc, base){
+      const {ctx, k} = E, fg = onColor(E, base), s = E.pick([7, 9, 12]) * k;
+      ctx.strokeStyle = fg.hex; ctx.lineWidth = .9 * k; ctx.beginPath();
+      for (let t = -rc.h; t < rc.w; t += s){ ctx.moveTo(rc.x + t, rc.y + rc.h); ctx.lineTo(rc.x + t + rc.h, rc.y); } ctx.stroke();
+      if (hasContrast(E, E.pal.accent, base) && E.pal.accent !== fg && E.chance(.75)){
+        const w = rc.w * E.r(.28, .5), h = rc.h * E.r(.28, .5), x = E.chance(.5) ? rc.x : rc.x + rc.w - w, y = E.chance(.5) ? rc.y : rc.y + rc.h - h;
+        E.box(x, y, w, h, E.pal.accent, 18);
+      }
+    },
+    modulos(E, rc, base){
+      const {ctx, k} = E, fg = onColor(E, base), s = E.pick([18, 24, 30]) * k, a = s * .16, ac = E.pal.accent, useAc = hasContrast(E, ac, base) && ac !== fg;
+      const cols = Math.max(1, Math.floor(rc.w / s)), rows = Math.max(1, Math.floor(rc.h / s)), ox = rc.x + (rc.w - cols * s) / 2 + s / 2, oy = rc.y + (rc.h - rows * s) / 2 + s / 2;
+      const hot = useAc ? {i: E.ri(0, Math.max(0, cols - 3)), j: E.ri(0, Math.max(0, rows - 2)), w: E.ri(2, 3), h: E.ri(1, 2)} : null;
+      ctx.lineWidth = 1.3 * k;
+      for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++){
+        const x = ox + i * s, y = oy + j * s, isHot = hot && i >= hot.i && i < hot.i + hot.w && j >= hot.j && j < hot.j + hot.h;
+        ctx.strokeStyle = (isHot ? ac : fg).hex; ctx.beginPath();
+        if ((i * 7 + j * 3) % 4 === 0){ ctx.moveTo(x - a, y - a); ctx.lineTo(x + a, y + a); ctx.moveTo(x + a, y - a); ctx.lineTo(x - a, y + a); }
+        else { ctx.moveTo(x - a, y); ctx.lineTo(x + a, y); ctx.moveTo(x, y - a); ctx.lineTo(x, y + a); }
+        ctx.stroke();
+      }
+    },
+    formas(E, rc, base){
+      const {ctx, k} = E, fg = onColor(E, base), ac = E.pal.accent, useAc = hasContrast(E, ac, base) && ac !== fg;
+      const cols = E.ri(2, 3), rows = Math.max(2, Math.round(cols * rc.h / rc.w)), cw = rc.w / cols, ch = rc.h / rows;
+      for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++){
+        if (E.chance(.16)) continue;
+        const cx = rc.x + (i + .5) * cw, cy = rc.y + (j + .5) * ch, r = Math.min(cw, ch) * .34, col = useAc && E.chance(.4) ? ac : fg;
+        ctx.fillStyle = ctx.strokeStyle = col.hex; ctx.lineWidth = r * .16; ctx.beginPath();
+        const t = E.pick(['tri', 'ring', 'semi', 'sqx', 'dot']);
+        if (t === 'tri'){ ctx.moveTo(cx, cy - r); ctx.lineTo(cx + r, cy + r * .8); ctx.lineTo(cx - r, cy + r * .8); ctx.closePath(); ctx.fill(); }
+        else if (t === 'ring'){ ctx.arc(cx, cy, r, 0, 7); ctx.stroke(); ctx.beginPath(); ctx.arc(cx, cy, r * .28, 0, 7); ctx.fill(); }
+        else if (t === 'semi'){ ctx.arc(cx, cy + r * .4, r, Math.PI, 0); ctx.closePath(); ctx.fill(); }
+        else if (t === 'sqx'){ ctx.rect(cx - r * .85, cy - r * .85, r * 1.7, r * 1.7); ctx.moveTo(cx - r * .85, cy - r * .85); ctx.lineTo(cx + r * .85, cy + r * .85); ctx.moveTo(cx + r * .85, cy - r * .85); ctx.lineTo(cx - r * .85, cy + r * .85); ctx.stroke(); }
+        else { ctx.arc(cx, cy, r * .55, 0, 7); ctx.fill(); }
+      }
+    },
+    bandas(E, rc, base){
+      const {ctx, k} = E, fg = onColor(E, base), ac = E.pal.accent, useAc = hasContrast(E, ac, base) && ac !== fg;
+      const n = E.ri(3, 5), d = Math.hypot(rc.w, rc.h), bh = d / (n * 2.1), A = bh * .28, lam = bh * E.r(2.2, 3.6), ang = E.pick([-.5, -.35, .35, .5]);
+      ctx.save(); ctx.translate(rc.x + rc.w / 2, rc.y + rc.h / 2); ctx.rotate(ang);
+      for (let i = 0; i < n; i++){
+        const y0 = -d / 2 + (i * 2 + .5) * bh * 1.05, col = i % 2 === 0 && useAc ? ac : fg, ph = E.r(0, 6.28), edge = (x, y) => y + A * Math.sin(x / lam * 6.283 + ph);
+        ctx.beginPath();
+        for (let x = -d / 2; x <= d / 2; x += 4 * k){ const y = edge(x, y0); x === -d / 2 ? ctx.moveTo(x, y) : ctx.lineTo(x, y); }
+        for (let x = d / 2; x >= -d / 2; x -= 4 * k) ctx.lineTo(x, edge(x, y0 + bh));
+        ctx.closePath(); ctx.fillStyle = col.hex; ctx.fill();
+        if (col === fg){ ctx.save(); ctx.clip(); ctx.strokeStyle = base.hex; ctx.lineWidth = .8 * k; ctx.beginPath(); for (let t = -d; t < d; t += 5 * k){ ctx.moveTo(t, y0 - A); ctx.lineTo(t + bh * 1.4, y0 + bh + A); } ctx.stroke(); ctx.restore(); }
+      }
+      ctx.restore();
+    },
+    lineas(E, rc, base){
+      const {ctx, k} = E, fg = onColor(E, base), ac = E.pal.accent, px = rc.x + rc.w * E.r(.25, .75), py = rc.y + rc.h * E.r(.25, .75);
+      ctx.strokeStyle = fg.hex; ctx.lineWidth = 1.2 * k; ctx.beginPath(); ctx.moveTo(rc.x, py); ctx.lineTo(rc.x + rc.w, py); ctx.moveTo(px, rc.y); ctx.lineTo(px, rc.y + rc.h); ctx.stroke();
+      ctx.lineWidth = k; ctx.beginPath();
+      for (let x = rc.x; x < rc.x + rc.w; x += 12 * k){ ctx.moveTo(x, py - 3 * k); ctx.lineTo(x, py + 3 * k); }
+      for (let y = rc.y; y < rc.y + rc.h; y += 12 * k){ ctx.moveTo(px - 3 * k, y); ctx.lineTo(px + 3 * k, y); } ctx.stroke();
+      const sq = 9 * k; ctx.fillStyle = (hasContrast(E, ac, base) ? ac : fg).hex; ctx.fillRect(px - sq / 2, py - sq / 2, sq, sq);
+      ctx.font = E.font('body', 9 * k, E.wmap('body', 600)); ctx.fillStyle = fg.hex; ctx.textBaseline = 'alphabetic';
+      const label = 'X ' + ((px - rc.x) / rc.w).toFixed(2) + '  Y ' + ((py - rc.y) / rc.h).toFixed(2), lw = ctx.measureText(label).width;
+      ctx.fillText(label, clamp(px + 8 * k, rc.x + 4 * k, rc.x + rc.w - lw - 4 * k), clamp(py - 8 * k, rc.y + 12 * k, rc.y + rc.h - 4 * k));
+    },
+    letra(E, rc, base){
+      const {ctx} = E, s = Math.min(rc.w, rc.h) * .78, x = rc.x + (rc.w - s) / 2, y = rc.y + (rc.h - s) / 2, ac = E.pal.accent, tile = hasContrast(E, ac, base) ? ac : onColor(E, base);
+      E.box(x, y, s, s, tile, 22);
+      const ch = String(E.letter || E.c.brand || 'N').trim()[0] || 'N';
+      ctx.save(); ctx.font = E.font('display', s * .72, E.wmap('display', 700)); ctx.fillStyle = onColor(E, tile).hex; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(ch.toUpperCase(), x + s / 2, y + s / 2 + s * .04); ctx.restore();
+    }
+  },
+  tokens: {
+    bloques(E, rc, base){
+      const cols = [...new Set([E.pal.accent, E.pal.ink, E.pal.tint, E.pal.accent2, E.pal.bg])].filter(c => c !== base), rects = [{x: rc.x, y: rc.y, w: rc.w, h: rc.h}];
+      for (let i = 0, n = E.ri(3, 5); i < n; i++){
+        const j = E.ri(0, rects.length - 1), r = rects[j], vert = r.w > r.h, f = E.r(.35, .65);
+        const a = vert ? {x: r.x, y: r.y, w: r.w * f, h: r.h} : {x: r.x, y: r.y, w: r.w, h: r.h * f};
+        const b = vert ? {x: r.x + r.w * f, y: r.y, w: r.w * (1 - f), h: r.h} : {x: r.x, y: r.y + r.h * f, w: r.w, h: r.h * (1 - f)};
+        rects.splice(j, 1, a, b);
+      }
+      let prev = null; for (const r of rects){ let col = E.pick(cols); if (col === prev) col = E.pick(cols); prev = col; E.ctx.fillStyle = col.hex; E.ctx.fillRect(r.x, r.y, r.w + 1, r.h + 1); }
+    },
+    cuadricula(E, rc, base){
+      const n = E.pick([2, 3, 4]), s = rc.w / n, rows = Math.max(1, Math.round(rc.h / s)), ch = rc.h / rows, g = E.pick([0, 3, 5]) * E.k;
+      const cols = [...new Set([E.pal.accent, E.pal.ink, E.pal.tint, E.pal.accent2, E.pal.bg])].filter(c => c !== base);
+      for (let j = 0; j < rows; j++) for (let i = 0; i < n; i++){ if (E.chance(.2)) continue; E.box(rc.x + i * s + g / 2, rc.y + j * ch + g / 2, s - g, ch - g, E.pick(cols), 14); }
+    },
+    regla(E, rc, base){
+      const {ctx, k} = E, fg = onColor(E, base), s = E.pick([12, 16, 22]) * k; ctx.fillStyle = fg.hex; let i = 0;
+      for (let y = rc.y + s / 2; y < rc.y + rc.h; y += s, i++) ctx.fillRect(rc.x, y, rc.w * (i % 5 === 0 ? 1 : E.r(.35, 1)), (i % 5 === 0 ? 2 : 1) * k);
+      const ac = E.pal.accent; if (hasContrast(E, ac, base)){ ctx.fillStyle = ac.hex; ctx.fillRect(rc.x, rc.y + Math.round(rc.h / s / 2) * s - s / 2, rc.w * .3, 3 * k); }
+    }
+  },
+  hola: {
+    hero(E, rc, base){
+      if (!E.has('sello')) return;
+      const r = Math.min(rc.w, rc.h) * .13, fg = onColor(E, base), x = rc.x + rc.w - r * 1.6, y = rc.y + r * 1.6;
+      seal(E, x, y, r, fg, base);
+    }
+  }
+};
+/* vista previa de cada elemento (para la vista Explorar) */
+function previewElement(E, id, rc){
+  const {ctx, k, pal} = E, base = pal.bg;
+  if (DECOR[E.kit][id]){ const b = E.pick([pal.accent, pal.ink, pal.tint !== pal.bg ? pal.tint : pal.accent2].filter(c => c !== base)); E.decor({...rc, cap: 0}, b, id); return; }
+  ctx.fillStyle = base.hex; ctx.fillRect(rc.x, rc.y, rc.w, rc.h);
+  const R = {x: rc.x + 14 * k, y: rc.y, w: rc.w - 28 * k, h: rc.h}, mid = h => rc.y + (rc.h - h) / 2;
+  if (id === 'boton'){ const l = ctaLay(E, 'Ver más', R, 'left'); l.y = mid(l.h); l.paint(pal.ink, base); }
+  else if (id === 'chip' || id === 'respuestas'){ const l = chipsLay(E, ['Ver más', 'Precios', 'Ayuda'], R, 'left'); l.y = mid(l.h); l.paint(pal.ink); }
+  else if (id === 'micro'){ const l = microLay(E, 'Nuevo experimento', R.x, 0, R.w, 'left'); l.y = mid(l.h); l.paint(pal.ink); }
+  else if (id === 'rasgos'){ const l = listLay(E, ['Plano', 'Preciso', 'Abierto'], R); l.y = mid(l.h); l.paint(pal.ink); }
+  else if (id === 'wordmark'){ const l = wordLay(E, E.c.brand || 'xNoleet', R.x, rc.y + rc.h / 2 - 8 * k, R.w, 16 * k); l.paint(pal.ink); }
+  else if (id === 'simbolo' || id === 'logo' || id === 'marca'){
+    const lg = E.P.logo;
+    if (lg){ const hh = Math.min(rc.h * .5, 40 * k), lw = Math.min(hh * lg.ratio, R.w); ctx.drawImage(lg.img, rc.x + (rc.w - lw) / 2, rc.y + (rc.h - hh) / 2, lw, hh); }
+    else T(E, E.c.brand || '', R.x, rc.y, R.w, rc.h, {role: E.kit === 'hola' ? 'body' : 'display', max: 24 * k, min: 10 * k, lines: 1, va: 'middle', align: 'center', weight: 700}).paint(pal.ink);
+  }
+  else if (id === 'burbuja'){ const a = bubbleLay(E, 'Hola, ¿en qué te ayudo?', 'bot', R.w * .8, 12 * k), b = bubbleLay(E, 'Quiero saber más', 'user', R.w * .7, 12 * k), tot = a.h + b.h + 8 * k; a.y = mid(tot); b.y = a.y + a.h + 8 * k; a.paint(R, pal.tint !== base ? pal.tint : pal.ink, onColor(E, pal.tint !== base ? pal.tint : pal.ink)); b.paint(R, pal.accent, onColor(E, pal.accent)); }
+  else if (id === 'patrocinado'){ const l = sponsorLay(E, R.w, 11 * k); l.y = mid(l.h); l.paint(R); }
+  else if (id === 'sello'){ seal(E, rc.x + rc.w / 2, rc.y + rc.h / 2, Math.min(rc.w, rc.h) * .3, pal.accent, onColor(E, pal.accent)); }
+  else if (id === 'chaflan'){ E.cham = true; E.cut = 14 * k; E.box(rc.x + rc.w * .2, rc.y + rc.h * .2, rc.w * .6, rc.h * .6, pal.ink, 40); }
+  else if (id === 'imagen'){ ctx.strokeStyle = pal.ink.hex; ctx.lineWidth = 1.5 * k; ctx.strokeRect(rc.x + rc.w * .2, rc.y + rc.h * .22, rc.w * .6, rc.h * .56); ctx.beginPath(); ctx.moveTo(rc.x + rc.w * .2, rc.y + rc.h * .78); ctx.lineTo(rc.x + rc.w * .42, rc.y + rc.h * .5); ctx.lineTo(rc.x + rc.w * .56, rc.y + rc.h * .66); ctx.lineTo(rc.x + rc.w * .66, rc.y + rc.h * .56); ctx.lineTo(rc.x + rc.w * .8, rc.y + rc.h * .78); ctx.stroke(); }
+}
+
+/* composiciones: solo combinan los elementos activos del sistema */
+const ARCH = {
+  poster(E){
+    const {k, pal, W, H} = E; E.fill(pal.bg);
+    const f = footer(E), A = {x: E.x1, y: E.y1, w: E.cw, h: f.y - E.y1 - 12 * k};
+    const vert = W > H * 1.15 ? true : H > W * 1.15 ? false : E.chance(.5), first = E.chance(.5), frac = E.r(.34, .5), gap = E.m * .6;
+    let art, txt;
+    if (vert){ const aw = A.w * frac; art = {x: first ? A.x : A.x + A.w - aw, y: A.y, w: aw, h: A.h}; txt = {x: first ? A.x + aw + gap : A.x, y: A.y, w: A.w - aw - gap, h: A.h}; }
+    else { const ah = A.h * frac; art = {x: A.x, y: first ? A.y : A.y + A.h - ah, w: A.w, h: ah}; txt = {x: A.x, y: first ? A.y + ah + gap : A.y, w: A.w, h: A.h - ah - gap}; }
+    art.cap = 26; E.art(art, E.pick([pal.accent, pal.ink, pal.tint, pal.accent2].filter(c => c !== pal.bg)));
+    stack(E, txt, {titleVA: E.pick(['top', 'middle', 'bottom'])}).paint({ink: pal.ink, ...E.cta(pal.bg)});
+    f.paint(pal.ink, pal.bg);
+  },
+  split(E){
+    const {k, pal, W, H} = E, vert = W > H * 1.15 ? true : H > W * 1.15 ? false : E.chance(.5);
+    const ratio = E.r(.42, .58), flip = E.chance(.5);
+    const aFill = E.pick([pal.bg, pal.bg, pal.accent, pal.tint]);
+    const bFill = E.pick([pal.accent, pal.accent2, pal.ink, pal.tint].filter(x => x !== aFill));
+    let A, B;
+    if (vert){ const aw = W * ratio; A = {x: flip ? W - aw : 0, y: 0, w: aw, h: H}; B = {x: flip ? 0 : aw, y: 0, w: W - aw, h: H}; }
+    else { const ah = H * ratio; A = {x: 0, y: flip ? H - ah : 0, w: W, h: ah}; B = {x: 0, y: flip ? 0 : ah, w: W, h: H - ah}; }
+    E.fill(pal.bg); E.ctx.fillStyle = aFill.hex; E.ctx.fillRect(A.x, A.y, A.w, A.h);
+    B.cap = 0; E.art(B, bFill);
+    const pad = E.m, tx = A.x + pad, tw = A.w - 2 * pad;
+    const ty = A.y <= 1 ? E.y1 : A.y + pad, tb = A.y + A.h >= H - 1 ? E.y2 : A.y + A.h - pad;
+    const f = footer(E, tx, tw, tb), col = onColor(E, aFill);
+    stack(E, {x: tx, y: ty, w: tw, h: f.y - ty - 12 * k}, {titleVA: E.pick(['top', 'middle', 'bottom'])}).paint({ink: col, ...E.cta(aFill)});
+    f.paint(col, aFill);
+  },
+  frame(E){
+    const {ctx, k, pal, W, H} = E; E.fill(pal.bg);
+    const bgBase = E.pick([pal.bg, pal.tint, pal.accent]); E.decor({x: 0, y: 0, w: W, h: H, cap: 0}, bgBase);
+    const cw = W * E.r(.74, .9), ch = H * E.r(.62, .86), cx = (W - cw) / 2, cy = (H - ch) * E.r(.35, .65);
+    const cfill = E.pick([pal.bg, pal.ink, pal.accent, pal.tint].filter(c => c !== bgBase));
+    E.box(cx, cy, cw, ch, cfill, 26);
+    if (cfill === pal.bg || cfill === pal.tint){ ctx.save(); shapePath(E, cx, cy, cw, ch, 26); ctx.strokeStyle = pal.ink.hex; ctx.lineWidth = E.pick([1.5, 2.5, 4]) * k; ctx.stroke(); ctx.restore(); }
+    const p = 20 * k, col = onColor(E, cfill), f = footer(E, cx + p, cw - 2 * p, cy + ch - p * .8);
+    stack(E, {x: cx + p, y: cy + p, w: cw - 2 * p, h: f.y - cy - p - 10 * k}, {align: E.pick(['left', 'center']), titleVA: 'middle'}).paint({ink: col, ...E.cta(cfill)});
+    f.paint(col, cfill);
+  },
+  grid(E){
+    const {k, pal, c, W, H} = E; E.fill(pal.bg);
+    const f = footer(E), A = {x: E.x1, y: E.y1, w: E.cw, h: f.y - E.y1 - 12 * k};
+    const cols = W > H * 1.2 ? E.ri(5, 7) : E.ri(3, 5), cwid = A.w / cols, rows = Math.max(3, Math.round(A.h / cwid)), chei = A.h / rows, gap = E.pick([0, 0, 3 * k, 6 * k]);
+    const cell = (i, j, sx, sy) => ({x: A.x + i * cwid + gap / 2, y: A.y + j * chei + gap / 2, w: cwid * sx - gap, h: chei * sy - gap, cap: 14});
+    const occ = Array.from({length: rows}, () => Array(cols).fill(false));
+    const mark = (i, j, sx, sy) => { for (let a = j; a < j + sy; a++) for (let b = i; b < i + sx; b++) occ[a][b] = true; };
+    const isy = chei < 85 * k && rows > 3 ? 2 : 1, tr = clamp(Math.round(rows * E.r(.45, .6)), 1, rows - isy), atTop = E.chance(.5), tj = atTop ? 0 : rows - tr;
+    const tfill = E.pick([pal.accent, pal.ink, pal.tint, pal.accent2].filter(x => x !== pal.bg)), TB = cell(0, tj, cols, tr); mark(0, tj, cols, tr);
+    E.box(TB.x, TB.y, TB.w, TB.h, tfill, 18);
+    const tp = 14 * k, tcol = onColor(E, tfill);
+    stack(E, {x: TB.x + tp, y: TB.y + tp, w: TB.w - 2 * tp, h: TB.h - 2 * tp}, {body: false, cta: false, extra: false, titleVA: E.pick(['top', 'bottom'])}).paint({ink: tcol});
+    const ij = atTop ? rows - isy : 0, ic = E.ri(Math.ceil(cols / 2), cols), i0 = E.chance(.5) ? 0 : cols - ic; mark(i0, ij, ic, isy);
+    const IB = cell(i0, ij, ic, isy);
+    if (c.body || (c.cta && E.has('boton'))){
+      const ifill = E.pick([pal.tint, pal.bg]); E.box(IB.x, IB.y, IB.w, IB.h, ifill, 14);
+      const ip = 10 * k, icol = onColor(E, ifill);
+      stack(E, {x: IB.x + ip, y: IB.y + ip, w: IB.w - 2 * ip, h: IB.h - 2 * ip}, {kicker: false, title: false, extra: false, bodyMax: 13 * k}).paint({ink: icol, ...E.cta(ifill)});
+    }
+    if (E.img){
+      let spots = [];
+      for (const [sx, sy] of [[Math.min(2, cols), Math.min(2, rows)], [2, 1], [1, 1]]){
+        for (let j = 0; j + sy <= rows; j++) for (let i = 0; i + sx <= cols; i++){
+          let ok = true; for (let a = j; a < j + sy && ok; a++) for (let b = i; b < i + sx; b++) if (occ[a][b]) { ok = false; break; }
+          if (ok) spots.push([i, j, sx, sy]);
+        }
+        if (spots.length) break;
+      }
+      if (spots.length){ const [i, j, sx, sy] = E.pick(spots), rc = cell(i, j, sx, sy); E.cover(E.img, rc.x, rc.y, rc.w, rc.h, 14); mark(i, j, sx, sy); }
+    }
+    const letters = String(c.title || c.brand || 'N').replace(/[^\p{L}\p{N}]/gu, '').split('');
+    const pool = [pal.accent, pal.accent2, pal.ink, pal.tint, pal.bg].filter((x, i, a) => a.indexOf(x) === i);
+    const tileIds = E.decorIds.filter(id => id !== 'hero');
+    for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++){
+      if (occ[j][i] || !E.chance(.74)) continue;
+      E.letter = letters.length ? E.pick(letters) : null;
+      E.decor(cell(i, j, 1, 1), E.pick(pool), E.pick(tileIds));
+    }
+    f.paint(pal.ink, pal.bg);
+  },
+  bands(E){
+    const {ctx, k, pal, W, H} = E;
+    const n = E.ri(3, 4), big = E.ri(0, n - 1), ws = Array.from({length: n}, (_, i) => i === big ? E.r(2.2, 3.2) : E.r(.45, .9)), sum = ws.reduce((a, b) => a + b, 0);
+    const base = E.shuffle([pal.bg, pal.accent, pal.ink, pal.accent2, pal.tint]).filter((c, i, a) => a.indexOf(c) === i);
+    let y = 0; const bands = [];
+    ws.forEach((w, i) => { const h = H * w / sum; let col = base[i % base.length]; if (i > 0 && col === bands[i - 1].col) col = base[(i + 1) % base.length]; bands.push({y, h, col}); y += h; });
+    E.fill(pal.bg); bands.forEach(b => { ctx.fillStyle = b.col.hex; ctx.fillRect(0, b.y, W, b.h + 1); });
+    const tb = bands[big], col = onColor(E, tb.col), pad = E.m;
+    const f = footer(E, E.x1, E.cw, Math.min(E.y2, tb.y + tb.h - pad)), ty = Math.max(E.y1, tb.y + pad);
+    stack(E, {x: E.x1, y: ty, w: E.cw, h: f.y - ty - 10 * k}, {titleVA: E.pick(['top', 'middle', 'bottom']), tmax: 110 * k}).paint({ink: col, ctaFill: col, ctaText: tb.col});
+    f.paint(col, tb.col);
+  },
+  edge(E){
+    const {ctx, k, pal, c} = E, ts = titleStyle(E); E.fill(pal.bg);
+    const f = footer(E), A = {x: E.x1, y: E.y1, w: E.cw, h: f.y - E.y1 - 12 * k};
+    const tw = A.w * E.r(.36, .48), left = E.chance(.5), gap = 14 * k;
+    const tcol = E.kit !== 'xnoleet' && contrast(pal.accent, pal.bg) >= 3 ? pal.accent : pal.ink;
+    ctx.save();
+    if (left){ ctx.translate(A.x, A.y + A.h); ctx.rotate(-Math.PI / 2); } else { ctx.translate(A.x + A.w, A.y); ctx.rotate(Math.PI / 2); }
+    T(E, c.title, 0, 0, A.h, tw, {role: ts.role, weight: ts.weight, max: tw * .8, min: 14 * k, lines: 3, va: 'middle', track: -.02, upper: ts.upper || E.chance(.5)}).paint(tcol);
+    ctx.restore();
+    const R2 = {x: left ? A.x + tw + gap : A.x, w: A.w - tw - gap}, vh = A.h * E.r(.38, .55);
+    E.art({x: R2.x, y: A.y, w: R2.w, h: vh, cap: 20}, E.pick([pal.accent, pal.accent2, pal.tint, pal.ink].filter(x => x !== pal.bg)));
+    stack(E, {x: R2.x, y: A.y + vh + gap, w: R2.w, h: A.h - vh - gap}, {title: false, bodyMax: 14 * k}).paint({ink: pal.ink, ...E.cta(pal.bg)});
+    f.paint(pal.ink, pal.bg);
+  },
+  photo(E){
+    const {ctx, k, pal, W, H} = E; E.fill(pal.bg);
+    const sy = H * E.r(.5, .64), top = E.chance(.5);
+    const bfill = E.pick([pal.accent, pal.ink, pal.tint, pal.bg].filter((c, i, a) => a.indexOf(c) === i));
+    const ib = top ? {x: 0, y: 0, w: W, h: sy} : {x: 0, y: H - sy, w: W, h: sy}, tb = top ? {y: sy, h: H - sy} : {y: 0, h: H - sy};
+    E.cover(E.img, ib.x, ib.y, ib.w, ib.h, 0);
+    ctx.fillStyle = bfill.hex; ctx.fillRect(0, tb.y, W, tb.h);
+    const pad = E.m, ty = tb.y + pad, tbot = tb.y + tb.h - pad, f = footer(E, E.x1, E.cw, tbot), col = onColor(E, bfill);
+    stack(E, {x: E.x1, y: ty, w: E.cw, h: f.y - ty - 10 * k}, {titleVA: 'top', tmax: 80 * k}).paint({ink: col, ...E.cta(bfill)});
+    f.paint(col, bfill);
+  },
+  chat(E){
+    const {ctx, k, pal, c, W, H} = E, ts = titleStyle(E); E.fill(pal.bg);
+    const f = footer(E), A = {x: E.x1, y: E.y1, w: E.cw, h: f.y - E.y1 - 10 * k}, gap = 10 * k;
+    const hh = A.h * E.r(.3, .4), hb = E.pick([pal.accent, pal.ink].filter(x => contrast(x, pal.bg) >= 1.5)) || pal.ink;
+    if (E.has('hero')){
+      const rc = {x: A.x, y: A.y, w: A.w, h: hh, cap: 22}; E.decor(rc, hb, 'hero');
+      const p = 14 * k, sr = E.has('sello') ? Math.min(rc.w, rc.h) * .13 * 3.4 : 0; T(E, c.title, rc.x + p, rc.y + p + sr, rc.w - 2 * p, rc.h - 2 * p - sr, {role: ts.role, weight: ts.weight, max: 70 * k, min: 12 * k, lines: 4, va: 'bottom', track: -.01, upper: ts.upper}).paint(onColor(E, hb));
+    } else {
+      if (E.has('sello')) seal(E, A.x + A.w - 18 * k, A.y + 18 * k, 16 * k, hb, onColor(E, hb));
+      T(E, c.title, A.x, A.y, A.w - (E.has('sello') ? 44 * k : 0), hh, {role: ts.role, weight: ts.weight, max: 64 * k, min: 12 * k, lines: 4, va: 'top', track: -.01, upper: ts.upper}).paint(pal.ink);
+    }
+    const y0 = A.y + hh + gap * 1.4, avail = A.y + A.h - y0, items = itemsOf(c);
+    let fs = 14 * k, rows = [];
+    for (let tr = 0; tr < 7; tr++){
+      rows = [];
+      if (E.has('burbuja')){ if (c.body) rows.push({t: 'bot', l: bubbleLay(E, c.body, 'bot', A.w * .8, fs)}); if (c.reply) rows.push({t: 'user', l: bubbleLay(E, c.reply, 'user', A.w * .62, fs)}); }
+      if (E.has('respuestas') && items.length){ const l = chipsLay(E, items, A, 'left'); if (l.n) rows.push({t: 'chips', l}); }
+      if (E.has('patrocinado') && tr < 4) rows.push({t: 'ad', l: sponsorLay(E, A.w * .86, fs)});
+      if (c.cta && E.has('boton')) rows.push({t: 'cta', l: ctaLay(E, c.cta, A, 'left')});
+      const tot = rows.reduce((s, r) => s + r.l.h, 0) + gap * Math.max(0, rows.length - 1);
+      if (tot <= avail) break; fs *= .88;
+    }
+    let yy = y0; const tint = pal.tint !== pal.bg ? pal.tint : pal.ink, userFill = hasContrast(E, pal.accent, pal.bg) ? pal.accent : pal.ink;
+    for (const r of rows){
+      r.l.y = yy; yy += r.l.h + gap;
+      if (r.t === 'bot') r.l.paint(A, tint, onColor(E, tint));
+      else if (r.t === 'user') r.l.paint(A, userFill, onColor(E, userFill));
+      else if (r.t === 'chips') r.l.paint(pal.ink);
+      else if (r.t === 'ad') r.l.paint(A);
+      else r.l.paint(...Object.values(E.cta(pal.bg)));
+    }
+    f.paint(pal.ink, pal.bg);
+  }
+};
+function compose(ctx, W, H, seed, P){
+  P = P || params();
+  const E = makeEnv(ctx, W, H, seed, P);
+  const names = ['poster', 'split', 'frame', 'edge'];
+  if (E.decorIds.filter(id => id !== 'hero').length) names.push('grid');
+  if (E.has('bloques') || E.has('bandas')) names.push('bands');
+  if (H < W * 1.15) names.splice(names.indexOf('edge'), 1);
+  if (E.img) names.push('photo', 'photo', 'split');
+  if (E.kit === 'hola' && (E.has('burbuja') || E.has('respuestas') || E.has('patrocinado'))) names.push('chat', 'chat', 'chat');
+  E.name = E.pick(names);
+  ctx.save(); ctx.clearRect(0, 0, W, H); ARCH[E.name](E); ctx.restore();
+  return E.name;
+}
+
+/* ============ app state ============ */
+const FORMATS = [
+  {id:'post', name:'Post', sub:'1:1', w:1080, h:1080}, {id:'vert', name:'Vertical', sub:'4:5', w:1080, h:1350},
+  {id:'story', name:'Story / Reel', sub:'9:16', w:1080, h:1920}, {id:'pin', name:'Pin', sub:'2:3', w:1000, h:1500},
+  {id:'wide', name:'Enlace', sub:'1.91:1', w:1200, h:630}, {id:'banner', name:'Banner', sub:'16:9', w:1600, h:900}
+];
+const KEY = 'numerica-producido-v1';
+const DEF_CONTENT = {kicker:'Nueva edición', title:'Diseña a la velocidad del cursor', body:'Cada movimiento propone una composición distinta. Fija la que te guste y expórtala.', cta:'Ver más', handle:'@tumarca', brand:'', chips:'Ver más, Precios, Ayuda', reply:'Quiero saber más'};
+const S = {systems: [...BUILTIN], sysId: 'art-xnoleet', themeId: 'light', fmt: 'vert', bg: 'auto', seed: (Math.random() * 4294967296) >>> 0, locked: false, hist: [], hi: -1, sens: 140, scale: 1, type: 'png', imgEl: null, logoOverride: null, logoObj: null, content: {...DEF_CONTENT}, arch: '', off: {}, tb: {pos: 'right', open: true, tab: 'sys', x: 40, y: 80}};
+let hadTb = false;
+try {
+  const sv = JSON.parse(localStorage.getItem(KEY) || 'null');
+  if (sv){
+    if (Array.isArray(sv.systems)) S.systems.push(...sv.systems.filter(s => s && s.id && s.colors && s.themes));
+    for (const k of ['sysId','themeId','fmt','bg','sens','scale','type']) if (sv[k] != null) S[k] = sv[k];
+    if (sv.content) S.content = {...DEF_CONTENT, ...sv.content};
+    if (sv.off && typeof sv.off === 'object') S.off = sv.off;
+    if (sv.tb && typeof sv.tb === 'object'){ S.tb = {...S.tb, ...sv.tb}; hadTb = true; }
+  }
+} catch(e){}
+if (!hadTb && window.innerWidth <= 860) S.tb.open = false;
+for (const s of S.systems) if (!s.builtin){ if (!s.kit) s.kit = 'tokens'; if (!s.info) s.info = autoInfo(s); }
+const curSys = () => S.systems.find(s => s.id === S.sysId) || S.systems[0];
+const fmt = () => FORMATS.find(f => f.id === S.fmt) || FORMATS[1];
+if (!S.systems.find(s => s.id === S.sysId)) S.sysId = S.systems[0].id;
+if (!curSys().themes.find(t => t.id === S.themeId)) S.themeId = curSys().themes[0].id;
+const kitOf = sys => (sys.kit && ELEMENTS[sys.kit]) ? sys.kit : 'tokens';
+const offOf = sys => new Set((S.off[sys.id] || []).filter(id => KIT_IDS[kitOf(sys)].has(id)));
+function stateObj(){
+  return {systems: S.systems.filter(s => !s.builtin).map(s => ({...s, fontFiles: undefined})), sysId: S.sysId, themeId: S.themeId, fmt: S.fmt, bg: S.bg, sens: S.sens, scale: S.scale, type: S.type, content: S.content, off: S.off};
+}
+function persist(){
+  try { localStorage.setItem(KEY, JSON.stringify({...stateObj(), tb: S.tb})); } catch(e){}
+  cloudSchedule();
+}
+/* Acceso compartido de Hola Apps: los ajustes se guardan por usuario en Supabase (tabla numerica_docs). Si la tabla no existe se sigue con el guardado local. */
+const cloud = {sb: null, user: null, t: 0, off: false};
+function cloudSchedule(){
+  if (!cloud.sb || !cloud.user || cloud.off) return;
+  clearTimeout(cloud.t);
+  cloud.t = setTimeout(async () => {
+    try {
+      const r = await cloud.sb.from('numerica_docs').upsert({user_id: cloud.user.id, json: JSON.stringify(stateObj()), updated_at: new Date().toISOString()});
+      if (r.error) cloud.off = true;
+    } catch(e){ cloud.off = true; }
+  }, 1200);
+}
+async function cloudLoad(){
+  try {
+    const r = await cloud.sb.from('numerica_docs').select('json').eq('user_id', cloud.user.id).maybeSingle();
+    if (r.error){ cloud.off = true; return; }
+    if (!r.data || !r.data.json) return;
+    const sv = JSON.parse(r.data.json);
+    S.systems = S.systems.filter(s => s.builtin);
+    if (Array.isArray(sv.systems)) for (const s of sv.systems) if (s && s.id && s.colors && s.themes){ if (!s.kit) s.kit = 'tokens'; if (!s.info) s.info = autoInfo(s); S.systems.push(s); }
+    for (const k of ['sysId','themeId','fmt','bg','sens','scale','type']) if (sv[k] != null) S[k] = sv[k];
+    if (sv.content) S.content = {...DEF_CONTENT, ...sv.content};
+    if (sv.off && typeof sv.off === 'object') S.off = sv.off;
+    if (!S.systems.find(s => s.id === S.sysId)) S.sysId = S.systems[0].id;
+    if (!curSys().themes.find(t => t.id === S.themeId)) S.themeId = curSys().themes[0].id;
+    try { localStorage.setItem(KEY, JSON.stringify({...stateObj(), tb: S.tb})); } catch(e){}
+    renderControls(); renderFormats(); await selectSystem(S.sysId);
+  } catch(e){}
+}
+function onUser(user, client){ cloud.sb = client; cloud.user = user; cloud.off = false; cloudLoad(); }
+function onLogout(){
+  const had = !!cloud.user; cloud.sb = null; cloud.user = null; clearTimeout(cloud.t);
+  if (had){ try { localStorage.removeItem(KEY); } catch(e){} location.reload(); }
+}
+let persistT = 0; const schedPersist = () => { clearTimeout(persistT); persistT = setTimeout(persist, 400); };
+function params(sys = curSys(), over = {}){
+  return {sys, kit: kitOf(sys), off: offOf(sys), themeId: S.themeId, bgMode: S.bg, content: {...S.content, brand: S.content.brand || sys.name}, img: S.imgEl, logo: sys.id === curSys().id ? S.logoObj : null, fonts: sysFonts(sys), ...over};
+}
+
+/* logo */
+const logoCache = new Map();
+async function loadLogo(src){
+  if (logoCache.has(src)) return logoCache.get(src);
+  const img = await loadImg(src); const w = img.naturalWidth || 200, h = img.naturalHeight || 100; let L = .5;
+  try {
+    const c = document.createElement('canvas'); c.width = 32; c.height = Math.max(1, Math.round(32 * h / w));
+    const x = c.getContext('2d'); x.drawImage(img, 0, 0, c.width, c.height);
+    const d = x.getImageData(0, 0, c.width, c.height).data; let s = 0, n = 0;
+    for (let i = 0; i < d.length; i += 4) if (d[i + 3] > 128){ s += mk([d[i], d[i+1], d[i+2]]).L; n++; }
+    if (n) L = s / n;
+  } catch(e){}
+  const o = {img, ratio: (w / h) || 2, L}; logoCache.set(src, o); return o;
+}
+async function refreshLogo(){
+  const src = S.logoOverride || curSys().logo;
+  if (!src){ S.logoObj = null; render(); return; }
+  try { S.logoObj = await loadLogo(src); } catch(e){ S.logoObj = null; }
+  render();
+}
+
+/* ============ rendering ============ */
+const cv = $('#cv'), cx = cv.getContext('2d');
+let raf = 0;
+function render(){ if (raf) return; raf = requestAnimationFrame(() => { raf = 0; draw(); }); }
+function draw(){
+  const f = fmt(), s = Math.min(1, 1200 / Math.max(f.w, f.h)), w = Math.round(f.w * s), h = Math.round(f.h * s);
+  if (cv.width !== w || cv.height !== h){ cv.width = w; cv.height = h; }
+  fitCanvas();
+  S.arch = compose(cx, w, h, S.seed);
+  const sys = curSys(), th = sys.themes.find(t => t.id === S.themeId);
+  $('#readout').innerHTML = '<span>semilla <b>' + String(S.seed).padStart(10, '0') + '</b></span><span>composición <b>' + S.arch + '</b></span><span><b>' + f.w + '×' + f.h + '</b></span><span><b>' + esc(sys.name) + (th ? ' / ' + esc(th.name) : '') + '</b></span>';
+  schedThumbs();
+}
+function fitCanvas(){
+  const st = $('#stage'), cs = getComputedStyle(st), aw = st.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - 40, ah = st.clientHeight - 68;
+  if (aw <= 0 || ah <= 0) return;
+  const sc = Math.min(aw / cv.width, ah / cv.height);
+  cv.style.width = Math.floor(cv.width * sc) + 'px'; cv.style.height = Math.floor(cv.height * sc) + 'px';
+}
+new ResizeObserver(fitCanvas).observe($('#stage'));
+let thT = 0; const schedThumbs = () => { clearTimeout(thT); thT = setTimeout(buildThumbs, 240); };
+function buildThumbs(){
+  const f = fmt(), h = 60, w = Math.max(24, Math.round(h * f.w / f.h)), wrap = $('#hist'), P = params();
+  wrap.innerHTML = '';
+  if (!S.hist.length){ wrap.innerHTML = '<span class="none">Las composiciones que generes aparecen aquí.</span>'; return; }
+  S.hist.forEach((sd, i) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'th'; b.setAttribute('aria-label', 'Composición ' + (i + 1)); b.setAttribute('aria-pressed', String(i === S.hi));
+    const c = document.createElement('canvas'); c.width = w * 2; c.height = h * 2; c.style.width = w + 'px'; c.style.height = h + 'px';
+    compose(c.getContext('2d'), c.width, c.height, sd, P); b.appendChild(c);
+    b.onclick = () => { S.hi = i; S.seed = sd; render(); };
+    wrap.appendChild(b);
+  });
+  const a = wrap.querySelector('[aria-pressed="true"]'); if (a) wrap.scrollLeft = a.offsetLeft - wrap.clientWidth / 2 + a.offsetWidth / 2;
+}
+let counter = 0;
+function pushSeed(seed){
+  S.seed = seed >>> 0;
+  S.hist = S.hist.slice(0, S.hi + 1); S.hist.push(S.seed); if (S.hist.length > 40) S.hist.shift(); S.hi = S.hist.length - 1;
+  render();
+}
+function newSeed(x = 0, y = 0){ pushSeed(((x * 73856093) ^ (y * 19349663) ^ (++counter * 83492791) ^ ((performance.now() * 1000) | 0) ^ (Math.random() * 4294967296)) >>> 0); }
+function step(d){ const i = clamp(S.hi + d, 0, S.hist.length - 1); if (i === S.hi) return; S.hi = i; S.seed = S.hist[i]; render(); }
+function setLock(v){
+  S.locked = v; $('#stage').classList.toggle('locked', v);
+  $('#stText').textContent = v ? 'Fijado' : 'Generando';
+  const b = $('#bLock'); b.textContent = v ? 'Soltar' : 'Fijar'; b.setAttribute('aria-pressed', String(v));
+  $('#tip').textContent = v ? 'Composición fijada. Clic o espacio para volver a generar.' : 'Mueve el cursor sobre el lienzo. Clic para fijar.';
+  if (v) $('#stage').classList.remove('hot');
+}
+
+/* cursor-driven generation */
+const stage = $('#stage'), ret = $('#reticle');
+let acc = 0, lx = null, ly = null, lastT = 0, down = null;
+stage.addEventListener('pointermove', e => {
+  const r = stage.getBoundingClientRect();
+  ret.style.transform = 'translate(' + (e.clientX - r.left) + 'px,' + (e.clientY - r.top) + 'px)';
+  stage.classList.add('hot');
+  if (S.locked){ lx = e.clientX; ly = e.clientY; return; }
+  if (lx !== null) acc += Math.hypot(e.clientX - lx, e.clientY - ly);
+  lx = e.clientX; ly = e.clientY;
+  ret.style.setProperty('--p', Math.min(1, acc / S.sens).toFixed(3));
+  const now = performance.now();
+  if (acc >= S.sens && now - lastT > 90){ acc = 0; lastT = now; ret.style.setProperty('--p', 0); newSeed(e.clientX, e.clientY); }
+});
+stage.addEventListener('pointerleave', () => { lx = ly = null; stage.classList.remove('hot'); });
+stage.addEventListener('pointerdown', e => { down = {x: e.clientX, y: e.clientY}; });
+stage.addEventListener('pointerup', e => {
+  if (down && Math.hypot(e.clientX - down.x, e.clientY - down.y) < 8) setLock(!S.locked);
+  down = null;
+});
+stage.addEventListener('pointercancel', () => { down = null; });
+
+/* ============ toolbox flotante ============ */
+const barH = () => document.querySelector('.suite-bar') ? 44 : 0;
+const tb = $('#tb'), mobileQ = () => window.innerWidth <= 860, TBW = 340;
+function applyTb(){
+  const open = S.tb.open, mob = mobileQ();
+  tb.classList.toggle('min', !open); tb.dataset.pos = S.tb.pos;
+  $('#tbMin').setAttribute('aria-expanded', String(open)); $('#tbMin').firstElementChild.style.transform = open ? '' : 'rotate(180deg)';
+  $('#tbMin').title = open ? 'Contraer (T)' : 'Expandir (T)';
+  $('#tbPos').title = 'Posición: ' + ({left: 'izquierda', right: 'derecha', free: 'libre'}[S.tb.pos]);
+  if (mob){ tb.style.left = tb.style.right = tb.style.top = ''; stage.style.setProperty('--tbl', '0px'); stage.style.setProperty('--tbr', '0px'); }
+  else if (S.tb.pos === 'free'){
+    const x = clamp(S.tb.x, 8, Math.max(8, window.innerWidth - TBW - 8)), y = clamp(S.tb.y, 56 + barH(), Math.max(56, window.innerHeight - 90));
+    tb.style.left = x + 'px'; tb.style.top = y + 'px'; tb.style.right = 'auto'; tb.style.maxHeight = 'calc(100svh - ' + (y + 12) + 'px)';
+    stage.style.setProperty('--tbl', '0px'); stage.style.setProperty('--tbr', '0px');
+  } else {
+    tb.style.top = (64 + barH()) + 'px'; tb.style.maxHeight = 'calc(100svh - ' + (76 + barH()) + 'px)'; tb.style.left = S.tb.pos === 'left' ? '24px' : 'auto'; tb.style.right = S.tb.pos === 'right' ? '24px' : 'auto';
+    const pad = open ? (TBW + 24) + 'px' : '0px';
+    stage.style.setProperty('--tbl', S.tb.pos === 'left' ? pad : '0px'); stage.style.setProperty('--tbr', S.tb.pos === 'right' ? pad : '0px');
+  }
+  $$('#tbTabs .tab').forEach(t => t.setAttribute('aria-selected', String(t.dataset.t === S.tb.tab)));
+  $$('.tbbody [data-p]').forEach(p => { p.hidden = p.dataset.p !== S.tb.tab; });
+  seg($('#segPos'), [{v:'left', t:'Izquierda'}, {v:'right', t:'Derecha'}, {v:'free', t:'Libre'}], () => S.tb.pos, v => { setPos(v); });
+  requestAnimationFrame(fitCanvas);
+}
+function setPos(p){ S.tb.pos = p; if (p === 'free'){ const r = tb.getBoundingClientRect(); S.tb.x = r.left; S.tb.y = r.top; } applyTb(); persist(); }
+$('#tbMin').onclick = () => { S.tb.open = !S.tb.open; applyTb(); persist(); };
+$('#tbPos').onclick = () => setPos({right: 'left', left: 'free', free: 'right'}[S.tb.pos] || 'right');
+$('#tbTabs').onclick = e => { const b = e.target.closest('.tab'); if (!b) return; S.tb.tab = b.dataset.t; if (!S.tb.open) S.tb.open = true; applyTb(); persist(); };
+{ /* arrastrar el toolbox por la cabecera; al soltarlo cerca de un borde se acopla */
+  let drag = null;
+  $('#tbHead').addEventListener('pointerdown', e => {
+    if (mobileQ() || e.target.closest('button')) return;
+    const r = tb.getBoundingClientRect(); drag = {dx: e.clientX - r.left, dy: e.clientY - r.top, moved: false};
+    try { $('#tbHead').setPointerCapture(e.pointerId); } catch(_){}
+  });
+  $('#tbHead').addEventListener('pointermove', e => {
+    if (!drag) return;
+    if (!drag.moved && Math.hypot(e.movementX, e.movementY) < .5) return;
+    drag.moved = true; tb.classList.add('dragging');
+    S.tb.pos = 'free'; S.tb.x = e.clientX - drag.dx; S.tb.y = e.clientY - drag.dy; applyTb();
+  });
+  const end = () => {
+    if (!drag) return; const moved = drag.moved; drag = null; tb.classList.remove('dragging'); if (!moved) return;
+    const r = tb.getBoundingClientRect();
+    if (r.left < 56) S.tb.pos = 'left'; else if (window.innerWidth - r.right < 56) S.tb.pos = 'right';
+    else { S.tb.x = r.left; S.tb.y = r.top; }
+    applyTb(); persist();
+  };
+  $('#tbHead').addEventListener('pointerup', end); $('#tbHead').addEventListener('pointercancel', end);
+}
+window.addEventListener('resize', applyTb);
+
+/* ============ sistema: dropdown + ficha ============ */
+function swatchHTML(sys, themeId){
+  const cols = (sys.colors[themeId] || sys.colors[sys.themes[0].id] || []).map(c => mk(hex2rgb(c.hex)));
+  const seen = new Set(), u = cols.filter(c => !seen.has(c.hex) && seen.add(c.hex));
+  const lt = [...u].sort((a, b) => b.L - a.L)[0], dk = [...u].sort((a, b) => a.L - b.L)[0];
+  const ch = u.filter(c => c !== lt && c !== dk).sort((a, b) => b.C - a.C).slice(0, 4);
+  return [lt, dk, ...ch].filter(Boolean).map(c => '<i style="background:' + c.hex + '"></i>').join('');
+}
+function renderSelect(){
+  const sel = $('#selSys'), art = S.systems.filter(s => s.builtin), imp = S.systems.filter(s => !s.builtin);
+  const opt = s => '<option value="' + esc(s.id) + '"' + (s.id === S.sysId ? ' selected' : '') + '>' + esc(s.name) + '</option>';
+  sel.innerHTML = '<optgroup label="Artefactos de diseño">' + art.map(opt).join('') + '</optgroup>' + (imp.length ? '<optgroup label="Importados">' + imp.map(opt).join('') + '</optgroup>' : '');
+  sel.value = S.sysId;
+}
+let delArm = null;
+function enabledCount(sys){ const all = ELEMENTS[kitOf(sys)], off = offOf(sys); return [all.length - off.size, all.length]; }
+function renderBrief(){
+  const sys = curSys(), f = sysFonts(sys), [on, all] = enabledCount(sys), th = sys.themes.find(t => t.id === S.themeId) || sys.themes[0];
+  $('#brief').innerHTML =
+    '<div class="bh"><b>' + esc(sys.name) + '</b><span class="tag">' + (sys.builtin ? 'Artefacto' : 'Importado') + '</span></div>' +
+    '<p>' + esc((sys.info && sys.info.brief) || '') + '</p>' +
+    '<div class="sw">' + swatchHTML(sys, th.id) + '</div>' +
+    '<dl class="facts"><dt>Tipografía</dt><dd>' + esc(f.dName || 'del sistema') + (f.bName && f.bName !== f.dName ? ' · ' + esc(f.bName) : '') + '</dd>' +
+    '<dt>Temas</dt><dd>' + sys.themes.map(t => esc(t.name)).join(' · ') + '</dd>' +
+    '<dt>Elementos</dt><dd>' + on + ' de ' + all + ' activos' + (sys.info && sys.info.components && sys.info.components.length ? ' · ' + sys.info.components.length + ' componentes' : '') + '</dd></dl>' +
+    '<div class="btnrow"><button class="btn primary sm" type="button" id="bExplore">Explorar sistema</button><button class="btn sm" type="button" id="bImport">Importar</button>' +
+    (sys.builtin ? '' : '<button class="btn sm ghost" type="button" id="bDel">' + (delArm === sys.id ? '¿Quitar?' : 'Quitar') + '</button>') + '</div>';
+  $('#bExplore').onclick = openExplore; $('#bImport').onclick = () => openImport();
+  const d = $('#bDel');
+  if (d) d.onclick = () => {
+    if (delArm !== sys.id){ delArm = sys.id; renderBrief(); setTimeout(() => { if (delArm === sys.id){ delArm = null; renderBrief(); } }, 3000); return; }
+    delArm = null; S.systems = S.systems.filter(x => x.id !== sys.id); selectSystem(S.systems[0].id); persist();
+  };
+}
+async function selectSystem(id){
+  S.sysId = id; const sys = curSys();
+  if (!sys.themes.find(t => t.id === S.themeId)) S.themeId = sys.themes[0].id;
+  renderSelect(); renderBrief(); renderThemeSeg(); renderElements(); render(); persist();
+  if (!$('#explore').hidden) renderExplore();
+  await registerFontFiles(sys); await ensureFonts(sys); render(); refreshLogo();
+  if (!$('#explore').hidden) renderExplore();
+}
+$('#selSys').onchange = e => selectSystem(e.target.value);
+function seg(el, opts, get, set){
+  el.innerHTML = opts.map(o => '<button type="button" data-v="' + esc(o.v) + '" aria-pressed="' + (get() === o.v) + '"' + (opts.length < 2 ? ' disabled' : '') + '>' + esc(o.t) + '</button>').join('');
+  el.onclick = e => {
+    const b = e.target.closest('button'); if (!b || b.disabled) return;
+    set(b.dataset.v); $$('button', el).forEach(x => x.setAttribute('aria-pressed', String(x.dataset.v === get())));
+  };
+}
+function renderThemeSeg(){
+  seg($('#segTheme'), curSys().themes.map(t => ({v: t.id, t: t.name})), () => S.themeId, v => { S.themeId = v; renderBrief(); render(); persist(); if (!$('#explore').hidden) renderExplore(); });
+}
+
+/* ============ elementos del sistema ============ */
+function renderElements(){
+  const sys = curSys(), els = ELEMENTS[kitOf(sys)], off = offOf(sys), groups = [...new Set(els.map(e => e.g))];
+  $('#elNote').textContent = 'El generador solo usa lo que esté marcado aquí y los tokens de ' + sys.name + '. Nada de formas o colores externos.';
+  const wrap = $('#elList');
+  wrap.innerHTML = '<div class="elrow"><span class="h2">' + (els.length - off.size) + ' de ' + els.length + ' activos</span><button class="btn sm" type="button" data-all="1">Todos</button><button class="btn sm ghost" type="button" data-all="0">Ninguno</button></div>' +
+    groups.map(g => '<div class="elg"><div class="h2">' + esc(g) + '</div>' + els.filter(e => e.g === g).map(e =>
+      '<button type="button" class="el" data-id="' + e.id + '" aria-pressed="' + !off.has(e.id) + '"><span class="chk"></span><span><b>' + esc(e.n) + '</b><small>' + esc(e.d) + '</small></span></button>').join('') + '</div>').join('');
+}
+$('#elList').addEventListener('click', e => {
+  const sys = curSys(), els = ELEMENTS[kitOf(sys)], all = e.target.closest('[data-all]'), b = e.target.closest('.el');
+  if (all) S.off[sys.id] = all.dataset.all === '1' ? [] : els.map(x => x.id);
+  else if (b){ const off = offOf(sys); off.has(b.dataset.id) ? off.delete(b.dataset.id) : off.add(b.dataset.id); S.off[sys.id] = [...off]; }
+  else return;
+  renderElements(); renderBrief(); render(); persist(); if (!$('#explore').hidden) renderExplore();
+});
+
+/* ============ formato, contenido, salida ============ */
+function renderFormats(){
+  const wrap = $('#fmtList'); wrap.innerHTML = '';
+  FORMATS.forEach(f => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'fmt'; b.setAttribute('aria-pressed', String(f.id === S.fmt));
+    const mw = f.w >= f.h ? 30 : Math.round(30 * f.w / f.h), mh = f.w >= f.h ? Math.round(30 * f.h / f.w) : 30;
+    b.innerHTML = '<span class="mini" style="width:' + mw + 'px;height:' + mh + 'px"></span><span><b>' + esc(f.name) + '</b><small>' + f.sub + ' · ' + f.w + '×' + f.h + '</small></span>';
+    b.onclick = () => { S.fmt = f.id; renderFormats(); render(); persist(); };
+    wrap.appendChild(b);
+  });
+}
+function bindField(id, key){
+  const el = $(id); el.value = S.content[key] || '';
+  el.addEventListener('input', () => { S.content[key] = el.value; render(); schedPersist(); });
+}
+function renderControls(){
+  for (const [id, key] of [['#fKicker','kicker'],['#fTitle','title'],['#fBody','body'],['#fCta','cta'],['#fHandle','handle'],['#fBrand','brand'],['#fChips','chips'],['#fReply','reply']]) $(id).value = S.content[key] || '';
+  seg($('#segBg'), [{v:'auto', t:'Auto'}, {v:'light', t:'Claro'}, {v:'dark', t:'Oscuro'}, {v:'accent', t:'Acento'}], () => S.bg, v => { S.bg = v; render(); persist(); });
+  seg($('#segScale'), [{v:'1', t:'1×'}, {v:'2', t:'2×'}], () => String(S.scale), v => { S.scale = +v; persist(); });
+  seg($('#segType'), [{v:'png', t:'PNG'}, {v:'jpg', t:'JPG'}], () => S.type, v => { S.type = v; persist(); });
+  rS.value = S.sens; $('#vSens').textContent = 'cada ' + S.sens + ' px';
+}
+const rS = $('#rSens');
+bindField('#fKicker', 'kicker'); bindField('#fTitle', 'title'); bindField('#fBody', 'body'); bindField('#fCta', 'cta'); bindField('#fHandle', 'handle'); bindField('#fBrand', 'brand'); bindField('#fChips', 'chips'); bindField('#fReply', 'reply');
+rS.addEventListener('input', () => { S.sens = +rS.value; $('#vSens').textContent = 'cada ' + S.sens + ' px'; schedPersist(); });
+renderControls();
+
+/* image + logo inputs */
+$('#bImg').onclick = () => $('#inImg').click();
+$('#bLogo').onclick = () => $('#inLogo').click();
+$('#inImg').onchange = async e => {
+  const f = e.target.files[0]; if (!f) return;
+  try { S.imgEl = await loadImg(URL.createObjectURL(f)); $('#nmImg').textContent = f.name; $('#xImg').hidden = false; render(); } catch(err){ toast('No se pudo leer la imagen.'); }
+  e.target.value = '';
+};
+$('#xImg').onclick = () => { S.imgEl = null; $('#nmImg').textContent = 'Sin imagen'; $('#xImg').hidden = true; render(); };
+$('#inLogo').onchange = async e => {
+  const f = e.target.files[0]; if (!f) return;
+  try {
+    const ext = extOf(f.name);
+    S.logoOverride = ext === 'svg' ? 'data:image/svg+xml;utf8,' + encodeURIComponent(await f.text()) : await prepLogo({ext, buf: await f.arrayBuffer()});
+    $('#nmLogo').textContent = f.name; $('#xLogo').hidden = false; refreshLogo();
+  } catch(err){ toast('No se pudo leer el logo.'); }
+  e.target.value = '';
+};
+$('#xLogo').onclick = () => { S.logoOverride = null; $('#nmLogo').textContent = 'Logo del sistema'; $('#xLogo').hidden = true; refreshLogo(); };
+
+/* ============ vista Explorar (independiente) ============ */
+const exp = $('#explore');
+function hashStr(s){ let h = 2166136261; for (let i = 0; i < s.length; i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+function renderExplore(){
+  const sys = curSys(), f = sysFonts(sys), th = sys.themes.find(t => t.id === S.themeId) || sys.themes[0], els = ELEMENTS[kitOf(sys)], off = offOf(sys), info = sys.info || {brief: '', rules: [], components: []};
+  const themes = sys.themes.map(t => {
+    const seen = new Set(), cols = (sys.colors[t.id] || []).filter(c => !seen.has(c.hex) && seen.add(c.hex));
+    return '<div class="theme"><h4>' + esc(t.name) + '</h4><div class="chips">' + cols.map(c => '<div class="cc"><i style="background:' + c.hex + '"></i><span><b>' + esc(c.name || c.hex) + '</b>' + c.hex + '</span></div>').join('') + '</div></div>';
+  }).join('');
+  const spec = (label, stack, size, wt, text) => '<div class="spec"><small>' + label + ' · ' + esc(stack) + '</small><div style="font:' + wt + ' ' + size + 'px/1.1 ' + esc(stack).replace(/&quot;/g, "'") + ';overflow-wrap:anywhere">' + text + '</div></div>';
+  const maxSp = Math.max(1, ...(sys.spacing || [1]));
+  exp.innerHTML = '<div class="xwrap"><div class="xhead"><button class="btn" type="button" id="xBack">← Volver al compositor</button><h2>' + esc(sys.name) + '</h2>' +
+    (sys.url ? '<a class="btn" href="' + esc(sys.url) + '" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit">Abrir artefacto original ↗</a>' : '') + '</div>' +
+    '<div class="xcard"><h3>Resumen</h3><p>' + esc(info.brief) + '</p><div class="comps"><span>' + (sys.builtin ? 'Artefacto' : 'Importado') + '</span><span>' + sys.themes.length + ' temas</span><span>' + (Object.values(sys.colors)[0] || []).length + ' colores</span><span>' + els.length + ' elementos</span></div>' +
+    (info.rules && info.rules.length ? '<h3 style="margin-top:18px">Reglas</h3><ul>' + info.rules.map(r => '<li>' + esc(r) + '</li>').join('') + '</ul>' : '') + '</div>' +
+    '<div class="xcard"><h3>Colores</h3>' + themes + '</div>' +
+    '<div class="xcard"><h3>Tipografía</h3>' + spec('Display', f.dStack, 44, 700, 'Diseña a la velocidad del cursor') + spec('Texto', f.bStack, 18, 400, 'Cada movimiento propone una composición distinta. Fija la que te guste y expórtala.') + '</div>' +
+    ((sys.spacing && sys.spacing.length) || (sys.radius && sys.radius.length) ? '<div class="xcard"><h3>Espacios y radios</h3>' +
+      (sys.spacing && sys.spacing.length ? '<div class="bars">' + sys.spacing.map(v => '<div><i style="width:' + Math.max(6, v) + 'px;height:' + Math.max(6, Math.min(60, 8 + v * 40 / maxSp)) + 'px"></i>' + v + '</div>').join('') + '</div>' : '') +
+      (sys.radius && sys.radius.length ? '<div class="bars radii" style="margin-top:16px">' + sys.radius.map(v => '<div><i style="border-radius:' + Math.min(v, 27) + 'px"></i>' + (v >= 999 ? 'píldora' : v + 'px') + '</div>').join('') + '</div>' : '') + '</div>' : '') +
+    '<div class="xcard"><h3>Elementos para componer</h3><p>Esto es lo único que dibuja el generador. Activa o apaga cada uno desde la pestaña Elementos del toolbox.</p><div class="elgrid">' +
+    els.map(e => '<div class="elcard"><canvas width="420" height="260" data-el="' + e.id + '"></canvas><div><b>' + esc(e.n) + '</b><small>' + esc(e.d) + '</small><span class="tag">' + (off.has(e.id) ? 'Apagado' : 'Activo') + '</span></div></div>').join('') + '</div></div>' +
+    (info.components && info.components.length ? '<div class="xcard"><h3>Componentes del artefacto</h3><div class="comps">' + info.components.map(c => '<span>' + esc(c) + '</span>').join('') + '</div></div>' : '') +
+    '<div class="btnrow"><button class="btn primary" type="button" id="xUse">Componer con este sistema</button></div></div>';
+  $('#xBack').onclick = closeExplore; $('#xUse').onclick = closeExplore;
+  $$('canvas[data-el]', exp).forEach(c => {
+    const id = c.dataset.el, P = params(sys, {off: new Set(), bgMode: 'light', content: {...DEF_CONTENT, brand: sys.name}, logo: S.logoObj, img: null});
+    try { const E = makeEnv(c.getContext('2d'), c.width, c.height, hashStr(sys.id + id), P); if (!DECOR[E.kit][id]) E.k = 2.1; previewElement(E, id, {x: 0, y: 0, w: c.width, h: c.height}); } catch(err){}
+  });
+}
+function openExplore(){
+  renderExplore(); exp.hidden = false; exp.scrollTop = 0; try { history.replaceState(null, '', '#explorar'); } catch(e){}
+  const b = $('#xBack'); b && b.focus();
+}
+function closeExplore(){
+  exp.hidden = true; try { history.replaceState(null, '', location.pathname + location.search); } catch(e){}
+  const b = $('#bExplore'); b && b.focus();
+}
+window.addEventListener('hashchange', () => { if (location.hash === '#explorar' && exp.hidden) openExplore(); else if (location.hash !== '#explorar' && !exp.hidden) { exp.hidden = true; } });
+
+/* ============ export ============ */
+let toastT = 0;
+function toast(msg){ const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 3200); }
+let dlP = null;
+function getDownloads(){
+  if (!dlP) dlP = (window.claude && typeof claude.use === 'function') ? Promise.resolve(claude.use('downloads')).catch(() => null) : Promise.resolve(null);
+  return dlP;
+}
+async function renderBlob(mime){
+  const f = fmt(), W = f.w * S.scale, H = f.h * S.scale, off = document.createElement('canvas'); off.width = W; off.height = H;
+  compose(off.getContext('2d'), W, H, S.seed);
+  return new Promise(r => off.toBlob(r, mime, .94));
+}
+async function exportPiece(){
+  const mime = S.type === 'jpg' ? 'image/jpeg' : 'image/png', blob = await renderBlob(mime);
+  if (!blob){ toast('No se pudo generar la imagen. Prueba con escala 1×.'); return; }
+  const name = 'numerica-' + slug(curSys().name) + '-' + fmt().id + '-' + S.seed + '.' + S.type;
+  const dl = await getDownloads();
+  if (dl && typeof dl.save === 'function'){
+    const bytes = new Uint8Array(await blob.arrayBuffer());
+    for (const data of [blob, bytes]){
+      try { await dl.save({filename: name, data}); toast('Exportado: ' + name); return; }
+      catch(err){ if (/cancel|declin|reject|denied/i.test(String(err && (err.code || err.name || err.message)))){ toast('Descarga cancelada.'); return; } }
+    }
+  }
+  if (!window.claude){
+    const u = URL.createObjectURL(blob), a = document.createElement('a'); a.href = u; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(u), 4000); toast('Exportado: ' + name); return;
+  }
+  openPreview(blob, name);
+}
+async function copyPiece(){
+  try {
+    const blob = await renderBlob('image/png');
+    await navigator.clipboard.write([new ClipboardItem({'image/png': blob})]); toast('Imagen copiada.');
+  } catch(e){ toast('Tu navegador no permite copiar aquí. Usa Exportar.'); }
+}
+
+/* ============ modal ============ */
+const modal = $('#modal'), dlg = $('#dlg'); let lastFocus = null;
+function showModal(html){ lastFocus = document.activeElement; dlg.innerHTML = html; modal.hidden = false; const f = dlg.querySelector('button, input, textarea'); f && f.focus(); }
+function closeModal(){ modal.hidden = true; dlg.innerHTML = ''; lastFocus && lastFocus.focus && lastFocus.focus(); }
+modal.addEventListener('pointerdown', e => { if (e.target === modal) closeModal(); });
+function openPreview(blob, name){
+  const url = URL.createObjectURL(blob);
+  showModal('<h3 id="dlgT">Tu pieza está lista</h3><p>Este visor no permite descargas directas. Guarda la imagen con clic derecho o pulsación larga, o cópiala.</p><div class="prev"><img alt="Pieza exportada" src="' + url + '"></div><div class="dlgrow"><span class="nm" style="margin-right:auto;font:11px var(--font-mono);color:var(--mute)">' + esc(name) + '</span><button class="btn" type="button" id="pvCopy">Copiar imagen</button><button class="btn primary" type="button" id="pvClose">Cerrar</button></div>');
+  $('#pvClose').onclick = closeModal;
+  $('#pvCopy').onclick = async () => { try { const png = blob.type === 'image/png' ? blob : await renderBlob('image/png'); await navigator.clipboard.write([new ClipboardItem({'image/png': png})]); toast('Imagen copiada.'); } catch(e){ toast('No se pudo copiar. Usa clic derecho.'); } };
+}
+let imp = {entries: [], res: null}, impAuto = '';
+function openImport(files){
+  imp = {entries: [], res: null}; impAuto = '';
+  showModal('<h3 id="dlgT">Importar sistema de diseño</h3><p>Suelta lo que exportaste del artefacto del sistema de diseño: tokens.json, tokens.css, README.md o el .zip completo. Puedes añadir un logo y fuentes en la misma tanda.</p>' +
+    '<label class="drop" id="drop" tabindex="0">Arrastra archivos o <u>elígelos</u><small>.zip .json .css .md .svg .png .woff2 .ttf</small><input type="file" id="impFile" multiple hidden accept=".zip,.json,.css,.md,.txt,.svg,.png,.jpg,.jpeg,.webp,.woff,.woff2,.ttf,.otf"></label>' +
+    '<label for="impPaste">O pega JSON o CSS</label><textarea id="impPaste" rows="4" placeholder=\'{"color":{"tokens":[…]}}  o  :root{--ink:#111;…}\'></textarea>' +
+    '<div id="impReport" aria-live="polite"></div>' +
+    '<div class="dlgrow"><input type="text" id="impName" placeholder="Nombre del sistema" autocomplete="off"><button class="btn" type="button" id="impClear">Limpiar</button><button class="btn" type="button" id="impCancel">Cancelar</button><button class="btn primary" type="button" id="impOk" disabled>Añadir sistema</button></div>');
+  const drop = $('#drop'), inp = $('#impFile');
+  drop.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); inp.click(); } });
+  inp.onchange = () => addImportFiles(inp.files).then(() => { inp.value = ''; });
+  ['dragenter', 'dragover'].forEach(ev => dlg.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
+  dlg.addEventListener('dragleave', e => { if (!dlg.contains(e.relatedTarget)) drop.classList.remove('over'); });
+  dlg.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('over'); addImportFiles(e.dataTransfer.files); });
+  let pt = 0; $('#impPaste').addEventListener('input', () => { clearTimeout(pt); pt = setTimeout(rebuildImport, 300); });
+  $('#impClear').onclick = () => { imp.entries = []; $('#impPaste').value = ''; rebuildImport(); };
+  $('#impCancel').onclick = closeModal;
+  $('#impOk').onclick = commitImport;
+  if (files && files.length) addImportFiles(files);
+}
+async function addImportFiles(files){
+  try { imp.entries.push(...await readEntries([...files])); } catch(e){ $('#impReport').innerHTML = '<p class="err">' + esc(e.message || 'No se pudo leer el archivo.') + '</p>'; return; }
+  rebuildImport();
+}
+async function rebuildImport(){
+  const rep = $('#impReport'); if (!rep) return;
+  const entries = [...imp.entries], t = $('#impPaste').value.trim();
+  if (t) entries.push({name: 'pegado', ext: /^\s*[\[{]/.test(t) ? 'json' : /--[\w-]+\s*:/.test(t) ? 'css' : 'md', text: t});
+  const ok = $('#impOk');
+  if (!entries.length){ rep.innerHTML = ''; ok.disabled = true; imp.res = null; return; }
+  let res; try { res = await buildSystem(entries); } catch(e){ rep.innerHTML = '<p class="err">' + esc(e.message || 'No se pudo leer el contenido.') + '</p>'; ok.disabled = true; return; }
+  imp.res = res;
+  if (!res.sys){ rep.innerHTML = '<p class="err">No encontré colores en lo que cargaste. Importa el tokens.json, el tokens.css o el .zip exportado del sistema.</p>'; ok.disabled = true; return; }
+  const s = res.sys, f = sysFonts(s), nc = Object.values(s.colors)[0].length;
+  const nameEl = $('#impName'); if (!nameEl.value || nameEl.value === impAuto){ nameEl.value = s.name; impAuto = s.name; }
+  rep.innerHTML = '<div class="sw">' + swatchHTML(s, s.themes[0].id) + '</div><ul><li>' + nc + ' colores en ' + s.themes.length + (s.themes.length === 1 ? ' tema' : ' temas') + '</li><li>Tipografía: ' + esc(f.dName || 'del sistema (sin fuente detectada)') + (f.bName && f.bName !== f.dName ? ' y ' + esc(f.bName) : '') + '</li>' +
+    '<li>' + (s.radius.length ? s.radius.length + ' radios' : 'Sin radios, uso esquinas suaves') + ' · ' + (s.spacing.length ? s.spacing.length + ' espacios' : 'sin espacios, uso márgenes por defecto') + '</li>' +
+    '<li>' + (s.logo ? 'Logo detectado' : 'Sin logo, uso el nombre como marca') + (s.fontFiles.length ? ' · ' + s.fontFiles.length + ' archivos de fuente' : '') + '</li>' + res.notes.map(n => '<li>' + esc(n) + '</li>').join('') + '</ul>';
+  ok.disabled = false;
+}
+async function commitImport(){
+  if (!imp.res || !imp.res.sys) return;
+  const s = imp.res.sys; s.name = ($('#impName').value || s.name).trim().slice(0, 40) || 'Sistema importado';
+  s.kit = 'tokens'; s.info = autoInfo(s);
+  S.systems.push(s); closeModal(); await registerFontFiles(s); await selectSystem(s.id); toast('Sistema añadido: ' + s.name);
+}
+window.addEventListener('dragover', e => { if (e.dataTransfer && [...e.dataTransfer.types].includes('Files')) e.preventDefault(); });
+window.addEventListener('drop', e => {
+  if (!modal.hidden || !e.dataTransfer || !e.dataTransfer.files.length) return;
+  e.preventDefault();
+  const fs = [...e.dataTransfer.files]; if (fs.some(f => ['zip','json','css','md','txt','woff','woff2','ttf','otf'].includes(extOf(f.name)))) openImport(fs);
+});
+
+/* ============ actions + keys ============ */
+$('#bShuffle').onclick = () => newSeed(Math.random() * 1e4, Math.random() * 1e4);
+$('#bLock').onclick = () => setLock(!S.locked);
+$('#bPrev').onclick = () => step(-1);
+$('#bNext').onclick = () => step(1);
+$('#bExport').onclick = exportPiece;
+$('#bCopy').onclick = copyPiece;
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape'){ if (!modal.hidden){ closeModal(); return; } if (!exp.hidden){ closeExplore(); return; } }
+  if (!modal.hidden || !exp.hidden || e.metaKey || e.ctrlKey || e.altKey) return;
+  const tag = e.target.tagName; if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+  if (e.key === ' ' && (tag === 'BUTTON' || tag === 'A')) return;
+  if (e.key === ' '){ e.preventDefault(); setLock(!S.locked); }
+  else if (e.key === 'r' || e.key === 'R') newSeed(Math.random() * 1e4, Math.random() * 1e4);
+  else if (e.key === 'ArrowLeft') step(-1);
+  else if (e.key === 'ArrowRight') step(1);
+  else if (e.key === 'e' || e.key === 'E') exportPiece();
+  else if (e.key === 't' || e.key === 'T'){ S.tb.open = !S.tb.open; applyTb(); persist(); }
+});
+document.addEventListener('pointerup', e => { const b = e.target.closest && e.target.closest('button'); if (b && e.pointerType !== 'touch') setTimeout(() => b.blur(), 0); });
+
+/* ============ boot ============ */
+renderSelect(); renderBrief(); renderThemeSeg(); renderElements(); renderFormats(); applyTb(); setLock(false);
+pushSeed(S.seed);
+if (location.hash === '#explorar') openExplore();
+Suite.init({app: 'numerica', gate: true, onUser: onUser, onLogout: onLogout});
+applyTb();
+(async () => {
+  const sys = curSys();
+  await registerFontFiles(sys);
+  await Promise.race([ensureFonts(sys), new Promise(r => setTimeout(r, 3500))]);
+  render(); refreshLogo();
+})();
+})();
+</script>
+</body>
+</html>
