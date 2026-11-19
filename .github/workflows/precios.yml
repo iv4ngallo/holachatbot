@@ -20,6 +20,10 @@ on:
         description: 'Simulación: no escribe en la base de datos'
         type: boolean
         default: true
+      sonda:
+        description: 'Solo sondear qué sitios responden (no recolecta precios). Cadenas: ver "cadenas"; vacío = todas las candidatas'
+        type: boolean
+        default: false
       debug:
         description: 'Guardar respuestas y capturas para revisar (artefacto)'
         type: boolean
@@ -50,7 +54,13 @@ jobs:
         run: npm test
       - name: Instalar Chromium
         run: npx playwright install --with-deps chromium
+      - name: Sonda de sitios
+        if: github.event_name == 'workflow_dispatch' && inputs.sonda
+        env:
+          CADENAS: ${{ inputs.cadenas }}
+        run: node src/sonda.mjs
       - name: Recolectar precios
+        if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.sonda) }}
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}

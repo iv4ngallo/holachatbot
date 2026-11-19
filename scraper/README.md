@@ -20,6 +20,26 @@ La columna `ciudad_del_sitio` dice `Ibagué` solo si el texto de la página lo m
 - **D1:** API pública de catálogo de VTEX (`/api/catalog_system/pub/products/search?ft=…`) y, si no responde, la búsqueda del sitio. Sin filtro de ciudad.
 - **Bloqueos:** tras 3 respuestas 403/429 seguidas hace una pausa de 60 s y abre una sesión nueva; si vuelve a fallar, detiene la cadena. Con una corrida incompleta solo se reemplazan las ofertas de los productos obtenidos.
 
+## Otras cadenas de Ibagué (por confirmar)
+
+Olímpica, Jumbo, Makro, Mercacentro y Ara están registradas con un adaptador VTEX genérico, **sin confirmar**. Para saber cuáles responden: Actions → Run workflow → marca **sonda** (deja `cadenas` vacío). Genera `debug/sonda/sonda.json` y una captura por sitio: estado, si hay antibots, si es VTEX, si responde la API de catálogo y la de regiones.
+
+## Correr Éxito en tu computador
+
+Cloudflare bloquea las IP de GitHub, pero normalmente deja pasar una IP residencial. Necesitas Node 20+.
+
+```
+git pull
+cd scraper
+npm install && npx playwright install chromium
+# 1) simulación con ventana visible
+HEADLESS=0 DRY_RUN=1 DEBUG=1 CADENAS=exito CATEGORIA=lacteos LIMITE=5 node src/run.mjs
+# 2) corrida real que escribe en Supabase (clave de servicio solo en tu terminal, nunca en el repo)
+SUPABASE_URL=https://xxfjujppcjiatgfojbvq.supabase.co SUPABASE_SERVICE_ROLE_KEY=... CADENAS=exito node src/run.mjs
+```
+
+En Windows (PowerShell) usa `$env:CADENAS='exito'; node src/run.mjs`. Si aparece la verificación "Verifique que es un ser humano", con `HEADLESS=0` puedes marcarla tú una vez en la ventana.
+
 ## Historial de precios
 
 Cada corrida deja tres cosas en Supabase:

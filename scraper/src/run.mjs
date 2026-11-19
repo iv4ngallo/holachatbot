@@ -190,9 +190,9 @@ async function main() {
   console.log(`Productos: ${productos.length} · Cadenas: ${ids.join(', ')} · ${DRY || !db ? 'SIMULACIÓN (no escribe)' : 'escribe en Supabase'}${DEBUG ? ' · DEBUG' : ''}`);
 
   const { chromium } = await import('playwright');
-  const browser = await chromium.launch();
+  const browser = await chromium.launch({ headless: env.HEADLESS !== '0' }); // HEADLESS=0: ventana visible (útil en tu computador)
   const ctx = await browser.newContext({ userAgent: UA, locale: 'es-CO', timezoneId: 'America/Bogota', viewport: { width: 1366, height: 900 } });
-  let hayError = false;
+  let hayError = false, hayExito = false;
 
   for (const id of ids) {
     const ad = ADAPTADORES[id];
@@ -203,6 +203,7 @@ async function main() {
     const resumen = `${filas.length} ofertas, ${conPrecio} de ${consultados} productos consultados con precio${bloqueada ? ' (el sitio bloqueó las consultas; quedaron productos sin consultar)' : ''}; ciudad del sitio: ${ciudadSitio}`;
     console.log(`-> ${resumen}`);
     if (bloqueada) hayError = true;
+    if (filas.length) hayExito = true;
     if (!db) continue;
     if (filas.length) {
       // Historial (solo cambios) + foto actual. Con corrida incompleta solo se reemplazan los productos obtenidos.
@@ -212,11 +213,12 @@ async function main() {
     } else {
       const motivo = bloqueada ? 'El sitio bloqueó las consultas automáticas (protección antibots).' : 'La última ejecución no obtuvo productos (el sitio cambió o bloqueó la consulta).';
       await db.actualizarCadena(ad.id, { estado: 'sin_dato', motivo, consultado_en: new Date().toISOString() });
-      hayError = true;
     }
   }
   await browser.close();
-  if (hayError) process.exitCode = 1;
+  // Una cadena bloqueada no tumba la corrida si otra sí entregó datos; solo falla si ninguna lo hizo.
+  if (!hayExito || ids.some((i) => !ADAPTADORES[i])) process.exitCode = 1;
+  else if (hayError) console.log('\nAviso: alguna cadena quedó incompleta o bloqueada (ver arriba).');
 }
 
 main().catch((e) => { console.error(e); process.exit(1); });

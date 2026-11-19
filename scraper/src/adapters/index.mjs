@@ -23,6 +23,30 @@ export async function regionVtex(page, base, cp = CP_IBAGUE) {
   }, { base, cp });
 }
 
+// Tienda VTEX genérica: API pública de catálogo y, si no responde, la búsqueda del sitio.
+// Las cadenas de abajo (olimpica…ara) aún NO están confirmadas: corre la sonda (src/sonda.mjs) para ver cuáles responden.
+export function vtex(id, nombre, base) {
+  return {
+    id, nombre, base, inicio: `${base}/`,
+    async preparar(page) {
+      const r = await regionVtex(page, base);
+      return { detalle: `regiones: estado ${r.estado}, ${r.n} resultado(s); ciudad sin verificar` };
+    },
+    apiUrls: (t) => [`${base}/api/catalog_system/pub/products/search?ft=${q(t)}&_from=0&_to=23`],
+    urlsBusqueda: (t) => [`${base}/${q(t)}?_q=${q(t)}&map=ft`],
+  };
+}
+
+export const CANDIDATAS = {
+  olimpica: ['Olímpica', 'https://www.olimpica.com'],
+  jumbo: ['Jumbo', 'https://www.jumbocolombia.com'],
+  makro: ['Makro', 'https://www.makro.com.co'],
+  mercacentro: ['Mercacentro', 'https://www.mercacentro.com'],
+  ara: ['Ara', 'https://www.ara.com.co'],
+  alkosto: ['Alkosto', 'https://www.alkosto.com'],
+  carulla: ['Carulla', 'https://www.carulla.com'],
+};
+
 export const ADAPTADORES = {
   exito: {
     id: 'exito',
@@ -58,4 +82,5 @@ export const ADAPTADORES = {
     apiUrls: (t) => [`https://www.d1.com.co/api/catalog_system/pub/products/search?ft=${q(t)}&_from=0&_to=23`],
     urlsBusqueda: (t) => [`https://www.d1.com.co/${q(t)}?_q=${q(t)}&map=ft`],
   },
+  ...Object.fromEntries(['olimpica', 'jumbo', 'makro', 'mercacentro', 'ara'].map((id) => [id, vtex(id, CANDIDATAS[id][0], CANDIDATAS[id][1])])),
 };
