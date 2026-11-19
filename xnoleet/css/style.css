@@ -183,3 +183,7 @@ footer a{color:var(--tx);text-decoration-color:var(--g);text-decoration-thicknes
   html{scroll-behavior:auto}
   .rv{opacity:1;transform:none;transition:none}
 }
+
+/* Lista de respaldo de la obra: se ve solo si JavaScript no corre; main.js la reemplaza por la cuadrícula */
+.obra-ssr { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.obra-ssr li { padding: 12px 0; border-top: 1px solid currentColor; }

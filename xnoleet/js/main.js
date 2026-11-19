@@ -702,6 +702,7 @@
     });
   }
 
+  grid.innerHTML = ''; // reemplaza la lista estática de respaldo (legible sin JavaScript)
   PIEZAS.forEach(function (p, i) {
     var b = document.createElement('button');
     b.type = 'button'; b.className = 'card rv'; b.dataset.i = i; b.dataset.s = p.s;

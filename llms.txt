@@ -1,0 +1,20 @@
+# holaibague.co
+
+> Sitios personales y profesionales de Iván Gallo y xNoleet, alojados bajo holaibague.co. Contenido en español de Colombia; el perfil de Iván Gallo y sus entradas también pueden estar en inglés.
+
+## Iván Gallo
+- [Perfil profesional](https://holaibague.co/ivangallo/): Consultor estratégico y administrador de proyectos en tecnología, producto digital y Go-To-Market. Cronología desde 2006, resumen, proyectos y contacto, en español e inglés. Incluye dos perfiles (Estrategia y Diseño) y la opción de descargar el CV.
+- [Blog](https://holaibague.co/ivangallo/blog/): Notas sobre estrategia, administración de proyectos y producto. Fuente RSS: https://holaibague.co/ivangallo/blog/feed.xml
+
+## Entradas recientes del blog
+<!-- BLOG:LIST -->
+(Aún no hay entradas publicadas.)
+<!-- /BLOG:LIST -->
+
+## xNoleet
+- [Portafolio](https://holaibague.co/xnoleet/): Artista gráfico. Obra en series (Trama, Círculo, Estructura, Tipografía) y laboratorio de experimentos.
+- [Laboratorio x-periment-41](https://holaibague.co/xnoleet/lab/): Experimentos 3D, juegos e interfaces: Laberinto de Lava 3D, La Colmena, Pirata en Relieve, Planta Neón 3D, Cueva de Amatista y Mapa de Counters (grafo 3D de héroes de Overwatch 2).
+
+## Notas para agentes
+- No hay APIs públicas. El contenido está en las páginas HTML.
+- Sky Port (/skyport/) y la administración del blog son privados y no deben rastrearse.
