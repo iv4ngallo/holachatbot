@@ -405,7 +405,53 @@ label.f textarea{min-height:76px;resize:vertical}
 #splash.ready #go{animation:none!important}
 #core *{animation:none!important}
 @media (prefers-reduced-motion:reduce){#spWarp{display:none}}
-</style></head>
+</style><link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#020718">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Sky Port">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<style>
+#ins{position:fixed;left:50%;bottom:calc(18px + var(--sab,0px));z-index:40;width:min(440px,calc(100vw - 24px));transform:translate(-50%,24px);opacity:0;pointer-events:none;transition:opacity .45s ease,transform .45s cubic-bezier(.2,.7,.2,1);background:linear-gradient(180deg,rgba(6,20,78,.96),rgba(2,8,34,.98));border:1px solid rgba(120,155,255,.32);border-top:2px solid #FFC700;clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,16px 100%,0 calc(100% - 16px));padding:14px 16px 14px 14px;display:flex;gap:12px;align-items:center;font-family:'Barlow',system-ui,sans-serif;color:#F4F7FF}
+#ins.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+#ins img{width:44px;height:44px;flex:none}
+#ins .tx{flex:1;min-width:0}
+#ins b{display:block;font:800 15px/1.1 'Barlow Condensed','Barlow',sans-serif;letter-spacing:.14em;text-transform:uppercase}
+#ins span{display:block;margin-top:4px;font-size:12px;line-height:1.35;color:#8FA3D9}
+#ins .bt{display:flex;flex-direction:column;gap:6px;flex:none}
+#ins button{all:unset;box-sizing:border-box;cursor:pointer;text-align:center;font:800 12px/1 'Barlow Condensed','Barlow',sans-serif;letter-spacing:.18em;text-transform:uppercase;padding:9px 12px}
+#ins #insGo{background:#FFC700;color:#02081f}#ins #insGo:hover,#ins #insGo:focus-visible{background:#fff}
+#ins #insNo{color:#8FA3D9}#ins #insNo:hover,#ins #insNo:focus-visible{color:#fff}
+@media (prefers-reduced-motion:reduce){#ins{transition:none}}
+</style>
+<script>
+(function(){
+ if('serviceWorker' in navigator)addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})});
+ var KEY='skyport.pwa.no',dp=null,box=null,shown=false;
+ function st(){return matchMedia('(display-mode: standalone)').matches||navigator.standalone===true}
+ function muted(){try{var t=+localStorage.getItem(KEY);return t&&Date.now()-t<3*864e5}catch(e){return false}}
+ function hide(rem){if(box)box.classList.remove('on');if(rem){try{localStorage.setItem(KEY,String(Date.now()))}catch(e){}}}
+ function build(ios){
+  if(box)return;box=document.createElement('div');box.id='ins';box.setAttribute('role','dialog');box.setAttribute('aria-label','Instalar la aplicación');
+  box.innerHTML='<img src="icon-192.png" alt="" width="44" height="44"><div class="tx"><b>Instalar Sky Port</b><span>'+(ios?'Toca Compartir y luego "Añadir a pantalla de inicio" para usarla como app.':'Instálala como app para abrirla más rápido y en pantalla completa.')+'</span></div><div class="bt">'+(ios?'':'<button type="button" id="insGo">Instalar</button>')+'<button type="button" id="insNo">'+(ios?'Entendido':'Ahora no')+'</button></div>';
+  document.body.appendChild(box);
+  var go=box.querySelector('#insGo');
+  if(go)go.addEventListener('click',function(){if(!dp)return;var p=dp;dp=null;hide(false);p.prompt();p.userChoice.then(function(c){if(c.outcome!=='accepted')hide(true)}).catch(function(){})});
+  box.querySelector('#insNo').addEventListener('click',function(){hide(true)});
+ }
+ function show(ios){if(shown||st()||muted())return;shown=true;build(ios);setTimeout(function(){box.classList.add('on')},1800)}
+ addEventListener('beforeinstallprompt',function(e){e.preventDefault();dp=e;function go(){show(false)}document.body?go():addEventListener('DOMContentLoaded',go)});
+ addEventListener('appinstalled',function(){dp=null;hide(false);shown=true});
+ addEventListener('DOMContentLoaded',function(){
+  var ua=navigator.userAgent,ios=/iphone|ipad|ipod/i.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  if(ios&&!st())show(true);
+ });
+})();
+</script>
+</head>
 <body>
 <canvas id="sky" aria-hidden="true"></canvas>
 <div id="aur" aria-hidden="true"><i class="a1"></i><i class="a2"></i><i class="r1"></i><i class="g1"></i></div>
