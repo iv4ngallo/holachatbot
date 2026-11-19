@@ -1084,19 +1084,6 @@ function loopState(h){
   return [{k:'Señal',ok:!!(h.place||h.cue)&&!!(h.time||anch)},{k:'Anhelo',ok:!!(h.want||h.benefit||h.group)},{k:'Respuesta',ok:!!(h.twoMin||h.prep)},{k:'Recompensa',ok:!!h.reward}];
 }
 const loopHtml=h=>`<div class="loop" aria-label="Bucle del hábito">${loopState(h).map(x=>`<span class="lp ${x.ok?'on':''}" title="${x.ok?'Completo':'Por completar'}">${x.k}</span>`).join('')}</div>`;
-function habitIssues(h){
-  if(h.kind==='fijo'||h.archived)return [];
-  const out=[];
-  if(h.type==='pos'){
-    if(!hIds(h).length)out.push({k:'R1',t:'Este hábito todavía no vota por ninguna identidad. ¿A cuál lo conectamos?'});
-    if(!h.time&&!stackedIds().has(h.id))out.push({k:'R2a',t:'Dale una señal: una hora fija o un hábito de tu día al que pegarlo.'});
-    if(!h.place)out.push({k:'R2',t:'Ya sabemos cuándo. ¿Y dónde? Entre más claro, más fácil arrancar.'});
-    if(!h.twoMin)out.push({k:'R4',t:'Arranquemos en chiquito: ¿cuál es la versión de 2 minutos? Primero aparecer, después mejorar.'});
-    if(!h.showCal&&!stackedIds().has(h.id))out.push({k:'V',t:'Para marcarlo cada día, muéstralo en el calendario o ponlo en una cadena.'});
-  }
-  if(h.type==='neg'&&!(h.hide||h.reframe||h.friction||contractFor(h.id)))out.push({k:'R10',t:'¿Qué ganas al evitarlo? Escríbelo y te lo recordamos en tu zona de riesgo.'});
-  return out;
-}
 
 /* --- Señales y sugerencias para Inicio --- */
 function signals(items,k){
@@ -1493,14 +1480,13 @@ function habitRow(h){
   const ids=hIds(h).map(stmtById).filter(Boolean);
   const end=h.time&&h.duration?fromMin(toMin(h.time)+h.duration):'';
   const reps=fijo?0:repsFor(h);
-  const iss=habitIssues(h);
   return `<div class="hrow ${h.archived?'arch':''}">
     <span class="badge ${fijo?'fijo':h.type}" title="${fijo?'Evento fijo':TYPE[h.type].label}">${fijo?ic('pin'):TYPE[h.type].sym}</span>
     <div class="hmain"><div class="hname">${esc(h.name)}${h.archived?' <span class="tag gray">Pausado</span>':''}${h.exp&&!h.archived?' <span class="tag yl">Experimento</span>':''}</div>
       <div class="hmeta"><span>${ic('clock')}${h.time?esc(h.time)+(fijo&&end?'–'+end:''):'Sin hora'}${h.duration&&!fijo?' · '+h.duration+' min':''}</span><span>${ic('cal')}${fmtDays(h.days)}</span>${h.place?`<span>${ic('pin')}${esc(h.place)}</span>`:''}${ids.map(s=>`<span class="tag">${esc(s.text)}</span>`).join('')}</div>
       ${!fijo?loopHtml(h):''}
       ${h.type==='pos'&&(h.twoMin||h.level>1)?`<div class="hmini"><b>Nivel ${h.level}:</b> ${esc(levelText(h))}</div>`:''}
-      ${iss.length?`<div class="issue">${ic('alert')}<span>${esc(iss[0].t)}${iss.length>1?` (y ${iss.length-1} más)`:''}</span></div>`:''}</div>
+      </div>
     <div class="hside">${reps?`<span class="tag gray" title="Repeticiones acumuladas">${reps} ${reps===1?'repetición':'repeticiones'}</span>`:''}${st&&st.state==='rescue'?'<span class="tag red">Modo rescate</span>':''}${st&&st.streak?`<span class="streak" title="Racha tolerante: se rompe con dos fallos seguidos">${ic('flame')}${st.streak}</span>`:''}${h.showCal?`<span class="muted" title="Se muestra en el calendario">${ic('eye')}</span>`:''}</div>
     <div class="acts">${!fijo?(lk('ficha')?`<button class="icon-btn is-lk" data-act="locked" data-f="ficha" aria-label="Ficha de diseño, bloqueada" title="${esc(lockedMsg('ficha'))}">${ic('lock')}</button>`:`<button class="icon-btn" data-act="open-ficha" data-id="${h.id}" aria-label="Ficha de diseño" title="Ficha de diseño">${ic('target')}</button>`):''}<button class="icon-btn" data-act="edit-habit" data-id="${h.id}" aria-label="Editar">${ic('edit')}</button><button class="icon-btn del" data-act="del-habit" data-id="${h.id}" aria-label="Eliminar">${ic('trash')}</button></div>
   </div>`;
