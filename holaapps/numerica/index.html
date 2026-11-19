@@ -97,21 +97,33 @@ input[type=range]{width:100%;accent-color:var(--signal)}
 .tag{font:500 10px var(--font-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mute);border:1px solid var(--line);border-radius:999px;padding:0 8px}
 
 /* toolbox flotante */
-#tb{position:fixed;top:64px;left:auto;right:24px;width:340px;max-height:calc(100svh - 76px);display:flex;flex-direction:column;background:var(--raised);border-radius:var(--r-lg);box-shadow:var(--shadow);z-index:6;overflow:hidden}
+#tb{position:fixed;top:64px;left:auto;right:24px;width:auto;max-height:calc(100svh - 76px);display:flex;flex-direction:row;align-items:stretch;background:var(--raised);border-radius:var(--r-lg);box-shadow:var(--shadow);z-index:6;overflow:hidden}
 #tb[data-pos="left"]{left:24px;right:auto}
+#tb[data-pos="right"]{flex-direction:row-reverse}
 #tb.dragging{transition:none;opacity:.94}
-.tbhead{display:flex;align-items:center;gap:6px;padding:10px 10px 8px 16px;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
-#tb.dragging .tbhead{cursor:grabbing}
-.tbhead .pill{margin-right:auto}
-.tbbtn{width:32px;height:32px;border-radius:50%;border:0;background:var(--panel);display:grid;place-items:center;flex:none;padding:0}
+.tbrail{width:56px;flex:none;display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 0;background:var(--panel);cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
+#tb.dragging .tbrail{cursor:grabbing}
+.tbbtn{width:36px;height:36px;border-radius:50%;border:0;background:var(--raised);display:grid;place-items:center;flex:none;padding:0}
 .tbbtn:hover,.tbbtn[aria-pressed="true"]{background:var(--bar);color:var(--bar-ink)}
 .tbbtn svg{width:16px;height:16px}
-.tbtabs{display:flex;flex-wrap:wrap;gap:5px;padding:0 12px 8px}
-.tab{border:1.5px solid var(--line);background:none;border-radius:999px;padding:2px 12px;font:700 13px var(--font-ui);text-transform:uppercase;letter-spacing:.07em}
-.tab:hover{border-color:var(--ink)}
-.tab[aria-selected="true"]{background:var(--bar);color:var(--bar-ink);border-color:var(--bar)}
+.tbbtn svg.rot{transition:transform .2s}
+.tbsep{width:24px;height:1.5px;background:var(--line);margin:4px 0;flex:none}
+.tbtabs{display:flex;flex-direction:column;align-items:center;gap:6px}
+.tab{width:40px;height:40px;border:0;background:none;border-radius:50%;display:grid;place-items:center;padding:0;color:var(--ink)}
+.tab svg{width:20px;height:20px}
+.tab:hover{background:var(--raised)}
+.tab[aria-selected="true"]{background:var(--bar);color:var(--bar-ink)}
+.tbpanel{width:300px;display:flex;flex-direction:column;min-height:0;min-width:0}
+.tbhead{padding:14px 16px 8px}
 .tbbody{overflow:auto;padding:4px 16px 18px;flex:1;min-height:0}
-#tb.min .tbtabs,#tb.min .tbbody{display:none}
+#tb.min .tbpanel{display:none}
+.fmenu{position:relative;flex:none}
+.fmbtn{display:inline-flex;align-items:center;gap:8px;border:1.5px solid var(--line);background:none;border-radius:999px;padding:4px 14px 4px 10px;font:700 13px var(--font-ui);text-transform:uppercase;letter-spacing:.07em;color:var(--ink)}
+.fmbtn svg{width:16px;height:16px}
+.fmbtn:hover,.fmbtn[aria-expanded="true"]{border-color:var(--ink)}
+.fmbtn[aria-expanded="true"]{background:var(--bar);color:var(--bar-ink);border-color:var(--bar)}
+.fmpop{position:absolute;right:0;top:calc(100% + 8px);width:340px;max-width:calc(100vw - 16px);max-height:calc(100svh - 120px);overflow:auto;background:var(--raised);border-radius:var(--r-lg);box-shadow:var(--shadow);padding:16px;z-index:9}
+.fmpop[hidden]{display:none}
 .h2{font:600 12px var(--font-ui);letter-spacing:.09em;text-transform:uppercase;color:var(--mute);margin:0 0 8px}
 .selwrap{position:relative;display:block}
 .selwrap select{appearance:none;-webkit-appearance:none;width:100%;background:var(--bar);color:var(--bar-ink);border:0;padding:10px 40px 10px 18px;font:700 15px var(--font-ui);text-transform:uppercase;letter-spacing:.08em;cursor:pointer;border-radius:999px}
@@ -227,9 +239,12 @@ input[type=range]{width:100%;accent-color:var(--signal)}
   .app{height:auto}
   .stagecol{position:static;display:block;margin:0 8px 8px;padding-bottom:0}
   .stage{height:62svh;padding:0}
-  #tb,#tb[data-pos]{position:fixed;left:8px;right:8px;top:auto;bottom:8px;width:auto;max-height:52svh;border-radius:var(--r-lg)}
-  .tbhead{cursor:default}
+  #tb,#tb[data-pos]{position:fixed;left:auto;right:8px;top:auto;bottom:8px;max-height:72svh;border-radius:var(--r-lg);flex-direction:row-reverse}
+  .tbrail{cursor:default}
+  .tbpanel{width:calc(100vw - 88px)}
   #tb .tbbtn.posbtn{display:none}
+  .stagecol{margin-right:72px!important}
+  .fmbtn span{display:none}.fmbtn{padding:4px 9px}
   .xcard{padding:18px}
 }
 @media (prefers-reduced-motion:reduce){.state .dot{animation:none!important}#toast,.stage{transition:none}}
@@ -239,6 +254,22 @@ input[type=range]{width:100%;accent-color:var(--signal)}
 <header class="top">
   <div class="brand"><span class="wm">Numérica</span></div>
   <div class="keys" aria-hidden="true"><span><kbd>F</kbd> fijar</span><span><kbd>R</kbd> mezclar</span><span><kbd>←</kbd><kbd>→</kbd> historial</span><span><kbd>E</kbd> exportar</span><span><kbd>⌘/Ctrl S</kbd> guardar</span><span><kbd>T</kbd> toolbox</span></div>
+  <div class="fmenu" id="fMenu">
+    <button class="fmbtn" type="button" id="fmBtn" aria-haspopup="true" aria-expanded="false" aria-controls="fmPop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Archivos</span></button>
+    <div class="fmpop" id="fmPop" hidden role="dialog" aria-label="Archivos">
+      <div id="fmBody">
+        <div class="h2">Archivo actual</div>
+        <div class="curfile" id="curFile"></div>
+        <div class="btnrow"><button class="btn sm" type="button" id="fNew">Nuevo</button><button class="btn primary sm" type="button" id="fSave">Guardar…</button><button class="btn sm" type="button" id="fSaveAs">Guardar como…</button><button class="btn sm ghost" type="button" id="fOpenDisk">Abrir del equipo</button></div>
+        <input type="file" id="inFile" accept=".json,application/json" multiple hidden>
+        <div class="h2" style="margin-top:16px">Mis archivos <span id="fCount"></span></div>
+        <input type="text" id="fFilter" placeholder="Buscar…" aria-label="Buscar archivos">
+        <div class="files" id="fileList"></div>
+        <p class="note" id="fWhere" style="margin-top:10px"></p>
+      </div>
+    </div>
+  </div>
+
 </header>
 <div class="app">
   <main class="stagecol">
@@ -262,20 +293,21 @@ input[type=range]{width:100%;accent-color:var(--signal)}
   </main>
 
   <aside id="tb" data-pos="right" aria-label="Toolbox">
-    <div class="tbhead" id="tbHead">
-      <span class="pill">Toolbox</span>
+    <div class="tbrail" id="tbHead">
+      <button class="tbbtn" type="button" id="tbMin" aria-label="Contraer toolbox" aria-expanded="true" title="Contraer (T)"><svg class="rot" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3l5 5-5 5"/></svg></button>
       <button class="tbbtn posbtn" type="button" id="tbPos" aria-label="Cambiar posición del toolbox" title="Posición: derecha"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="1.5" y="2.5" width="13" height="11" rx="2"/><path d="M10 2.5v11" /></svg></button>
-      <button class="tbbtn" type="button" id="tbMin" aria-label="Contraer toolbox" aria-expanded="true" title="Contraer (T)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 10l5-5 5 5"/></svg></button>
+      <div class="tbsep"></div>
+      <div class="tbtabs" role="tablist" aria-orientation="vertical" id="tbTabs">
+        <button class="tab" role="tab" data-t="sys" type="button" aria-label="Sistema" title="Sistema"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="8.5" cy="10" r="1.3" fill="currentColor"/><circle cx="12" cy="7.5" r="1.3" fill="currentColor"/><circle cx="15.5" cy="10" r="1.3" fill="currentColor"/><path d="M12 21c-2 0-2-2.2-.6-3.2 1.2-.9.8-2.3 2.4-2.3H17"/></svg></button>
+        <button class="tab" role="tab" data-t="el" type="button" aria-label="Elementos" title="Elementos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3l4 7H3z"/><circle cx="17" cy="7" r="4"/><rect x="4" y="14" width="7" height="7" rx="1"/><path d="M14 14l7 7M21 14l-7 7"/></svg></button>
+        <button class="tab" role="tab" data-t="fmt" type="button" aria-label="Formato" title="Formato"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 7h6M9 11h6" opacity=".6"/></svg></button>
+        <button class="tab" role="tab" data-t="txt" type="button" aria-label="Contenido" title="Contenido"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 6V4h14v2M12 4v16M9 20h6"/></svg></button>
+        <button class="tab" role="tab" data-t="img" type="button" aria-label="Imagen" title="Imagen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.8"/><path d="M3 17l5-4 4 3 3-2 6 4"/></svg></button>
+        <button class="tab" role="tab" data-t="out" type="button" aria-label="Salida" title="Salida"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M4 20h16"/></svg></button>
+      </div>
     </div>
-    <div class="tbtabs" role="tablist" id="tbTabs">
-      <button class="tab" role="tab" data-t="sys" type="button">Sistema</button>
-      <button class="tab" role="tab" data-t="el" type="button">Elementos</button>
-      <button class="tab" role="tab" data-t="fmt" type="button">Formato</button>
-      <button class="tab" role="tab" data-t="txt" type="button">Contenido</button>
-      <button class="tab" role="tab" data-t="img" type="button">Imagen</button>
-      <button class="tab" role="tab" data-t="out" type="button">Salida</button>
-      <button class="tab" role="tab" data-t="files" type="button">Archivos</button>
-    </div>
+    <div class="tbpanel">
+    <div class="tbhead"><span class="pill" id="tbTitle">Sistema</span></div>
     <div class="tbbody">
       <section data-p="sys">
         <div class="h2">Sistema de diseño</div>
@@ -335,16 +367,7 @@ input[type=range]{width:100%;accent-color:var(--signal)}
         <label>Posición del toolbox</label>
         <div class="seg" id="segPos"></div>
       </section>
-      <section data-p="files" hidden>
-        <div class="h2">Archivo actual</div>
-        <div class="curfile" id="curFile"></div>
-        <div class="btnrow"><button class="btn sm" type="button" id="fNew">Nuevo</button><button class="btn primary sm" type="button" id="fSave">Guardar…</button><button class="btn sm" type="button" id="fSaveAs">Guardar como…</button><button class="btn sm ghost" type="button" id="fOpenDisk">Abrir del equipo</button></div>
-        <input type="file" id="inFile" accept=".json,application/json" multiple hidden>
-        <div class="h2" style="margin-top:16px">Mis archivos <span id="fCount"></span></div>
-        <input type="text" id="fFilter" placeholder="Buscar…" aria-label="Buscar archivos">
-        <div class="files" id="fileList"></div>
-        <p class="note" id="fWhere" style="margin-top:10px"></p>
-      </section>
+    </div>
     </div>
   </aside>
 </div>
@@ -1583,24 +1606,27 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden) star
 
 /* ============ toolbox flotante ============ */
 const barH = () => document.querySelector('.suite-bar') ? 44 : 0;
-const tb = $('#tb'), mobileQ = () => window.innerWidth <= 860, TBW = 340;
+const tb = $('#tb'), mobileQ = () => window.innerWidth <= 860, TBW = 356, RAILW = 56, TABNAMES = {sys: 'Sistema', el: 'Elementos', fmt: 'Formato', txt: 'Contenido', img: 'Imagen', out: 'Salida'};
 function applyTb(){
   const open = S.tb.open, mob = mobileQ();
-  tb.classList.toggle('min', !open); tb.dataset.pos = S.tb.pos;
-  $('#tbMin').setAttribute('aria-expanded', String(open)); $('#tbMin').firstElementChild.style.transform = open ? '' : 'rotate(180deg)';
-  $('#tbMin').title = open ? 'Contraer (T)' : 'Expandir (T)';
+  tb.classList.toggle('min', !open);
+  if (!TABNAMES[S.tb.tab]) S.tb.tab = 'sys';
+  const effPos = mob ? 'right' : S.tb.pos; tb.dataset.pos = effPos;
+  $('#tbMin').setAttribute('aria-expanded', String(open)); $('#tbMin').firstElementChild.style.transform = ((effPos === 'right') === open) ? '' : 'rotate(180deg)';
+  $('#tbTitle').textContent = TABNAMES[S.tb.tab];
+  $('#tbMin').title = open ? 'Contraer (T)' : 'Expandir (T)'; $('#tbMin').setAttribute('aria-label', open ? 'Contraer toolbox' : 'Expandir toolbox');
   $('#tbPos').title = 'Posición: ' + ({left: 'izquierda', right: 'derecha', free: 'libre'}[S.tb.pos]);
   if (mob){ tb.style.left = tb.style.right = tb.style.top = ''; stage.style.setProperty('--tbl', '0px'); stage.style.setProperty('--tbr', '0px'); }
   else if (S.tb.pos === 'free'){
-    const x = clamp(S.tb.x, 8, Math.max(8, window.innerWidth - TBW - 8)), y = clamp(S.tb.y, 56 + barH(), Math.max(56, window.innerHeight - 90));
+    const x = clamp(S.tb.x, 8, Math.max(8, window.innerWidth - (open ? TBW : RAILW) - 8)), y = clamp(S.tb.y, 56 + barH(), Math.max(56, window.innerHeight - 90));
     tb.style.left = x + 'px'; tb.style.top = y + 'px'; tb.style.right = 'auto'; tb.style.maxHeight = 'calc(100svh - ' + (y + 12) + 'px)';
     stage.style.setProperty('--tbl', '0px'); stage.style.setProperty('--tbr', '0px');
   } else {
     tb.style.top = (64 + barH()) + 'px'; tb.style.maxHeight = 'calc(100svh - ' + (76 + barH()) + 'px)'; tb.style.left = S.tb.pos === 'left' ? '24px' : 'auto'; tb.style.right = S.tb.pos === 'right' ? '24px' : 'auto';
-    const pad = open ? (TBW + 24) + 'px' : '0px';
+    const pad = ((open ? TBW : RAILW) + 24) + 'px';
     stage.style.setProperty('--tbl', S.tb.pos === 'left' ? pad : '0px'); stage.style.setProperty('--tbr', S.tb.pos === 'right' ? pad : '0px');
   }
-  $$('#tbTabs .tab').forEach(t => t.setAttribute('aria-selected', String(t.dataset.t === S.tb.tab)));
+  $$('#tbTabs .tab').forEach(t => { const on = t.dataset.t === S.tb.tab; t.setAttribute('aria-selected', String(on)); t.tabIndex = on ? 0 : -1; });
   $$('.tbbody [data-p]').forEach(p => { p.hidden = p.dataset.p !== S.tb.tab; });
   seg($('#segPos'), [{v:'left', t:'Izquierda'}, {v:'right', t:'Derecha'}, {v:'free', t:'Libre'}], () => S.tb.pos, v => { setPos(v); });
   requestAnimationFrame(fitCanvas);
@@ -1608,6 +1634,15 @@ function applyTb(){
 function setPos(p){ S.tb.pos = p; if (p === 'free'){ const r = tb.getBoundingClientRect(); S.tb.x = r.left; S.tb.y = r.top; } applyTb(); persist(); }
 $('#tbMin').onclick = () => { S.tb.open = !S.tb.open; applyTb(); persist(); };
 $('#tbPos').onclick = () => setPos({right: 'left', left: 'free', free: 'right'}[S.tb.pos] || 'right');
+/* menú Archivos (arriba a la derecha) */
+{
+  const btn = $('#fmBtn'), pop = $('#fmPop');
+  const setFm = on => { pop.hidden = !on; btn.setAttribute('aria-expanded', String(on)); if (on) filesLoad(); };
+  btn.onclick = e => { e.stopPropagation(); setFm(pop.hidden); };
+  document.addEventListener('pointerdown', e => { if (!pop.hidden && !e.target.closest('#fMenu') && !e.target.closest('#modal')) setFm(false); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !pop.hidden && $('#modal').hidden){ setFm(false); btn.focus(); } });
+  window.openFilesMenu = () => setFm(true);
+}
 $('#tbTabs').onclick = e => { const b = e.target.closest('.tab'); if (!b) return; S.tb.tab = b.dataset.t; if (!S.tb.open) S.tb.open = true; applyTb(); persist(); };
 { /* arrastrar el toolbox por la cabecera; al soltarlo cerca de un borde se acopla */
   let drag = null;
