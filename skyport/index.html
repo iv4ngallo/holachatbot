@@ -346,9 +346,8 @@ label.f textarea{min-height:76px;resize:vertical}
 @media(max-width:820px){
  #idx{top:calc(112px + var(--sat));bottom:calc(86px + var(--sab));left:12px;right:12px;width:auto;transform:none}
  /* Con el índice abierto en móvil se oculta el fondo (estrellas, auroras y mundo 3D) */
- body.ixo{background:linear-gradient(180deg,#01040F 0%,#061246 55%,#0A1E6E 100%) fixed}
- body.ixo #sky,body.ixo #aur,body.ixo #ghost,body.ixo #gl,body.ixo #lbls,body.ixo #fx,body.ixo #lead{visibility:hidden}
- body.ixo #nx{display:none}
+ body #sky,body #aur,body #ghost,body #gl,body #lbls,body #fx,body #nx{transition:opacity .55s ease,visibility 0s}
+ body.ixo #sky,body.ixo #aur,body.ixo #ghost,body.ixo #gl,body.ixo #lbls,body.ixo #fx,body.ixo #nx{opacity:0!important;visibility:hidden;pointer-events:none;transition:opacity .55s ease,visibility 0s linear .55s}
  #idx:not(.open){display:none}
  #top{padding:calc(10px + var(--sat)) 12px 0}
  .brand h1{font-size:20px}.hz{width:28px;height:28px}
