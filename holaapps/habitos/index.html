@@ -786,7 +786,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 <div id="toast" role="status" aria-live="polite"><i></i><span></span></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="../suite/config.js?v=2"></script>
+<script src="../suite/config.js?v=3"></script>
 <script src="../suite/suite.js?v=10"></script>
 <script>
 /* ================= Utilidades ================= */
@@ -837,7 +837,7 @@ const ic=(n,cls='i')=>`<svg class="${cls}" viewBox="0 0 24 24" fill="none" strok
 
 /* ================= Estado ================= */
 let LS_KEY='habitos-atomicos-v1.invitado'; // pasa a habitos-atomicos-v1.<id de usuario> al iniciar sesión
-const emptyState=()=>({v:2,path:'',unlocked:0,first:'',identity:{now:'',future:'',statements:[]},habits:[],stacks:[],done:{},skips:{},slips:{},meta:{},card:[],contracts:[],reviews:[],dismiss:{}});
+const emptyState=()=>({v:2,path:'',unlocked:0,first:'',identity:{now:'',future:'',statements:[]},habits:[],stacks:[],done:{},skips:{},slips:{},meta:{},card:[],contracts:[],reviews:[],dismiss:{},gcal:{on:false,calId:'',last:0,map:{}}});
 const arr=x=>Array.isArray(x)?x:[];
 const sv=x=>String(x==null?'':x);
 const newHabit=o=>({id:uid(),name:'',type:'pos',kind:'habito',time:'',duration:0,days:[],identityIds:[],twoMin:'',showCal:false,notes:'',place:'',cue:'',want:'',benefit:'',group:'',prep:'',commit:'',reward:'',hide:'',reframe:'',friction:'',lvl2:'',lvl3:'',level:1,levelSince:'',suggAt:'',rewardAt:'',start:dk(new Date()),goal:'',exp:null,archived:false,...o});
@@ -861,6 +861,8 @@ function normalize(o){
   R.path=o.path==='novato'?'novato':(o.path==='full'?'full':(hasContent(R)?'full':''));
   R.unlocked=Math.max(0,Math.min(4,Math.floor(+o.unlocked)||0));
   R.first=sv(o.first);
+  const gc=(o.gcal&&typeof o.gcal==='object')?o.gcal:{};
+  R.gcal={on:!!gc.on,calId:sv(gc.calId),last:+gc.last||0,map:(gc.map&&typeof gc.map==='object')?Object.fromEntries(Object.entries(gc.map).filter(([k,m])=>m&&typeof m==='object'&&m.id).map(([k,m])=>[String(k),{id:sv(m.id),sig:sv(m.sig),dead:!!m.dead,dn:dm(m.dn,v=>!!v)}])):{}};
   return R;
 }
 const hasContent=s=>!!(s.identity.now||s.identity.future||s.identity.statements.length||s.habits.length||s.stacks.length||s.card.length);
@@ -1596,6 +1598,7 @@ function vCalendario(){
     <div class="seg"><button data-act="cal-nav" data-d="-1" aria-label="Anterior">${ic('left')}</button><button data-act="cal-today">Hoy</button><button data-act="cal-nav" data-d="1" aria-label="Siguiente">${ic('right')}</button></div>
     <h2>${mode==='week'?weekTitle(d):longDate(d).replace(/^./,c=>c.toUpperCase())}</h2>
     <div class="seg"><button class="${mode==='week'?'on':''}" data-act="cal-mode" data-m="week">Semana</button><button class="${mode==='day'?'on':''}" data-act="cal-mode" data-m="day">Día</button></div>
+    <button type="button" class="btn ghost sm" data-act="gc-open" title="Sincronizar con Google Calendar">Google Calendar</button>
   </div>
   <div class="legend"><span><i class="c-pila"></i>Cadena de hábitos</span><span><i class="c-ancla"></i>Ancla</span><span><i class="c-pos"></i>Hábito positivo</span><span><i class="c-neg"></i>Hábito negativo (zona de riesgo)</span><span><i class="c-neu"></i>Neutral</span><span><i class="c-fijo"></i>Evento fijo</span></div>
   ${mode==='day'?`<div class="daystrip">${[0,1,2,3,4,5,6].map(i=>{const x=addDays(ws,i);return `<button class="${dk(x)===dk(d)?'on':''} ${dk(x)===tk?'today':''}" data-act="cal-goday" data-date="${dk(x)}"><small>${DAYS[i]}</small><b>${x.getDate()}</b></button>`}).join('')}</div>`:''}
@@ -1959,6 +1962,7 @@ function settingsModal(){
     body:`<div class="settings-sec"><h4>Tema de color</h4><p>Cambia la paleta de toda la app.</p><button type="button" class="btn ghost sm" data-act="themes">Elegir tema</button></div>
       <div class="settings-sec"><h4>Camino de uso</h4><p>${isNov()?'Vas por el camino principiante: '+S.unlocked+' de '+UNLOCK.length+' funciones abiertas.':'Estás usando la versión full.'}</p>${isNov()?'<button type="button" class="btn ghost sm" data-act="go-full">Pasar a la versión full</button>':''}</div>
       <div class="settings-sec"><h4>Dónde se guardan tus datos</h4><p>${store.ref?'Tus datos se guardan de forma privada en tu cuenta y te siguen entre dispositivos.':'Tus datos se guardan en este navegador. Exporta un respaldo para no perderlos.'}</p></div>
+      ${window.GCal?GCal.section():''}
       <div class="settings-sec"><h4>Exportar respaldo</h4><p>Copia tus datos en formato JSON y guárdalos donde quieras.</p><div class="btns"><button type="button" class="btn ghost sm" data-act="copy-backup">Copiar respaldo</button></div><textarea id="bk-out" readonly style="display:none;margin-top:10px"></textarea></div>
       <div class="settings-sec"><h4>Restaurar respaldo</h4><p>Pega aquí un respaldo copiado antes. Reemplaza los datos actuales.</p><textarea id="bk-in" placeholder='{"v":1,...}'></textarea><div class="btns" style="margin-top:8px"><button type="button" class="btn soft sm" data-act="restore-backup">Restaurar</button></div></div>
       <div class="settings-sec"><h4>Datos de ejemplo</h4><p>Carga una rutina de ejemplo para explorar la plataforma.</p><button type="button" class="btn ghost sm" data-act="load-example">Cargar ejemplo</button></div>
@@ -2393,5 +2397,6 @@ setInterval(()=>{if(ui.view==='calendario'||ui.view==='inicio'){const m=$('#moda
 Suite.init({app:'habitos',gate:true,onUser:iniciarUsuario,onLogout:alSalir});
 Suite.addMenuItems([{label:'Ajustes y respaldo',onClick:function(){settingsModal()}}]);
 </script>
+<script src="gcal.js?v=1"></script>
 </body>
 </html>
