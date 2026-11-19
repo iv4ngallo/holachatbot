@@ -190,8 +190,10 @@ html.resume #splash{display:none}
 #idx{transition:opacity .35s ease,transform .35s ease}
 #idx:not(.open){opacity:0;pointer-events:none;transform:translateX(-24px)!important;visibility:hidden}
 .chip.on{border-color:var(--r);color:#fff;background:rgba(255,59,59,.22)}
-.ste{margin-left:auto;font:700 10px/1 var(--cond);font-style:normal;letter-spacing:.16em;padding:4px 7px;border:1px solid var(--line);color:var(--dim)}
-.chip.on .ste{border-color:var(--y);background:var(--y);color:#02081f}
+/* Botón del índice: encendido (rojo sólido) con el índice desplegado, apagado con el índice cerrado */
+#bIdx.on{background:var(--r);border-color:var(--r);color:#fff;box-shadow:0 0 14px rgba(255,59,59,.55)}
+#bIdx.on svg{color:#fff}
+#bIdx.on:hover{background:#FF5A5A}
 #legend{display:none}
 #hint{left:50%;bottom:calc(22px + var(--sab));transform:translate(-50%,14px);font:600 11px/1 var(--cond);letter-spacing:.24em;text-transform:uppercase;color:var(--dim);white-space:nowrap;text-align:center;pointer-events:none}
 body.live #hint{transform:translate(-50%,0)}
@@ -478,7 +480,7 @@ label.f textarea{min-height:76px;resize:vertical}
  </div>
 </header>
 <div id="mnu" class="hud" role="menu" aria-label="Menú principal">
-  <button class="chip" id="bIdx" type="button" aria-label="Índice" role="menuitemcheckbox" aria-checked="false"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 6h2v2H4zM9 6h11v2H9zM4 11h2v2H4zM9 11h11v2H9zM4 16h2v2H4zM9 16h11v2H9z" fill="currentColor"/></svg><span class="tx">Índice de nodos</span><i class="ste" id="bIdxS">Cerrado</i></button>
+  <button class="chip" id="bIdx" type="button" aria-label="Índice" role="menuitemcheckbox" aria-checked="false"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 6h2v2H4zM9 6h11v2H9zM4 11h2v2H4zM9 11h11v2H9zM4 16h2v2H4zM9 16h11v2H9z" fill="currentColor"/></svg><span class="tx">Índice</span></button>
   <button class="chip y" id="bAdm" type="button" role="menuitem"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M3 7h9M16 7h5M3 17h5M12 17h9" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="14" cy="7" r="2.3" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="10" cy="17" r="2.3" fill="none" stroke="currentColor" stroke-width="2"/></svg><span class="tx">Administrar</span></button>
   <div id="uRow" role="group" aria-label="Usuario"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="12" cy="8" r="4" fill="currentColor"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7z" fill="currentColor"/></svg><span id="uMail">Usuario</span><button id="bOut" type="button" aria-label="Cerrar sesión" title="Cerrar sesión"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M5 3h8v2H7v14h6v2H5zM16 7l5 5-5 5-1.4-1.4L17.2 13H9v-2h8.2l-2.6-2.6z" fill="currentColor"/></svg></button></div>
 </div>
@@ -859,7 +861,7 @@ $('#lst').addEventListener('click',function(e){var tg=e.target.closest('[data-t]
 $('#lst').addEventListener('pointerover',function(e){var b=e.target.closest('.it');hover=b?b.getAttribute('data-id'):null});
 $('#lst').addEventListener('pointerleave',function(){hover=null});
 $('#bHome').addEventListener('click',function(){if(live)goHome()});
-function idxMark(on){var b=$('#bIdx'),t=$('#bIdxS');b.classList.toggle('on',on);b.setAttribute('aria-expanded',on?'true':'false');b.setAttribute('aria-checked',on?'true':'false');b.title=on?'Ocultar índice de nodos':'Mostrar índice de nodos';if(t)t.textContent=on?'Abierto':'Cerrado'}
+function idxMark(on){var b=$('#bIdx');b.classList.toggle('on',on);b.setAttribute('aria-expanded',on?'true':'false');b.setAttribute('aria-checked',on?'true':'false');b.title=on?'Ocultar índice de nodos':'Mostrar índice de nodos'}
 function idxApply(on,fx){var a=$('#idx');if(fx){var bb=$('#bMenu');bb.classList.remove('gl');void bb.offsetWidth;bb.classList.add('gl')}a.classList.toggle('open',on);document.body.classList.toggle('ixo',on);a.setAttribute('aria-hidden',on?'false':'true');idxMark(on);if(!on&&idxEl){idxEl.classList.add('nt');setDetail(false);setTimeout(function(){idxEl.classList.remove('nt')},80)}}
 var ixBusy=false,ixShip=null,ixLas=null;
 function ixTween(ms,fn){return new Promise(function(res){var t0=performance.now();(function f(n){var p=Math.min(1,(n-t0)/ms);fn(p);if(p<1)requestAnimationFrame(f);else res()})(t0)})}
