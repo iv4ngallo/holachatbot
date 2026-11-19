@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Presupuesto Personal · Hola Apps</title>
-<meta name="description" content="Tu presupuesto mensual en pesos colombianos: ingresos, pagos, fechas y balance, mes a mes. Parte de Hola Apps.">
+<title>PlatIA · Hola Apps</title>
+<meta name="description" content="PlatIA: tu presupuesto mensual en pesos colombianos: ingresos, pagos, fechas y balance, mes a mes. Parte de Hola Apps.">
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#3D3A86">
 <link rel="stylesheet" href="../suite/suite.css?v=7">
@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Climate+Crisis&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* Presupuesto Personal · Hola Apps
+/* PlatIA · Hola Apps
    Sistema de diseño: Hola Chatbot (tokens.json). Superficies planas, sin degradados ni sombras.
    Tokens de marca: purple-primary, purple-secondary, gray-neutral, white, surface, surface-raised, ink, ink-muted,
    brand, on-brand, accent, on-accent, line, control-border, focus-ring.
@@ -77,8 +77,8 @@ body {
   margin: 0; background: var(--surface); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.6;
   padding: 0 0 var(--space-12);
 }
-.wrap { max-width: 1080px; margin: 0 auto; padding-inline: max(16px, env(safe-area-inset-left, 0px)) max(16px, env(safe-area-inset-right, 0px)); }
-.top .wrap { padding-inline: 0; }
+.wrap { max-width: 1112px; margin: 0 auto; padding-inline: max(16px, env(safe-area-inset-left, 0px)) max(16px, env(safe-area-inset-right, 0px)); }
+.top .wrap { padding-inline: 0; max-width: 1080px; }
 button, input, select { font: inherit; color: inherit; }
 button { cursor: pointer; }
 :focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 2px; }
@@ -93,7 +93,7 @@ button { cursor: pointer; }
 }
 .top .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3) var(--space-6); justify-content: space-between; }
 .brand { min-width: 0; }
-h1 { font-family: var(--font-display); font-weight: 400; font-size: 36px; line-height: 42px; margin: 0; text-transform: uppercase; overflow-wrap: anywhere; }
+h1 { font-family: var(--font-display); font-weight: 400; font-size: 36px; line-height: 42px; margin: 0; overflow-wrap: anywhere; }
 .brand small { display: block; font-weight: 400; font-size: 14px; line-height: 22px; }
 .top-ctls { display: flex; flex-wrap: wrap; gap: var(--space-3) var(--space-6); align-items: center; min-width: 0; }
 .month-ctl { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-3); align-items: center; }
@@ -406,7 +406,7 @@ body.dragging { -webkit-user-select: none; user-select: none; cursor: grabbing; 
 <header class="top">
   <div class="wrap">
     <div class="brand">
-      <h1>Presupuesto</h1>
+      <h1>PlatIA</h1>
       <small>Hola Apps · Pesos colombianos (COP)</small>
     </div>
     <div class="top-ctls">
@@ -423,7 +423,7 @@ body.dragging { -webkit-user-select: none; user-select: none; cursor: grabbing; 
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script src="../suite/config.js?v=2"></script>
-<script src="../suite/suite.js?v=7"></script>
+<script src="../suite/suite.js?v=8"></script>
 <script>
 (function () {
   "use strict";

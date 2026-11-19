@@ -1,4 +1,4 @@
-/* Hola Apps · menú de la suite (PrecIA, AgendIA, Organic, Hábitos Atómicos, Presupuesto, Numérica) y acceso compartido con Supabase.
+/* Hola Apps · menú de la suite (PrecIA, AgendIA, Organic, Hábitos Atómicos, PlatIA, Numérica) y acceso compartido con Supabase.
    Uso:  Suite.init({ app:'habitos', gate:true, onUser:function(user, sb){}, onLogout:function(){} })
    Sin gate solo se muestra el menú superior (PrecIA y Organic ya traen su propio acceso); esas apps avisan
    el usuario con Suite.setUser(user, sb) y la salida con Suite.setUser(null).
@@ -18,7 +18,7 @@
     { id: 'agendia', nombre: 'AgendIA', color: '#7B3FC4' },
     { id: 'organic', nombre: 'Organic', color: '#2c8447' },
     { id: 'habitos', nombre: 'Hábitos Atómicos', color: '#d97b2e' },
-    { id: 'presupuesto', nombre: 'Presupuesto', color: '#3D3A86' },
+    { id: 'presupuesto', nombre: 'PlatIA', color: '#3D3A86' },
     { id: 'numerica', nombre: 'Numérica', color: '#C0398B' }
   ];
   var svg = function (inner, extra) { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"' + (extra || '') + '>' + inner + '</svg>'; };
