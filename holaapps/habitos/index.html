@@ -515,6 +515,15 @@ button,input,select,textarea{font:inherit;color:inherit}
 .val-pick input:checked+span.neu{background:var(--neu);color:#fff}
 .badge.pos,.badge.neg,.badge.neu{font-weight:900}
 .chk-list{display:flex;flex-direction:column;gap:6px}
+.id-box{display:flex;flex-direction:column;gap:10px}
+.id-row{display:flex;align-items:center;gap:6px;justify-content:space-between}
+.id-row .check{flex:1;min-width:0}
+.id-row .check span{overflow-wrap:anywhere}
+.id-row .id-ed{width:32px;height:32px;flex:none}
+.id-row .id-ed:hover{background:var(--or-50,rgba(0,0,0,.05));color:var(--ink)}
+.id-edit{display:flex;flex-direction:column;gap:8px;padding:10px;border-radius:14px;background:var(--or-50,rgba(0,0,0,.03))}
+.id-edit-btns{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.id-add{align-self:flex-start}
 .more summary{cursor:pointer;font-weight:800;color:var(--or-d)}
 .ev.skip{opacity:.45;border-style:dashed}
 .ev.slip{box-shadow:inset 0 0 0 2px var(--pk)}
@@ -1645,9 +1654,38 @@ function stmtModal(s,after){
 }
 
 /* --- Hábitos --- */
-function idChecks(sel){
-  if(!S.identity.statements.length)return `<div class="hint">Aún no tienes identidades. <button type="button" class="btn soft sm" data-act="new-stmt-from-habit">Crear la primera</button></div>`;
-  return `<div class="chk-list">${S.identity.statements.map(s=>`<label class="check"><input type="checkbox" name="identityIds" value="${s.id}" ${sel.includes(s.id)?'checked':''}><span>${esc(s.text)}</span></label>`).join('')}</div>`;
+function idChecks(sel,editing){
+  editing=editing||'';
+  const st=S.identity.statements;
+  const editor=(id,val)=>`<div class="id-edit"><input class="id-inp" data-id="${id}" value="${esc(val)}" maxlength="120" placeholder="Soy una persona que…" aria-label="${id==='new'?'Nueva identidad':'Editar identidad'}"><div class="id-edit-btns"><button type="button" class="btn ghost sm" data-act="hm-id-cancel">Cancelar</button><button type="button" class="btn primary sm" data-act="hm-id-save" data-id="${id}">${ic('check')} Guardar</button></div><small class="err"></small></div>`;
+  const rows=st.map(s=>editing===s.id?editor(s.id,s.text)+(sel.includes(s.id)?`<input type="checkbox" name="identityIds" value="${s.id}" checked hidden>`:'')
+    :`<div class="id-row"><label class="check"><input type="checkbox" name="identityIds" value="${s.id}" ${sel.includes(s.id)?'checked':''}><span>${esc(s.text)}</span></label><button type="button" class="icon-btn id-ed" data-act="hm-id-edit" data-id="${s.id}" aria-label="Editar «${esc(s.text)}»" title="Editar">${ic('edit')}</button></div>`).join('');
+  const empty=!st.length&&editing!=='new'?`<div class="hint" style="margin:0">Aún no tienes identidades. Crea una y vincúlala a este hábito.</div>`:'';
+  const foot=editing==='new'?editor('new','Soy ')
+    :(editing?'':`<button type="button" class="btn soft sm id-add" data-act="hm-id-new">${ic('plus')} Nueva identidad</button>`);
+  return `<div class="id-box" id="hm-ids">${empty}${rows?`<div class="chk-list">${rows}</div>`:''}${foot}</div>`;
+}
+function hmIdsRender(editing,extraSel){
+  const box=$('#hm-ids');if(!box)return;
+  const sel=$$('input[name=identityIds]:checked',box).map(i=>i.value);
+  if(extraSel&&!sel.includes(extraSel))sel.push(extraSel);
+  box.outerHTML=idChecks(sel,editing);
+  const nb=$('#hm-ids');
+  const inp=nb.querySelector('.id-inp');if(inp){inp.focus();const v=inp.value;inp.setSelectionRange(v.length,v.length)}
+}
+function hmIdSave(id){
+  const box=$('#hm-ids');if(!box)return;
+  const inp=box.querySelector('.id-inp'),err=box.querySelector('.id-edit .err');if(!inp)return;
+  const t=inp.value.trim();
+  const bad=m=>{err.textContent=m;inp.focus()};
+  if(t.length<3||/^soy$/i.test(t))return bad('Escribe una afirmación.');
+  if(S.identity.statements.some(x=>x.id!==id&&x.text.toLowerCase()===t.toLowerCase()))return bad('Ya tienes esa identidad.');
+  if(NEG_RE.test(t)&&inp.dataset.warned!==t){inp.dataset.warned=t;return bad('Se lee en negativo. Prueba en positivo, por ejemplo «Soy una persona que…». Si así la quieres, guarda de nuevo.')}
+  let newId='';
+  if(id==='new'){newId=uid();S.identity.statements.push({id:newId,text:t,quality:'',created:dk(new Date())});party(lastPt.x,lastPt.y,16)}
+  else{const s=stmtById(id);if(!s)return;s.text=t}
+  commit();hmIdsRender('',newId);
+  toast(id==='new'?'Identidad creada y vinculada':'Identidad actualizada');
 }
 function habitModal(h,kind){
   const isNew=!h;
@@ -2179,6 +2217,10 @@ const ACT={
   'ng-item':el=>{const k=el.dataset.date,key=el.dataset.key;const h=habitById(keyHabitId(key));const l=S.done[k]||(S.done[k]=[]);if(!l.includes(key))l.push(key);(S.meta[k]||(S.meta[k]={}))[key]={t:new Date().toTimeString().slice(0,5),lvl:1,late:false,ng:true};closeModal();commit();toast('Versión mínima cuenta: '+(h&&h.twoMin?h.twoMin:'aparecer ya es votar'))},
   'rev-open':el=>reviewModal(el.dataset.t||'week'),
   'sugg':el=>doSugg(el),
+  'hm-id-new':()=>hmIdsRender('new'),
+  'hm-id-edit':el=>hmIdsRender(el.dataset.id),
+  'hm-id-cancel':()=>hmIdsRender(''),
+  'hm-id-save':el=>hmIdSave(el.dataset.id),
   'new-stmt-from-habit':()=>{closeModal();stmtModal(null,()=>toast('Ahora abre el hábito y vincúlalo a esa identidad'))},
   'modal-close':()=>closeModal(),
   'settings':()=>settingsModal(),
@@ -2261,6 +2303,10 @@ document.addEventListener('submit',e=>{
 });
 document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if(!el||el.disabled)return;const fn=ACT[el.dataset.act];if(fn){e.preventDefault();fn(el,e)}});
 document.addEventListener('keydown',e=>{
+  if(e.target.matches&&e.target.matches('.id-inp')){
+    if(e.key==='Enter'){e.preventDefault();hmIdSave(e.target.dataset.id);return}
+    if(e.key==='Escape'){e.preventDefault();hmIdsRender('');return}
+  }
   if(e.key==='Escape'&&$('#modal-root').classList.contains('open'))closeModal();else if(e.key==='Escape'&&wiz.open)wizClose(false);
   if((e.key==='Enter'||e.key===' ')&&e.target.matches('.dh[data-act]')){e.preventDefault();ACT['cal-goday'](e.target)}
 });
