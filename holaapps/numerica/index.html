@@ -239,7 +239,7 @@ input[type=range]{width:100%;accent-color:var(--signal)}
   .app{height:auto}
   .stagecol{position:static;display:block;margin:0 8px 8px;padding-bottom:0}
   .stage{height:62svh;padding:0}
-  #tb,#tb[data-pos]{position:fixed;left:auto;right:8px;top:auto;bottom:8px;max-height:72svh;border-radius:var(--r-lg);flex-direction:row-reverse}
+  #tb,#tb[data-pos]{position:fixed;left:auto;right:8px;top:60px;bottom:auto;max-height:calc(100svh - 72px);border-radius:var(--r-lg);flex-direction:row-reverse}
   .tbrail{cursor:default}
   .tbpanel{width:calc(100vw - 88px)}
   #tb .tbbtn.posbtn{display:none}
@@ -1616,7 +1616,7 @@ function applyTb(){
   $('#tbTitle').textContent = TABNAMES[S.tb.tab];
   $('#tbMin').title = open ? 'Contraer (T)' : 'Expandir (T)'; $('#tbMin').setAttribute('aria-label', open ? 'Contraer toolbox' : 'Expandir toolbox');
   $('#tbPos').title = 'Posición: ' + ({left: 'izquierda', right: 'derecha', free: 'libre'}[S.tb.pos]);
-  if (mob){ tb.style.left = tb.style.right = tb.style.top = ''; stage.style.setProperty('--tbl', '0px'); stage.style.setProperty('--tbr', '0px'); }
+  if (mob){ tb.style.left = tb.style.right = ''; tb.style.top = (60 + barH()) + 'px'; tb.style.maxHeight = 'calc(100svh - ' + (72 + barH()) + 'px)'; stage.style.setProperty('--tbl', '0px'); stage.style.setProperty('--tbr', '0px'); }
   else if (S.tb.pos === 'free'){
     const x = clamp(S.tb.x, 8, Math.max(8, window.innerWidth - (open ? TBW : RAILW) - 8)), y = clamp(S.tb.y, 56 + barH(), Math.max(56, window.innerHeight - 90));
     tb.style.left = x + 'px'; tb.style.top = y + 'px'; tb.style.right = 'auto'; tb.style.maxHeight = 'calc(100svh - ' + (y + 12) + 'px)';
