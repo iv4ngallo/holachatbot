@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hola Apps · Tus apps, un solo login</title>
+<meta name="description" content="Hola Apps reúne PrecIA, AgendIA, Organic, Hábitos Atómicos, Presupuesto y numérica. producido. Una cuenta abre todas.">
+<link rel="canonical" href="https://holaibague.co/holaapps/">
+<meta name="theme-color" content="#3D3A86">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Tipografías del sistema Hola Chatbot. Si subes fonts/ClimateCrisis-Regular.woff2 y fonts/WorkSans-Variable.woff2 junto a este archivo, se usan primero. -->
+<link href="https://fonts.googleapis.com/css2?family=Climate+Crisis&family=Work+Sans:wght@400..800&display=swap" rel="stylesheet">
+<style>
+/* ===== Tokens · Hola Chatbot (tokens.json) ===== */
+:root{
+  --purple-primary:#3D3A86; --purple-secondary:#8C3F71; --gray-neutral:#96989A; --white:#FEFEFE;
+  --surface:#FEFEFE; --surface-raised:#F1F0F8; --ink:#1E1C46; --ink-muted:#5B5D60;
+  --brand:#3D3A86; --on-brand:#FEFEFE; --accent:#8C3F71; --on-accent:#FEFEFE;
+  --line:#96989A; --control-border:#767880; --focus-ring:#3D3A86;
+  --font-display:"Climate Crisis",Impact,"Arial Black",sans-serif;
+  --font-sans:"Work Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px; --space-6:24px; --space-8:32px; --space-12:48px; --space-16:64px;
+  --radius-sm:8px; --radius-md:12px; --radius-lg:20px; --radius-pill:999px;
+}
+:root[data-theme="dark"]{
+  --surface:#15142E; --surface-raised:#1F1D44; --ink:#F4F3FB; --ink-muted:#B4B6BA;
+  --brand:#B9B6F2; --on-brand:#15142E; --accent:#E3A0CB; --on-accent:#15142E;
+  --line:#6A6C72; --control-border:#8A8C92; --focus-ring:#B9B6F2;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;background:var(--surface);color:var(--ink);font:400 16px/1.6 var(--font-sans);-webkit-font-smoothing:antialiased}
+img,svg{display:block}
+a{color:var(--brand)}
+button{font-family:inherit}
+:focus-visible{outline:3px solid var(--focus-ring);outline-offset:2px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.wrap{max-width:1180px;margin:0 auto;padding:0 var(--space-6)}
+section{padding:var(--space-16) 0}
+.skip{position:absolute;left:var(--space-4);top:-60px;background:var(--brand);color:var(--on-brand);padding:var(--space-2) var(--space-4);border-radius:var(--radius-md);z-index:100;font-weight:600}
+.skip:focus{top:var(--space-2)}
+
+/* ===== Tipografía ===== */
+.t1,.t2{font-family:var(--font-display);font-weight:400;text-transform:uppercase;color:var(--brand);margin:0}
+.t1{font-size:clamp(34px,5.2vw,48px);line-height:1.12}
+.t2{font-size:clamp(26px,4vw,36px);line-height:1.18}
+.t3{font:600 24px/32px var(--font-sans);margin:0}
+.eyebrow{font:600 14px/20px var(--font-sans);letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:0 0 var(--space-3)}
+.lead{font-size:18px;line-height:1.6;color:var(--ink-muted);max-width:52ch;margin:var(--space-4) 0 0}
+.small{font:400 14px/22px var(--font-sans);color:var(--ink-muted)}
+.sec-head{max-width:720px;margin-bottom:var(--space-8)}
+
+/* ===== Componentes (bundle.css) ===== */
+.hc-btn{display:inline-flex;align-items:center;gap:var(--space-2);padding:var(--space-3) var(--space-6);border-radius:var(--radius-md);border:2px solid transparent;font:600 14px/20px var(--font-sans);cursor:pointer;background:var(--brand);color:var(--on-brand);text-decoration:none;transition:transform .15s}
+.hc-btn:hover{transform:translateY(-2px)}
+.hc-btn--secondary{background:transparent;color:var(--brand);border-color:var(--control-border)}
+.hc-btn--accent{background:var(--accent);color:var(--on-accent)}
+.hc-btn[disabled]{opacity:.45;cursor:not-allowed;transform:none}
+.hc-chip{display:inline-flex;align-items:center;gap:var(--space-2);padding:var(--space-2) var(--space-4);border-radius:var(--radius-pill);border:2px solid var(--control-border);background:var(--surface);color:var(--brand);font:600 14px/20px var(--font-sans);cursor:pointer;transition:background .15s,color .15s}
+.hc-chip[aria-selected="true"],.hc-chip[aria-pressed="true"]{background:var(--brand);color:var(--on-brand);border-color:var(--brand)}
+.hc-seal{display:inline-flex;align-items:center;gap:var(--space-2);padding:var(--space-1) var(--space-3);border-radius:var(--radius-sm);border:2px solid currentColor;font:600 13px/18px var(--font-sans)}
+.hc-seal i{width:8px;height:8px;border-radius:50%;background:currentColor}
+.hc-bubble{padding:var(--space-3) var(--space-4);border-radius:var(--radius-lg);font:400 16px/1.4 var(--font-sans);max-width:85%}
+.hc-bubble--bot{background:var(--surface-raised);color:var(--ink);border-bottom-left-radius:var(--radius-sm);align-self:flex-start}
+.hc-bubble--user{background:var(--brand);color:var(--on-brand);border-bottom-right-radius:var(--radius-sm);align-self:flex-end}
+.hc-field{display:flex;flex-direction:column;gap:var(--space-1);margin-bottom:var(--space-4)}
+.hc-field label{font:600 14px/20px var(--font-sans)}
+.hc-field input,.hc-input{padding:var(--space-3) var(--space-4);border-radius:var(--radius-md);border:2px solid var(--control-border);background:var(--surface);color:var(--ink);font:400 16px/1.4 var(--font-sans);width:100%}
+
+/* ===== Icon ===== */
+.ic{width:1em;height:1em;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* ===== Header ===== */
+.top{position:sticky;top:0;z-index:50;background:var(--surface);border-bottom:2px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:var(--space-6);height:68px}
+.logo{font-family:var(--font-display);font-size:22px;text-transform:uppercase;text-decoration:none;color:var(--brand);line-height:1;display:flex;flex-direction:column;gap:2px}
+.logo b{font-weight:400;color:var(--brand)}.logo b span{color:var(--accent)}
+.logo small{font:600 10px/1 var(--font-sans);letter-spacing:.04em;color:var(--gray-neutral);text-transform:none}
+.nav{display:flex;gap:var(--space-1);margin-left:auto}
+.nav a{padding:var(--space-2) var(--space-3);border-radius:var(--radius-md);text-decoration:none;color:var(--ink);font:600 14px/20px var(--font-sans)}
+.nav a:hover{background:var(--surface-raised)}
+.tbtn{width:44px;height:44px;border-radius:var(--radius-md);border:2px solid var(--control-border);background:var(--surface);color:var(--brand);display:grid;place-items:center;cursor:pointer;font-size:20px}
+.top .hc-btn{padding:var(--space-2) var(--space-4)}
+@media(max-width:860px){.nav{display:none}.top .wrap{gap:var(--space-3)}.top .tbtn{margin-left:auto}}
+
+/* ===== Hero ===== */
+.hero{padding:var(--space-12) 0 var(--space-16);background:var(--surface-raised);overflow:hidden}
+.hero .wrap{display:grid;grid-template-columns:5fr 7fr;gap:var(--space-8);align-items:center}
+.hero-cta{display:flex;flex-wrap:wrap;gap:var(--space-3);margin-top:var(--space-8)}
+.hero-stats{display:flex;gap:var(--space-8);margin-top:var(--space-8);flex-wrap:wrap}
+.hero-stats b{display:block;font:700 28px/1.1 var(--font-sans);color:var(--brand)}
+.stage-wrap{position:relative;overflow:hidden;padding:var(--space-2) 0}
+.stage{position:relative;height:480px;perspective:1700px;perspective-origin:50% 40%;outline-offset:6px;touch-action:pan-y;cursor:grab;user-select:none}
+.stage.drag{cursor:grabbing}
+.c3{position:absolute;left:50%;top:0;width:min(330px,74vw);height:440px;transform-style:preserve-3d;transition:transform .8s cubic-bezier(.2,.75,.2,1),opacity .6s;will-change:transform}
+.face{position:absolute;inset:0;border-radius:var(--radius-lg);padding:var(--space-6);display:flex;flex-direction:column;gap:var(--space-3);transition:transform .25s ease-out;border:2px solid transparent;overflow:hidden}
+.v0{background:var(--brand);color:var(--on-brand)}
+.v1{background:var(--accent);color:var(--on-accent)}
+.v2{background:var(--surface);color:var(--ink);border-color:var(--brand)}
+.v3{background:var(--ink);color:var(--surface)}
+.face .row{display:flex;justify-content:space-between;align-items:center;font:600 13px/18px var(--font-sans);letter-spacing:.06em;text-transform:uppercase}
+.face .big-ic{font-size:44px;margin-top:var(--space-2)}
+.face h3{margin:0;font:800 38px/1.05 var(--font-sans);letter-spacing:-.01em}
+.face p{margin:0;font:400 15px/1.45 var(--font-sans);opacity:.92}
+.mini{margin-top:auto;display:flex;flex-direction:column;gap:6px}
+.mini div{display:flex;justify-content:space-between;gap:var(--space-2);padding:7px var(--space-3);border-radius:var(--radius-sm);background:color-mix(in srgb,currentColor 14%,transparent);font:600 13px/18px var(--font-sans)}
+.face .hc-btn{background:var(--surface);color:var(--brand);align-self:flex-start;margin-top:var(--space-2)}
+.v2 .hc-btn{background:var(--brand);color:var(--on-brand)}
+.v3 .hc-btn{background:var(--surface);color:var(--ink)}
+.c3:not(.on) .face{pointer-events:none}
+.c3:not(.on) .hc-btn{visibility:hidden}
+.c3.side{cursor:pointer}
+.ctrls{display:flex;align-items:center;justify-content:center;gap:var(--space-4);margin-top:var(--space-4)}
+.dots{display:flex;gap:var(--space-2)}
+.dot{width:12px;height:12px;border-radius:var(--radius-pill);border:2px solid var(--control-border);background:transparent;padding:0;cursor:pointer;transition:width .3s,background .3s}
+.dot[aria-current="true"]{width:32px;background:var(--brand);border-color:var(--brand)}
+.arrow{width:44px;height:44px;border-radius:var(--radius-md);border:2px solid var(--control-border);background:var(--surface);color:var(--brand);cursor:pointer;font-size:20px;display:grid;place-items:center}
+.arrow:hover{background:var(--brand);color:var(--on-brand)}
+@media(max-width:960px){.hero .wrap{grid-template-columns:1fr}.stage{height:470px}}
+@media(prefers-reduced-motion:reduce){.c3{transition:opacity .3s}html{scroll-behavior:auto}}
+
+/* ===== Login / ecosistema ===== */
+.eco{display:grid;grid-template-columns:5fr 7fr;gap:var(--space-8);align-items:start}
+.card{background:var(--surface-raised);border:2px solid var(--line);border-radius:var(--radius-lg);padding:var(--space-6)}
+.card .t3{margin-bottom:var(--space-2)}
+.sess{display:none;flex-direction:column;gap:var(--space-3)}
+.logged .sess{display:flex}.logged .form{display:none}
+.hub{position:relative;aspect-ratio:1/1;max-width:620px;margin:0 auto;width:100%}
+.hub svg.lines{position:absolute;inset:0;width:100%;height:100%}
+.hub line{stroke:var(--line);stroke-width:2;stroke-dasharray:6 6;transition:stroke .4s}
+.logged .hub line{stroke:var(--brand);stroke-dasharray:none}
+.core{position:absolute;left:50%;top:50%;width:26%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:var(--brand);color:var(--on-brand);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font:700 14px/1.2 var(--font-sans);gap:4px}
+.core .ic{font-size:30px}
+.node{position:absolute;width:21%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:var(--radius-lg);border:2px solid var(--control-border);background:var(--surface);color:var(--ink-muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;font:600 12px/1.15 var(--font-sans);text-align:center;padding:4px;transition:background .4s,color .4s,border-color .4s,transform .25s}
+.node .ic{font-size:26px}
+.node:hover{transform:translate(-50%,-50%) scale(1.08)}
+.logged .node{background:var(--brand);color:var(--on-brand);border-color:var(--brand)}
+.hubcap{text-align:center;margin-top:var(--space-4);min-height:48px}
+.hubcap b{color:var(--brand)}
+@media(max-width:960px){.eco{grid-template-columns:1fr}}
+
+/* ===== Explorer ===== */
+.tabs{display:flex;flex-wrap:wrap;gap:var(--space-2);margin-bottom:var(--space-6)}
+.panel{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-8);align-items:start}
+.panel .meta{display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-3);flex-wrap:wrap;color:var(--accent)}
+.panel .meta .ic{font-size:30px;color:var(--brand)}
+.feat{list-style:none;padding:0;margin:var(--space-6) 0;display:grid;gap:var(--space-3)}
+.feat li{display:flex;gap:var(--space-3);align-items:flex-start;padding:var(--space-3) var(--space-4);border:2px solid var(--line);border-radius:var(--radius-md);background:var(--surface);transition:border-color .2s,transform .2s}
+.feat li:hover{border-color:var(--brand);transform:translateX(4px)}
+.feat .ic{font-size:22px;color:var(--brand);flex:none;margin-top:2px}
+.feat b{display:block;font-weight:600}
+.demo{background:var(--surface-raised);border:2px solid var(--line);border-radius:var(--radius-lg);padding:var(--space-6);min-height:360px}
+.demo h4{margin:0 0 var(--space-1);font:600 16px/24px var(--font-sans)}
+.demo .row{display:flex;gap:var(--space-2);margin:var(--space-4) 0}
+.demo .row .hc-btn{padding:var(--space-3) var(--space-4)}
+.dl{list-style:none;margin:var(--space-3) 0 0;padding:0;display:grid;gap:var(--space-2)}
+.dl button.it{width:100%;display:flex;align-items:center;gap:var(--space-3);padding:var(--space-3) var(--space-4);border-radius:var(--radius-md);border:2px solid var(--line);background:var(--surface);color:var(--ink);font:400 16px/1.3 var(--font-sans);cursor:pointer;text-align:left}
+.dl button.it .bx{width:22px;height:22px;border:2px solid var(--control-border);border-radius:6px;flex:none;display:grid;place-items:center;font-size:14px;color:transparent}
+.dl button.it[aria-checked="true"]{border-color:var(--brand)}
+.dl button.it[aria-checked="true"] .bx{background:var(--brand);border-color:var(--brand);color:var(--on-brand)}
+.dl button.it[aria-checked="true"] span.tx{text-decoration:line-through;color:var(--ink-muted)}
+.dl .am{margin-left:auto;font-weight:600}
+.prog{height:12px;border-radius:var(--radius-pill);background:var(--surface);border:2px solid var(--line);overflow:hidden;margin-top:var(--space-3)}
+.prog i{display:block;height:100%;background:var(--brand);width:0;transition:width .4s}
+.hgrid{display:grid;grid-template-columns:1fr repeat(7,34px);gap:6px;align-items:center;margin-top:var(--space-3)}
+.hgrid .d{font:600 12px/1 var(--font-sans);text-align:center;color:var(--ink-muted)}
+.hgrid button{width:34px;height:34px;border-radius:var(--radius-sm);border:2px solid var(--control-border);background:var(--surface);cursor:pointer;padding:0;color:var(--on-brand);font-size:16px;display:grid;place-items:center}
+.hgrid button[aria-pressed="true"]{background:var(--brand);border-color:var(--brand)}
+.hgrid .hn{font:600 14px/1.2 var(--font-sans)}
+.cards2{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-2);margin-top:var(--space-3)}
+.cards2 div,.tbl div,.bars div{padding:var(--space-3);border-radius:var(--radius-md);background:var(--surface);border:2px solid var(--line);font:600 14px/1.3 var(--font-sans)}
+.cards2 span,.tbl span,.bars span{display:block;font-weight:400;color:var(--ink-muted)}
+.tbl{display:grid;gap:6px;margin-top:var(--space-3)}.tbl div{display:flex;justify-content:space-between;padding:var(--space-2) var(--space-3)}
+.bars{display:grid;gap:var(--space-2);margin-top:var(--space-3)}.bars div{position:relative;overflow:hidden}.bars div i{position:absolute;left:0;top:0;bottom:0;background:var(--brand);opacity:.18}.bars div *{position:relative}
+.prev{margin:var(--space-4) auto 0;background:var(--surface);color:var(--brand);border:2px solid var(--brand);border-radius:var(--radius-md);display:grid;place-items:center;text-align:center;font:400 20px/1.1 var(--font-display);text-transform:uppercase;padding:var(--space-4);transition:aspect-ratio .4s,width .4s,background .3s,color .3s}
+.prev.dk{background:#15142E;color:#B9B6F2;border-color:#B9B6F2}
+@media(max-width:960px){.panel{grid-template-columns:1fr}}
+
+/* ===== Funciones ===== */
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-4)}
+.fc{background:var(--surface-raised);border:2px solid var(--line);border-radius:var(--radius-lg);padding:var(--space-6);transition:transform .25s,border-color .25s}
+.fc:hover{transform:translateY(-6px);border-color:var(--brand)}
+.fc .ic{font-size:32px;color:var(--brand);margin-bottom:var(--space-3)}
+.fc h3{margin:0 0 var(--space-2);font:600 20px/28px var(--font-sans)}
+.fc p{margin:0;color:var(--ink-muted)}
+@media(max-width:960px){.grid3{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.grid3{grid-template-columns:1fr}}
+
+/* ===== Pasos ===== */
+.steps{counter-reset:s;display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-4);list-style:none;padding:0;margin:0}
+.steps li{counter-increment:s;background:var(--brand);color:var(--on-brand);border-radius:var(--radius-lg);padding:var(--space-6)}
+.steps li::before{content:"0" counter(s);font:400 36px/1 var(--font-display);display:block;margin-bottom:var(--space-4)}
+.steps li b{display:block;font:600 20px/28px var(--font-sans);margin-bottom:var(--space-1)}
+.steps li:nth-child(2){background:var(--accent);color:var(--on-accent)}
+.steps li:nth-child(3){background:var(--ink);color:var(--surface)}
+@media(max-width:760px){.steps{grid-template-columns:1fr}}
+
+/* ===== CTA + footer ===== */
+.cta{background:var(--brand);color:var(--on-brand);border-radius:var(--radius-lg);padding:var(--space-12);display:flex;flex-wrap:wrap;gap:var(--space-6);align-items:center;justify-content:space-between}
+.cta .t2{color:var(--on-brand)}
+.cta .hc-btn{background:var(--surface);color:var(--brand)}
+footer{border-top:2px solid var(--line);padding:var(--space-8) 0}
+footer .wrap{display:flex;flex-wrap:wrap;gap:var(--space-6);justify-content:space-between;align-items:center}
+footer nav{display:flex;gap:var(--space-4);flex-wrap:wrap}
+footer a{font:600 14px/20px var(--font-sans);color:var(--ink);text-decoration:none}
+footer a:hover{color:var(--brand);text-decoration:underline}
+
+/* ===== Reveal ===== */
+.rv{opacity:0;transform:translateY(24px);transition:opacity .7s,transform .7s}
+.rv.in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}}
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,120px);background:var(--ink);color:var(--surface);padding:var(--space-3) var(--space-6);border-radius:var(--radius-md);font:600 14px/20px var(--font-sans);transition:transform .35s;z-index:80}
+.toast.on{transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<a class="skip" href="#apps">Saltar al contenido</a>
+
+<!-- Íconos de línea: set provisional (el sistema de marca aún no define iconografía) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-cart" viewBox="0 0 24 24"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M3 4h2.5l2.2 10.2a1 1 0 0 0 1 .8h8.6a1 1 0 0 0 1-.8L20 8H6.2"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17M9 15l2 2 4-4"/></symbol>
+  <symbol id="i-sprout" viewBox="0 0 24 24"><path d="M12 21v-9"/><path d="M12 12C12 8 9 6 4.5 6 4.5 10.5 7 12 12 12z"/><path d="M12 14c0-3.5 2.5-6 7.5-6 0 4.2-2.7 6-7.5 6z"/></symbol>
+  <symbol id="i-atom" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1.6"/><ellipse cx="12" cy="12" rx="9.5" ry="3.8"/><ellipse cx="12" cy="12" rx="9.5" ry="3.8" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9.5" ry="3.8" transform="rotate(120 12 12)"/></symbol>
+  <symbol id="i-wallet" viewBox="0 0 24 24"><path d="M4 7.5A2.5 2.5 0 0 1 6.5 5H18v3"/><rect x="3.5" y="8" width="17" height="11.5" rx="3"/><circle cx="16.5" cy="13.8" r="1.2"/></symbol>
+  <symbol id="i-layout" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="3"/><path d="M3.5 9.5h17M10 9.5v11"/></symbol>
+  <symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M16 7l3 3M14 9l2 2"/></symbol>
+  <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M7 18a4.5 4.5 0 0 1-.6-8.96A6 6 0 0 1 18 10.5a3.8 3.8 0 0 1-.5 7.5H7z"/></symbol>
+  <symbol id="i-devices" viewBox="0 0 24 24"><rect x="2.5" y="5" width="13" height="9.5" rx="2"/><path d="M6 18h6M9 14.5V18"/><rect x="17" y="9" width="4.5" height="9.5" rx="1.3"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24"><circle cx="5" cy="5" r="1.4"/><circle cx="12" cy="5" r="1.4"/><circle cx="19" cy="5" r="1.4"/><circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/><circle cx="5" cy="19" r="1.4"/><circle cx="12" cy="19" r="1.4"/><circle cx="19" cy="19" r="1.4"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5z"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-left" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20c.8-4 3.8-6 7.5-6s6.7 2 7.5 6"/></symbol>
+</svg>
+
+<header class="top">
+  <div class="wrap">
+    <a class="logo" href="#top" aria-label="Hola Apps, inicio"><b>HOLA <span>APPS</span></b><small>by Hola Chatbot</small></a>
+    <nav class="nav" aria-label="Principal">
+      <a href="#login">Un solo login</a>
+      <a href="#apps">Las apps</a>
+      <a href="#funciones">Funciones</a>
+      <a href="#empezar">Empezar</a>
+    </nav>
+    <button class="tbtn" id="theme" aria-label="Cambiar entre tema claro y oscuro"><svg class="ic"><use href="#i-moon"/></svg></button>
+    <a class="hc-btn" href="#login">Entrar</a>
+  </div>
+</header>
+
+<main id="top">
+<!-- ===== HERO ===== -->
+<section class="hero" aria-labelledby="h1">
+  <div class="wrap">
+    <div class="rv">
+      <p class="eyebrow">Hola Apps</p>
+      <h1 class="t1" id="h1">Tus apps. Un solo login.</h1>
+      <p class="lead">Compras, agenda, presupuesto, hábitos, ideas y piezas para redes. Seis herramientas en un mismo lugar, con la misma cuenta y tus datos donde los dejaste.</p>
+      <div class="hero-cta">
+        <a class="hc-btn" href="#login">Entrar con mi cuenta</a>
+        <a class="hc-btn hc-btn--secondary" href="#apps">Ver las apps</a>
+      </div>
+      <div class="hero-stats">
+        <div><b>6</b><span class="small">apps en la suite</span></div>
+        <div><b>1</b><span class="small">cuenta para todas</span></div>
+        <div><b>0</b><span class="small">apps que instalar</span></div>
+      </div>
+    </div>
+    <div class="stage-wrap rv">
+      <div class="stage" id="stage" tabindex="0" role="group" aria-roledescription="carrusel" aria-label="Apps de Hola Apps. Usa las flechas del teclado para cambiar."></div>
+      <div class="ctrls">
+        <button class="arrow" id="prev" aria-label="App anterior"><svg class="ic"><use href="#i-left"/></svg></button>
+        <div class="dots" id="dots"></div>
+        <button class="arrow" id="next" aria-label="App siguiente"><svg class="ic"><use href="#i-right"/></svg></button>
+      </div>
+      <p class="sr" id="live" aria-live="polite"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== LOGIN / ECOSISTEMA ===== -->
+<section id="login" aria-labelledby="h-login">
+  <div class="wrap eco" id="eco">
+    <div class="rv">
+      <p class="eyebrow">El ecosistema</p>
+      <h2 class="t2" id="h-login">Una cuenta, seis apps</h2>
+      <p class="lead">Crea tu cuenta una vez y úsala en todas. Cada app guarda lo tuyo por separado, y solo tú puedes verlo.</p>
+      <div class="card" style="margin-top:var(--space-6)">
+        <form class="form" id="loginForm" novalidate>
+          <h3 class="t3">Pruébalo aquí</h3>
+          <p class="small" style="margin:0 0 var(--space-4)">Simulación: no se envía ni se guarda nada. Mira cómo una sesión abre todo.</p>
+          <div class="hc-field"><label for="em">Correo</label><input id="em" type="email" autocomplete="off" placeholder="tu@correo.co"></div>
+          <div class="hc-field"><label for="pw">Contraseña</label><input id="pw" type="password" autocomplete="off" placeholder="••••••••"></div>
+          <button class="hc-btn" type="submit">Entrar</button>
+        </form>
+        <div class="sess" id="sess" role="status">
+          <span class="hc-seal" style="color:var(--brand);align-self:flex-start"><i></i> Sesión iniciada</span>
+          <h3 class="t3" id="who">Hola</h3>
+          <p class="small" style="margin:0">Las seis apps reconocen tu cuenta. En cada una verás tu correo y la opción Cerrar sesión.</p>
+          <button class="hc-btn hc-btn--secondary" id="logout" type="button" style="align-self:flex-start">Cerrar sesión</button>
+        </div>
+      </div>
+    </div>
+    <div class="rv">
+      <div class="hub" id="hub" aria-label="Diagrama: una cuenta conectada a seis apps">
+        <svg class="lines" id="lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"></svg>
+        <div class="core"><svg class="ic"><use href="#i-key"/></svg>Tu cuenta</div>
+      </div>
+      <p class="hubcap small" id="hubcap">Toca una app para ver qué guarda.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== APPS ===== -->
+<section id="apps" style="background:var(--surface-raised)" aria-labelledby="h-apps">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <p class="eyebrow">Las apps</p>
+      <h2 class="t2" id="h-apps">Elige una y pruébala</h2>
+      <p class="lead">Cada app resuelve una tarea concreta. Aquí tienes una muestra interactiva de cada una.</p>
+    </div>
+    <div class="tabs" id="tabs" role="tablist" aria-label="Apps"></div>
+    <div class="panel" id="panel" role="tabpanel"></div>
+  </div>
+</section>
+
+<!-- ===== FUNCIONES ===== -->
+<section id="funciones" aria-labelledby="h-fn">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <p class="eyebrow">Funciones de la suite</p>
+      <h2 class="t2" id="h-fn">Lo que comparten todas</h2>
+    </div>
+    <div class="grid3">
+      <article class="fc rv"><svg class="ic"><use href="#i-key"/></svg><h3>Un solo login</h3><p>Un correo y una contraseña abren las seis apps. Sin cuentas repetidas.</p></article>
+      <article class="fc rv"><svg class="ic"><use href="#i-cloud"/></svg><h3>Tus datos en la nube</h3><p>Lo que guardas queda asociado a tu cuenta, no a un solo navegador.</p></article>
+      <article class="fc rv"><svg class="ic"><use href="#i-devices"/></svg><h3>Cambia de dispositivo</h3><p>Entra desde otro computador o el celular y retoma donde lo dejaste.</p></article>
+      <article class="fc rv"><svg class="ic"><use href="#i-grid"/></svg><h3>Menú de la suite</h3><p>Una barra superior con un botón de nueve puntos te lleva de una app a otra.</p></article>
+      <article class="fc rv"><svg class="ic"><use href="#i-lock"/></svg><h3>Privado por usuario</h3><p>Cada cuenta ve solo lo suyo. Tus listas, hábitos y presupuestos no se mezclan.</p></article>
+      <article class="fc rv"><svg class="ic"><use href="#i-moon"/></svg><h3>Sin instalar nada</h3><p>Funcionan en el navegador, en cualquier pantalla. Abre el enlace y listo.</p></article>
+    </div>
+  </div>
+</section>
+
+<!-- ===== EMPEZAR ===== -->
+<section id="empezar" style="padding-top:0" aria-labelledby="h-go">
+  <div class="wrap">
+    <div class="sec-head rv"><p class="eyebrow">Empezar</p><h2 class="t2" id="h-go">Tres pasos</h2></div>
+    <ol class="steps">
+      <li class="rv"><b>Abre cualquier app</b>Elige la que necesites hoy. Todas viven en holaibague.co/holaapps.</li>
+      <li class="rv"><b>Crea tu cuenta</b>Correo y contraseña. Una sola vez para toda la suite.</li>
+      <li class="rv"><b>Salta entre apps</b>Usa el menú de nueve puntos. Ya estás dentro en todas.</li>
+    </ol>
+    <div class="cta rv" style="margin-top:var(--space-8)">
+      <h2 class="t2">Tu día, en orden</h2>
+      <a class="hc-btn" href="/holaapps/precia/">Empezar con PrecIA</a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <a class="logo" href="#top"><b>HOLA <span>APPS</span></b><small>by Hola Chatbot</small></a>
+    <nav aria-label="Apps">
+      <a href="/holaapps/precia/">PrecIA</a><a href="/holaapps/agendia/">AgendIA</a><a href="/holaapps/organic/">Organic</a>
+      <a href="/holaapps/habitos/">Hábitos Atómicos</a><a href="/holaapps/presupuesto/">Presupuesto</a><a href="/holaapps/numerica/">numérica.</a>
+    </nav>
+    <span class="small">© 2026 Hola Ibagué</span>
+  </div>
+</footer>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+"use strict";
+var $=function(s,r){return (r||document).querySelector(s)};
+var ic=function(n,c){return '<svg class="ic'+(c?' '+c:'')+'" aria-hidden="true"><use href="#i-'+n+'"/></svg>'};
+var esc=function(s){return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})};
+var reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ===== Datos de las apps (edita aquí textos y enlaces) ===== */
+var APPS=[
+ {id:"precia",name:"PrecIA",icon:"cart",tag:"Compras",status:"Disponible",href:"/holaapps/precia/",
+  tagline:"Tus listas de compras, claras y a la mano.",
+  mini:[["Arroz 1 kg","✓"],["Huevos x30","✓"],["Leche","—"]],
+  desc:"Arma tus listas de compras, márcalas mientras recorres el supermercado y no olvides nada. Tu cuenta las guarda.",
+  feats:[["check","Listas de compras","Crea, edita y borra tus propias listas."],["user","Una cuenta, tus listas","Se guardan con tu cuenta de Hola Apps."],["cloud","Próximamente: comparar precios","Esta función está en pausa por ahora."]]},
+ {id:"agendia",name:"AgendIA",icon:"cal",tag:"Agenda",status:"Disponible",href:"/holaapps/agendia/",
+  tagline:"Tu agenda del día, sin enredos.",
+  mini:[["09:00","Equipo"],["12:30","Almuerzo"],["16:00","Evento"]],
+  desc:"Organiza tu día en una agenda sencilla. Lo que programas te acompaña en cualquier dispositivo.",
+  feats:[["cal","Agenda","Programa y consulta tus compromisos."],["cloud","Guardada en tu cuenta","Recupera tu agenda al entrar desde otro equipo."],["grid","Dentro de la suite","Salta a otra app desde el menú superior."]]},
+ {id:"organic",name:"Organic",icon:"sprout",tag:"Ideas",status:"Beta",href:"/holaapps/organic/",
+  tagline:"Planta una idea. Mírala crecer.",
+  mini:[["Semilla","Nueva"],["Semilla","Con imagen"],["Semilla","Guardada"]],
+  desc:"Guarda tus semillas, con imágenes incluidas, y vuelve a ellas cuando quieras. Puedes exportar e importar tus datos.",
+  feats:[["sprout","Semillas","Captura ideas con texto e imágenes."],["cloud","Sincronización por cuenta","Tus semillas viajan con tu sesión."],["devices","Exportar e importar","Lleva tus datos adonde los necesites."]]},
+ {id:"habitos",name:"Hábitos Atómicos",icon:"atom",tag:"Bienestar",status:"Beta",href:"/holaapps/habitos/",
+  tagline:"Cambios pequeños. Resultados grandes.",
+  mini:[["Leer 10 min","7/7"],["Caminar","5/7"],["Agua","6/7"]],
+  desc:"Define quién quieres ser y construye hábitos pequeños que lo sostengan, un día a la vez.",
+  feats:[["user","Tu identidad","Escribe quién quieres ser y deja que guíe tus hábitos."],["check","Seguimiento diario","Marca cada hábito cuando lo cumplas."],["cloud","Estado en tu cuenta","Tu progreso te sigue entre dispositivos."]]},
+ {id:"presupuesto",name:"Presupuesto",icon:"wallet",tag:"Finanzas",status:"Disponible",href:"/holaapps/presupuesto/",
+  tagline:"Tus pesos, mes a mes.",
+  mini:[["Arriendo","$900.000"],["Mercado","$450.000"],["Internet","$85.000"]],
+  desc:"Presupuesto personal en pesos colombianos, con meses, pagos y categorías. Míralo como más te sirva.",
+  feats:[["layout","Siete vistas","Tarjetas, tabla, calendario, agenda, pendientes, resumen y comparativo."],["wallet","Pesos colombianos","Todo en COP, con separador de miles."],["cal","Mes a mes","Cambia de mes y compara."]]},
+ {id:"numerica",name:"numérica.",icon:"layout",tag:"Redes",status:"Beta",href:"/holaapps/numerica/",
+  tagline:"Piezas para redes con tu sistema de diseño.",
+  mini:[["Cuadrado","1:1"],["Vertical","4:5"],["Historia","9:16"]],
+  desc:"Compón piezas para redes sociales con el sistema de diseño que importes, en tema claro u oscuro.",
+  feats:[["layout","Compositor de piezas","Arma tus publicaciones en distintos formatos."],["grid","Tu sistema de diseño","Importa el que exportes desde tu artefacto."],["moon","Claro y oscuro","Cada tema respeta los colores del sistema."]]}
+];
+function toast(t){var e=$("#toast");e.textContent=t;e.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(function(){e.classList.remove("on")},2400)}
+
+/* ===== Tema ===== */
+var root=document.documentElement;
+try{var sv=localStorage.getItem("hola-theme");if(sv)root.dataset.theme=sv;else if(window.matchMedia("(prefers-color-scheme: dark)").matches)root.dataset.theme="dark"}catch(e){}
+$("#theme").onclick=function(){var d=root.dataset.theme==="dark"?"light":"dark";root.dataset.theme=d;try{localStorage.setItem("hola-theme",d)}catch(e){}};
+
+/* ===== HERO 3D ===== */
+var stage=$("#stage"),dots=$("#dots"),N=APPS.length,cur=0,cards=[],timer=null,hover=false;
+APPS.forEach(function(a,i){
+  var c=document.createElement("div");c.className="c3";c.dataset.i=i;
+  c.innerHTML='<div class="face v'+(i%4)+'"><div class="row"><span>'+String(i+1).padStart(2,"0")+" / "+String(N).padStart(2,"0")+'</span><span class="hc-seal"><i></i>'+esc(a.status)+'</span></div>'+
+   ic(a.icon,"big-ic")+'<h3>'+esc(a.name)+'</h3><p>'+esc(a.tagline)+'</p>'+
+   '<div class="mini">'+a.mini.map(function(m){return "<div><span>"+esc(m[0])+"</span><span>"+esc(m[1])+"</span></div>"}).join("")+'</div>'+
+   '<a class="hc-btn" href="'+a.href+'" tabindex="-1">Abrir '+esc(a.name)+'</a></div>';
+  stage.appendChild(c);cards.push(c);
+  var d=document.createElement("button");d.className="dot";d.setAttribute("aria-label","Ver "+a.name);d.onclick=function(){go(i,true)};dots.appendChild(d);
+});
+function off(i){var d=((i-cur)%N+N)%N;if(d>N/2)d-=N;return d}
+function layout(){
+  var w=stage.clientWidth,sp=Math.min(w*.25,170);
+  cards.forEach(function(c,i){
+    var d=off(i),a=Math.abs(d),on=d===0;
+    var x=d*sp,z=-a*150,ry=-d*34,s=1-a*.06;
+    if(a>2){x=Math.sign(d)*sp*2.2;z=-420;ry=-Math.sign(d)*40}
+    c.style.transform=reduce?"translateX(-50%)":"translateX(calc(-50% + "+x+"px)) translateZ("+z+"px) rotateY("+ry+"deg) scale("+s+")";
+    c.style.opacity=reduce?(on?1:0):(a>2?0:1-a*.22);
+    c.style.zIndex=10-a;c.style.pointerEvents=reduce&&!on?"none":"";
+    c.classList.toggle("on",on);c.classList.toggle("side",!on&&a<=2);
+    c.setAttribute("aria-hidden",on?"false":"true");
+    var b=c.querySelector(".hc-btn");b.tabIndex=on?0:-1;
+    if(!on)c.querySelector(".face").style.transform="";
+  });
+  [].forEach.call(dots.children,function(d,i){d.setAttribute("aria-current",i===cur?"true":"false")});
+  $("#live").textContent=APPS[cur].name+", "+(cur+1)+" de "+N;
+}
+function go(i,user){cur=((i%N)+N)%N;layout();if(user)restart()}
+function restart(){clearInterval(timer);if(reduce)return;timer=setInterval(function(){if(!hover&&!document.hidden)go(cur+1)},4500)}
+$("#next").onclick=function(){go(cur+1,true)};$("#prev").onclick=function(){go(cur-1,true)};
+stage.addEventListener("keydown",function(e){if(e.key==="ArrowRight"){go(cur+1,true);e.preventDefault()}if(e.key==="ArrowLeft"){go(cur-1,true);e.preventDefault()}});
+stage.addEventListener("mouseenter",function(){hover=true});stage.addEventListener("mouseleave",function(){hover=false;cards.forEach(function(c){c.querySelector(".face").style.transform=""})});
+stage.addEventListener("focusin",function(){hover=true});stage.addEventListener("focusout",function(){hover=false});
+/* arrastre / swipe + clic en tarjetas laterales + inclinación */
+var sx=null,moved=false;
+stage.addEventListener("pointerdown",function(e){sx=e.clientX;moved=false;stage.classList.add("drag")});
+window.addEventListener("pointerup",function(e){
+  if(sx===null)return;var dx=e.clientX-sx;sx=null;stage.classList.remove("drag");
+  if(Math.abs(dx)>50){moved=true;go(cur+(dx<0?1:-1),true)}
+});
+stage.addEventListener("click",function(e){
+  var c=e.target.closest(".c3");if(!c||moved)return;
+  if(c.classList.contains("side")){go(+c.dataset.i,true);e.preventDefault()}
+});
+stage.addEventListener("pointermove",function(e){
+  if(reduce||sx!==null)return;var c=cards[cur],r=c.getBoundingClientRect();
+  var px=(e.clientX-r.left)/r.width-.5,py=(e.clientY-r.top)/r.height-.5;
+  if(Math.abs(px)<.9&&Math.abs(py)<.9)c.querySelector(".face").style.transform="rotateX("+(-py*10)+"deg) rotateY("+(px*12)+"deg)";
+});
+window.addEventListener("resize",layout);layout();restart();
+
+/* ===== Ecosistema / login simulado ===== */
+var hub=$("#hub"),lines=$("#lines"),eco=$("#eco"),cap=$("#hubcap");
+APPS.forEach(function(a,i){
+  var ang=(-90+i*360/N)*Math.PI/180,x=50+38*Math.cos(ang),y=50+38*Math.sin(ang);
+  var l=document.createElementNS("http://www.w3.org/2000/svg","line");
+  l.setAttribute("x1",50);l.setAttribute("y1",50);l.setAttribute("x2",x);l.setAttribute("y2",y);lines.appendChild(l);
+  var n=document.createElement("button");n.className="node";n.style.left=x+"%";n.style.top=y+"%";n.type="button";
+  n.innerHTML=ic(a.icon)+"<span>"+esc(a.name)+"</span>";
+  n.onclick=function(){cap.innerHTML="<b>"+esc(a.name)+"</b>: "+esc(a.desc)+' <a href="'+a.href+'">Abrir</a>'};
+  hub.appendChild(n);
+});
+$("#loginForm").addEventListener("submit",function(e){
+  e.preventDefault();var m=$("#em").value.trim();
+  $("#who").textContent="Hola, "+(m?m.split("@")[0]:"vecino");
+  eco.classList.add("logged");cap.textContent="Tu cuenta abrió las seis apps.";toast("Sesión simulada: las seis apps quedaron conectadas");
+});
+$("#logout").onclick=function(){eco.classList.remove("logged");cap.textContent="Toca una app para ver qué guarda.";$("#pw").value=""};
+
+/* ===== Explorador de apps + demos ===== */
+var tabs=$("#tabs"),panel=$("#panel"),active=0;
+APPS.forEach(function(a,i){
+  var b=document.createElement("button");b.className="hc-chip";b.setAttribute("role","tab");b.id="tab-"+a.id;
+  b.innerHTML=ic(a.icon)+esc(a.name);b.onclick=function(){show(i)};
+  b.addEventListener("keydown",function(e){var k=e.key==="ArrowRight"?1:e.key==="ArrowLeft"?-1:0;if(k){show((i+k+N)%N);$("#tab-"+APPS[active].id).focus()}});
+  tabs.appendChild(b);
+});
+function show(i){
+  active=i;var a=APPS[i];
+  [].forEach.call(tabs.children,function(t,j){t.setAttribute("aria-selected",j===i?"true":"false");t.tabIndex=j===i?0:-1});
+  panel.setAttribute("aria-labelledby","tab-"+a.id);
+  panel.innerHTML='<div><div class="meta">'+ic(a.icon)+'<span class="hc-seal"><i></i>'+esc(a.status)+'</span><span class="small">'+esc(a.tag)+'</span></div>'+
+   '<h3 class="t3" style="font-size:32px;line-height:40px">'+esc(a.name)+'</h3><p class="lead" style="margin-top:var(--space-2)">'+esc(a.desc)+'</p>'+
+   '<ul class="feat">'+a.feats.map(function(f){return "<li>"+ic(f[0])+"<div><b>"+esc(f[1])+"</b><span class=\"small\">"+esc(f[2])+"</span></div></li>"}).join("")+'</ul>'+
+   '<a class="hc-btn" href="'+a.href+'">Abrir '+esc(a.name)+'</a></div><div class="demo" id="demo"></div>';
+  DEMOS[a.id]($("#demo"));
+}
+function checklist(box,title,items,showAm){
+  box.innerHTML='<h4>'+title+'</h4><div class="prog"><i id="pg"></i></div><ul class="dl" id="dl"></ul>';
+  function draw(){
+    var done=items.filter(function(x){return x.d}).length;$("#pg").style.width=(items.length?done/items.length*100:0)+"%";
+    $("#dl").innerHTML=items.map(function(x,i){return '<li><button class="it" role="checkbox" aria-checked="'+x.d+'" data-i="'+i+'"><span class="bx">'+ic("check")+'</span><span class="tx">'+esc(x.t)+'</span>'+(x.a?'<span class="am">'+esc(x.a)+'</span>':"")+'</button></li>'}).join("");
+  }
+  box.addEventListener("click",function(e){var b=e.target.closest(".it");if(!b)return;items[+b.dataset.i].d=!items[+b.dataset.i].d;draw()});
+  draw();return draw;
+}
+var DEMOS={
+ precia:function(box){
+  var items=[{t:"Arroz 1 kg",d:true},{t:"Huevos x30",d:false},{t:"Leche",d:false}];
+  var draw=checklist(box,"Mi lista de compras",items);
+  var f=document.createElement("form");f.className="row";f.innerHTML='<input class="hc-input" placeholder="Agrega un producto" aria-label="Nuevo producto"><button class="hc-btn" type="submit">Agregar</button>';
+  box.insertBefore(f,box.querySelector(".prog"));
+  f.onsubmit=function(e){e.preventDefault();var v=f.querySelector("input").value.trim();if(!v)return;items.push({t:v,d:false});f.querySelector("input").value="";draw()};
+ },
+ agendia:function(box){
+  checklist(box,"Hoy",[{t:"Reunión con el equipo",a:"09:00",d:true},{t:"Almuerzo",a:"12:30",d:false},{t:"Llamar al proveedor",a:"15:00",d:false},{t:"Evento en la ciudad",a:"18:30",d:false}]);
+ },
+ organic:function(box){
+  var seeds=["Una idea para el huerto del barrio","Receta de la abuela, con foto"];
+  box.innerHTML='<h4>Mis semillas</h4><form class="row"><input class="hc-input" placeholder="Planta una semilla" aria-label="Nueva semilla"><button class="hc-btn" type="submit">Plantar</button></form><ul class="dl" id="sd"></ul>';
+  function draw(){$("#sd").innerHTML=seeds.map(function(s){return '<li><div class="hc-bubble hc-bubble--bot" style="max-width:100%;display:flex;gap:var(--space-3);align-items:center">'+ic("sprout")+esc(s)+'</div></li>'}).join("")}
+  box.querySelector("form").onsubmit=function(e){e.preventDefault();var i=box.querySelector("input");if(!i.value.trim())return;seeds.unshift(i.value.trim());i.value="";draw()};
+  draw();
+ },
+ habitos:function(box){
+  var H=[["Leer 10 minutos",[1,1,1,1,0,1,1]],["Caminar",[1,0,1,0,1,0,0]],["Tomar agua",[1,1,0,1,1,1,0]]],D=["L","M","X","J","V","S","D"];
+  box.innerHTML='<h4>Esta semana</h4><p class="small" style="margin:0">Soy alguien que cuida su rutina.</p><div class="hgrid" id="hg"></div><p class="small" id="ht" style="margin-top:var(--space-4)"></p>';
+  function draw(){
+    var h='<span></span>'+D.map(function(d){return '<span class="d">'+d+'</span>'}).join("");
+    H.forEach(function(r,i){h+='<span class="hn">'+esc(r[0])+'</span>'+r[1].map(function(v,j){return '<button aria-pressed="'+!!v+'" aria-label="'+esc(r[0])+", "+D[j]+'" data-i="'+i+'" data-j="'+j+'">'+(v?ic("check"):"")+'</button>'}).join("")});
+    $("#hg").innerHTML=h;
+    var t=H.reduce(function(s,r){return s+r[1].reduce(function(a,b){return a+b},0)},0);
+    $("#ht").textContent=t+" de 21 hábitos cumplidos";
+  }
+  box.addEventListener("click",function(e){var b=e.target.closest("[data-i]");if(!b)return;H[+b.dataset.i][1][+b.dataset.j]^=1;draw()});
+  draw();
+ },
+ presupuesto:function(box){
+  var R=[["Arriendo",900000],["Mercado",450000],["Servicios",210000],["Internet",85000]],V=["Tarjetas","Tabla","Resumen"],v=0;
+  var fm=function(n){return "$"+String(n).replace(/\B(?=(\d{3})+(?!\d))/g,".")};
+  box.innerHTML='<h4>Noviembre</h4><p class="small" style="margin:0">Total: <b id="tt"></b> COP</p><div class="tabs" style="margin:var(--space-3) 0 0" id="vb"></div><div id="vw"></div>';
+  $("#tt").textContent=fm(R.reduce(function(s,r){return s+r[1]},0));
+  var vb=$("#vb");V.forEach(function(n,i){var b=document.createElement("button");b.className="hc-chip";b.setAttribute("aria-pressed",i===0);b.textContent=n;b.onclick=function(){v=i;[].forEach.call(vb.children,function(c,j){c.setAttribute("aria-pressed",j===i)});draw()};vb.appendChild(b)});
+  function draw(){
+    var mx=Math.max.apply(null,R.map(function(r){return r[1]})),h="";
+    if(v===0)h='<div class="cards2">'+R.map(function(r){return "<div>"+r[0]+"<span>"+fm(r[1])+"</span></div>"}).join("")+"</div>";
+    if(v===1)h='<div class="tbl">'+R.map(function(r){return "<div><span>"+r[0]+"</span><b>"+fm(r[1])+"</b></div>"}).join("")+"</div>";
+    if(v===2)h='<div class="bars">'+R.map(function(r){return '<div><i style="width:'+r[1]/mx*100+'%"></i><b>'+r[0]+"</b><span>"+fm(r[1])+"</span></div>"}).join("")+"</div>";
+    $("#vw").innerHTML=h;
+  }
+  draw();
+ },
+ numerica:function(box){
+  var F=[["Cuadrado","1/1"],["Vertical","4/5"],["Historia","9/16"]];
+  box.innerHTML='<h4>Tu pieza</h4><div class="tabs" id="fb" style="margin:var(--space-3) 0 0"></div><div class="prev" id="pv">Tu ciudad<br>al instante</div><div class="row" style="justify-content:center"><button class="hc-chip" id="dk" aria-pressed="false">Tema oscuro</button></div>';
+  var fb=$("#fb"),pv=$("#pv");
+  function set(i){pv.style.aspectRatio=F[i][1];pv.style.width=(i===2?150:i===1?210:240)+"px";[].forEach.call(fb.children,function(c,j){c.setAttribute("aria-pressed",j===i)})}
+  F.forEach(function(f,i){var b=document.createElement("button");b.className="hc-chip";b.textContent=f[0];b.onclick=function(){set(i)};fb.appendChild(b)});
+  $("#dk").onclick=function(){var p=pv.classList.toggle("dk");this.setAttribute("aria-pressed",p)};
+  set(0);
+ }
+};
+show(0);
+
+/* ===== Reveal on scroll ===== */
+var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target)}})},{threshold:.12});
+[].forEach.call(document.querySelectorAll(".rv"),function(el){io.observe(el)});
+})();
+</script>
+</body>
+</html>
