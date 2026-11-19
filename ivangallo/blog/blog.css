@@ -1,0 +1,37 @@
+/* Blog de Iván Gallo. Usa las variables de ../css/style.css (papel, tinta, azul de identidad). */
+.bh { border-bottom: 1px solid var(--haze); background: var(--paper); }
+.bh-in { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); min-height: 56px; }
+.bh a { color: var(--ink); text-decoration: none; }
+.bh nav { display: flex; gap: var(--space-5); }
+.bh nav a:hover, .bh nav a[aria-current="page"] { color: var(--brand); }
+.bmain { padding-block: var(--space-7) var(--space-9); }
+.bmain.narrow { max-width: 760px; }
+.btitle { font-family: var(--font-display); font-weight: 800; font-size: clamp(34px, 6vw, 56px); line-height: 1.05; margin-top: var(--space-3); text-wrap: balance; }
+.blead { color: var(--ink-muted); margin-top: var(--space-4); max-width: 60ch; }
+.plist { margin-top: var(--space-7); display: grid; gap: 0; }
+.pitem { display: grid; grid-template-columns: 150px 1fr; gap: var(--space-5); padding: var(--space-5) 0; border-top: 1px solid var(--haze); }
+.pitem:last-child { border-bottom: 1px solid var(--haze); }
+.pitem time, .pmeta { font-family: var(--font-label); font-size: 12px; line-height: 16px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-muted); }
+.pitem h2 { font-family: var(--font-display); font-weight: 700; font-size: 24px; line-height: 30px; }
+.pitem h2 a { color: var(--ink); text-decoration: none; }
+.pitem h2 a:hover { color: var(--brand); text-decoration: underline; text-underline-offset: 4px; }
+.pitem p { color: var(--ink-muted); margin-top: var(--space-2); }
+.tags { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-3); }
+.tag { font-family: var(--font-label); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; padding: 2px 8px; border: 1px solid var(--ash); color: var(--ink-muted); }
+.bstate { margin-top: var(--space-6); color: var(--ink-muted); }
+.prose-b { margin-top: var(--space-6); font-size: 18px; line-height: 30px; }
+.prose-b > * + * { margin-top: var(--space-4); }
+.prose-b h2, .prose-b h3, .prose-b h4 { font-family: var(--font-display); font-weight: 700; line-height: 1.2; margin-top: var(--space-6); text-wrap: balance; }
+.prose-b h2 { font-size: 28px; } .prose-b h3 { font-size: 22px; } .prose-b h4 { font-size: 18px; }
+.prose-b a { color: var(--brand); text-underline-offset: 3px; }
+.prose-b blockquote { border-left: 3px solid var(--brand); padding-left: var(--space-4); color: var(--ink-muted); }
+.prose-b ul, .prose-b ol { padding-left: var(--space-5); } .prose-b ul { list-style: square; } .prose-b ol { list-style: decimal; }
+.prose-b li + li { margin-top: var(--space-2); }
+.prose-b code { font-family: var(--font-label); font-size: .88em; background: var(--mist); padding: 1px 5px; }
+.prose-b pre { background: var(--mist); padding: var(--space-4); overflow-x: auto; }
+.prose-b pre code { background: none; padding: 0; }
+.prose-b hr { border: 0; border-top: 1px solid var(--haze); margin-block: var(--space-6); }
+.prose-b img { height: auto; display: block; }
+.bfoot { border-top: 1px solid var(--haze); padding-block: var(--space-5); color: var(--ink-muted); font-size: 14px; }
+.bfoot a { color: var(--ink-muted); }
+@media (max-width: 640px) { .pitem { grid-template-columns: 1fr; gap: var(--space-2); } .bmain { padding-block: var(--space-6) var(--space-8); } }

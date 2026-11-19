@@ -9,6 +9,7 @@
   var rnd = function (a, b) { return a + Math.random() * (b - a); };
   var reduceMQ = window.matchMedia('(prefers-reduced-motion: reduce)');
   var motion = !reduceMQ.matches;
+  var VEIL = 0.5; // 0 = sin atenuar, 1 = fondo invisible. Medio = 0.5
   var DK = '#1e2838', G = '#0037b3', PAPER = '#f5f7fb', RI = 'rgba(30,40,56,', RA = 'rgba(0,55,179,';
   function rgb(hex) { hex = (hex || '').trim().replace('#', ''); if (hex.length === 3) hex = hex.replace(/(.)/g, '$1$1'); var n = parseInt(hex, 16); return isNaN(n) ? null : [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
   function colors() {
@@ -294,6 +295,9 @@
     cx.moveTo(disk.x - Math.cos(a) * len, disk.y - Math.sin(a) * len);
     cx.lineTo(disk.x + Math.cos(a) * len, disk.y + Math.sin(a) * len);
     cx.stroke();
+
+    // velo de atenuacion (nivel medio): suaviza todo el fondo menos el cursor y las ondas
+    cx.globalAlpha = VEIL; cx.fillStyle = PAPER; cx.fillRect(0, 0, W, H); cx.globalAlpha = 1;
 
     // disco verde y anillo
     var pulse = motion ? Math.sin(t / 520) * 4 : 0;

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Administrar blog · Iván Gallo</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" type="image/svg+xml" href="../../favicon.svg?v=2">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&family=Syne:wght@700;800&display=swap">
+<link rel="stylesheet" href="../../css/style.css">
+<link rel="stylesheet" href="../blog.css">
+<style>
+.adm { display: grid; grid-template-columns: 300px 1fr; gap: var(--space-6); align-items: start; }
+.adm h1 { font-family: var(--font-display); font-weight: 800; font-size: 32px; line-height: 38px; }
+.pane-l { border: 1px solid var(--haze); background: var(--paper-raised); position: sticky; top: var(--space-4); max-height: calc(100vh - 32px); display: flex; flex-direction: column; }
+.pane-l header { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--haze); }
+.pl { overflow: auto; }
+.pl button { all: unset; box-sizing: border-box; display: block; width: 100%; padding: var(--space-3) var(--space-4); cursor: pointer; border-bottom: 1px solid var(--mist); border-left: 3px solid transparent; }
+.pl button:hover, .pl button:focus-visible { background: var(--mist); }
+.pl button:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+.pl button[aria-current="true"] { border-left-color: var(--brand); background: var(--mist); }
+.pl .t { display: block; font-weight: 700; line-height: 22px; }
+.pl .s { display: flex; gap: var(--space-2); align-items: center; font-family: var(--font-label); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-muted); margin-top: 2px; }
+.dot { width: 8px; height: 8px; background: var(--ash); display: inline-block; }
+.dot.on { background: var(--brand); }
+.f { display: grid; gap: var(--space-4); }
+.f label { display: grid; gap: var(--space-1); font-family: var(--font-label); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-muted); }
+.f input[type=text], .f input[type=email], .f input[type=password], .f select, .f textarea {
+  width: 100%; padding: 10px 12px; border: 1.5px solid var(--ash); background: var(--paper-raised); color: var(--ink); font: 400 16px/24px var(--font-sans); letter-spacing: 0; text-transform: none; border-radius: 0; }
+.f textarea { min-height: 320px; resize: vertical; font-family: var(--font-label); font-size: 14px; line-height: 22px; }
+.f input:focus-visible, .f select:focus-visible, .f textarea:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.f .hint { font-family: var(--font-sans); font-size: 13px; line-height: 18px; letter-spacing: 0; text-transform: none; color: var(--ink-muted); }
+.f .err { color: #b00020; }
+.row { display: grid; grid-template-columns: 1fr 160px; gap: var(--space-4); }
+.chk { display: flex !important; grid-template-columns: none; align-items: center; gap: var(--space-3); font-family: var(--font-sans) !important; font-size: 16px !important; letter-spacing: 0 !important; text-transform: none !important; color: var(--ink) !important; }
+.chk input { width: 20px; height: 20px; accent-color: var(--brand); }
+.btn { all: unset; box-sizing: border-box; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 var(--space-5); background: var(--brand); color: var(--on-brand); font-family: var(--font-label); font-size: 13px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+.btn:hover { background: var(--brand-bright); }
+.btn:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+.btn[disabled] { opacity: .5; cursor: default; }
+.btn.sec { background: transparent; color: var(--ink); border: 1.5px solid var(--ash); }
+.btn.sec:hover { background: var(--mist); }
+.btn.dng { background: transparent; color: #b00020; border: 1.5px solid #b00020; }
+.btn.sm { min-height: 32px; padding: 0 var(--space-3); font-size: 12px; }
+.bar { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; }
+.bar .sp { margin-left: auto; color: var(--ink-muted); font-size: 14px; }
+.tabs { display: flex; gap: 0; border-bottom: 1px solid var(--haze); }
+.tabs button { all: unset; cursor: pointer; padding: var(--space-2) var(--space-4); font-family: var(--font-label); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; border-bottom: 3px solid transparent; }
+.tabs button[aria-selected="true"] { border-bottom-color: var(--brand); font-weight: 700; }
+.tabs button:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+.login { max-width: 420px; margin-inline: auto; }
+#msg { position: fixed; left: 50%; bottom: var(--space-5); transform: translateX(-50%); max-width: min(560px, 92vw); padding: var(--space-3) var(--space-5); background: var(--ink); color: var(--paper); font-size: 15px; line-height: 22px; z-index: 30; }
+#msg.err { background: #b00020; color: #fff; }
+dialog { border: 1.5px solid var(--ink); background: var(--paper-raised); color: var(--ink); padding: var(--space-5); max-width: 440px; }
+dialog::backdrop { background: rgba(15,20,29,.55); }
+dialog h2 { font-family: var(--font-display); font-size: 22px; margin-bottom: var(--space-3); }
+dialog .bar { margin-top: var(--space-5); }
+@media (max-width: 860px) { .adm { grid-template-columns: 1fr; } .pane-l { position: static; max-height: 280px; } .row { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header class="bh"><div class="wrap bh-in">
+  <a class="label" href="../">Ver el blog</a>
+  <div class="bar"><span class="label" id="who" hidden></span><button type="button" class="btn sec sm" id="out" hidden>Cerrar sesión</button></div>
+</div></header>
+
+<main class="wrap bmain">
+ <section id="vLogin" class="login" hidden aria-labelledby="hLogin">
+  <h1 id="hLogin">Administrar blog</h1>
+  <p class="blead">Ingresa con la misma cuenta de Sky Port.</p>
+  <form class="f" id="fLogin" style="margin-top:var(--space-5)" novalidate>
+   <label for="lEm">Correo<input id="lEm" type="email" autocomplete="username" required></label>
+   <label for="lPw">Contraseña<input id="lPw" type="password" autocomplete="current-password" required></label>
+   <p class="hint err" id="lEr" role="alert"></p>
+   <button class="btn" id="lBt" type="submit">Ingresar</button>
+  </form>
+ </section>
+
+ <section id="vApp" hidden>
+  <div class="adm">
+   <aside class="pane-l" aria-label="Entradas">
+    <header><strong class="label">Entradas</strong><button type="button" class="btn sm" id="nuevo">Nueva</button></header>
+    <div class="pl" id="pl"></div>
+   </aside>
+   <div>
+    <h1 id="eTitle">Nueva entrada</h1>
+    <form class="f" id="fPost" style="margin-top:var(--space-5)" novalidate>
+     <div class="row">
+      <label for="pTit">Título<input id="pTit" type="text" maxlength="160" required></label>
+      <label for="pLang">Idioma<select id="pLang"><option value="es">Español</option><option value="en">English</option></select></label>
+     </div>
+     <label for="pSlug">Enlace (slug)<input id="pSlug" type="text" maxlength="80" spellcheck="false" aria-describedby="sHint"><span class="hint" id="sHint">Se genera desde el título. Solo minúsculas, números y guiones. Quedará en /ivangallo/blog/tu-enlace/</span></label>
+     <label for="pExc">Resumen<input id="pExc" type="text" maxlength="400" aria-describedby="eHint"><span class="hint" id="eHint">Una o dos frases que aparecen en el listado y en buscadores.</span></label>
+     <label for="pTag">Etiquetas<input id="pTag" type="text" aria-describedby="tHint"><span class="hint" id="tHint">Separadas por coma. Ejemplo: estrategia, producto</span></label>
+     <div>
+      <div class="tabs" role="tablist" aria-label="Contenido"><button type="button" role="tab" id="tabE" aria-selected="true" aria-controls="boxE">Escribir</button><button type="button" role="tab" id="tabP" aria-selected="false" aria-controls="boxP">Vista previa</button></div>
+      <div id="boxE" role="tabpanel" aria-labelledby="tabE" style="margin-top:var(--space-3)"><label for="pBody">Contenido en Markdown<textarea id="pBody" aria-describedby="bHint"></textarea><span class="hint" id="bHint"># Título, ## Subtítulo, **negrita**, *cursiva*, [texto](https://enlace), ![descripción](https://imagen), listas con - o 1., citas con &gt; y bloques con ```.</span></label></div>
+      <div id="boxP" role="tabpanel" aria-labelledby="tabP" hidden style="margin-top:var(--space-3)"><div class="prose-b" id="prev" style="margin-top:0"></div></div>
+     </div>
+     <label class="chk" for="pPub"><input id="pPub" type="checkbox"> Publicada (visible para todos en el blog)</label>
+     <p class="hint err" id="pEr" role="alert"></p>
+     <div class="bar">
+      <button type="submit" class="btn" id="save">Guardar</button>
+      <a class="btn sec" id="ver" href="#" target="_blank" rel="noopener" hidden>Ver en el blog</a>
+      <button type="button" class="btn dng" id="del" hidden>Eliminar</button>
+      <span class="sp" id="dirty" aria-live="polite"></span>
+     </div>
+     <p class="hint">Al publicar, la entrada se ve de inmediato en el blog. La versión estática para buscadores e IA se genera automáticamente cada hora.</p>
+    </form>
+   </div>
+  </div>
+ </section>
+</main>
+
+<dialog id="dlg" aria-labelledby="dT"><h2 id="dT">Eliminar entrada</h2><p id="dP"></p><div class="bar"><button type="button" class="btn sec" id="dNo">Cancelar</button><button type="button" class="btn dng" id="dYes">Eliminar</button></div></dialog>
+<div id="msg" role="status" hidden></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="../config.js"></script>
+<script src="../md.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>

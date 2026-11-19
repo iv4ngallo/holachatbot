@@ -1,0 +1,9 @@
+# Sitios de holaibague.co. Se permite el rastreo, incluidos los agentes de IA.
+User-agent: *
+Allow: /
+# Sky Port es un panel privado con inicio de sesión
+Disallow: /skyport/
+# Administración del blog
+Disallow: /ivangallo/blog/admin/
+
+Sitemap: https://holaibague.co/sitemap.xml
