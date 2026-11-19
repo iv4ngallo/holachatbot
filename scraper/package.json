@@ -1,0 +1,17 @@
+{
+  "name": "precia-scraper",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Recolecta precios de supermercados para PrecIA y los guarda en Supabase.",
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "start": "node src/run.mjs"
+  },
+  "dependencies": {
+    "playwright": "1.49.1"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

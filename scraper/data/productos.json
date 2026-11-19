@@ -1,0 +1,1814 @@
+[
+ {
+  "key": "leche",
+  "nombre": "Leche entera",
+  "categoria": "lacteos",
+  "unidad": "L",
+  "cantidad": 1,
+  "alias": [
+   "leche"
+  ]
+ },
+ {
+  "key": "huevos",
+  "nombre": "Huevos",
+  "categoria": "lacteos",
+  "unidad": "und",
+  "cantidad": 30,
+  "alias": [
+   "huevo",
+   "huevos aa"
+  ]
+ },
+ {
+  "key": "queso",
+  "nombre": "Queso campesino",
+  "categoria": "lacteos",
+  "unidad": "g",
+  "cantidad": 500,
+  "alias": [
+   "queso"
+  ]
+ },
+ {
+  "key": "mantequilla",
+  "nombre": "Mantequilla",
+  "categoria": "lacteos",
+  "unidad": "g",
+  "cantidad": 250,
+  "alias": [
+   "margarina"
+  ]
+ },
+ {
+  "key": "yogur",
+  "nombre": "Yogur",
+  "categoria": "lacteos",
+  "unidad": "L",
+  "cantidad": 1,
+  "alias": [
+   "yogurt"
+  ]
+ },
+ {
+  "key": "kumis",
+  "nombre": "Kumis",
+  "categoria": "lacteos",
+  "unidad": "L",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "crema-leche",
+  "nombre": "Crema de leche",
+  "categoria": "lacteos",
+  "unidad": "ml",
+  "cantidad": 200,
+  "alias": []
+ },
+ {
+  "key": "banano",
+  "nombre": "Bananos",
+  "categoria": "frutas",
+  "unidad": "und",
+  "cantidad": 6,
+  "alias": [
+   "banano",
+   "guineo"
+  ]
+ },
+ {
+  "key": "limon",
+  "nombre": "Limón Tahití",
+  "categoria": "frutas",
+  "unidad": "kg",
+  "cantidad": 1,
+  "alias": [
+   "limon"
+  ]
+ },
+ {
+  "key": "aguacate",
+  "nombre": "Aguacate",
+  "categoria": "frutas",
+  "unidad": "und",
+  "cantidad": 2,
+  "alias": []
+ },
+ {
+  "key": "mango",
+  "nombre": "Mango",
+  "categoria": "frutas",
+  "unidad": "und",
+  "cantidad": 3,
+  "alias": []
+ },
+ {
+  "key": "papaya",
+  "nombre": "Papaya",
+  "categoria": "frutas",
+  "unidad": "und",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "mora",
+  "nombre": "Mora",
+  "categoria": "frutas",
+  "unidad": "g",
+  "cantidad": 500,
+  "alias": []
+ },
+ {
+  "key": "naranja",
+  "nombre": "Naranja",
+  "categoria": "frutas",
+  "unidad": "kg",
+  "cantidad": 2,
+  "alias": []
+ },
+ {
+  "key": "tomate-arbol",
+  "nombre": "Tomate de árbol",
+  "categoria": "frutas",
+  "unidad": "kg",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "papa",
+  "nombre": "Papa pastusa",
+  "categoria": "verduras",
+  "unidad": "kg",
+  "cantidad": 2,
+  "alias": [
+   "papa",
+   "papas"
+  ]
+ },
+ {
+  "key": "platano",
+  "nombre": "Plátano hartón",
+  "categoria": "verduras",
+  "unidad": "und",
+  "cantidad": 3,
+  "alias": [
+   "platano"
+  ]
+ },
+ {
+  "key": "yuca",
+  "nombre": "Yuca",
+  "categoria": "verduras",
+  "unidad": "kg",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "tomate",
+  "nombre": "Tomate chonto",
+  "categoria": "verduras",
+  "unidad": "kg",
+  "cantidad": 1,
+  "alias": [
+   "tomate"
+  ]
+ },
+ {
+  "key": "cebolla",
+  "nombre": "Cebolla cabezona",
+  "categoria": "verduras",
+  "unidad": "kg",
+  "cantidad": 1,
+  "alias": [
+   "cebolla"
+  ]
+ },
+ {
+  "key": "cebolla-larga",
+  "nombre": "Cebolla larga",
+  "categoria": "verduras",
+  "unidad": "und",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "zanahoria",
+  "nombre": "Zanahoria",
+  "categoria": "verduras",
+  "unidad": "kg",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "ajo",
+  "nombre": "Ajo",
+  "categoria": "verduras",
+  "unidad": "g",
+  "cantidad": 250,
+  "alias": []
+ },
+ {
+  "key": "cilantro",
+  "nombre": "Cilantro",
+  "categoria": "verduras",
+  "unidad": "und",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "pimenton",
+  "nombre": "Pimentón",
+  "categoria": "verduras",
+  "unidad": "und",
+  "cantidad": 2,
+  "alias": []
+ },
+ {
+  "key": "lechuga",
+  "nombre": "Lechuga",
+  "categoria": "verduras",
+  "unidad": "und",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "arveja",
+  "nombre": "Arveja verde",
+  "categoria": "verduras",
+  "unidad": "g",
+  "cantidad": 500,
+  "alias": []
+ },
+ {
+  "key": "pollo",
+  "nombre": "Pechuga de pollo",
+  "categoria": "carnes",
+  "unidad": "kg",
+  "cantidad": 1,
+  "alias": [
+   "pollo"
+  ]
+ },
+ {
+  "key": "muslos-pollo",
+  "nombre": "Muslos de pollo",
+  "categoria": "carnes",
+  "unidad": "kg",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "carne-molida",
+  "nombre": "Carne molida",
+  "categoria": "carnes",
+  "unidad": "g",
+  "cantidad": 500,
+  "alias": [
+   "carne"
+  ]
+ },
+ {
+  "key": "carne-res",
+  "nombre": "Carne de res para asar",
+  "categoria": "carnes",
+  "unidad": "kg",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "cerdo",
+  "nombre": "Lomo de cerdo",
+  "categoria": "carnes",
+  "unidad": "kg",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "costilla-cerdo",
+  "nombre": "Costilla de cerdo",
+  "categoria": "carnes",
+  "unidad": "kg",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "mojarra",
+  "nombre": "Mojarra",
+  "categoria": "carnes",
+  "unidad": "kg",
+  "cantidad": 1,
+  "alias": [
+   "pescado"
+  ]
+ },
+ {
+  "key": "chorizo",
+  "nombre": "Chorizo",
+  "categoria": "carnes",
+  "unidad": "und",
+  "cantidad": 6,
+  "alias": []
+ },
+ {
+  "key": "salchichas",
+  "nombre": "Salchichas",
+  "categoria": "carnes",
+  "unidad": "und",
+  "cantidad": 10,
+  "alias": []
+ },
+ {
+  "key": "arroz",
+  "nombre": "Arroz",
+  "categoria": "despensa",
+  "unidad": "kg",
+  "cantidad": 1,
+  "alias": [
+   "arroz blanco"
+  ]
+ },
+ {
+  "key": "frijol",
+  "nombre": "Fríjol",
+  "categoria": "despensa",
+  "unidad": "kg",
+  "cantidad": 1,
+  "alias": [
+   "frijol",
+   "frijoles",
+   "fríjoles"
+  ]
+ },
+ {
+  "key": "lentejas",
+  "nombre": "Lentejas",
+  "categoria": "despensa",
+  "unidad": "g",
+  "cantidad": 500,
+  "alias": [
+   "lenteja"
+  ]
+ },
+ {
+  "key": "garbanzos",
+  "nombre": "Garbanzos",
+  "categoria": "despensa",
+  "unidad": "g",
+  "cantidad": 500,
+  "alias": []
+ },
+ {
+  "key": "pasta",
+  "nombre": "Pasta espagueti",
+  "categoria": "despensa",
+  "unidad": "g",
+  "cantidad": 500,
+  "alias": [
+   "pasta",
+   "espagueti"
+  ]
+ },
+ {
+  "key": "harina-maiz",
+  "nombre": "Harina de maíz",
+  "categoria": "despensa",
+  "unidad": "kg",
+  "cantidad": 1,
+  "alias": [
+   "harina pan"
+  ]
+ },
+ {
+  "key": "azucar",
+  "nombre": "Azúcar",
+  "categoria": "despensa",
+  "unidad": "kg",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "panela",
+  "nombre": "Panela",
+  "categoria": "despensa",
+  "unidad": "und",
+  "cantidad": 2,
+  "alias": []
+ },
+ {
+  "key": "sal",
+  "nombre": "Sal",
+  "categoria": "despensa",
+  "unidad": "kg",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "aceite",
+  "nombre": "Aceite vegetal",
+  "categoria": "despensa",
+  "unidad": "L",
+  "cantidad": 1,
+  "alias": [
+   "aceite"
+  ]
+ },
+ {
+  "key": "cafe",
+  "nombre": "Café molido",
+  "categoria": "despensa",
+  "unidad": "g",
+  "cantidad": 500,
+  "alias": [
+   "cafe",
+   "tinto"
+  ]
+ },
+ {
+  "key": "chocolate",
+  "nombre": "Chocolate de mesa",
+  "categoria": "despensa",
+  "unidad": "g",
+  "cantidad": 500,
+  "alias": [
+   "chocolate"
+  ]
+ },
+ {
+  "key": "avena",
+  "nombre": "Avena en hojuelas",
+  "categoria": "despensa",
+  "unidad": "g",
+  "cantidad": 500,
+  "alias": [
+   "avena"
+  ]
+ },
+ {
+  "key": "atun",
+  "nombre": "Atún en lata",
+  "categoria": "despensa",
+  "unidad": "und",
+  "cantidad": 2,
+  "alias": [
+   "atun"
+  ]
+ },
+ {
+  "key": "salsa-tomate",
+  "nombre": "Salsa de tomate",
+  "categoria": "despensa",
+  "unidad": "g",
+  "cantidad": 400,
+  "alias": []
+ },
+ {
+  "key": "pan",
+  "nombre": "Pan tajado",
+  "categoria": "panaderia",
+  "unidad": "und",
+  "cantidad": 1,
+  "alias": [
+   "pan"
+  ]
+ },
+ {
+  "key": "arepas",
+  "nombre": "Arepas",
+  "categoria": "panaderia",
+  "unidad": "und",
+  "cantidad": 10,
+  "alias": [
+   "arepa"
+  ]
+ },
+ {
+  "key": "galletas",
+  "nombre": "Galletas",
+  "categoria": "panaderia",
+  "unidad": "und",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "cereal",
+  "nombre": "Cereal",
+  "categoria": "panaderia",
+  "unidad": "g",
+  "cantidad": 500,
+  "alias": []
+ },
+ {
+  "key": "agua",
+  "nombre": "Agua en botella",
+  "categoria": "bebidas",
+  "unidad": "L",
+  "cantidad": 6,
+  "alias": [
+   "agua"
+  ]
+ },
+ {
+  "key": "jugo",
+  "nombre": "Jugo de fruta",
+  "categoria": "bebidas",
+  "unidad": "L",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "gaseosa",
+  "nombre": "Gaseosa",
+  "categoria": "bebidas",
+  "unidad": "L",
+  "cantidad": 1.5,
+  "alias": []
+ },
+ {
+  "key": "jabon-loza",
+  "nombre": "Jabón lavaloza",
+  "categoria": "aseo",
+  "unidad": "g",
+  "cantidad": 500,
+  "alias": [
+   "lavaloza"
+  ]
+ },
+ {
+  "key": "detergente",
+  "nombre": "Detergente en polvo",
+  "categoria": "aseo",
+  "unidad": "kg",
+  "cantidad": 1,
+  "alias": [
+   "detergente"
+  ]
+ },
+ {
+  "key": "papel-higienico",
+  "nombre": "Papel higiénico",
+  "categoria": "aseo",
+  "unidad": "und",
+  "cantidad": 12,
+  "alias": [
+   "papel"
+  ]
+ },
+ {
+  "key": "jabon-bano",
+  "nombre": "Jabón de baño",
+  "categoria": "aseo",
+  "unidad": "und",
+  "cantidad": 3,
+  "alias": []
+ },
+ {
+  "key": "crema-dental",
+  "nombre": "Crema dental",
+  "categoria": "aseo",
+  "unidad": "und",
+  "cantidad": 2,
+  "alias": []
+ },
+ {
+  "key": "cloro",
+  "nombre": "Blanqueador",
+  "categoria": "aseo",
+  "unidad": "L",
+  "cantidad": 1,
+  "alias": [
+   "cloro",
+   "límpido"
+  ]
+ },
+ {
+  "key": "suavizante",
+  "nombre": "Suavizante de ropa",
+  "categoria": "aseo",
+  "unidad": "L",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "leche-deslactosada",
+  "nombre": "Leche deslactosada",
+  "categoria": "lacteos",
+  "unidad": "L",
+  "cantidad": 1,
+  "alias": [
+   "deslactosada"
+  ]
+ },
+ {
+  "key": "leche-polvo",
+  "nombre": "Leche en polvo",
+  "categoria": "lacteos",
+  "unidad": "g",
+  "cantidad": 400,
+  "alias": []
+ },
+ {
+  "key": "queso-mozzarella",
+  "nombre": "Queso mozzarella",
+  "categoria": "lacteos",
+  "unidad": "g",
+  "cantidad": 500,
+  "alias": [
+   "mozzarella"
+  ]
+ },
+ {
+  "key": "queso-doble-crema",
+  "nombre": "Queso doble crema",
+  "categoria": "lacteos",
+  "unidad": "g",
+  "cantidad": 500,
+  "alias": []
+ },
+ {
+  "key": "queso-costeno",
+  "nombre": "Queso costeño",
+  "categoria": "lacteos",
+  "unidad": "g",
+  "cantidad": 500,
+  "alias": []
+ },
+ {
+  "key": "queso-crema",
+  "nombre": "Queso crema",
+  "categoria": "lacteos",
+  "unidad": "g",
+  "cantidad": 200,
+  "alias": []
+ },
+ {
+  "key": "cuajada",
+  "nombre": "Cuajada",
+  "categoria": "lacteos",
+  "unidad": "g",
+  "cantidad": 500,
+  "alias": []
+ },
+ {
+  "key": "yogur-griego",
+  "nombre": "Yogur griego",
+  "categoria": "lacteos",
+  "unidad": "g",
+  "cantidad": 150,
+  "alias": []
+ },
+ {
+  "key": "avena-liquida",
+  "nombre": "Avena líquida",
+  "categoria": "lacteos",
+  "unidad": "L",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "suero-costeno",
+  "nombre": "Suero costeño",
+  "categoria": "lacteos",
+  "unidad": "g",
+  "cantidad": 250,
+  "alias": []
+ },
+ {
+  "key": "leche-achocolatada",
+  "nombre": "Leche achocolatada",
+  "categoria": "lacteos",
+  "unidad": "und",
+  "cantidad": 6,
+  "alias": []
+ },
+ {
+  "key": "fresa",
+  "nombre": "Fresa",
+  "categoria": "frutas",
+  "unidad": "g",
+  "cantidad": 500,
+  "alias": [
+   "fresas"
+  ]
+ },
+ {
+  "key": "pina",
+  "nombre": "Piña",
+  "categoria": "frutas",
+  "unidad": "und",
+  "cantidad": 1,
+  "alias": [
+   "pina"
+  ]
+ },
+ {
+  "key": "maracuya",
+  "nombre": "Maracuyá",
+  "categoria": "frutas",
+  "unidad": "kg",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "lulo",
+  "nombre": "Lulo",
+  "categoria": "frutas",
+  "unidad": "kg",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "guayaba",
+  "nombre": "Guayaba",
+  "categoria": "frutas",
+  "unidad": "kg",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "manzana",
+  "nombre": "Manzana roja",
+  "categoria": "frutas",
+  "unidad": "kg",
+  "cantidad": 1,
+  "alias": [
+   "manzana"
+  ]
+ },
+ {
+  "key": "pera",
+  "nombre": "Pera",
+  "categoria": "frutas",
+  "unidad": "kg",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "uvas",
+  "nombre": "Uvas",
+  "categoria": "frutas",
+  "unidad": "g",
+  "cantidad": 500,
+  "alias": [
+   "uva"
+  ]
+ },
+ {
+  "key": "sandia",
+  "nombre": "Sandía",
+  "categoria": "frutas",
+  "unidad": "und",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "melon",
+  "nombre": "Melón",
+  "categoria": "frutas",
+  "unidad": "und",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "mandarina",
+  "nombre": "Mandarina",
+  "categoria": "frutas",
+  "unidad": "kg",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "coco",
+  "nombre": "Coco",
+  "categoria": "frutas",
+  "unidad": "und",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "granadilla",
+  "nombre": "Granadilla",
+  "categoria": "frutas",
+  "unidad": "kg",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "durazno",
+  "nombre": "Durazno",
+  "categoria": "frutas",
+  "unidad": "kg",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "guanabana",
+  "nombre": "Guanábana",
+  "categoria": "frutas",
+  "unidad": "und",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "pitahaya",
+  "nombre": "Pitahaya",
+  "categoria": "frutas",
+  "unidad": "und",
+  "cantidad": 2,
+  "alias": []
+ },
+ {
+  "key": "ciruela",
+  "nombre": "Ciruela",
+  "categoria": "frutas",
+  "unidad": "kg",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "papa-criolla",
+  "nombre": "Papa criolla",
+  "categoria": "verduras",
+  "unidad": "kg",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "platano-maduro",
+  "nombre": "Plátano maduro",
+  "categoria": "verduras",
+  "unidad": "und",
+  "cantidad": 3,
+  "alias": []
+ },
+ {
+  "key": "cebolla-roja",
+  "nombre": "Cebolla roja",
+  "categoria": "verduras",
+  "unidad": "kg",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "tomate-cherry",
+  "nombre": "Tomate cherry",
+  "categoria": "verduras",
+  "unidad": "g",
+  "cantidad": 250,
+  "alias": []
+ },
+ {
+  "key": "pepino",
+  "nombre": "Pepino cohombro",
+  "categoria": "verduras",
+  "unidad": "und",
+  "cantidad": 2,
+  "alias": [
+   "pepino"
+  ]
+ },
+ {
+  "key": "remolacha",
+  "nombre": "Remolacha",
+  "categoria": "verduras",
+  "unidad": "kg",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "repollo",
+  "nombre": "Repollo",
+  "categoria": "verduras",
+  "unidad": "und",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "brocoli",
+  "nombre": "Brócoli",
+  "categoria": "verduras",
+  "unidad": "und",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "coliflor",
+  "nombre": "Coliflor",
+  "categoria": "verduras",
+  "unidad": "und",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "espinaca",
+  "nombre": "Espinaca",
+  "categoria": "verduras",
+  "unidad": "g",
+  "cantidad": 250,
+  "alias": []
+ },
+ {
+  "key": "habichuela",
+  "nombre": "Habichuela",
+  "categoria": "verduras",
+  "unidad": "g",
+  "cantidad": 500,
+  "alias": []
+ },
+ {
+  "key": "mazorca",
+  "nombre": "Mazorca",
+  "categoria": "verduras",
+  "unidad": "und",
+  "cantidad": 4,
+  "alias": [
+   "maiz tierno"
+  ]
+ },
+ {
+  "key": "ahuyama",
+  "nombre": "Ahuyama",
+  "categoria": "verduras",
+  "unidad": "kg",
+  "cantidad": 1,
+  "alias": [
+   "auyama"
+  ]
+ },
+ {
+  "key": "apio",
+  "nombre": "Apio",
+  "categoria": "verduras",
+  "unidad": "und",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "perejil",
+  "nombre": "Perejil",
+  "categoria": "verduras",
+  "unidad": "und",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "champinones",
+  "nombre": "Champiñones",
+  "categoria": "verduras",
+  "unidad": "g",
+  "cantidad": 250,
+  "alias": [
+   "champinon"
+  ]
+ },
+ {
+  "key": "calabacin",
+  "nombre": "Calabacín",
+  "categoria": "verduras",
+  "unidad": "und",
+  "cantidad": 2,
+  "alias": [
+   "zucchini"
+  ]
+ },
+ {
+  "key": "arracacha",
+  "nombre": "Arracacha",
+  "categoria": "verduras",
+  "unidad": "kg",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "name",
+  "nombre": "Ñame",
+  "categoria": "verduras",
+  "unidad": "kg",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "pollo-entero",
+  "nombre": "Pollo entero",
+  "categoria": "carnes",
+  "unidad": "und",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "alas-pollo",
+  "nombre": "Alas de pollo",
+  "categoria": "carnes",
+  "unidad": "kg",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "higado",
+  "nombre": "Hígado de res",
+  "categoria": "carnes",
+  "unidad": "g",
+  "cantidad": 500,
+  "alias": []
+ },
+ {
+  "key": "sobrebarriga",
+  "nombre": "Sobrebarriga",
+  "categoria": "carnes",
+  "unidad": "kg",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "punta-anca",
+  "nombre": "Punta de anca",
+  "categoria": "carnes",
+  "unidad": "kg",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "costilla-res",
+  "nombre": "Costilla de res",
+  "categoria": "carnes",
+  "unidad": "kg",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "chuleta-cerdo",
+  "nombre": "Chuleta de cerdo",
+  "categoria": "carnes",
+  "unidad": "kg",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "tocineta",
+  "nombre": "Tocineta",
+  "categoria": "carnes",
+  "unidad": "g",
+  "cantidad": 250,
+  "alias": []
+ },
+ {
+  "key": "jamon",
+  "nombre": "Jamón",
+  "categoria": "carnes",
+  "unidad": "g",
+  "cantidad": 250,
+  "alias": []
+ },
+ {
+  "key": "salchichon",
+  "nombre": "Salchichón",
+  "categoria": "carnes",
+  "unidad": "g",
+  "cantidad": 250,
+  "alias": []
+ },
+ {
+  "key": "mortadela",
+  "nombre": "Mortadela",
+  "categoria": "carnes",
+  "unidad": "g",
+  "cantidad": 250,
+  "alias": []
+ },
+ {
+  "key": "morcilla",
+  "nombre": "Morcilla",
+  "categoria": "carnes",
+  "unidad": "und",
+  "cantidad": 4,
+  "alias": []
+ },
+ {
+  "key": "chicharron",
+  "nombre": "Chicharrón",
+  "categoria": "carnes",
+  "unidad": "g",
+  "cantidad": 250,
+  "alias": []
+ },
+ {
+  "key": "tilapia",
+  "nombre": "Tilapia",
+  "categoria": "carnes",
+  "unidad": "kg",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "camaron",
+  "nombre": "Camarón",
+  "categoria": "carnes",
+  "unidad": "g",
+  "cantidad": 500,
+  "alias": []
+ },
+ {
+  "key": "arroz-integral",
+  "nombre": "Arroz integral",
+  "categoria": "despensa",
+  "unidad": "kg",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "aceite-oliva",
+  "nombre": "Aceite de oliva",
+  "categoria": "despensa",
+  "unidad": "ml",
+  "cantidad": 500,
+  "alias": []
+ },
+ {
+  "key": "mayonesa",
+  "nombre": "Mayonesa",
+  "categoria": "despensa",
+  "unidad": "g",
+  "cantidad": 400,
+  "alias": []
+ },
+ {
+  "key": "mostaza",
+  "nombre": "Mostaza",
+  "categoria": "despensa",
+  "unidad": "g",
+  "cantidad": 200,
+  "alias": []
+ },
+ {
+  "key": "vinagre",
+  "nombre": "Vinagre",
+  "categoria": "despensa",
+  "unidad": "ml",
+  "cantidad": 500,
+  "alias": []
+ },
+ {
+  "key": "pimienta",
+  "nombre": "Pimienta",
+  "categoria": "despensa",
+  "unidad": "g",
+  "cantidad": 50,
+  "alias": []
+ },
+ {
+  "key": "comino",
+  "nombre": "Comino",
+  "categoria": "despensa",
+  "unidad": "g",
+  "cantidad": 50,
+  "alias": []
+ },
+ {
+  "key": "caldo-gallina",
+  "nombre": "Caldo de gallina",
+  "categoria": "despensa",
+  "unidad": "und",
+  "cantidad": 12,
+  "alias": [
+   "caldo"
+  ]
+ },
+ {
+  "key": "harina-trigo",
+  "nombre": "Harina de trigo",
+  "categoria": "despensa",
+  "unidad": "kg",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "maizena",
+  "nombre": "Maicena",
+  "categoria": "despensa",
+  "unidad": "g",
+  "cantidad": 300,
+  "alias": [
+   "maizena"
+  ]
+ },
+ {
+  "key": "fideos",
+  "nombre": "Fideos",
+  "categoria": "despensa",
+  "unidad": "g",
+  "cantidad": 250,
+  "alias": [
+   "sopa de pasta"
+  ]
+ },
+ {
+  "key": "arveja-seca",
+  "nombre": "Arveja seca",
+  "categoria": "despensa",
+  "unidad": "g",
+  "cantidad": 500,
+  "alias": []
+ },
+ {
+  "key": "quinua",
+  "nombre": "Quinua",
+  "categoria": "despensa",
+  "unidad": "g",
+  "cantidad": 500,
+  "alias": []
+ },
+ {
+  "key": "arequipe",
+  "nombre": "Arequipe",
+  "categoria": "despensa",
+  "unidad": "g",
+  "cantidad": 250,
+  "alias": []
+ },
+ {
+  "key": "leche-condensada",
+  "nombre": "Leche condensada",
+  "categoria": "despensa",
+  "unidad": "g",
+  "cantidad": 395,
+  "alias": []
+ },
+ {
+  "key": "miel",
+  "nombre": "Miel de abejas",
+  "categoria": "despensa",
+  "unidad": "g",
+  "cantidad": 300,
+  "alias": [
+   "miel"
+  ]
+ },
+ {
+  "key": "mani",
+  "nombre": "Maní",
+  "categoria": "despensa",
+  "unidad": "g",
+  "cantidad": 200,
+  "alias": []
+ },
+ {
+  "key": "sardinas",
+  "nombre": "Sardinas en lata",
+  "categoria": "despensa",
+  "unidad": "und",
+  "cantidad": 2,
+  "alias": [
+   "sardina"
+  ]
+ },
+ {
+  "key": "salsa-soya",
+  "nombre": "Salsa de soya",
+  "categoria": "despensa",
+  "unidad": "ml",
+  "cantidad": 150,
+  "alias": []
+ },
+ {
+  "key": "pasta-tomate",
+  "nombre": "Pasta de tomate",
+  "categoria": "despensa",
+  "unidad": "g",
+  "cantidad": 200,
+  "alias": []
+ },
+ {
+  "key": "maiz-lata",
+  "nombre": "Maíz tierno en lata",
+  "categoria": "despensa",
+  "unidad": "g",
+  "cantidad": 300,
+  "alias": []
+ },
+ {
+  "key": "cafe-instantaneo",
+  "nombre": "Café instantáneo",
+  "categoria": "despensa",
+  "unidad": "g",
+  "cantidad": 170,
+  "alias": [
+   "nescafe"
+  ]
+ },
+ {
+  "key": "cacao-polvo",
+  "nombre": "Cacao en polvo",
+  "categoria": "despensa",
+  "unidad": "g",
+  "cantidad": 200,
+  "alias": [
+   "cacao"
+  ]
+ },
+ {
+  "key": "aromaticas",
+  "nombre": "Aromáticas",
+  "categoria": "despensa",
+  "unidad": "und",
+  "cantidad": 20,
+  "alias": [
+   "aromatica"
+  ]
+ },
+ {
+  "key": "te",
+  "nombre": "Té",
+  "categoria": "despensa",
+  "unidad": "und",
+  "cantidad": 20,
+  "alias": []
+ },
+ {
+  "key": "pan-hamburguesa",
+  "nombre": "Pan de hamburguesa",
+  "categoria": "panaderia",
+  "unidad": "und",
+  "cantidad": 6,
+  "alias": []
+ },
+ {
+  "key": "pan-perro",
+  "nombre": "Pan para perro caliente",
+  "categoria": "panaderia",
+  "unidad": "und",
+  "cantidad": 6,
+  "alias": []
+ },
+ {
+  "key": "pan-integral",
+  "nombre": "Pan integral",
+  "categoria": "panaderia",
+  "unidad": "und",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "mantecadas",
+  "nombre": "Mantecadas",
+  "categoria": "panaderia",
+  "unidad": "und",
+  "cantidad": 6,
+  "alias": [
+   "mantecada"
+  ]
+ },
+ {
+  "key": "tostadas",
+  "nombre": "Tostadas",
+  "categoria": "panaderia",
+  "unidad": "und",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "galletas-saladas",
+  "nombre": "Galletas saladas",
+  "categoria": "panaderia",
+  "unidad": "und",
+  "cantidad": 1,
+  "alias": [
+   "saltin"
+  ]
+ },
+ {
+  "key": "almojabana",
+  "nombre": "Almojábana",
+  "categoria": "panaderia",
+  "unidad": "und",
+  "cantidad": 4,
+  "alias": [
+   "almojabanas"
+  ]
+ },
+ {
+  "key": "pandebono",
+  "nombre": "Pandebono",
+  "categoria": "panaderia",
+  "unidad": "und",
+  "cantidad": 4,
+  "alias": []
+ },
+ {
+  "key": "granola",
+  "nombre": "Granola",
+  "categoria": "panaderia",
+  "unidad": "g",
+  "cantidad": 400,
+  "alias": []
+ },
+ {
+  "key": "mermelada",
+  "nombre": "Mermelada",
+  "categoria": "panaderia",
+  "unidad": "g",
+  "cantidad": 300,
+  "alias": []
+ },
+ {
+  "key": "mantequilla-mani",
+  "nombre": "Mantequilla de maní",
+  "categoria": "panaderia",
+  "unidad": "g",
+  "cantidad": 340,
+  "alias": []
+ },
+ {
+  "key": "tortillas",
+  "nombre": "Tortillas de trigo",
+  "categoria": "panaderia",
+  "unidad": "und",
+  "cantidad": 8,
+  "alias": []
+ },
+ {
+  "key": "agua-gas",
+  "nombre": "Agua con gas",
+  "categoria": "bebidas",
+  "unidad": "L",
+  "cantidad": 6,
+  "alias": []
+ },
+ {
+  "key": "cerveza",
+  "nombre": "Cerveza",
+  "categoria": "bebidas",
+  "unidad": "und",
+  "cantidad": 6,
+  "alias": []
+ },
+ {
+  "key": "malta",
+  "nombre": "Malta",
+  "categoria": "bebidas",
+  "unidad": "und",
+  "cantidad": 6,
+  "alias": []
+ },
+ {
+  "key": "te-frio",
+  "nombre": "Té frío",
+  "categoria": "bebidas",
+  "unidad": "L",
+  "cantidad": 1.5,
+  "alias": []
+ },
+ {
+  "key": "hidratante",
+  "nombre": "Bebida hidratante",
+  "categoria": "bebidas",
+  "unidad": "ml",
+  "cantidad": 500,
+  "alias": [
+   "gatorade"
+  ]
+ },
+ {
+  "key": "energizante",
+  "nombre": "Bebida energizante",
+  "categoria": "bebidas",
+  "unidad": "und",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "refresco-polvo",
+  "nombre": "Refresco en polvo",
+  "categoria": "bebidas",
+  "unidad": "und",
+  "cantidad": 10,
+  "alias": []
+ },
+ {
+  "key": "aguardiente",
+  "nombre": "Aguardiente",
+  "categoria": "bebidas",
+  "unidad": "ml",
+  "cantidad": 750,
+  "alias": []
+ },
+ {
+  "key": "ron",
+  "nombre": "Ron",
+  "categoria": "bebidas",
+  "unidad": "ml",
+  "cantidad": 750,
+  "alias": []
+ },
+ {
+  "key": "vino",
+  "nombre": "Vino",
+  "categoria": "bebidas",
+  "unidad": "ml",
+  "cantidad": 750,
+  "alias": []
+ },
+ {
+  "key": "jabon-barra",
+  "nombre": "Jabón en barra para ropa",
+  "categoria": "aseo",
+  "unidad": "und",
+  "cantidad": 3,
+  "alias": []
+ },
+ {
+  "key": "ambientador",
+  "nombre": "Ambientador",
+  "categoria": "aseo",
+  "unidad": "und",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "esponjas",
+  "nombre": "Esponjas",
+  "categoria": "aseo",
+  "unidad": "und",
+  "cantidad": 3,
+  "alias": [
+   "esponja"
+  ]
+ },
+ {
+  "key": "bolsas-basura",
+  "nombre": "Bolsas de basura",
+  "categoria": "aseo",
+  "unidad": "und",
+  "cantidad": 10,
+  "alias": []
+ },
+ {
+  "key": "servilletas",
+  "nombre": "Servilletas",
+  "categoria": "aseo",
+  "unidad": "und",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "papel-cocina",
+  "nombre": "Papel de cocina",
+  "categoria": "aseo",
+  "unidad": "und",
+  "cantidad": 3,
+  "alias": []
+ },
+ {
+  "key": "desinfectante",
+  "nombre": "Desinfectante",
+  "categoria": "aseo",
+  "unidad": "L",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "limpiavidrios",
+  "nombre": "Limpiavidrios",
+  "categoria": "aseo",
+  "unidad": "ml",
+  "cantidad": 500,
+  "alias": []
+ },
+ {
+  "key": "limpiador-pisos",
+  "nombre": "Limpiador de pisos",
+  "categoria": "aseo",
+  "unidad": "L",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "trapero",
+  "nombre": "Trapero",
+  "categoria": "aseo",
+  "unidad": "und",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "escoba",
+  "nombre": "Escoba",
+  "categoria": "aseo",
+  "unidad": "und",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "guantes",
+  "nombre": "Guantes de aseo",
+  "categoria": "aseo",
+  "unidad": "und",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "insecticida",
+  "nombre": "Insecticida",
+  "categoria": "aseo",
+  "unidad": "und",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "fosforos",
+  "nombre": "Fósforos",
+  "categoria": "aseo",
+  "unidad": "und",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "champu",
+  "nombre": "Champú",
+  "categoria": "cuidado",
+  "unidad": "ml",
+  "cantidad": 400,
+  "alias": [
+   "shampoo"
+  ]
+ },
+ {
+  "key": "acondicionador",
+  "nombre": "Acondicionador",
+  "categoria": "cuidado",
+  "unidad": "ml",
+  "cantidad": 400,
+  "alias": []
+ },
+ {
+  "key": "desodorante",
+  "nombre": "Desodorante",
+  "categoria": "cuidado",
+  "unidad": "und",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "cepillo-dientes",
+  "nombre": "Cepillo de dientes",
+  "categoria": "cuidado",
+  "unidad": "und",
+  "cantidad": 2,
+  "alias": []
+ },
+ {
+  "key": "enjuague-bucal",
+  "nombre": "Enjuague bucal",
+  "categoria": "cuidado",
+  "unidad": "ml",
+  "cantidad": 250,
+  "alias": []
+ },
+ {
+  "key": "crema-corporal",
+  "nombre": "Crema corporal",
+  "categoria": "cuidado",
+  "unidad": "ml",
+  "cantidad": 400,
+  "alias": []
+ },
+ {
+  "key": "protector-solar",
+  "nombre": "Protector solar",
+  "categoria": "cuidado",
+  "unidad": "ml",
+  "cantidad": 120,
+  "alias": []
+ },
+ {
+  "key": "toallas-higienicas",
+  "nombre": "Toallas higiénicas",
+  "categoria": "cuidado",
+  "unidad": "und",
+  "cantidad": 10,
+  "alias": []
+ },
+ {
+  "key": "afeitadoras",
+  "nombre": "Máquinas de afeitar",
+  "categoria": "cuidado",
+  "unidad": "und",
+  "cantidad": 3,
+  "alias": []
+ },
+ {
+  "key": "hilo-dental",
+  "nombre": "Hilo dental",
+  "categoria": "cuidado",
+  "unidad": "und",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "jabon-manos",
+  "nombre": "Jabón líquido de manos",
+  "categoria": "cuidado",
+  "unidad": "ml",
+  "cantidad": 500,
+  "alias": []
+ },
+ {
+  "key": "panuelos",
+  "nombre": "Pañuelos desechables",
+  "categoria": "cuidado",
+  "unidad": "und",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "panales",
+  "nombre": "Pañales",
+  "categoria": "bebe",
+  "unidad": "und",
+  "cantidad": 30,
+  "alias": [
+   "panal"
+  ]
+ },
+ {
+  "key": "toallitas-humedas",
+  "nombre": "Toallitas húmedas",
+  "categoria": "bebe",
+  "unidad": "und",
+  "cantidad": 80,
+  "alias": []
+ },
+ {
+  "key": "formula-infantil",
+  "nombre": "Fórmula infantil",
+  "categoria": "bebe",
+  "unidad": "g",
+  "cantidad": 400,
+  "alias": []
+ },
+ {
+  "key": "compotas",
+  "nombre": "Compotas",
+  "categoria": "bebe",
+  "unidad": "und",
+  "cantidad": 4,
+  "alias": [
+   "compota"
+  ]
+ },
+ {
+  "key": "cereal-infantil",
+  "nombre": "Cereal infantil",
+  "categoria": "bebe",
+  "unidad": "g",
+  "cantidad": 300,
+  "alias": []
+ },
+ {
+  "key": "champu-bebe",
+  "nombre": "Champú para bebé",
+  "categoria": "bebe",
+  "unidad": "ml",
+  "cantidad": 200,
+  "alias": []
+ },
+ {
+  "key": "crema-panal",
+  "nombre": "Crema antipañalitis",
+  "categoria": "bebe",
+  "unidad": "g",
+  "cantidad": 100,
+  "alias": []
+ },
+ {
+  "key": "concentrado-perro",
+  "nombre": "Concentrado para perro",
+  "categoria": "mascotas",
+  "unidad": "kg",
+  "cantidad": 2,
+  "alias": []
+ },
+ {
+  "key": "concentrado-gato",
+  "nombre": "Concentrado para gato",
+  "categoria": "mascotas",
+  "unidad": "kg",
+  "cantidad": 1,
+  "alias": []
+ },
+ {
+  "key": "arena-gato",
+  "nombre": "Arena para gato",
+  "categoria": "mascotas",
+  "unidad": "kg",
+  "cantidad": 4,
+  "alias": []
+ },
+ {
+  "key": "snacks-perro",
+  "nombre": "Snacks para perro",
+  "categoria": "mascotas",
+  "unidad": "und",
+  "cantidad": 1,
+  "alias": []
+ }
+]

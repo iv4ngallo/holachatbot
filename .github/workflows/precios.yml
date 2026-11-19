@@ -1,0 +1,70 @@
+name: Precios de supermercados (PrecIA)
+
+on:
+  # Ejecución diaria desactivada hasta validar con una corrida manual y revisar los términos de uso de cada sitio.
+  # Para activarla, quita el "#" de las dos líneas siguientes (06:00 hora de Colombia).
+  # schedule:
+  #   - cron: '0 11 * * *'
+  workflow_dispatch:
+    inputs:
+      cadenas:
+        description: 'Cadenas separadas por coma (vacío = todas): exito,d1'
+        default: ''
+      categoria:
+        description: 'Solo una categoría del catálogo (p. ej. lacteos). Vacío = todas'
+        default: 'lacteos'
+      limite:
+        description: 'Máximo de productos por cadena (vacío = sin límite)'
+        default: '5'
+      dry_run:
+        description: 'Simulación: no escribe en la base de datos'
+        type: boolean
+        default: true
+      debug:
+        description: 'Guardar respuestas y capturas para revisar (artefacto)'
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: precios
+  cancel-in-progress: false
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    defaults:
+      run:
+        working-directory: scraper
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Instalar dependencias
+        run: npm install --no-audit --no-fund
+      - name: Pruebas
+        run: npm test
+      - name: Instalar Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Recolectar precios
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          CADENAS: ${{ github.event_name == 'workflow_dispatch' && inputs.cadenas || '' }}
+          CATEGORIA: ${{ github.event_name == 'workflow_dispatch' && inputs.categoria || '' }}
+          LIMITE: ${{ github.event_name == 'workflow_dispatch' && inputs.limite || '' }}
+          DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run && '1' || '0' }}
+          DEBUG: ${{ github.event_name == 'workflow_dispatch' && inputs.debug && '1' || '0' }}
+        run: node src/run.mjs
+      - name: Subir respuestas para revisión
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-precios
+          path: scraper/debug/
+          if-no-files-found: ignore
+          retention-days: 7
