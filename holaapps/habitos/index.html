@@ -311,6 +311,9 @@ button,input,select,textarea{font:inherit;color:inherit}
 
 /* ---------- Calendario ---------- */
 .cal-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.cal-new{display:inline-flex;gap:6px}
+.cal-hint{margin:0 0 10px}
+.col[data-act=cal-slot]{cursor:copy}
 .cal-bar h2{font-size:23px;flex:1;min-width:180px}
 .seg{display:inline-flex;background:#fff;border:2px solid var(--or-100);border-radius:14px;padding:3px;gap:2px}
 .seg button{border:0;background:transparent;padding:6px 12px;border-radius:10px;font-weight:800;font-size:13px;cursor:pointer;color:var(--muted);display:inline-flex;align-items:center}
@@ -1598,17 +1601,19 @@ function vCalendario(){
     <div class="seg"><button data-act="cal-nav" data-d="-1" aria-label="Anterior">${ic('left')}</button><button data-act="cal-today">Hoy</button><button data-act="cal-nav" data-d="1" aria-label="Siguiente">${ic('right')}</button></div>
     <h2>${mode==='week'?weekTitle(d):longDate(d).replace(/^./,c=>c.toUpperCase())}</h2>
     <div class="seg"><button class="${mode==='week'?'on':''}" data-act="cal-mode" data-m="week">Semana</button><button class="${mode==='day'?'on':''}" data-act="cal-mode" data-m="day">Día</button></div>
+    <div class="cal-new"><button type="button" class="btn primary sm" data-act="cal-new" data-kind="habito">${ic('plus')} Hábito</button><button type="button" class="btn soft sm" data-act="cal-new" data-kind="fijo">${ic('plus')} Evento</button></div>
     <button type="button" class="btn ghost sm" data-act="gc-open" title="Sincronizar con Google Calendar">Google Calendar</button>
   </div>
   <div class="legend"><span><i class="c-pila"></i>Cadena de hábitos</span><span><i class="c-ancla"></i>Ancla</span><span><i class="c-pos"></i>Hábito positivo</span><span><i class="c-neg"></i>Hábito negativo (zona de riesgo)</span><span><i class="c-neu"></i>Neutral</span><span><i class="c-fijo"></i>Evento fijo</span></div>
+  <p class="hint cal-hint">Toca un espacio vacío del calendario para crear un evento a esa hora, o toca un bloque para verlo y editarlo.</p>
   ${mode==='day'?`<div class="daystrip">${[0,1,2,3,4,5,6].map(i=>{const x=addDays(ws,i);return `<button class="${dk(x)===dk(d)?'on':''} ${dk(x)===tk?'today':''}" data-act="cal-goday" data-date="${dk(x)}"><small>${DAYS[i]}</small><b>${x.getDate()}</b></button>`}).join('')}</div>`:''}
   ${anyItems?'':`<div class="empty" style="margin-bottom:14px">${mascot("sol",64)}<b>Tu calendario está vacío</b>Registra hábitos con hora o crea cadenas para verlos aquí.<br><button class="btn primary sm" data-act="load-example">Ver con datos de ejemplo</button></div>`}
   <div class="cal-wrap"><div class="cal-x"><div class="cal ${mode}" style="--n:${days.length};--pph:${PPH}px">
     <div class="cal-row cal-head"><div class="gut"></div>${data.map(o=>`<div class="dh ${o.k===tk?'today':''}" data-act="cal-goday" data-date="${o.k}" role="button" tabindex="0"><span class="dn">${DAYS[dayIdx(o.date)]}</span><span class="dd">${o.date.getDate()}</span><span class="dp">${(()=>{const c=o.items.filter(i=>i.checkable);return c.length?c.filter(i=>isDone(o.k,i.key)).length+'/'+c.length:'·'})()}</span></div>`).join('')}</div>
     <div class="cal-row cal-allday"><div class="gut">Sin<br>hora</div>${data.map(o=>`<div class="ad">${o.items.filter(i=>i.start==null).map(it=>`<button class="ev static c-${it.cls} ${isDone(o.k,it.key)?'done':''}" data-act="open-item" data-key="${esc(it.key)}" data-date="${o.k}"><span class="ev-n">${esc(it.title)}</span></button>`).join('')}</div>`).join('')}</div>
-    <div class="cal-scroll"><div class="cal-body" style="height:${H}px">
+    <div class="cal-scroll"><div class="cal-body" style="height:${H}px" data-min="${minM}" data-ppm="${ppm}">
       <div class="hours">${hours.join('')}</div>
-      ${data.map(o=>`<div class="col ${o.k===tk?'today':''}">${layoutDay(o.items,ppm).map(it=>evHtml(it,o.k)).join('')}${o.k===tk&&nowM>=minM&&nowM<=maxM?`<div class="now" style="top:${(nowM-minM)*ppm}px"></div>`:''}</div>`).join('')}
+      ${data.map(o=>`<div class="col ${o.k===tk?'today':''}" data-date="${o.k}" data-act="cal-slot">${layoutDay(o.items,ppm).map(it=>evHtml(it,o.k)).join('')}${o.k===tk&&nowM>=minM&&nowM<=maxM?`<div class="now" style="top:${(nowM-minM)*ppm}px"></div>`:''}</div>`).join('')}
     </div></div>
   </div></div></div>`;
 }
@@ -1690,9 +1695,9 @@ function hmIdSave(id){
   commit();hmIdsRender('',newId);
   toast(id==='new'?'Identidad creada y vinculada':'Identidad actualizada');
 }
-function habitModal(h,kind){
+function habitModal(h,kind,pre){
   const isNew=!h;
-  const d=h||newHabit({kind:kind||'habito',duration:kind==='fijo'?60:10,showCal:true,start:dk(new Date())});
+  const d=h||newHabit({kind:kind||'habito',duration:kind==='fijo'?60:10,showCal:true,start:dk(new Date()),...(pre||{})});
   const typeOpt=t=>`<label><input type="radio" name="type" value="${t}" ${d.type===t?'checked':''}><span class="opt ${t}"><b>${TYPE[t].sym}</b><strong>${TYPE[t].label}</strong>${TYPE[t].desc}</span></label>`;
   const fld=(n,l,ph,v,hint)=>`<label class="fld"><span>${l}</span><input name="${n}" value="${esc(v)}" maxlength="120" placeholder="${esc(ph)}">${hint?`<small class="hint">${hint}</small>`:''}</label>`;
   openModal({title:isNew?(d.kind==='fijo'?'Nuevo evento fijo':'Nuevo hábito'):'Editar '+(d.kind==='fijo'?'evento':'hábito'),
@@ -1921,9 +1926,9 @@ function itemModal(key,k){
     </dl>${exp}${it.neg?'<p class="hint" style="margin:0">Es un hábito negativo: marca «Lo evité» si lo lograste o «Me pasó» si recaíste. Si no marcas nada, no cuenta en contra.</p>':''}${lateWarn}
     ${it.checkable&&!done&&!it.neg?`<div class="btns" style="margin-top:6px"><button type="button" class="btn ghost sm" data-act="skip-item" data-key="${esc(key)}" data-date="${k}" ${sm>=4&&!skip?'disabled':''}>${skip?'Quitar omisión':'Omitir hoy sin culpa'}</button><button type="button" class="btn ghost sm" data-act="ng-item" data-key="${esc(key)}" data-date="${k}">Hoy no tengo ganas</button></div><p class="hint" style="margin:6px 0 0">Omisiones este mes: ${sm} de 4. ${srcLink('never')}</p>`:''}
     </div>`,
-    extra:`<button type="button" class="btn ghost sm" data-act="edit-source" data-key="${esc(key)}">${ic('edit')} Editar</button>${it.neg&&!done?`<button type="button" class="btn ghost sm" data-act="slip-item" data-key="${esc(key)}" data-date="${k}">${slip?'Quitar «me pasó»':'Me pasó'}</button>`:''}`,
-    submit:done?'Desmarcar':(it.neg?'Lo evité':'Marcar como hecho'),
-    onSubmit:it.checkable?()=>{toggleDone(key,k)}:null});
+    extra:`${it.checkable?`<button type="button" class="btn ghost sm" data-act="edit-source" data-key="${esc(key)}">${ic('edit')} Editar</button>`:''}${it.neg&&!done?`<button type="button" class="btn ghost sm" data-act="slip-item" data-key="${esc(key)}" data-date="${k}">${slip?'Quitar «me pasó»':'Me pasó'}</button>`:''}`,
+    submit:it.checkable?(done?'Desmarcar':(it.neg?'Lo evité':'Marcar como hecho')):'Editar',
+    onSubmit:it.checkable?()=>{toggleDone(key,k)}:()=>{ACT['edit-source']({dataset:{key}});return false}});
 }
 function toggleDone(key,k){
   const list=S.done[k]||(S.done[k]=[]);
@@ -2231,6 +2236,19 @@ const ACT={
   'add-stmt':()=>stmtModal(),
   'edit-stmt':el=>stmtModal(stmtById(el.dataset.id)),
   'del-stmt':el=>{const s=stmtById(el.dataset.id);if(!s)return;confirmModal(`Se eliminará «${esc(s.text)}». Los hábitos vinculados se conservan.`,()=>{S.identity.statements=S.identity.statements.filter(x=>x.id!==s.id);S.habits.forEach(h=>{h.identityIds=hIds(h).filter(x=>x!==s.id)});commit()})},
+  'cal-new':el=>{
+    const kind=el.dataset.kind==='fijo'?'fijo':'habito';
+    if(kind==='habito'&&hab1Lock()){toast('Primero completa tu hábito '+UNLOCK_EVERY+' días seguidos para sumar otro. Llevas '+unlockInfo().best+'.');return}
+    const d=ui.calMode==='day'?ui.calDate:new Date();
+    habitModal(null,kind,{days:[dayIdx(d)],showCal:true});
+  },
+  'cal-slot':(el,e)=>{
+    if(e.target!==el&&!e.target.classList.contains('now'))return;
+    const body=el.closest('.cal-body');if(!body)return;
+    const y=e.clientY-body.getBoundingClientRect().top;
+    const m=Math.max(0,Math.min(1425,Math.floor((+body.dataset.min+y/(+body.dataset.ppm))/15)*15));
+    habitModal(null,'fijo',{time:fromMin(m),duration:60,days:[dayIdx(parseDk(el.dataset.date))],showCal:true});
+  },
   'add-habit':el=>{if(el.dataset.kind==='fijo'&&lk('cal')){toast(lockedMsg('cal'));return}if(el.dataset.kind!=='fijo'&&hab1Lock()){toast('Primero completa tu hábito '+UNLOCK_EVERY+' días seguidos para sumar otro. Llevas '+unlockInfo().best+'.');return}habitModal(null,el.dataset.kind)},
   'edit-habit':el=>habitModal(habitById(el.dataset.id)),
   'del-habit':el=>deleteHabit(el.dataset.id),
