@@ -1,4 +1,4 @@
--- numérica. producido · ajustes por usuario (Supabase)
+-- Numérica · ajustes por usuario (Supabase)
 -- Mismo proyecto y mismas cuentas que PrecIA, Organic, AgendIA y Presupuesto.
 -- Pégalo completo en Supabase → SQL Editor → New query → Run. Es seguro ejecutarlo más de una vez.
 -- Guarda una fila por usuario con sus sistemas de diseño importados, contenido, elementos activos y preferencias.
