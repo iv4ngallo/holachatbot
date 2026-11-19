@@ -211,7 +211,7 @@ body.live #hint{transform:translate(-50%,0)}
 .chips span,.chips button{all:unset;box-sizing:border-box;font:600 11px/1 var(--cond);letter-spacing:.14em;text-transform:uppercase;padding:6px 8px;border:1px solid var(--line);color:#DCE6FF;background:rgba(36,85,255,.14)}
 .chips button{cursor:pointer}.chips button:hover,.chips button:focus-visible{border-color:var(--r);color:#fff;background:rgba(255,59,59,.2);outline:none}
 .cd h5{margin:0 0 6px;font:700 10px/1 var(--cond);letter-spacing:.24em;text-transform:uppercase;color:var(--dim)}
-.act{display:flex;gap:8px;margin-top:4px}
+.act{display:flex;gap:8px;margin:0 0 16px}
 .go{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;height:42px;background:var(--y);color:#02081f;font:800 14px/1 var(--cond);letter-spacing:.18em;text-transform:uppercase;border:0;transition:.2s}
 .go:hover{background:#fff}
 .go.off{background:transparent;color:var(--y);border:1px dashed var(--y)}
@@ -915,11 +915,13 @@ function showCard(id,keep){
  var n=byId(id),o=OBJ[id];if(!n||!o)return;var g=GR[n.group];
  var rels=[];S.nodes.forEach(function(m){if(m.id===id)return;if((n.rel||[]).indexOf(m.id)>-1||(m.rel||[]).indexOf(id)>-1)rels.push(m)});
  var h='<div class="cd"><div class="cd-top"><span class="tag">'+esc(g.n)+'</span><span class="st" style="--sc:'+STS[n.status]+'">'+esc(n.status)+'</span></div>'
-  +'<h3>'+esc(n.name)+'</h3><p class="kind">'+esc(n.kind)+'</p><p class="ds">'+esc(n.desc)+'</p>';
+  +'<h3>'+esc(n.name)+'</h3><p class="kind">'+esc(n.kind)+'</p>';
+ h+='<div class="act">'+(n.url?'<a class="go" href="'+esc(n.url)+'" target="'+'_self'+'" rel="noopener">Lanzar <b>&rarr;</b></a>':'<button type="button" class="go off" data-edit>Asignar enlace</button>')+'<button type="button" class="ed" data-edit aria-label="Editar nodo">&#9998;</button></div>';
+ h+='<p class="ds">'+esc(n.desc)+'</p>';
  if(n.subs&&n.subs.length)h+='<h5>Incluye</h5><div class="chips">'+n.subs.map(function(s){return '<span>'+esc(s)+'</span>'}).join('')+'</div>';
  var pn=n.parent&&byId(n.parent);if(pn)h+='<h5>Pertenece a</h5><div class="chips"><button type="button" data-go="'+esc(pn.id)+'">'+esc(pn.name)+'</button></div>';
  if(rels.length)h+='<h5>Relacionado con</h5><div class="chips">'+rels.slice(0,10).map(function(m){return '<button type="button" data-go="'+esc(m.id)+'">'+esc(m.name)+'</button>'}).join('')+(rels.length>10?'<span>+'+(rels.length-10)+'</span>':'')+'</div>';
- h+='<div class="act">'+(n.url?'<a class="go" href="'+esc(n.url)+'" target="'+'_self'+'" rel="noopener">Lanzar <b>&rarr;</b></a>':'<button type="button" class="go off" data-edit>Asignar enlace</button>')+'<button type="button" class="ed" data-edit aria-label="Editar nodo">&#9998;</button></div></div>';
+ h+='</div>';
  card.innerHTML=h;card.style.setProperty('--c',g.c);if(!keep)iBody.scrollTop=0;
 }
 function hideCard(){setDetail(false);leadL.setAttribute('opacity',0);leadC.setAttribute('opacity',0)}
