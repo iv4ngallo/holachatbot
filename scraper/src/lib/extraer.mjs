@@ -35,8 +35,8 @@ export function aProducto(o, base = '') {
   if (precio === null || precio < PRECIO_MIN || precio > PRECIO_MAX) return null;
   let antes = primero(o.priceRange?.listPrice?.lowPrice, oferta?.ListPrice, o.listPrice, o.regularPrice, o.previousPrice, o.precioAnterior);
   if (antes !== null && antes <= precio) antes = null;
-  const marca = [o.brand?.name, o.brand, o.brandName, o.marca].find((m) => typeof m === 'string' && m.trim()) || null;
-  let url = o.link || o.url || o.href || (o.linkText ? `/${o.linkText}/p` : null) || ofLd?.url || null;
+  const marca = [o.brand?.name, o.brand?.brandName, o.brand, o.brandName, o.marca].find((m) => typeof m === 'string' && m.trim()) || null;
+  let url = o.link || o.url || o.href || (o.linkText ? `/${o.linkText}/p` : null) || (o.slug ? `/${o.slug}/p` : null) || ofLd?.url || null;
   if (typeof url !== 'string') url = null;
   else if (url.startsWith('/')) url = base + url;
   let disponible = null;
@@ -44,7 +44,9 @@ export function aProducto(o, base = '') {
   else if (typeof ofLd?.availability === 'string') disponible = /InStock/i.test(ofLd.availability);
   else if (typeof o.available === 'boolean') disponible = o.available;
   else if (typeof o.isAvailable === 'boolean') disponible = o.isAvailable;
-  return { nombre, marca, precio: Math.round(precio), precioAntes: antes === null ? null : Math.round(antes), url, disponible };
+  // SKU o id del producto en la tienda: da una identidad más estable que el nombre.
+  const sku = [o.sku, o.productId, o.itemId, o.id].map((v) => (typeof v === 'string' || typeof v === 'number' ? String(v) : null)).find(Boolean) || null;
+  return { nombre, marca, precio: Math.round(precio), precioAntes: antes === null ? null : Math.round(antes), url, disponible, sku };
 }
 
 export function extraerProductos(json, { base = '', max = 400 } = {}) {

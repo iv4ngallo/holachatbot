@@ -26,7 +26,10 @@ function dbFalsa() {
       return m;
     },
     async insertarHistorial(o) { s.historial.push(...o); },
-    async borrarOfertasDeCadena(c) { s.borrados.push(c); s.ofertas = s.ofertas.filter((x) => x.cadena_id !== c); },
+    async borrarOfertasDeCadena(c, keys) {
+      s.borrados.push({ c, keys });
+      s.ofertas = s.ofertas.filter((x) => !(x.cadena_id === c && (!keys || keys.includes(x.producto_key))));
+    },
     async insertarOfertas(f) { s.ofertas.push(...f); },
   };
 }
@@ -70,6 +73,31 @@ test('si el mismo item aparece repetido en una corrida, se guarda una sola vez',
   const r = await guardarCadena(db, 'd1', [fila(), fila()], '2026-11-19T10:00:00Z');
   assert.equal(r.items, 1);
   assert.equal(db.s.historial.length, 1);
+});
+
+test('con SKU la identidad no cambia aunque cambie el nombre', async () => {
+  const db = dbFalsa();
+  await guardarCadena(db, 'exito', [fila({ cadena_id: 'exito', sku: '1037843' })], { ahora: '2026-11-19T10:00:00Z' });
+  await guardarCadena(db, 'exito', [fila({ cadena_id: 'exito', sku: '1037843', producto_encontrado: 'Leche Entera Bolsa UHT NUEVA', precio: 3200 })], { ahora: '2026-11-20T10:00:00Z' });
+  assert.equal(db.s.items.length, 1);
+  assert.equal(db.s.items[0].ident, 'leche|sku:1037843');
+  assert.equal(db.s.historial.length, 2);
+});
+
+test('precia_ofertas no recibe la columna sku', async () => {
+  const db = dbFalsa();
+  await guardarCadena(db, 'exito', [fila({ sku: '99' })]);
+  assert.ok(!('sku' in db.s.ofertas[0]));
+});
+
+test('corrida parcial: solo reemplaza las ofertas de los productos obtenidos', async () => {
+  const db = dbFalsa();
+  db.s.ofertas.push({ cadena_id: 'd1', producto_key: 'queso', precio: 9999 }, { cadena_id: 'd1', producto_key: 'leche', precio: 1 });
+  await guardarCadena(db, 'd1', [fila()], { parcial: true });
+  assert.deepEqual(db.s.borrados.at(-1), { c: 'd1', keys: ['leche'] });
+  assert.deepEqual(db.s.ofertas.map((o) => o.producto_key).sort(), ['leche', 'queso']);
+  await guardarCadena(db, 'd1', [fila()], { parcial: false });
+  assert.deepEqual(db.s.ofertas.map((o) => o.producto_key), ['leche']); // corrida completa: reemplaza todo
 });
 
 test('observacionesNuevas ignora filas sin item', () => {

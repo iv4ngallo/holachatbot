@@ -12,6 +12,14 @@ Recolecta precios de supermercados y los guarda en Supabase (`precia_ofertas`), 
 
 La columna `ciudad_del_sitio` dice `Ibagué` solo si el texto de la página lo menciona; si no, `No verificada`.
 
+## Cómo consulta cada sitio (confirmado con la primera corrida)
+
+Éxito y D1 son VTEX. Para no abrir una página nueva por producto (Cloudflare de Éxito responde 403 a las siguientes), el scraper abre la página de inicio una vez y desde esa misma sesión pide la API con `fetch`. Si la API no devuelve nada, navega a la búsqueda como respaldo. Una página 404 o 403 nunca cuenta como resultado.
+
+- **Éxito:** operación `SearchQuery` de su API GraphQL, con la región de Ibagué (código postal 730001, resuelto con `/api/checkout/pub/regions`). Si la región se obtiene, `ciudad_del_sitio` queda como `Ibagué (CP 730001)`.
+- **D1:** API pública de catálogo de VTEX (`/api/catalog_system/pub/products/search?ft=…`) y, si no responde, la búsqueda del sitio. Sin filtro de ciudad.
+- **Bloqueos:** tras 3 respuestas 403/429 seguidas hace una pausa de 60 s y abre una sesión nueva; si vuelve a fallar, detiene la cadena. Con una corrida incompleta solo se reemplazan las ofertas de los productos obtenidos.
+
 ## Historial de precios
 
 Cada corrida deja tres cosas en Supabase:

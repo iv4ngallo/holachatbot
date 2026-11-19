@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 import { aNumero, extraerProductos } from '../src/lib/extraer.mjs';
 import { presentacion, relevancia, precioUnitario, tokens } from '../src/lib/normalizar.mjs';
 
@@ -23,7 +24,27 @@ test('extrae productos con la forma de VTEX productSearch', () => {
   const r = extraerProductos(json, { base: 'https://www.exito.com' });
   assert.equal(r.length, 1);
   assert.deepEqual(r[0], { nombre: 'Leche Colanta entera bolsa 1000 ml', marca: 'COLANTA', precio: 4280, precioAntes: 4500,
-    url: 'https://www.exito.com/leche-colanta-1l/p', disponible: true });
+    url: 'https://www.exito.com/leche-colanta-1l/p', disponible: true, sku: null });
+});
+
+test('lee una respuesta REAL de Éxito (SearchQuery de huevos, 18-nov-2026)', () => {
+  const real = JSON.parse(fs.readFileSync(new URL('./fixtures/exito-search-huevos.json', import.meta.url), 'utf8'));
+  const r = extraerProductos(real, { base: 'https://www.exito.com' });
+  assert.equal(r.length, 4);
+  const [a, b] = r;
+  assert.equal(a.nombre, 'Huevos AA KIKES Rojo Pet (30  und)');
+  assert.equal(a.marca, 'KIKES');
+  assert.equal(a.precio, 24500);
+  assert.equal(a.precioAntes, null);
+  assert.equal(a.sku, '1037843');
+  assert.equal(a.disponible, true);
+  assert.equal(a.url, 'https://www.exito.com/huevo-aa-rojo-30und-pet-744836-1037843/p');
+  assert.equal(b.precio, 10250);
+  assert.equal(b.precioAntes, 14700); // descuento del 30 %
+  // el emparejado con el catálogo acepta los huevos y calcula la presentación
+  const huevos = { nombre: 'Huevos', unidad: 'und', alias: ['huevo', 'huevos aa'] };
+  r.forEach((p) => assert.ok(relevancia(huevos, p.nombre, presentacion(p.nombre)) > 0, p.nombre));
+  assert.deepEqual(presentacion(a.nombre), { tamano: 30, unidad: 'und' });
 });
 
 test('extrae productos de schema.org / JSON-LD y de nombres en español', () => {

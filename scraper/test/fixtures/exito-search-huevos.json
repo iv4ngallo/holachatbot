@@ -1,0 +1,1994 @@
+{
+ "data": {
+  "search": {
+   "products": {
+    "edges": [
+     {
+      "node": {
+       "id": "1037843",
+       "slug": "huevo-aa-rojo-30und-pet-744836-1037843",
+       "sku": "1037843",
+       "productType": {
+        "type": "FOOD",
+        "isMkp": false
+       },
+       "brand": {
+        "brandName": "KIKES",
+        "name": "KIKES"
+       },
+       "name": "Huevos AA KIKES Rojo Pet (30  und)",
+       "gtin": "1037843",
+       "breadcrumbList": {
+        "itemListElement": [
+         {
+          "item": "/mercado/lacteos-huevos-y-refrigerados/huevos/",
+          "name": "Huevos",
+          "position": 1
+         },
+         {
+          "item": "/mercado/lacteos-huevos-y-refrigerados/",
+          "name": "Lácteos, huevos y refrigerados",
+          "position": 2
+         },
+         {
+          "item": "/mercado/",
+          "name": "Mercado",
+          "position": 3
+         },
+         {
+          "item": "/huevo-aa-rojo-30und-pet-744836-1037843/p",
+          "name": "Huevos AA KIKES Rojo Pet (30  und)",
+          "position": 4
+         }
+        ]
+       },
+       "properties": [
+        {
+         "name": "Tipo de Huevo",
+         "values": [
+          "Huevo rojo"
+         ]
+        },
+        {
+         "name": "Referencia",
+         "values": [
+          "SIN REF"
+         ]
+        },
+        {
+         "name": "IVA",
+         "values": [
+          "0"
+         ]
+        },
+        {
+         "name": "Tamaño del huevo",
+         "values": [
+          "AA"
+         ]
+        },
+        {
+         "name": "Factor Neto PUM",
+         "values": [
+          "30"
+         ]
+        },
+        {
+         "name": "Ump del Empaque 1 (Out)",
+         "values": [
+          "KILOGRAMO"
+         ]
+        },
+        {
+         "name": "Vendido por",
+         "values": [
+          "Éxito"
+         ]
+        },
+        {
+         "name": "Unidad de Medida",
+         "values": [
+          "Unidad"
+         ]
+        },
+        {
+         "name": "Prime",
+         "values": [
+          "Si"
+         ]
+        },
+        {
+         "name": "Unidad de Medida PUM Calculado",
+         "values": [
+          "Unidad"
+         ]
+        },
+        {
+         "name": "sellerId",
+         "values": [
+          "1"
+         ]
+        }
+       ],
+       "isVariantOf": {
+        "productGroupID": "744836",
+        "name": "Huevos AA KIKES Rojo Pet (30  und)",
+        "skuVariants": {
+         "activeVariations": {},
+         "slugsMap": {},
+         "availableVariations": {}
+        }
+       },
+       "items": [
+        {
+         "complementName": "Huevos AA KIKES Rojo Pet (30  und)",
+         "ean": "7707304621100",
+         "isKit": false,
+         "itemId": "1037843",
+         "measurementUnit": "un",
+         "modalType": "",
+         "name": "Huevos AA KIKES Rojo Pet (30  und)",
+         "nameComplete": "Huevos AA KIKES Rojo Pet (30  und)",
+         "attachments": [],
+         "Talla": null,
+         "Color": null,
+         "Colores": null,
+         "images": [],
+         "sellers": [
+          {
+           "sellerId": "1",
+           "sellerName": "exito",
+           "addToCartLink": "",
+           "sellerDefault": true,
+           "commertialOffer": {
+            "AvailableQuantity": 10000,
+            "Price": 24500,
+            "PriceWithoutDiscount": 24500,
+            "ListPrice": 24500,
+            "Tax": 0
+           }
+          }
+         ]
+        }
+       ],
+       "productClusters": [
+        {
+         "id": "205",
+         "name": "googleshopping"
+        },
+        {
+         "id": "276",
+         "name": "feed-todalatienda"
+        },
+        {
+         "id": "390",
+         "name": "feed-mercado"
+        },
+        {
+         "id": "477",
+         "name": "cont-mercado-completoAON-477"
+        },
+        {
+         "id": "741",
+         "name": "biggy"
+        },
+        {
+         "id": "791",
+         "name": "cont-categoria-mercado"
+        },
+        {
+         "id": "879",
+         "name": "cont-categoria-mercado"
+        },
+        {
+         "id": "1593",
+         "name": "Feed-celulares"
+        },
+        {
+         "id": "1965",
+         "name": "cont-mercado-licores"
+        },
+        {
+         "id": "2360",
+         "name": "cont-todomercado-conlicores"
+        },
+        {
+         "id": "2754",
+         "name": "allGrocery"
+        },
+        {
+         "id": "3756",
+         "name": "indexing-products"
+        },
+        {
+         "id": "6321",
+         "name": "alim-mastercardmañana"
+        },
+        {
+         "id": "8671",
+         "name": "facebook-feed-8671"
+        },
+        {
+         "id": "9357",
+         "name": "cont-huevoscompleto-9357-nov25"
+        },
+        {
+         "id": "10679",
+         "name": "cont-mercado-10679"
+        },
+        {
+         "id": "10900",
+         "name": "cont-pgc-frescos-10900"
+        },
+        {
+         "id": "11619",
+         "name": "cont-res-cerdo-11619"
+        },
+        {
+         "id": "12150",
+         "name": "cont-exito-12150"
+        },
+        {
+         "id": "12271",
+         "name": "cont-mercado-12271"
+        },
+        {
+         "id": "15945",
+         "name": "cont-rescate-pgc-15945"
+        },
+        {
+         "id": "16002",
+         "name": "cont-carnespolloypescado-16002"
+        },
+        {
+         "id": "16102",
+         "name": "cont-coomeva-16102"
+        },
+        {
+         "id": "16345",
+         "name": "cont-envio-gratis.tuya-16345"
+        },
+        {
+         "id": "16515",
+         "name": "cont-mercado-16515"
+        },
+        {
+         "id": "16703",
+         "name": "indexing-food"
+        },
+        {
+         "id": "17566",
+         "name": "cont-pgc-17566"
+        },
+        {
+         "id": "21602",
+         "name": "cont-miercolesmercado-21602"
+        },
+        {
+         "id": "22858",
+         "name": "cont-Slidermercadomartesdelcampo(NOTOCAR)-22858"
+        },
+        {
+         "id": "22964",
+         "name": "MD-6657-10-08062023"
+        },
+        {
+         "id": "23006",
+         "name": "cont-polloyhuevos-23006"
+        },
+        {
+         "id": "23689",
+         "name": "cont-bancopopular-23689"
+        },
+        {
+         "id": "23784",
+         "name": "alim-cafeybebidasNutresaNOTOCAR)-23784"
+        },
+        {
+         "id": "24041",
+         "name": "cont-varios-rev"
+        },
+        {
+         "id": "25953",
+         "name": "cont-mC17enero-25953"
+        },
+        {
+         "id": "27294",
+         "name": "cont-MC10Abril-27294"
+        },
+        {
+         "id": "28179",
+         "name": "ALIM-carnesfrescasycongeldas-28179"
+        },
+        {
+         "id": "29585",
+         "name": "ALIM-huevoscompleto-29585"
+        },
+        {
+         "id": "30107",
+         "name": "ALIM-mas vendidos mercado-30107"
+        },
+        {
+         "id": "30182",
+         "name": "alim-todohotsale(NOTOCAR)-30182"
+        },
+        {
+         "id": "30302",
+         "name": "alim-despensaEXITOYA(NOTOCAR)-30302"
+        },
+        {
+         "id": "30421",
+         "name": "Alim-desayunosEXITOYA(NOTOCAR-30421"
+        },
+        {
+         "id": "30519",
+         "name": "alim-desayunosmercolesdemercado(Notocar)-30519"
+        },
+        {
+         "id": "30589",
+         "name": "alim-seagotoencasaEXITOYA(NOTOCAR)-30589"
+        },
+        {
+         "id": "30633",
+         "name": "alim-mercadoHotsale(NOTOCAR)-30633"
+        },
+        {
+         "id": "30688",
+         "name": "alim-lacteosjueves(NOTOCAR)-30688"
+        },
+        {
+         "id": "31127",
+         "name": "ALIM-LacteosMiermerca(NOTOCAR)-31127"
+        },
+        {
+         "id": "31349",
+         "name": "ALIM-Frescos(EntregadoaKellynotocar)-31349"
+        },
+        {
+         "id": "31355",
+         "name": "ALIM-FrescosPLPHuevosKikes-31355"
+        },
+        {
+         "id": "31364",
+         "name": "ALIM-FrescosPLPHuevosAA-31364"
+        },
+        {
+         "id": "31410",
+         "name": "alim-lacteosmastercad(notocar)-31410"
+        },
+        {
+         "id": "31453",
+         "name": "Alim-desayunoypanaderiaEXITOYA(NOTOCAR)-31453"
+        },
+        {
+         "id": "31569",
+         "name": "ALIM-lacteosmiercarnes(NOTOCAR)-31569"
+        },
+        {
+         "id": "31584",
+         "name": "alim-huevosmadrugadoraDDPE-31584"
+        },
+        {
+         "id": "31900",
+         "name": "alim-huevosMD(NOTOCAR)-31900"
+        },
+        {
+         "id": "31909",
+         "name": "alim-huevoslacteostodo-31909"
+        }
+       ],
+       "additionalProperty": [],
+       "image": [
+        {
+         "url": "https://exitocol.vtexassets.com/arquivos/ids/34386923/Huevo-Aa-Rojo-30und-Pet-1037843_a.jpg?v=639211356189800000",
+         "alternateName": ""
+        },
+        {
+         "url": "https://exitocol.vtexassets.com/arquivos/ids/34386924/Huevo-Aa-Rojo-30und-Pet-1037843_b.jpg?v=639211356190730000",
+         "alternateName": ""
+        }
+       ],
+       "sellers": [
+        {
+         "sellerId": "1",
+         "sellerName": "exito",
+         "addToCartLink": "",
+         "sellerDefault": true,
+         "commertialOffer": {
+          "AvailableQuantity": 10000,
+          "Price": 24500,
+          "PriceWithoutDiscount": 24500,
+          "ListPrice": 24500,
+          "Tax": 0,
+          "teasers": [
+           {
+            "name": "exito1_20_aliado_prov_mercado_cat_ID44121_lim4_18nov_18nov",
+            "conditions": {
+             "minimumQuantity": 0,
+             "parameters": [
+              {
+               "name": "RestrictionsBins",
+               "value": "231030,266000,510120,515067,521897,522679,524238,526517,526522,555845,570423,590309,51551332,52143236,54492050,54493931,54549479,54556075,54557039,54597402,55537222,55953970"
+              }
+             ]
+            },
+            "effects": {
+             "parameters": [
+              {
+               "name": "PercentualDiscount",
+               "value": "20"
+              }
+             ]
+            }
+           }
+          ]
+         }
+        }
+       ],
+       "offers": {
+        "lowPrice": 24500,
+        "offerCount": 1,
+        "offers": [
+         {
+          "availability": "https://schema.org/InStock",
+          "price": 24500,
+          "listPrice": 24500,
+          "quantity": 10000,
+          "itemOffered": {
+           "measurementUnit": "un",
+           "sku": "1037843",
+           "unitMultiplier": 1,
+           "sellers": [
+            {
+             "sellerId": "1",
+             "sellerDefault": true,
+             "sellerName": "exito",
+             "addToCartLink": "",
+             "commertialOffer": {
+              "AvailableQuantity": 10000
+             }
+            }
+           ],
+           "properties": [
+            {
+             "originalName": "Tipo de Huevo",
+             "name": "Tipo de Huevo",
+             "values": [
+              "Huevo rojo"
+             ]
+            },
+            {
+             "originalName": "Referencia",
+             "name": "Referencia",
+             "values": [
+              "SIN REF"
+             ]
+            },
+            {
+             "originalName": "IVA",
+             "name": "IVA",
+             "values": [
+              "0"
+             ]
+            },
+            {
+             "originalName": "Tamaño del huevo",
+             "name": "Tamaño del huevo",
+             "values": [
+              "AA"
+             ]
+            },
+            {
+             "originalName": "Factor Neto PUM",
+             "name": "Factor Neto PUM",
+             "values": [
+              "30"
+             ]
+            },
+            {
+             "originalName": "Ump del Empaque 1 (Out)",
+             "name": "Ump del Empaque 1 (Out)",
+             "values": [
+              "KILOGRAMO"
+             ]
+            },
+            {
+             "originalName": "Vendido por",
+             "name": "Vendido por",
+             "values": [
+              "Éxito"
+             ]
+            },
+            {
+             "originalName": "Unidad de Medida",
+             "name": "Unidad de Medida",
+             "values": [
+              "Unidad"
+             ]
+            },
+            {
+             "originalName": "Prime",
+             "name": "Prime",
+             "values": [
+              "Si"
+             ]
+            },
+            {
+             "originalName": "Unidad de Medida PUM Calculado",
+             "name": "Unidad de Medida PUM Calculado",
+             "values": [
+              "Unidad"
+             ]
+            },
+            {
+             "originalName": "sellerId",
+             "name": "sellerId",
+             "values": [
+              "1"
+             ]
+            }
+           ]
+          },
+          "seller": {
+           "identifier": "1"
+          }
+         }
+        ]
+       }
+      }
+     },
+     {
+      "node": {
+       "id": "1232624",
+       "slug": "huevo-rojo-aaa-15und-pet-895234-1232624",
+       "sku": "1232624",
+       "productType": {
+        "type": "FOOD",
+        "isMkp": false
+       },
+       "brand": {
+        "brandName": "KIKES",
+        "name": "KIKES"
+       },
+       "name": "Huevos AAA KIKES rojo pet (15  und)",
+       "gtin": "1232624",
+       "breadcrumbList": {
+        "itemListElement": [
+         {
+          "item": "/mercado/lacteos-huevos-y-refrigerados/huevos/",
+          "name": "Huevos",
+          "position": 1
+         },
+         {
+          "item": "/mercado/lacteos-huevos-y-refrigerados/",
+          "name": "Lácteos, huevos y refrigerados",
+          "position": 2
+         },
+         {
+          "item": "/mercado/",
+          "name": "Mercado",
+          "position": 3
+         },
+         {
+          "item": "/huevo-rojo-aaa-15und-pet-895234-1232624/p",
+          "name": "Huevos AAA KIKES rojo pet (15  und)",
+          "position": 4
+         }
+        ]
+       },
+       "properties": [
+        {
+         "name": "Tipo de Huevo",
+         "values": [
+          "Huevo rojo"
+         ]
+        },
+        {
+         "name": "Referencia",
+         "values": [
+          "SIN REF"
+         ]
+        },
+        {
+         "name": "IVA",
+         "values": [
+          "0"
+         ]
+        },
+        {
+         "name": "Tamaño del huevo",
+         "values": [
+          "AAA"
+         ]
+        },
+        {
+         "name": "Factor Neto PUM",
+         "values": [
+          "15"
+         ]
+        },
+        {
+         "name": "Ump del Empaque 1 (Out)",
+         "values": [
+          "KILOGRAMO"
+         ]
+        },
+        {
+         "name": "Vendido por",
+         "values": [
+          "Éxito"
+         ]
+        },
+        {
+         "name": "Unidad de Medida",
+         "values": [
+          "Unidad"
+         ]
+        },
+        {
+         "name": "Prime",
+         "values": [
+          "Si"
+         ]
+        },
+        {
+         "name": "Unidad de Medida PUM Calculado",
+         "values": [
+          "Unidad"
+         ]
+        },
+        {
+         "name": "sellerId",
+         "values": [
+          "1"
+         ]
+        }
+       ],
+       "isVariantOf": {
+        "productGroupID": "895234",
+        "name": "Huevos AAA KIKES rojo pet (15  und)",
+        "skuVariants": {
+         "activeVariations": {},
+         "slugsMap": {},
+         "availableVariations": {}
+        }
+       },
+       "items": [
+        {
+         "complementName": "Huevos AAA KIKES rojo pet (15  und)",
+         "ean": "7707304621384",
+         "isKit": false,
+         "itemId": "1232624",
+         "measurementUnit": "un",
+         "modalType": "",
+         "name": "Huevos AAA KIKES rojo pet (15  und)",
+         "nameComplete": "Huevos AAA KIKES rojo pet (15  und)",
+         "attachments": [],
+         "Talla": null,
+         "Color": null,
+         "Colores": null,
+         "images": [],
+         "sellers": [
+          {
+           "sellerId": "1",
+           "sellerName": "exito",
+           "addToCartLink": "",
+           "sellerDefault": true,
+           "commertialOffer": {
+            "AvailableQuantity": 10000,
+            "Price": 10250,
+            "PriceWithoutDiscount": 10250,
+            "ListPrice": 14700,
+            "Tax": 0
+           }
+          }
+         ]
+        }
+       ],
+       "productClusters": [
+        {
+         "id": "205",
+         "name": "googleshopping"
+        },
+        {
+         "id": "276",
+         "name": "feed-todalatienda"
+        },
+        {
+         "id": "390",
+         "name": "feed-mercado"
+        },
+        {
+         "id": "477",
+         "name": "cont-mercado-completoAON-477"
+        },
+        {
+         "id": "741",
+         "name": "biggy"
+        },
+        {
+         "id": "791",
+         "name": "cont-categoria-mercado"
+        },
+        {
+         "id": "879",
+         "name": "cont-categoria-mercado"
+        },
+        {
+         "id": "1593",
+         "name": "Feed-celulares"
+        },
+        {
+         "id": "1965",
+         "name": "cont-mercado-licores"
+        },
+        {
+         "id": "2360",
+         "name": "cont-todomercado-conlicores"
+        },
+        {
+         "id": "2754",
+         "name": "allGrocery"
+        },
+        {
+         "id": "3756",
+         "name": "indexing-products"
+        },
+        {
+         "id": "6321",
+         "name": "alim-mastercardmañana"
+        },
+        {
+         "id": "8671",
+         "name": "facebook-feed-8671"
+        },
+        {
+         "id": "9357",
+         "name": "cont-huevoscompleto-9357-nov25"
+        },
+        {
+         "id": "10679",
+         "name": "cont-mercado-10679"
+        },
+        {
+         "id": "10900",
+         "name": "cont-pgc-frescos-10900"
+        },
+        {
+         "id": "11619",
+         "name": "cont-res-cerdo-11619"
+        },
+        {
+         "id": "12150",
+         "name": "cont-exito-12150"
+        },
+        {
+         "id": "12271",
+         "name": "cont-mercado-12271"
+        },
+        {
+         "id": "15945",
+         "name": "cont-rescate-pgc-15945"
+        },
+        {
+         "id": "16002",
+         "name": "cont-carnespolloypescado-16002"
+        },
+        {
+         "id": "16102",
+         "name": "cont-coomeva-16102"
+        },
+        {
+         "id": "16345",
+         "name": "cont-envio-gratis.tuya-16345"
+        },
+        {
+         "id": "16515",
+         "name": "cont-mercado-16515"
+        },
+        {
+         "id": "17566",
+         "name": "cont-pgc-17566"
+        },
+        {
+         "id": "22964",
+         "name": "MD-6657-10-08062023"
+        },
+        {
+         "id": "23006",
+         "name": "cont-polloyhuevos-23006"
+        },
+        {
+         "id": "23689",
+         "name": "cont-bancopopular-23689"
+        },
+        {
+         "id": "23784",
+         "name": "alim-cafeybebidasNutresaNOTOCAR)-23784"
+        },
+        {
+         "id": "24041",
+         "name": "cont-varios-rev"
+        },
+        {
+         "id": "25953",
+         "name": "cont-mC17enero-25953"
+        },
+        {
+         "id": "27294",
+         "name": "cont-MC10Abril-27294"
+        },
+        {
+         "id": "28179",
+         "name": "ALIM-carnesfrescasycongeldas-28179"
+        },
+        {
+         "id": "29585",
+         "name": "ALIM-huevoscompleto-29585"
+        },
+        {
+         "id": "30107",
+         "name": "ALIM-mas vendidos mercado-30107"
+        },
+        {
+         "id": "30302",
+         "name": "alim-despensaEXITOYA(NOTOCAR)-30302"
+        },
+        {
+         "id": "30519",
+         "name": "alim-desayunosmercolesdemercado(Notocar)-30519"
+        },
+        {
+         "id": "30589",
+         "name": "alim-seagotoencasaEXITOYA(NOTOCAR)-30589"
+        },
+        {
+         "id": "30688",
+         "name": "alim-lacteosjueves(NOTOCAR)-30688"
+        },
+        {
+         "id": "31127",
+         "name": "ALIM-LacteosMiermerca(NOTOCAR)-31127"
+        },
+        {
+         "id": "31349",
+         "name": "ALIM-Frescos(EntregadoaKellynotocar)-31349"
+        },
+        {
+         "id": "31355",
+         "name": "ALIM-FrescosPLPHuevosKikes-31355"
+        },
+        {
+         "id": "31363",
+         "name": "ALIM-FrescosPLPHuevosAAA-31363"
+        },
+        {
+         "id": "31410",
+         "name": "alim-lacteosmastercad(notocar)-31410"
+        },
+        {
+         "id": "31584",
+         "name": "alim-huevosmadrugadoraDDPE-31584"
+        },
+        {
+         "id": "31588",
+         "name": "alim-frescos13NOv(NOTOCAR)-31588"
+        },
+        {
+         "id": "31904",
+         "name": "alim-todocincuentazo(NOTOCAR)-31904"
+        },
+        {
+         "id": "31909",
+         "name": "alim-huevoslacteostodo-31909"
+        }
+       ],
+       "additionalProperty": [],
+       "image": [
+        {
+         "url": "https://exitocol.vtexassets.com/arquivos/ids/34386926/Huevo-Rojo-Aaa-15und-Pet-1232624_a.jpg?v=639211356212200000",
+         "alternateName": ""
+        },
+        {
+         "url": "https://exitocol.vtexassets.com/arquivos/ids/34386927/Huevo-Rojo-Aaa-15und-Pet-1232624_b.jpg?v=639211356212970000",
+         "alternateName": ""
+        }
+       ],
+       "sellers": [
+        {
+         "sellerId": "1",
+         "sellerName": "exito",
+         "addToCartLink": "",
+         "sellerDefault": true,
+         "commertialOffer": {
+          "AvailableQuantity": 10000,
+          "Price": 10250,
+          "PriceWithoutDiscount": 10250,
+          "ListPrice": 14700,
+          "Tax": 0,
+          "teasers": [
+           {
+            "name": "exito1_20_aliado_prov_mercado_cat_ID44121_lim4_18nov_18nov",
+            "conditions": {
+             "minimumQuantity": 0,
+             "parameters": [
+              {
+               "name": "RestrictionsBins",
+               "value": "231030,266000,510120,515067,521897,522679,524238,526517,526522,555845,570423,590309,51551332,52143236,54492050,54493931,54549479,54556075,54557039,54597402,55537222,55953970"
+              }
+             ]
+            },
+            "effects": {
+             "parameters": [
+              {
+               "name": "PercentualDiscount",
+               "value": "20"
+              }
+             ]
+            }
+           }
+          ]
+         }
+        }
+       ],
+       "offers": {
+        "lowPrice": 10250,
+        "offerCount": 1,
+        "offers": [
+         {
+          "availability": "https://schema.org/InStock",
+          "price": 10250,
+          "listPrice": 14700,
+          "quantity": 10000,
+          "itemOffered": {
+           "measurementUnit": "un",
+           "sku": "1232624",
+           "unitMultiplier": 1,
+           "sellers": [
+            {
+             "sellerId": "1",
+             "sellerDefault": true,
+             "sellerName": "exito",
+             "addToCartLink": "",
+             "commertialOffer": {
+              "AvailableQuantity": 10000
+             }
+            }
+           ],
+           "properties": [
+            {
+             "originalName": "Tipo de Huevo",
+             "name": "Tipo de Huevo",
+             "values": [
+              "Huevo rojo"
+             ]
+            },
+            {
+             "originalName": "Referencia",
+             "name": "Referencia",
+             "values": [
+              "SIN REF"
+             ]
+            },
+            {
+             "originalName": "IVA",
+             "name": "IVA",
+             "values": [
+              "0"
+             ]
+            },
+            {
+             "originalName": "Tamaño del huevo",
+             "name": "Tamaño del huevo",
+             "values": [
+              "AAA"
+             ]
+            },
+            {
+             "originalName": "Factor Neto PUM",
+             "name": "Factor Neto PUM",
+             "values": [
+              "15"
+             ]
+            },
+            {
+             "originalName": "Ump del Empaque 1 (Out)",
+             "name": "Ump del Empaque 1 (Out)",
+             "values": [
+              "KILOGRAMO"
+             ]
+            },
+            {
+             "originalName": "Vendido por",
+             "name": "Vendido por",
+             "values": [
+              "Éxito"
+             ]
+            },
+            {
+             "originalName": "Unidad de Medida",
+             "name": "Unidad de Medida",
+             "values": [
+              "Unidad"
+             ]
+            },
+            {
+             "originalName": "Prime",
+             "name": "Prime",
+             "values": [
+              "Si"
+             ]
+            },
+            {
+             "originalName": "Unidad de Medida PUM Calculado",
+             "name": "Unidad de Medida PUM Calculado",
+             "values": [
+              "Unidad"
+             ]
+            },
+            {
+             "originalName": "sellerId",
+             "name": "sellerId",
+             "values": [
+              "1"
+             ]
+            }
+           ]
+          },
+          "seller": {
+           "identifier": "1"
+          }
+         }
+        ]
+       }
+      }
+     },
+     {
+      "node": {
+       "id": "172836",
+       "slug": "huevo-napoles-de-30u-aa-rosado-subasta-30-und-496267-172836",
+       "sku": "172836",
+       "productType": {
+        "type": "FOOD",
+        "isMkp": false
+       },
+       "brand": {
+        "brandName": "NAPOLES",
+        "name": "NAPOLES"
+       },
+       "name": "Huevos AA NAPOLES rojo (30  und)",
+       "gtin": "172836",
+       "breadcrumbList": {
+        "itemListElement": [
+         {
+          "item": "/mercado/lacteos-huevos-y-refrigerados/huevos/",
+          "name": "Huevos",
+          "position": 1
+         },
+         {
+          "item": "/mercado/lacteos-huevos-y-refrigerados/",
+          "name": "Lácteos, huevos y refrigerados",
+          "position": 2
+         },
+         {
+          "item": "/mercado/",
+          "name": "Mercado",
+          "position": 3
+         },
+         {
+          "item": "/huevo-napoles-de-30u-aa-rosado-subasta-30-und-496267-172836/p",
+          "name": "Huevos AA NAPOLES rojo (30  und)",
+          "position": 4
+         }
+        ]
+       },
+       "properties": [
+        {
+         "name": "Tipo de Huevo",
+         "values": [
+          "Huevo rojo"
+         ]
+        },
+        {
+         "name": "Referencia",
+         "values": [
+          "SIN REFER"
+         ]
+        },
+        {
+         "name": "IVA",
+         "values": [
+          "0"
+         ]
+        },
+        {
+         "name": "Tamaño del huevo",
+         "values": [
+          "AA"
+         ]
+        },
+        {
+         "name": "Factor Neto PUM",
+         "values": [
+          "30"
+         ]
+        },
+        {
+         "name": "Ump del Empaque 1 (Out)",
+         "values": [
+          "KILOGRAMO"
+         ]
+        },
+        {
+         "name": "Vendido por",
+         "values": [
+          "Éxito"
+         ]
+        },
+        {
+         "name": "Unidad de Medida",
+         "values": [
+          "Unidad"
+         ]
+        },
+        {
+         "name": "Prime",
+         "values": [
+          "Si"
+         ]
+        },
+        {
+         "name": "Unidad de Medida PUM Calculado",
+         "values": [
+          "Unidad"
+         ]
+        },
+        {
+         "name": "sellerId",
+         "values": [
+          "1"
+         ]
+        }
+       ],
+       "isVariantOf": {
+        "productGroupID": "496267",
+        "name": "Huevos AA NAPOLES rojo (30  und)",
+        "skuVariants": {
+         "activeVariations": {},
+         "slugsMap": {},
+         "availableVariations": {}
+        }
+       },
+       "items": [
+        {
+         "complementName": "Huevos AA NAPOLES rojo (30  und)",
+         "ean": "7700624102038",
+         "isKit": false,
+         "itemId": "172836",
+         "measurementUnit": "un",
+         "modalType": "",
+         "name": "Huevos AA NAPOLES rojo (30  und)",
+         "nameComplete": "Huevos AA NAPOLES rojo (30  und)",
+         "attachments": [],
+         "Talla": null,
+         "Color": null,
+         "Colores": null,
+         "images": [],
+         "sellers": [
+          {
+           "sellerId": "1",
+           "sellerName": "exito",
+           "addToCartLink": "",
+           "sellerDefault": true,
+           "commertialOffer": {
+            "AvailableQuantity": 10000,
+            "Price": 22050,
+            "PriceWithoutDiscount": 24500,
+            "ListPrice": 24500,
+            "Tax": 0
+           }
+          }
+         ]
+        }
+       ],
+       "productClusters": [
+        {
+         "id": "205",
+         "name": "googleshopping"
+        },
+        {
+         "id": "276",
+         "name": "feed-todalatienda"
+        },
+        {
+         "id": "390",
+         "name": "feed-mercado"
+        },
+        {
+         "id": "477",
+         "name": "cont-mercado-completoAON-477"
+        },
+        {
+         "id": "741",
+         "name": "biggy"
+        },
+        {
+         "id": "791",
+         "name": "cont-categoria-mercado"
+        },
+        {
+         "id": "879",
+         "name": "cont-categoria-mercado"
+        },
+        {
+         "id": "1593",
+         "name": "Feed-celulares"
+        },
+        {
+         "id": "1965",
+         "name": "cont-mercado-licores"
+        },
+        {
+         "id": "2360",
+         "name": "cont-todomercado-conlicores"
+        },
+        {
+         "id": "2754",
+         "name": "allGrocery"
+        },
+        {
+         "id": "3756",
+         "name": "indexing-products"
+        },
+        {
+         "id": "6321",
+         "name": "alim-mastercardmañana"
+        },
+        {
+         "id": "8671",
+         "name": "facebook-feed-8671"
+        },
+        {
+         "id": "9357",
+         "name": "cont-huevoscompleto-9357-nov25"
+        },
+        {
+         "id": "10679",
+         "name": "cont-mercado-10679"
+        },
+        {
+         "id": "10900",
+         "name": "cont-pgc-frescos-10900"
+        },
+        {
+         "id": "11619",
+         "name": "cont-res-cerdo-11619"
+        },
+        {
+         "id": "12150",
+         "name": "cont-exito-12150"
+        },
+        {
+         "id": "12271",
+         "name": "cont-mercado-12271"
+        },
+        {
+         "id": "15945",
+         "name": "cont-rescate-pgc-15945"
+        },
+        {
+         "id": "16002",
+         "name": "cont-carnespolloypescado-16002"
+        },
+        {
+         "id": "16102",
+         "name": "cont-coomeva-16102"
+        },
+        {
+         "id": "16345",
+         "name": "cont-envio-gratis.tuya-16345"
+        },
+        {
+         "id": "16515",
+         "name": "cont-mercado-16515"
+        },
+        {
+         "id": "16703",
+         "name": "indexing-food"
+        },
+        {
+         "id": "17566",
+         "name": "cont-pgc-17566"
+        },
+        {
+         "id": "21602",
+         "name": "cont-miercolesmercado-21602"
+        },
+        {
+         "id": "22858",
+         "name": "cont-Slidermercadomartesdelcampo(NOTOCAR)-22858"
+        },
+        {
+         "id": "22964",
+         "name": "MD-6657-10-08062023"
+        },
+        {
+         "id": "23006",
+         "name": "cont-polloyhuevos-23006"
+        },
+        {
+         "id": "23689",
+         "name": "cont-bancopopular-23689"
+        },
+        {
+         "id": "23784",
+         "name": "alim-cafeybebidasNutresaNOTOCAR)-23784"
+        },
+        {
+         "id": "24041",
+         "name": "cont-varios-rev"
+        },
+        {
+         "id": "25953",
+         "name": "cont-mC17enero-25953"
+        },
+        {
+         "id": "27294",
+         "name": "cont-MC10Abril-27294"
+        },
+        {
+         "id": "28179",
+         "name": "ALIM-carnesfrescasycongeldas-28179"
+        },
+        {
+         "id": "29585",
+         "name": "ALIM-huevoscompleto-29585"
+        },
+        {
+         "id": "30050",
+         "name": "alim-carnespolloblack18nov-30050"
+        },
+        {
+         "id": "30182",
+         "name": "alim-todohotsale(NOTOCAR)-30182"
+        },
+        {
+         "id": "30302",
+         "name": "alim-despensaEXITOYA(NOTOCAR)-30302"
+        },
+        {
+         "id": "30421",
+         "name": "Alim-desayunosEXITOYA(NOTOCAR-30421"
+        },
+        {
+         "id": "30519",
+         "name": "alim-desayunosmercolesdemercado(Notocar)-30519"
+        },
+        {
+         "id": "30589",
+         "name": "alim-seagotoencasaEXITOYA(NOTOCAR)-30589"
+        },
+        {
+         "id": "30633",
+         "name": "alim-mercadoHotsale(NOTOCAR)-30633"
+        },
+        {
+         "id": "30688",
+         "name": "alim-lacteosjueves(NOTOCAR)-30688"
+        },
+        {
+         "id": "31127",
+         "name": "ALIM-LacteosMiermerca(NOTOCAR)-31127"
+        },
+        {
+         "id": "31349",
+         "name": "ALIM-Frescos(EntregadoaKellynotocar)-31349"
+        },
+        {
+         "id": "31364",
+         "name": "ALIM-FrescosPLPHuevosAA-31364"
+        },
+        {
+         "id": "31410",
+         "name": "alim-lacteosmastercad(notocar)-31410"
+        },
+        {
+         "id": "31453",
+         "name": "Alim-desayunoypanaderiaEXITOYA(NOTOCAR)-31453"
+        },
+        {
+         "id": "31569",
+         "name": "ALIM-lacteosmiercarnes(NOTOCAR)-31569"
+        },
+        {
+         "id": "31584",
+         "name": "alim-huevosmadrugadoraDDPE-31584"
+        },
+        {
+         "id": "31900",
+         "name": "alim-huevosMD(NOTOCAR)-31900"
+        },
+        {
+         "id": "31908",
+         "name": "alim-lacteosdesayunosblack-31908"
+        },
+        {
+         "id": "31909",
+         "name": "alim-huevoslacteostodo-31909"
+        },
+        {
+         "id": "32011",
+         "name": "alim-TODOBLACK(NOTOCAR)-32011"
+        }
+       ],
+       "additionalProperty": [],
+       "image": [
+        {
+         "url": "https://exitocol.vtexassets.com/arquivos/ids/36236725/HUEVO-NAPOLES-DE-30U-AA-ROSADO-SUBASTA-30-und-172836_a.jpg?v=639271763476130000",
+         "alternateName": ""
+        }
+       ],
+       "sellers": [
+        {
+         "sellerId": "1",
+         "sellerName": "exito",
+         "addToCartLink": "",
+         "sellerDefault": true,
+         "commertialOffer": {
+          "AvailableQuantity": 10000,
+          "Price": 22050,
+          "PriceWithoutDiscount": 24500,
+          "ListPrice": 24500,
+          "Tax": 0,
+          "teasers": [
+           {
+            "name": "exito1_20_aliado_mdo_plus_ID44135_50_lim4_cl2_18nov_18nov",
+            "conditions": {
+             "minimumQuantity": 0,
+             "parameters": [
+              {
+               "name": "RestrictionsBins",
+               "value": "231030,266000,510120,515067,521897,522679,524238,526517,526522,555845,570423,590309,51551332,52143236,54492050,54493931,54549479,54556075,54557039,54597402,55537222,55953970"
+              }
+             ]
+            },
+            "effects": {
+             "parameters": [
+              {
+               "name": "PercentualDiscount",
+               "value": "20"
+              }
+             ]
+            }
+           },
+           {
+            "name": "exito1_20_aliado_prov_mercado_cat_ID44121_lim4_18nov_18nov",
+            "conditions": {
+             "minimumQuantity": 0,
+             "parameters": [
+              {
+               "name": "RestrictionsBins",
+               "value": "231030,266000,510120,515067,521897,522679,524238,526517,526522,555845,570423,590309,51551332,52143236,54492050,54493931,54549479,54556075,54557039,54597402,55537222,55953970"
+              }
+             ]
+            },
+            "effects": {
+             "parameters": [
+              {
+               "name": "PercentualDiscount",
+               "value": "20"
+              }
+             ]
+            }
+           }
+          ]
+         }
+        }
+       ],
+       "offers": {
+        "lowPrice": 22050,
+        "offerCount": 1,
+        "offers": [
+         {
+          "availability": "https://schema.org/InStock",
+          "price": 22050,
+          "listPrice": 24500,
+          "quantity": 10000,
+          "itemOffered": {
+           "measurementUnit": "un",
+           "sku": "172836",
+           "unitMultiplier": 1,
+           "sellers": [
+            {
+             "sellerId": "1",
+             "sellerDefault": true,
+             "sellerName": "exito",
+             "addToCartLink": "",
+             "commertialOffer": {
+              "AvailableQuantity": 10000
+             }
+            }
+           ],
+           "properties": [
+            {
+             "originalName": "Tipo de Huevo",
+             "name": "Tipo de Huevo",
+             "values": [
+              "Huevo rojo"
+             ]
+            },
+            {
+             "originalName": "Referencia",
+             "name": "Referencia",
+             "values": [
+              "SIN REFER"
+             ]
+            },
+            {
+             "originalName": "IVA",
+             "name": "IVA",
+             "values": [
+              "0"
+             ]
+            },
+            {
+             "originalName": "Tamaño del huevo",
+             "name": "Tamaño del huevo",
+             "values": [
+              "AA"
+             ]
+            },
+            {
+             "originalName": "Factor Neto PUM",
+             "name": "Factor Neto PUM",
+             "values": [
+              "30"
+             ]
+            },
+            {
+             "originalName": "Ump del Empaque 1 (Out)",
+             "name": "Ump del Empaque 1 (Out)",
+             "values": [
+              "KILOGRAMO"
+             ]
+            },
+            {
+             "originalName": "Vendido por",
+             "name": "Vendido por",
+             "values": [
+              "Éxito"
+             ]
+            },
+            {
+             "originalName": "Unidad de Medida",
+             "name": "Unidad de Medida",
+             "values": [
+              "Unidad"
+             ]
+            },
+            {
+             "originalName": "Prime",
+             "name": "Prime",
+             "values": [
+              "Si"
+             ]
+            },
+            {
+             "originalName": "Unidad de Medida PUM Calculado",
+             "name": "Unidad de Medida PUM Calculado",
+             "values": [
+              "Unidad"
+             ]
+            },
+            {
+             "originalName": "sellerId",
+             "name": "sellerId",
+             "values": [
+              "1"
+             ]
+            }
+           ]
+          },
+          "seller": {
+           "identifier": "1"
+          }
+         }
+        ]
+       }
+      }
+     },
+     {
+      "node": {
+       "id": "3854273",
+       "slug": "huevo-kikes-pet-15-und-3253987-3854273",
+       "sku": "3854273",
+       "productType": {
+        "type": "FOOD",
+        "isMkp": false
+       },
+       "brand": {
+        "brandName": "KIKES",
+        "name": "KIKES"
+       },
+       "name": "huevo KIKES Pet (15  und)",
+       "gtin": "3854273",
+       "breadcrumbList": {
+        "itemListElement": [
+         {
+          "item": "/mercado/lacteos-huevos-y-refrigerados/huevos/",
+          "name": "Huevos",
+          "position": 1
+         },
+         {
+          "item": "/mercado/lacteos-huevos-y-refrigerados/",
+          "name": "Lácteos, huevos y refrigerados",
+          "position": 2
+         },
+         {
+          "item": "/mercado/",
+          "name": "Mercado",
+          "position": 3
+         },
+         {
+          "item": "/huevo-kikes-pet-15-und-3253987-3854273/p",
+          "name": "huevo KIKES Pet (15  und)",
+          "position": 4
+         }
+        ]
+       },
+       "properties": [
+        {
+         "name": "Tipo de Huevo",
+         "values": [
+          "Huevo rojo"
+         ]
+        },
+        {
+         "name": "Referencia",
+         "values": [
+          "PET"
+         ]
+        },
+        {
+         "name": "IVA",
+         "values": [
+          "0"
+         ]
+        },
+        {
+         "name": "Tamaño del huevo",
+         "values": [
+          "AA"
+         ]
+        },
+        {
+         "name": "Factor Neto PUM",
+         "values": [
+          "15"
+         ]
+        },
+        {
+         "name": "Ump del Empaque 1 (Out)",
+         "values": [
+          "KILOGRAMO"
+         ]
+        },
+        {
+         "name": "Vendido por",
+         "values": [
+          "Éxito"
+         ]
+        },
+        {
+         "name": "Unidad de Medida",
+         "values": [
+          "Unidad"
+         ]
+        },
+        {
+         "name": "Prime",
+         "values": [
+          "Si"
+         ]
+        },
+        {
+         "name": "Unidad de Medida PUM Calculado",
+         "values": [
+          "Unidad"
+         ]
+        },
+        {
+         "name": "sellerId",
+         "values": [
+          "1"
+         ]
+        }
+       ],
+       "isVariantOf": {
+        "productGroupID": "3253987",
+        "name": "huevo KIKES Pet (15  und)",
+        "skuVariants": {
+         "activeVariations": {},
+         "slugsMap": {},
+         "availableVariations": {}
+        }
+       },
+       "items": [
+        {
+         "complementName": "huevo KIKES Pet (15  und)",
+         "ean": "7707304621391",
+         "isKit": false,
+         "itemId": "3854273",
+         "measurementUnit": "un",
+         "modalType": "",
+         "name": "huevo KIKES Pet (15  und)",
+         "nameComplete": "huevo KIKES Pet (15  und)",
+         "attachments": [],
+         "Talla": null,
+         "Color": null,
+         "Colores": null,
+         "images": [],
+         "sellers": [
+          {
+           "sellerId": "1",
+           "sellerName": "exito",
+           "addToCartLink": "",
+           "sellerDefault": true,
+           "commertialOffer": {
+            "AvailableQuantity": 10000,
+            "Price": 7900,
+            "PriceWithoutDiscount": 7900,
+            "ListPrice": 10700,
+            "Tax": 0
+           }
+          }
+         ]
+        }
+       ],
+       "productClusters": [
+        {
+         "id": "205",
+         "name": "googleshopping"
+        },
+        {
+         "id": "276",
+         "name": "feed-todalatienda"
+        },
+        {
+         "id": "477",
+         "name": "cont-mercado-completoAON-477"
+        },
+        {
+         "id": "741",
+         "name": "biggy"
+        },
+        {
+         "id": "791",
+         "name": "cont-categoria-mercado"
+        },
+        {
+         "id": "879",
+         "name": "cont-categoria-mercado"
+        },
+        {
+         "id": "1593",
+         "name": "Feed-celulares"
+        },
+        {
+         "id": "1965",
+         "name": "cont-mercado-licores"
+        },
+        {
+         "id": "2360",
+         "name": "cont-todomercado-conlicores"
+        },
+        {
+         "id": "2754",
+         "name": "allGrocery"
+        },
+        {
+         "id": "3756",
+         "name": "indexing-products"
+        },
+        {
+         "id": "9357",
+         "name": "cont-huevoscompleto-9357-nov25"
+        },
+        {
+         "id": "10679",
+         "name": "cont-mercado-10679"
+        },
+        {
+         "id": "15945",
+         "name": "cont-rescate-pgc-15945"
+        },
+        {
+         "id": "16345",
+         "name": "cont-envio-gratis.tuya-16345"
+        },
+        {
+         "id": "16515",
+         "name": "cont-mercado-16515"
+        },
+        {
+         "id": "17566",
+         "name": "cont-pgc-17566"
+        },
+        {
+         "id": "22964",
+         "name": "MD-6657-10-08062023"
+        },
+        {
+         "id": "23006",
+         "name": "cont-polloyhuevos-23006"
+        },
+        {
+         "id": "23689",
+         "name": "cont-bancopopular-23689"
+        },
+        {
+         "id": "23784",
+         "name": "alim-cafeybebidasNutresaNOTOCAR)-23784"
+        }
+       ],
+       "additionalProperty": [],
+       "image": [
+        {
+         "url": "https://exitocol.vtexassets.com/arquivos/ids/36335845/huevo-KIKES-Pet-15-und-3854273_a.jpg?v=639275939091470000",
+         "alternateName": ""
+        }
+       ],
+       "sellers": [
+        {
+         "sellerId": "1",
+         "sellerName": "exito",
+         "addToCartLink": "",
+         "sellerDefault": true,
+         "commertialOffer": {
+          "AvailableQuantity": 10000,
+          "Price": 7900,
+          "PriceWithoutDiscount": 7900,
+          "ListPrice": 10700,
+          "Tax": 0,
+          "teasers": [
+           {
+            "name": "exito1_20_aliado_prov_mercado_cat_ID44121_lim4_18nov_18nov",
+            "conditions": {
+             "minimumQuantity": 0,
+             "parameters": [
+              {
+               "name": "RestrictionsBins",
+               "value": "231030,266000,510120,515067,521897,522679,524238,526517,526522,555845,570423,590309,51551332,52143236,54492050,54493931,54549479,54556075,54557039,54597402,55537222,55953970"
+              }
+             ]
+            },
+            "effects": {
+             "parameters": [
+              {
+               "name": "PercentualDiscount",
+               "value": "20"
+              }
+             ]
+            }
+           }
+          ]
+         }
+        }
+       ],
+       "offers": {
+        "lowPrice": 7900,
+        "offerCount": 1,
+        "offers": [
+         {
+          "availability": "https://schema.org/InStock",
+          "price": 7900,
+          "listPrice": 10700,
+          "quantity": 10000,
+          "itemOffered": {
+           "measurementUnit": "un",
+           "sku": "3854273",
+           "unitMultiplier": 1,
+           "sellers": [
+            {
+             "sellerId": "1",
+             "sellerDefault": true,
+             "sellerName": "exito",
+             "addToCartLink": "",
+             "commertialOffer": {
+              "AvailableQuantity": 10000
+             }
+            }
+           ],
+           "properties": [
+            {
+             "originalName": "Tipo de Huevo",
+             "name": "Tipo de Huevo",
+             "values": [
+              "Huevo rojo"
+             ]
+            },
+            {
+             "originalName": "Referencia",
+             "name": "Referencia",
+             "values": [
+              "PET"
+             ]
+            },
+            {
+             "originalName": "IVA",
+             "name": "IVA",
+             "values": [
+              "0"
+             ]
+            },
+            {
+             "originalName": "Tamaño del huevo",
+             "name": "Tamaño del huevo",
+             "values": [
+              "AA"
+             ]
+            },
+            {
+             "originalName": "Factor Neto PUM",
+             "name": "Factor Neto PUM",
+             "values": [
+              "15"
+             ]
+            },
+            {
+             "originalName": "Ump del Empaque 1 (Out)",
+             "name": "Ump del Empaque 1 (Out)",
+             "values": [
+              "KILOGRAMO"
+             ]
+            },
+            {
+             "originalName": "Vendido por",
+             "name": "Vendido por",
+             "values": [
+              "Éxito"
+             ]
+            },
+            {
+             "originalName": "Unidad de Medida",
+             "name": "Unidad de Medida",
+             "values": [
+              "Unidad"
+             ]
+            },
+            {
+             "originalName": "Prime",
+             "name": "Prime",
+             "values": [
+              "Si"
+             ]
+            },
+            {
+             "originalName": "Unidad de Medida PUM Calculado",
+             "name": "Unidad de Medida PUM Calculado",
+             "values": [
+              "Unidad"
+             ]
+            },
+            {
+             "originalName": "sellerId",
+             "name": "sellerId",
+             "values": [
+              "1"
+             ]
+            }
+           ]
+          },
+          "seller": {
+           "identifier": "1"
+          }
+         }
+        ]
+       }
+      }
+     }
+    ]
+   }
+  }
+ }
+}

@@ -11,7 +11,9 @@ export function crearCliente(url, clave) {
   const porLotes = (arr, n) => Array.from({ length: Math.ceil(arr.length / n) }, (_, i) => arr.slice(i * n, i * n + n));
   return {
     productos: () => llamar('precia_productos?select=*&order=key'),
-    borrarOfertasDeCadena: (cadena) => llamar(`precia_ofertas?cadena_id=eq.${encodeURIComponent(cadena)}`, { method: 'DELETE' }),
+    // keys (opcional): solo borra las ofertas de esos productos del catálogo.
+    borrarOfertasDeCadena: (cadena, keys = null) => llamar(
+      `precia_ofertas?cadena_id=eq.${encodeURIComponent(cadena)}${keys ? `&producto_key=in.(${keys.map(encodeURIComponent).join(',')})` : ''}`, { method: 'DELETE' }),
     async insertarOfertas(filas) {
       for (const lote of porLotes(filas, 200)) {
         await llamar('precia_ofertas', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify(lote) });
