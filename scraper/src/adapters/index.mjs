@@ -24,7 +24,8 @@ export async function regionVtex(page, base, cp = CP_IBAGUE) {
 }
 
 // Tienda VTEX genérica: API pública de catálogo y, si no responde, la búsqueda del sitio.
-// Las cadenas de abajo (olimpica…ara) aún NO están confirmadas: corre la sonda (src/sonda.mjs) para ver cuáles responden.
+// Sonda del 18-nov-2026: olimpica, jumbo (jumbocolombia.com), mercacentro, carulla y d1 son VTEX con API de catálogo abierta.
+// Makro y Alkosto no son VTEX (falta adaptador propio); Ara no tiene tienda en línea; Éxito bloquea las IP de GitHub (Cloudflare).
 export function vtex(id, nombre, base) {
   return {
     id, nombre, base, inicio: `${base}/`,
@@ -82,5 +83,5 @@ export const ADAPTADORES = {
     apiUrls: (t) => [`https://www.d1.com.co/api/catalog_system/pub/products/search?ft=${q(t)}&_from=0&_to=23`],
     urlsBusqueda: (t) => [`https://www.d1.com.co/${q(t)}?_q=${q(t)}&map=ft`],
   },
-  ...Object.fromEntries(['olimpica', 'jumbo', 'makro', 'mercacentro', 'ara'].map((id) => [id, vtex(id, CANDIDATAS[id][0], CANDIDATAS[id][1])])),
+  ...Object.fromEntries(['olimpica', 'jumbo', 'mercacentro'].map((id) => [id, vtex(id, CANDIDATAS[id][0], CANDIDATAS[id][1])])),
 };

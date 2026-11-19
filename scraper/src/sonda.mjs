@@ -12,6 +12,32 @@ const ctx = await browser.newContext({ userAgent: UA, locale: 'es-CO', timezoneI
 fs.mkdirSync('debug/sonda', { recursive: true });
 const informe = {};
 
+// Sitios no VTEX: escribe "leche" en el buscador de la página y anota la URL resultante y las respuestas JSON que la página pide.
+async function probarBusqueda(page, base) {
+  const out = { json: [] };
+  const onResp = async (resp) => {
+    try {
+      if (!(resp.headers()['content-type'] || '').includes('json') || resp.status() >= 400) return;
+      const txt = await resp.text();
+      out.json.push({ url: resp.url().slice(0, 300), bytes: txt.length, muestra: txt.slice(0, 200), precios: /"(price|precio|sellingPrice|finalPrice|salePrice)"/i.test(txt) });
+    } catch { /* respuesta liberada */ }
+  };
+  page.on('response', onResp);
+  try {
+    const caja = page.locator('input[type="search"], input[placeholder*="uscar" i], input[name*="search" i], input[name="q"], input[id*="search" i]').first();
+    await caja.waitFor({ state: 'visible', timeout: 8000 });
+    await caja.fill('leche');
+    await caja.press('Enter');
+    await page.waitForLoadState('networkidle', { timeout: 15_000 }).catch(() => {});
+    await page.waitForTimeout(2500);
+    out.url_resultado = page.url();
+    out.texto = await page.evaluate(() => document.body?.innerText?.slice(0, 1500) || '');
+  } catch (e) { out.error = e.message.split('\n')[0]; }
+  page.off('response', onResp);
+  out.json = out.json.filter((j) => j.precios).slice(0, 8);
+  return out;
+}
+
 for (const id of ids) {
   const [nombre, base] = todas[id] || [];
   if (!base) { console.log(`${id}: desconocida`); continue; }
@@ -33,6 +59,7 @@ for (const id of ids) {
       } catch (e) { return { estado: `error: ${e.message}` }; }
     }, base);
     r.regiones = await regionVtex(page, base);
+    if (!r.vtex || process.env.BUSCAR === '1') r.busqueda = await probarBusqueda(page, base);
     await page.screenshot({ path: `debug/sonda/${id}.png` }).catch(() => {});
   } catch (e) { r.error = e.message.split('\n')[0]; }
   await page.close();
