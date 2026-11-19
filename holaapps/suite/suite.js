@@ -9,7 +9,7 @@
     precia: '<path d="M3 4h2l2.2 10.2a1 1 0 0 0 1 .8h8.6a1 1 0 0 0 1-.8L20 8H6.2"/><circle cx="9" cy="19" r="1.4"/><circle cx="17" cy="19" r="1.4"/>',
     agendia: '<rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17M8.5 15l2.2 2.2 4.3-4.4"/>',
     organic: '<path d="M12 21v-8"/><path d="M12 13c0-4 2.6-6.4 7-6.4 0 4.2-2.7 6.4-7 6.4Z"/><path d="M12 15.5c0-3-2-4.9-5.5-4.9 0 3.2 2.1 4.9 5.5 4.9Z"/>',
-    presupuesto: '<path d="M19 7V5a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h14a1 1 0 0 1 1 1v3"/><path d="M3 6v12a2 2 0 0 0 2 2h14a1 1 0 0 0 1-1v-3"/><path d="M21 12v4h-4a2 2 0 0 1 0-4Z"/>',
+    platia: '<path d="M19 7V5a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h14a1 1 0 0 1 1 1v3"/><path d="M3 6v12a2 2 0 0 0 2 2h14a1 1 0 0 0 1-1v-3"/><path d="M21 12v4h-4a2 2 0 0 1 0-4Z"/>',
     numerica: '<rect x="3.5" y="3.5" width="17" height="17" rx="3"/><path d="M8 16V9l8 7V9"/>',
     habitos: '<circle cx="12" cy="12" r="1.7"/><ellipse cx="12" cy="12" rx="9" ry="3.8"/><ellipse cx="12" cy="12" rx="9" ry="3.8" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9" ry="3.8" transform="rotate(120 12 12)"/>'
   };
@@ -18,7 +18,7 @@
     { id: 'agendia', nombre: 'AgendIA', color: '#7B3FC4' },
     { id: 'organic', nombre: 'Organic', color: '#2c8447' },
     { id: 'habitos', nombre: 'Hábitos Atómicos', color: '#d97b2e' },
-    { id: 'presupuesto', nombre: 'PlatIA', color: '#3D3A86' },
+    { id: 'platia', nombre: 'PlatIA', color: '#3D3A86' },
     { id: 'numerica', nombre: 'Numérica', color: '#C0398B' }
   ];
   var svg = function (inner, extra) { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"' + (extra || '') + '>' + inner + '</svg>'; };

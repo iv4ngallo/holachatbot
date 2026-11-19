@@ -381,7 +381,7 @@ footer a:hover{color:var(--brand);text-decoration:underline}
     <a class="logo" href="#top"><b>HOLA <span>APPS</span></b><small>by Hola Chatbot</small></a>
     <nav aria-label="Apps">
       <a href="/holaapps/precia/">PrecIA</a><a href="/holaapps/agendia/">AgendIA</a><a href="/holaapps/organic/">Organic</a>
-      <a href="/holaapps/habitos/">Hábitos Atómicos</a><a href="/holaapps/presupuesto/">PlatIA</a><a href="/holaapps/numerica/">Numérica</a>
+      <a href="/holaapps/habitos/">Hábitos Atómicos</a><a href="/holaapps/platia/">PlatIA</a><a href="/holaapps/numerica/">Numérica</a>
     </nav>
     <span class="small">© 2026 Hola Ibagué</span>
   </div>
@@ -420,7 +420,7 @@ var APPS=[
   mini:[["Leer 10 min","7/7"],["Caminar","5/7"],["Agua","6/7"]],
   desc:"Define quién quieres ser y construye hábitos pequeños que lo sostengan, un día a la vez.",
   feats:[["user","Tu identidad","Escribe quién quieres ser y deja que guíe tus hábitos."],["check","Seguimiento diario","Marca cada hábito cuando lo cumplas."],["cloud","Estado en tu cuenta","Tu progreso te sigue entre dispositivos."]]},
- {id:"presupuesto",name:"PlatIA",icon:"wallet",tag:"Finanzas",status:"Disponible",href:"/holaapps/presupuesto/",
+ {id:"platia",name:"PlatIA",icon:"wallet",tag:"Finanzas",status:"Disponible",href:"/holaapps/platia/",
   tagline:"Tus pesos, mes a mes.",
   mini:[["Arriendo","$900.000"],["Mercado","$450.000"],["Internet","$85.000"]],
   desc:"Presupuesto personal en pesos colombianos, con meses, pagos y categorías. Míralo como más te sirva.",
@@ -653,7 +653,7 @@ var DEMOS={
   box.addEventListener("click",function(e){var b=e.target.closest("[data-i]");if(!b)return;H[+b.dataset.i][1][+b.dataset.j]^=1;draw()});
   draw();
  },
- presupuesto:function(box){
+ platia:function(box){
   var R=[["Arriendo",900000],["Mercado",450000],["Servicios",210000],["Internet",85000]],V=["Tarjetas","Tabla","Resumen"],v=0;
   var fm=function(n){return "$"+String(n).replace(/\B(?=(\d{3})+(?!\d))/g,".")};
   box.innerHTML='<h4>Noviembre</h4><p class="small" style="margin:0">Total: <b id="tt"></b> COP</p><div class="tabs" style="margin:var(--space-3) 0 0" id="vb"></div><div id="vw"></div>';
