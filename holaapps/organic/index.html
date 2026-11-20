@@ -2021,7 +2021,7 @@ document.addEventListener("click",function(e){
     var ck=a.dataset.k,ns=newSeed("",null,ck);
     if(!viewDef(S.ui.filter).f(ns))S.ui.filter="todos";
     if(S.ui.q){S.ui.q="";var qq=$("#q");if(qq)qq.value=""}
-    save();showNew();toast(ck==="semilla"?"Seed sembrado":(ck==="proyecto"?"Proyecto creado":"Ecosistema creado"));return;
+    save();showNew();toast(ck==="semilla"?"Idea plantada":(ck==="proyecto"?"Proyecto creado":"Ecosistema creado"));return;
   }
   if(act==="delmode"){closeMenu();if(dmode){exitSel()}else{if(sm)exitSel();dmode=true;picked={};renderList();renderSelbar();popDsel()}return}
   if(act==="dpick"){
@@ -2260,7 +2260,7 @@ function sow(){
   var i=$("#sow"),v=i.value.trim();if(!v&&newKind==="semilla"){i.focus();return}
   var s=newSeed(v,null,newKind);i.value="";
   if(!viewDef(S.ui.filter).f(s))S.ui.filter="todos";
-  save();showNew();toast(newKind==="semilla"?"Seed sembrado":(newKind==="proyecto"?"Proyecto creado":"Ecosistema creado"));
+  save();showNew();toast(newKind==="semilla"?"Idea plantada":(newKind==="proyecto"?"Proyecto creado":"Ecosistema creado"));
 }
 
 /* drag and drop del toolbox */
