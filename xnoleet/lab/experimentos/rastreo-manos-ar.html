@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0f14">
+<title>Rastreo de manos en realidad aumentada</title>
+<style>
+  :root{
+    --bg:#0b0f14; --panel:rgba(14,20,28,.88); --panel-solid:#121a24; --line:rgba(255,255,255,.14);
+    --txt:#f2f6fa; --muted:#a9b7c6; --accent:#35e0ff; --ok:#46e08a; --warn:#ffc857; --err:#ff6b6b;
+    --r:16px; --tap:48px;
+    --sat:env(safe-area-inset-top,0px); --sab:env(safe-area-inset-bottom,0px);
+    --sal:env(safe-area-inset-left,0px); --sar:env(safe-area-inset-right,0px);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--txt);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden;touch-action:manipulation}
+  #app{position:fixed;inset:0;height:100dvh}
+  canvas#stage{position:absolute;inset:0;width:100%;height:100%;display:block;background:#05080c}
+  video#cam{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+  button{font:inherit;color:inherit;cursor:pointer}
+  button:focus-visible,input:focus-visible,[role=switch]:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+  /* Estado del sistema (heurística 1) */
+  .top{position:absolute;left:0;right:0;top:0;padding:calc(10px + var(--sat)) calc(12px + var(--sar)) 0 calc(12px + var(--sal));
+    display:flex;gap:8px;align-items:flex-start;justify-content:space-between;pointer-events:none}
+  .chip{display:inline-flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--line);
+    border-radius:999px;padding:8px 14px;font-size:14px;backdrop-filter:blur(8px);pointer-events:auto;min-height:36px}
+  .dot{width:10px;height:10px;border-radius:50%;background:var(--muted);flex:none}
+  .dot.ok{background:var(--ok)} .dot.warn{background:var(--warn)} .dot.err{background:var(--err)} .dot.busy{background:var(--accent);animation:pulse 1s infinite}
+  @keyframes pulse{50%{opacity:.3}}
+  .meta{font-variant-numeric:tabular-nums;color:var(--muted);font-size:13px}
+  .hud{position:absolute;left:calc(12px + var(--sal));top:calc(58px + var(--sat));display:flex;flex-direction:column;gap:6px;pointer-events:none}
+  .hand{background:var(--panel);border:1px solid var(--line);border-left-width:4px;border-radius:12px;padding:6px 12px;font-size:14px;backdrop-filter:blur(8px)}
+  .hand b{font-weight:600}
+
+  /* Barra de control */
+  .bar{position:absolute;left:0;right:0;bottom:0;padding:10px calc(12px + var(--sar)) calc(12px + var(--sab)) calc(12px + var(--sal));
+    display:flex;gap:8px;justify-content:center}
+  .btn{min-height:var(--tap);min-width:var(--tap);padding:0 16px;border-radius:14px;border:1px solid var(--line);
+    background:var(--panel);display:inline-flex;align-items:center;justify-content:center;gap:8px;font-size:15px;backdrop-filter:blur(8px)}
+  .btn:active{transform:scale(.97)}
+  .btn.primary{background:var(--accent);color:#04202a;border-color:transparent;font-weight:700}
+  .btn.danger{border-color:rgba(255,107,107,.6)}
+  .btn svg{width:22px;height:22px;flex:none}
+  .bar .btn{flex:1 1 0;max-width:140px;flex-direction:column;gap:2px;font-size:12px;padding:6px 4px}
+
+  /* Pantalla de inicio */
+  .overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:20px;
+    background:radial-gradient(circle at 50% 30%,#14202e 0,#0b0f14 70%);overflow:auto}
+  .overlay[hidden]{display:none}
+  .card{width:100%;max-width:440px;background:var(--panel-solid);border:1px solid var(--line);border-radius:22px;padding:24px}
+  .card h1{font-size:24px;line-height:1.2;margin:0 0 8px}
+  .card p{margin:0 0 14px;color:var(--muted);line-height:1.5;font-size:15px}
+  .card .btn{width:100%;margin-top:6px}
+  .privacy{font-size:13px!important;border-top:1px solid var(--line);padding-top:12px;margin-top:16px!important}
+  .alert{display:none;background:rgba(255,107,107,.12);border:1px solid rgba(255,107,107,.5);border-radius:12px;padding:12px;margin:0 0 14px;font-size:14px;line-height:1.45}
+  .alert.show{display:block}
+  .alert strong{display:block;margin-bottom:4px;color:#ffb0b0}
+  .link{background:none;border:0;color:var(--accent);text-decoration:underline;padding:12px 0;min-height:var(--tap);width:100%}
+
+  /* Hojas inferiores */
+  .sheet{position:absolute;left:0;right:0;bottom:0;max-height:78dvh;overflow:auto;background:var(--panel-solid);
+    border-top:1px solid var(--line);border-radius:22px 22px 0 0;padding:16px calc(18px + var(--sar)) calc(20px + var(--sab)) calc(18px + var(--sal));
+    transform:translateY(105%);transition:transform .22s ease;z-index:5}
+  .sheet.open{transform:none}
+  @media (prefers-reduced-motion:reduce){.sheet{transition:none}.dot.busy{animation:none}}
+  .sheet header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .sheet h2{margin:0;font-size:18px}
+  .row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);min-height:var(--tap)}
+  .row:last-child{border-bottom:0}
+  .row label,.row .lbl{flex:1}
+  .row small{display:block;color:var(--muted);font-size:13px;margin-top:2px}
+  [role=switch]{width:52px;height:30px;border-radius:999px;border:1px solid var(--line);background:#2a3644;position:relative;flex:none;padding:0}
+  [role=switch]::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform .15s}
+  [role=switch][aria-checked=true]{background:var(--accent)}
+  [role=switch][aria-checked=true]::after{transform:translateX(22px)}
+  input[type=range]{width:150px;accent-color:var(--accent);height:32px}
+  .swatches{display:flex;gap:8px}
+  .sw{width:44px;height:44px;border-radius:50%;border:3px solid transparent;padding:0}
+  .sw[aria-pressed=true]{border-color:#fff}
+  .legend{display:grid;gap:10px;margin:8px 0 0;padding:0;list-style:none}
+  .legend li{display:flex;gap:12px;align-items:center;background:rgba(255,255,255,.05);border-radius:12px;padding:10px 12px;font-size:14px}
+  .legend svg{width:34px;height:34px;flex:none}
+  .steps{margin:8px 0 14px;padding-left:20px;color:var(--muted);line-height:1.6;font-size:14px}
+  .toast{position:absolute;left:50%;bottom:calc(96px + var(--sab));transform:translate(-50%,20px);opacity:0;background:#fff;color:#0b0f14;
+    padding:10px 16px;border-radius:12px;font-size:14px;font-weight:600;transition:.2s;pointer-events:none;z-index:9;max-width:90%;text-align:center}
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+  .scrim{position:absolute;inset:0;background:rgba(0,0,0,.45);z-index:4;display:none}
+  .scrim.on{display:block}
+</style>
+</head>
+<body>
+<div id="app">
+  <canvas id="stage" aria-label="Vista de la cámara con el trazado de las manos"></canvas>
+  <video id="cam" playsinline muted autoplay></video>
+
+  <div class="top" id="top" hidden>
+    <div class="chip" role="status" aria-live="polite"><span class="dot" id="dot"></span><span id="status">Listo</span></div>
+    <div class="chip meta" id="meta" aria-label="Rendimiento">-- FPS</div>
+  </div>
+  <div class="hud" id="hud" aria-live="polite"></div>
+
+  <div class="bar" id="bar" hidden>
+    <button class="btn" id="bSwitch" aria-label="Cambiar de cámara">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7h-3l-2-3H9L7 7H4a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1z"/><path d="M9 14a3 3 0 0 1 5-2l1 1M15 14a3 3 0 0 1-5 2l-1-1"/></svg>Cámara</button>
+    <button class="btn" id="bShot" aria-label="Guardar captura de pantalla">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.5"/><rect x="3" y="5" width="18" height="15" rx="3"/></svg>Captura</button>
+    <button class="btn" id="bSet" aria-label="Abrir ajustes">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>Ajustes</button>
+    <button class="btn" id="bHelp" aria-label="Abrir ayuda">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7M12 17h.01"/></svg>Ayuda</button>
+    <button class="btn danger" id="bStop" aria-label="Detener la cámara">
+      <svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>Detener</button>
+  </div>
+
+  <section class="overlay" id="start">
+    <div class="card">
+      <h1>Rastrea tus manos con la cámara</h1>
+      <p>Apunta la cámara frontal del celular hacia tus manos y verás en vivo los 21 puntos de cada una, además del gesto que haces.</p>
+      <div class="alert" id="alert" role="alert"><strong id="alertTitle"></strong><span id="alertBody"></span></div>
+      <button class="btn primary" id="bStart">Activar cámara</button>
+      <button class="link" id="bHow">¿Cómo funciona?</button>
+      <p class="privacy">Privacidad: el video se procesa solo en tu celular. No se graba ni se envía a ningún servidor.</p>
+    </div>
+  </section>
+
+  <div class="scrim" id="scrim"></div>
+
+  <aside class="sheet" id="sSet" aria-label="Ajustes" role="dialog" aria-modal="true">
+    <header><h2>Ajustes</h2><button class="btn" data-close aria-label="Cerrar ajustes">Cerrar</button></header>
+    <div class="row"><div class="lbl" id="lColor">Color del trazado</div>
+      <div class="swatches" role="group" aria-labelledby="lColor">
+        <button class="sw" data-color="finger" aria-label="Un color por dedo" aria-pressed="true" style="background:conic-gradient(#ff5d73,#ffc857,#46e08a,#35e0ff,#b184ff,#ff5d73)"></button>
+        <button class="sw" data-color="#35e0ff" aria-label="Cian" aria-pressed="false" style="background:#35e0ff"></button>
+        <button class="sw" data-color="#7dff6b" aria-label="Verde" aria-pressed="false" style="background:#7dff6b"></button>
+        <button class="sw" data-color="#ff4fd8" aria-label="Magenta" aria-pressed="false" style="background:#ff4fd8"></button>
+      </div></div>
+    <div class="row"><label for="rThick">Grosor de las líneas<small id="vThick">4 px</small></label><input type="range" id="rThick" min="2" max="10" value="4"></div>
+    <div class="row"><div class="lbl" id="lMirror">Efecto espejo<small>Recomendado con la cámara frontal</small></div><button role="switch" id="tMirror" aria-checked="true" aria-labelledby="lMirror"></button></div>
+    <div class="row"><div class="lbl" id="lNames">Nombres de los dedos<small>Muestra Pulgar, Índice, etc. en las yemas</small></div><button role="switch" id="tNames" aria-checked="true" aria-labelledby="lNames"></button></div>
+    <div class="row"><div class="lbl" id="lIdx">Numerar los 21 puntos<small>Útil para desarrollo</small></div><button role="switch" id="tIdx" aria-checked="false" aria-labelledby="lIdx"></button></div>
+    <div class="row"><div class="lbl" id="lFps">Mostrar FPS</div><button role="switch" id="tFps" aria-checked="true" aria-labelledby="lFps"></button></div>
+    <div class="row"><div class="lbl">Restablecer ajustes</div><button class="btn" id="bReset">Restablecer</button></div>
+  </aside>
+
+  <aside class="sheet" id="sHelp" aria-label="Ayuda" role="dialog" aria-modal="true">
+    <header><h2>Cómo funciona</h2><button class="btn" data-close aria-label="Cerrar ayuda">Cerrar</button></header>
+    <ol class="steps">
+      <li>Toca Activar cámara y acepta el permiso del navegador.</li>
+      <li>Ubica tus manos a unos 30 a 60 cm de la cámara, con buena luz.</li>
+      <li>Puedes mostrar hasta dos manos a la vez.</li>
+      <li>Usa Ajustes para cambiar color, grosor o el efecto espejo.</li>
+    </ol>
+    <h2 style="font-size:16px">Gestos que reconoce</h2>
+    <ul class="legend">
+      <li><svg viewBox="0 0 34 34" fill="none" stroke="#35e0ff" stroke-width="2.5" stroke-linecap="round"><path d="M10 28V12M15 28V6M20 28V6M25 28V12M6 20l4 4"/></svg><span><b>Palma abierta</b>: todos los dedos extendidos.</span></li>
+      <li><svg viewBox="0 0 34 34" fill="none" stroke="#35e0ff" stroke-width="2.5"><rect x="8" y="12" width="18" height="14" rx="6"/></svg><span><b>Puño</b>: todos los dedos cerrados.</span></li>
+      <li><svg viewBox="0 0 34 34" fill="none" stroke="#35e0ff" stroke-width="2.5" stroke-linecap="round"><path d="M14 28l-4-12 8-6M18 10l6 6"/><circle cx="17" cy="12" r="3"/></svg><span><b>Pinza</b>: pulgar e índice se tocan. Se marca con un círculo.</span></li>
+      <li><svg viewBox="0 0 34 34" fill="none" stroke="#35e0ff" stroke-width="2.5" stroke-linecap="round"><path d="M12 28l2-22M22 28l-2-22"/></svg><span><b>Paz</b>: índice y corazón extendidos.</span></li>
+      <li><svg viewBox="0 0 34 34" fill="none" stroke="#35e0ff" stroke-width="2.5" stroke-linecap="round"><path d="M17 28V6"/></svg><span><b>Señalar</b>: solo el índice extendido.</span></li>
+    </ul>
+  </aside>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  const $ = id => document.getElementById(id);
+  const video = $("cam"), canvas = $("stage"), ctx = canvas.getContext("2d");
+
+  /* ---------- Estado y ajustes ---------- */
+  const DEFAULTS = {color:"finger", thick:4, mirror:true, names:true, idx:false, fps:true};
+  let S = Object.assign({}, DEFAULTS);
+  try{ const raw = localStorage.getItem("ar-manos"); if(raw) S = Object.assign(S, JSON.parse(raw)); }catch(e){}
+  const save = () => { try{ localStorage.setItem("ar-manos", JSON.stringify(S)); }catch(e){} };
+
+  let facing = "user", stream = null, hands = null, running = false, busy = false;
+  let W = 0, H = 0, lastCount = -1;
+  let frames = 0, fpsT = performance.now(), fps = 0;
+
+  const FINGERS = [
+    {n:"Pulgar",  ids:[1,2,3,4],   c:"#ff5d73"},
+    {n:"Índice",  ids:[5,6,7,8],   c:"#ffc857"},
+    {n:"Corazón", ids:[9,10,11,12],c:"#46e08a"},
+    {n:"Anular",  ids:[13,14,15,16],c:"#35e0ff"},
+    {n:"Meñique", ids:[17,18,19,20],c:"#b184ff"}
+  ];
+  const PALM = [[0,1],[0,5],[0,17],[5,9],[9,13],[13,17]];
+
+  /* ---------- Interfaz ---------- */
+  function setStatus(text, kind){
+    $("status").textContent = text;
+    $("dot").className = "dot " + (kind || "");
+  }
+  let toastT;
+  function toast(msg){
+    const t = $("toast"); t.textContent = msg; t.classList.add("show");
+    clearTimeout(toastT); toastT = setTimeout(()=>t.classList.remove("show"), 2600);
+  }
+  function showAlert(title, body){
+    $("alertTitle").textContent = title; $("alertBody").textContent = body; $("alert").classList.add("show");
+  }
+  function hideAlert(){ $("alert").classList.remove("show"); }
+
+  let openSheet = null;
+  function open(el){ closeSheets(); el.classList.add("open"); $("scrim").classList.add("on"); openSheet = el;
+    const f = el.querySelector("button"); if(f) f.focus(); }
+  function closeSheets(){ document.querySelectorAll(".sheet.open").forEach(s=>s.classList.remove("open")); $("scrim").classList.remove("on"); openSheet = null; }
+  $("scrim").onclick = closeSheets;
+  document.querySelectorAll("[data-close]").forEach(b=>b.onclick = closeSheets);
+  document.addEventListener("keydown", e => { if(e.key === "Escape") closeSheets(); });
+
+  function syncControls(){
+    $("rThick").value = S.thick; $("vThick").textContent = S.thick + " px";
+    [["tMirror","mirror"],["tNames","names"],["tIdx","idx"],["tFps","fps"]].forEach(([id,k])=>$(id).setAttribute("aria-checked", String(S[k])));
+    document.querySelectorAll(".sw").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.color === S.color)));
+    $("meta").style.display = S.fps ? "" : "none";
+  }
+  [["tMirror","mirror"],["tNames","names"],["tIdx","idx"],["tFps","fps"]].forEach(([id,k])=>{
+    $(id).onclick = () => { S[k] = !S[k]; save(); syncControls(); };
+  });
+  $("rThick").oninput = e => { S.thick = +e.target.value; save(); syncControls(); };
+  document.querySelectorAll(".sw").forEach(b=>b.onclick = () => { S.color = b.dataset.color; save(); syncControls(); });
+  $("bReset").onclick = () => { S = Object.assign({}, DEFAULTS); save(); syncControls(); toast("Ajustes restablecidos"); };
+  $("bSet").onclick = () => open($("sSet"));
+  $("bHelp").onclick = () => open($("sHelp"));
+  $("bHow").onclick = () => open($("sHelp"));
+
+  /* ---------- Lienzo ---------- */
+  function resize(){
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = canvas.clientWidth; H = canvas.clientHeight;
+    canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    if(!running) drawIdle();
+  }
+  window.addEventListener("resize", resize);
+  window.addEventListener("orientationchange", () => setTimeout(resize, 250));
+
+  function drawIdle(){
+    ctx.clearRect(0,0,W,H);
+    const g = ctx.createLinearGradient(0,0,W,H); g.addColorStop(0,"#0b0f14"); g.addColorStop(1,"#101c28");
+    ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+  }
+
+  /* ---------- Cámara y modelo ---------- */
+  function loadScript(src){
+    return new Promise((res, rej) => {
+      const s = document.createElement("script"); s.src = src; s.crossOrigin = "anonymous";
+      s.onload = res; s.onerror = () => rej(new Error("script")); document.head.appendChild(s);
+    });
+  }
+
+  async function ensureModel(){
+    if(hands) return;
+    if(!window.Hands) await loadScript("https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hands.js");
+    hands = new window.Hands({locateFile: f => "https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/" + f});
+    hands.setOptions({maxNumHands:2, modelComplexity:1, minDetectionConfidence:0.6, minTrackingConfidence:0.5});
+    hands.onResults(onResults);
+    await hands.initialize();
+  }
+
+  async function openCamera(){
+    if(stream){ stream.getTracks().forEach(t=>t.stop()); stream = null; }
+    stream = await navigator.mediaDevices.getUserMedia({
+      audio:false,
+      video:{facingMode:{ideal:facing}, width:{ideal:1280}, height:{ideal:720}}
+    });
+    video.srcObject = stream;
+    await video.play();
+  }
+
+  function explainError(err){
+    const n = (err && err.name) || "";
+    if(err && err.message === "script")
+      return ["No se pudo cargar el modelo de detección","Revisa tu conexión a internet y vuelve a intentar. Si estás dentro de una vista previa que bloquea contenido externo, abre la página directamente en el navegador del celular."];
+    if(n === "NotAllowedError" || n === "SecurityError")
+      return ["No hay permiso para usar la cámara","Permite el acceso a la cámara en la configuración del navegador y toca Reintentar. La cámara solo funciona si la página se abre con HTTPS y no dentro de una vista previa incrustada."];
+    if(n === "NotFoundError" || n === "OverconstrainedError")
+      return ["No encontramos una cámara disponible","Verifica que tu dispositivo tenga cámara y que ninguna otra aplicación la esté usando."];
+    if(n === "NotReadableError")
+      return ["La cámara está ocupada","Cierra otras aplicaciones que la estén usando y vuelve a intentar."];
+    return ["Algo salió mal al iniciar","Recarga la página y vuelve a intentar. Detalle técnico: " + (n || (err && err.message) || "desconocido")];
+  }
+
+  async function start(){
+    hideAlert();
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+      showAlert("Este navegador no permite usar la cámara","Abre la página con HTTPS en Chrome o Safari actualizados.");
+      return;
+    }
+    $("bStart").disabled = true; $("bStart").textContent = "Iniciando...";
+    $("top").hidden = false; setStatus("Cargando el modelo de detección...", "busy");
+    try{
+      await ensureModel();
+      setStatus("Abriendo la cámara...", "busy");
+      await openCamera();
+      running = true; lastCount = -1;
+      $("start").hidden = true; $("bar").hidden = false;
+      S.mirror = (facing === "user") ? S.mirror : false; syncControls();
+      setStatus("Muestra tus manos a la cámara", "warn");
+      loop();
+    }catch(err){
+      const [t,b] = explainError(err);
+      showAlert(t,b);
+      $("top").hidden = true;
+      if(stream){ stream.getTracks().forEach(x=>x.stop()); stream = null; }
+      $("bStart").textContent = "Reintentar";
+    }finally{
+      $("bStart").disabled = false;
+      if($("bStart").textContent === "Iniciando...") $("bStart").textContent = "Activar cámara";
+    }
+  }
+  $("bStart").onclick = start;
+
+  function stop(){
+    running = false;
+    if(stream){ stream.getTracks().forEach(t=>t.stop()); stream = null; }
+    $("hud").innerHTML = ""; $("bar").hidden = true; $("top").hidden = true; $("start").hidden = false;
+    $("bStart").textContent = "Activar cámara"; closeSheets(); drawIdle();
+    toast("Cámara detenida");
+  }
+  $("bStop").onclick = stop;
+
+  $("bSwitch").onclick = async () => {
+    facing = facing === "user" ? "environment" : "user";
+    S.mirror = facing === "user"; syncControls();
+    setStatus("Cambiando de cámara...", "busy");
+    try{ await openCamera(); toast(facing === "user" ? "Cámara frontal" : "Cámara trasera"); }
+    catch(err){ facing = facing === "user" ? "environment" : "user"; try{ await openCamera(); }catch(e){}
+      toast("No se pudo cambiar de cámara"); }
+  };
+
+  $("bShot").onclick = () => {
+    try{
+      canvas.toBlob(blob => {
+        if(!blob){ toast("No se pudo guardar la captura"); return; }
+        const url = URL.createObjectURL(blob), a = document.createElement("a");
+        a.href = url; a.download = "rastreo-manos-" + Date.now() + ".png";
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(()=>URL.revokeObjectURL(url), 4000);
+        toast("Captura guardada");
+      }, "image/png");
+    }catch(e){ toast("No se pudo guardar la captura"); }
+  };
+
+  async function loop(){
+    if(!running) return;
+    if(!busy && video.readyState >= 2){
+      busy = true;
+      try{ await hands.send({image: video}); }catch(e){}
+      busy = false;
+    }
+    requestAnimationFrame(loop);
+  }
+
+  /* ---------- Geometría y gestos ---------- */
+  let vw = 1, vh = 1, sc = 1, ox = 0, oy = 0;
+  function layout(){
+    vw = video.videoWidth || 1280; vh = video.videoHeight || 720;
+    sc = Math.max(W/vw, H/vh); ox = (W - vw*sc)/2; oy = (H - vh*sc)/2;
+  }
+  function P(lm){
+    let x = ox + lm.x * vw * sc; const y = oy + lm.y * vh * sc;
+    if(S.mirror) x = W - x;
+    return [x,y];
+  }
+  const D = (a,b) => Math.hypot((a.x-b.x)*vw, (a.y-b.y)*vh);
+
+  function gesture(l){
+    const size = D(l[0], l[9]) || 1;
+    const tips = [8,12,16,20], pips = [6,10,14,18];
+    const ext = tips.map((t,i) => D(l[t], l[0]) > D(l[pips[i]], l[0]) * 1.08);
+    const count = ext.filter(Boolean).length;
+    const pinch = D(l[4], l[8]) / size < 0.28;
+    if(pinch && count >= 2) return {name:"Pinza", pinch:true};
+    if(count === 0) return {name:"Puño"};
+    if(count === 4) return {name:"Palma abierta"};
+    if(ext[0] && ext[1] && !ext[2] && !ext[3]) return {name:"Paz"};
+    if(ext[0] && count === 1) return {name:"Señalar"};
+    return {name:"Mano detectada"};
+  }
+
+  /* ---------- Dibujo de resultados ---------- */
+  function onResults(res){
+    if(!running) return;
+    layout();
+    // fotograma de la cámara
+    ctx.save();
+    if(S.mirror){ ctx.translate(W,0); ctx.scale(-1,1); }
+    ctx.drawImage(res.image, ox, oy, vw*sc, vh*sc);
+    ctx.restore();
+    ctx.fillStyle = "rgba(0,0,0,.18)"; ctx.fillRect(0,0,W,H);
+
+    const list = res.multiHandLandmarks || [];
+    const labels = res.multiHandedness || [];
+    const hud = [];
+    list.forEach((l, i) => {
+      // El modelo asume imagen en espejo; el fotograma crudo no lo está, así que se invierte la etiqueta.
+      const raw = labels[i] && labels[i].label;
+      const side = raw === "Left" ? "Derecha" : "Izquierda";
+      const g = gesture(l);
+      drawHand(l, g, side);
+      hud.push({side, g});
+    });
+    renderHud(hud);
+
+    if(list.length !== lastCount){
+      lastCount = list.length;
+      if(list.length === 0) setStatus("Muestra tus manos a la cámara", "warn");
+      else setStatus(list.length === 1 ? "1 mano detectada" : "2 manos detectadas", "ok");
+    }
+    frames++;
+    const now = performance.now();
+    if(now - fpsT >= 1000){ fps = Math.round(frames*1000/(now-fpsT)); frames = 0; fpsT = now; $("meta").textContent = fps + " FPS"; }
+  }
+
+  function strokeSeg(a, b, color, w){
+    ctx.strokeStyle = color; ctx.lineWidth = w; ctx.lineCap = "round";
+    ctx.shadowColor = color; ctx.shadowBlur = 10;
+    ctx.beginPath(); ctx.moveTo(a[0],a[1]); ctx.lineTo(b[0],b[1]); ctx.stroke();
+    ctx.shadowBlur = 0;
+  }
+
+  function drawHand(l, g, side){
+    const pts = l.map(P);
+    const single = S.color !== "finger" ? S.color : null;
+    const w = S.thick;
+    PALM.forEach(([a,b]) => strokeSeg(pts[a], pts[b], single || "#d7e3ee", w));
+    FINGERS.forEach(f => {
+      const col = single || f.c;
+      const chain = f.n === "Pulgar" ? [1,2,3,4] : [0].concat(f.ids).slice(1); // base ya unida por la palma
+      let prev = f.n === "Pulgar" ? 1 : f.ids[0];
+      f.ids.slice(1).forEach(id => { strokeSeg(pts[prev], pts[id], col, w); prev = id; });
+    });
+    // articulaciones
+    l.forEach((_, i) => {
+      const f = FINGERS.find(x => x.ids.includes(i));
+      const col = single || (f ? f.c : "#ffffff");
+      const tip = i === 4 || i === 8 || i === 12 || i === 16 || i === 20;
+      ctx.fillStyle = "#0b0f14"; ctx.beginPath(); ctx.arc(pts[i][0], pts[i][1], (tip ? w*1.6 : w*1.1) + 1.5, 0, 7); ctx.fill();
+      ctx.fillStyle = col; ctx.beginPath(); ctx.arc(pts[i][0], pts[i][1], tip ? w*1.6 : w*1.1, 0, 7); ctx.fill();
+      if(S.idx){ ctx.fillStyle = "#fff"; ctx.font = "11px system-ui"; ctx.fillText(i, pts[i][0]+8, pts[i][1]-6); }
+    });
+    // nombres de dedos
+    if(S.names){
+      ctx.font = "600 12px system-ui"; ctx.textAlign = "center";
+      FINGERS.forEach(f => {
+        const t = pts[f.ids[3]];
+        const label = f.n, tw = ctx.measureText(label).width + 12;
+        ctx.fillStyle = "rgba(11,15,20,.78)"; ctx.beginPath();
+        ctx.roundRect ? ctx.roundRect(t[0]-tw/2, t[1]-34, tw, 20, 8) : ctx.rect(t[0]-tw/2, t[1]-34, tw, 20);
+        ctx.fill();
+        ctx.fillStyle = "#fff"; ctx.fillText(label, t[0], t[1]-19);
+      });
+      ctx.textAlign = "start";
+    }
+    // anillo de pinza
+    if(g.pinch){
+      const a = pts[4], b = pts[8], m = [(a[0]+b[0])/2, (a[1]+b[1])/2];
+      const r = Math.max(14, Math.hypot(a[0]-b[0], a[1]-b[1])/2 + 12);
+      ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 3; ctx.shadowColor = "#fff"; ctx.shadowBlur = 14;
+      ctx.beginPath(); ctx.arc(m[0], m[1], r, 0, 7); ctx.stroke(); ctx.shadowBlur = 0;
+    }
+  }
+
+  function renderHud(items){
+    const hud = $("hud");
+    const html = items.map(({side,g}) =>
+      '<div class="hand" style="border-left-color:' + (side === "Derecha" ? "#35e0ff" : "#ff4fd8") + '"><b>' + side + ':</b> ' + g.name + '</div>').join("");
+    if(hud._h !== html){ hud.innerHTML = html; hud._h = html; }
+  }
+
+  /* ---------- Arranque ---------- */
+  syncControls(); resize();
+  document.addEventListener("visibilitychange", () => { if(document.hidden && running) setStatus("En pausa", "warn"); });
+})();
+</script>
+</body>
+</html>
