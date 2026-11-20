@@ -418,9 +418,9 @@ var APPS=[
   feats:[["cal","Agenda","Programa y consulta tus compromisos."],["cloud","Guardada en tu cuenta","Recupera tu agenda al entrar desde otro equipo."],["grid","Dentro de la suite","Salta a otra app desde el menú superior."]]},
  {id:"organic",name:"Organic",icon:"sprout",tag:"Ideas",status:"Beta",href:"/holaapps/organic/",
   tagline:"Planta una idea. Mírala crecer.",
-  mini:[["Semilla","Nueva"],["Semilla","Con imagen"],["Semilla","Guardada"]],
+  mini:[["Idea","Nueva"],["Idea","Con imagen"],["Idea","Guardada"]],
   desc:"Guarda tus semillas, con imágenes incluidas, y vuelve a ellas cuando quieras. Puedes exportar e importar tus datos.",
-  feats:[["sprout","Semillas","Captura ideas con texto e imágenes."],["cloud","Sincronización por cuenta","Tus semillas viajan con tu sesión."],["devices","Exportar e importar","Lleva tus datos adonde los necesites."]]},
+  feats:[["sprout","Ideas","Captura ideas con texto e imágenes."],["cloud","Sincronización por cuenta","Tus ideas viajan con tu sesión."],["devices","Exportar e importar","Lleva tus datos adonde los necesites."]]},
  {id:"habitos",name:"Hábitos Atómicos",icon:"atom",tag:"Bienestar",status:"Beta",href:"/holaapps/habitos/",
   tagline:"Cambios pequeños. Resultados grandes.",
   mini:[["Leer 10 min","7/7"],["Caminar","5/7"],["Agua","6/7"]],
@@ -646,7 +646,7 @@ var DEMOS={
  },
  organic:function(box){
   var seeds=["Una idea para el huerto del barrio","Receta de la abuela, con foto"];
-  box.innerHTML='<h4>Mis semillas</h4><form class="row"><input class="hc-input" placeholder="Planta una semilla" aria-label="Nueva semilla"><button class="hc-btn" type="submit">Plantar</button></form><ul class="dl" id="sd"></ul>';
+  box.innerHTML='<h4>Mis ideas</h4><form class="row"><input class="hc-input" placeholder="Planta una idea" aria-label="Nueva idea"><button class="hc-btn" type="submit">Plantar</button></form><ul class="dl" id="sd"></ul>';
   function draw(){$("#sd").innerHTML=seeds.map(function(s){return '<li><div class="hc-bubble hc-bubble--bot" style="max-width:100%;display:flex;gap:var(--space-3);align-items:center">'+ic("sprout")+esc(s)+'</div></li>'}).join("")}
   box.querySelector("form").onsubmit=function(e){e.preventDefault();var i=box.querySelector("input");if(!i.value.trim())return;seeds.unshift(i.value.trim());i.value="";draw()};
   draw();

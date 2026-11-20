@@ -833,11 +833,11 @@ var REDUCED=!!(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: re
 var progMem={},foldMem={},newMod=null,freshId=null,lastDetail;
 var KEY="organic.v2.invitado"; // cambia a organic.v2.<id de usuario> al iniciar sesión
 var STAGES=[
- {k:"semilla",n:"Semilla",d:"Un texto plano. Todo empieza aquí. Es la hoja de la jerarquía y no contiene otros seeds."},
- {k:"proyecto",n:"Proyecto",d:"Contiene solo semillas. Puede estar en el workspace o dentro de un ecosistema."},
- {k:"ecosistema",n:"Ecosistema",d:"El nivel más alto. Contiene proyectos y semillas sin proyecto."}
+ {k:"semilla",n:"Idea",d:"Un texto plano. Todo empieza aquí. Es la hoja de la jerarquía y no contiene otros seeds."},
+ {k:"proyecto",n:"Proyecto",d:"Contiene solo ideas. Puede estar en el workspace o dentro de un ecosistema."},
+ {k:"ecosistema",n:"Ecosistema",d:"El nivel más alto. Contiene proyectos y ideas sin proyecto."}
 ];
-var RULE={semilla:"Una semilla no contiene otros seeds.",proyecto:"Un proyecto contiene solo semillas.",ecosistema:"Un ecosistema contiene proyectos y semillas sin proyecto."};
+var RULE={semilla:"Una idea no contiene otros seeds.",proyecto:"Un proyecto contiene solo ideas.",ecosistema:"Un ecosistema contiene proyectos y ideas sin proyecto."};
 var ALLOW={ecosistema:{proyecto:1,semilla:1},proyecto:{semilla:1},semilla:{}};
 function canHold(pk,ck){return !!(ALLOW[pk]&&ALLOW[pk][ck])}
 var TOOLS=[
@@ -990,7 +990,7 @@ function hasDate(s){return filled(s,"fecha")}
 var VIEWS=[
  {g:"Tipo",items:[
   {k:"todos",n:"Todos",f:function(){return true}},
-  {k:"semilla",n:"Semillas",f:function(s){return !s.loose&&stageOf(s)==="semilla"}},
+  {k:"semilla",n:"Ideas",f:function(s){return !s.loose&&stageOf(s)==="semilla"}},
   {k:"proyecto",n:"Proyectos",f:function(s){return !s.loose&&stageOf(s)==="proyecto"}},
   {k:"ecosistema",n:"Ecosistemas",f:function(s){return stageOf(s)==="ecosistema"}},
   {k:"sueltos",n:"Módulos",f:function(s){return !!s.loose}}]},
@@ -1053,7 +1053,7 @@ function renderList(){
       (sm?'<span class="pick'+(pk?" on":"")+'" aria-hidden="true"></span>':(dmode?'':'<input type="checkbox" class="chk" data-a="done" aria-label="Marcar como hecho" '+(s.done?"checked":"")+'>'))+
       '<div class="row-main"><div class="row-title"'+(truncW(s.title)!==(s.title||"").trim()?' title="'+esc(s.title)+'"':'')+'>'+(esc(truncW(s.title))||(s.loose?'<span class="dimt">'+esc(truncW(looseLabel(s)))+'</span>':"Seed sin título"))+'</div><div class="meta">'+meta+'</div></div>'+
       (sm||dmode||!PO?'':'<button class="parbtn" data-a="parmove" data-id="'+s.id+'" aria-label="'+(curPar?"Devolver a la lista principal":"Mover a En paralelo")+'" title="'+(curPar?"Devolver a la lista principal":"Mover a En paralelo")+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(curPar?'<path d="M12 19V7M6.500 12 12 6.500l5.500 5.500M5 4h14"/>':'<path d="M12 5v12M6.500 12l5.500 5.500 5.500-5.500M5 20h14"/>')+'</svg></button>')+
-      (sm?'':(s.loose?'<button class="rowtool toseed" data-a="toseed" data-id="'+s.id+'" aria-label="Convertir en semilla" title="Convertir en semilla">'+gico("semilla")+'</button>':'<button class="rowtool" data-a="rowtools" data-id="'+s.id+'" aria-label="Agregar módulo al workspace" title="Agregar módulo al workspace"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="5"/><path d="M12 8.500v7M8.500 12h7"/></svg></button>'))+
+      (sm?'':(s.loose?'<button class="rowtool toseed" data-a="toseed" data-id="'+s.id+'" aria-label="Convertir en idea" title="Convertir en idea">'+gico("semilla")+'</button>':'<button class="rowtool" data-a="rowtools" data-id="'+s.id+'" aria-label="Agregar módulo al workspace" title="Agregar módulo al workspace"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="5"/><path d="M12 8.500v7M8.500 12h7"/></svg></button>'))+
       (sm||!dmode?'':'<input type="checkbox" class="chk dsel" data-a="dpick" data-id="'+s.id+'" aria-label="Seleccionar para eliminar" title="Seleccionar para eliminar" '+(pk?"checked":"")+'>')+'</div>';
   }
   var ch={},seen={};
@@ -1088,7 +1088,7 @@ function renderDetail(keepScroll){
     el.innerHTML='<div class="welcome">'+cross()+
       '<h2 class="hero"><span class="l">Todo</span><br><span class="b">empieza con</span><br><span class="b">un seed</span></h2>'+tris()+
       '<p class="lead">Siembra una idea, ábrela y súmale módulos desde el toolbox. Cuando crezca, conviértela en proyecto o ecosistema respetando la jerarquía.</p>'+
-      '<div class="ladder">'+STAGES.map(function(x){return '<button class="rung" data-a="create" data-k="'+x.k+'" title="Crear '+(x.k==="semilla"?"una semilla":"un "+x.k)+'"><span class="stage '+x.k+'">'+gico(x.k)+'</span><div><b>'+x.n+'</b><p>'+x.d+'</p></div></button>'}).join("")+'</div></div>';
+      '<div class="ladder">'+STAGES.map(function(x){return '<button class="rung" data-a="create" data-k="'+x.k+'" title="Crear '+(x.k==="semilla"?"una idea":"un "+x.k)+'"><span class="stage '+x.k+'">'+gico(x.k)+'</span><div><b>'+x.n+'</b><p>'+x.d+'</p></div></button>'}).join("")+'</div></div>';
     renderTools();if(lastDetail!==null)animWelcome(el);lastDetail=null;return;
   }
   sortMods(s);
@@ -1097,10 +1097,10 @@ function renderDetail(keepScroll){
   var html='<div class="pane"><div class="pane-top"><button class="iconbtn back" data-a="close" title="Volver a la lista" aria-label="Volver a la lista"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button><button class="iconbtn closebtn" data-a="close" title="Cerrar" aria-label="Cerrar y volver al panel inicial"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>';
   if(par)html+='<div class="crumb">Dentro de <button data-a="open" data-id="'+par.id+'">'+esc(par.title||"sin título")+'</button><button class="unl" data-a="unlink" data-id="'+s.id+'" aria-label="Desvincular de '+esc(par.title||"sin título")+'" title="Desvincular">x</button></div>';
   html+='<textarea class="title" id="ttl" rows="1" placeholder="'+(s.loose?"Título opcional":"Escribe el seed")+'" aria-label="Título del seed">'+esc(s.title)+'</textarea>';
-  if(s.loose)html+='<div class="sug"><span>Este módulo está solo en el workspace. Conviértelo en semilla para darle jerarquía y sumarle más módulos.</span><div><button class="btn" data-a="toseed" data-id="'+s.id+'">Convertir en semilla</button></div></div>';
+  if(s.loose)html+='<div class="sug"><span>Este módulo está solo en el workspace. Conviértelo en idea para darle jerarquía y sumarle más módulos.</span><div><button class="btn" data-a="toseed" data-id="'+s.id+'">Convertir en idea</button></div></div>';
   if(!s.loose)html+='<div class="kinds" role="group" aria-label="Tipo de seed" style="margin-bottom:6px">'+STAGES.map(function(x){return '<button class="kind '+x.k+'" data-a="setkind" data-k="'+x.k+'" aria-pressed="'+(s.kind===x.k)+'">'+gico(x.k)+x.n+'</button>'}).join("")+'</div><div class="tiny" style="margin-bottom:16px">'+RULE[s.kind]+'</div>';
   else html+='<div style="height:10px"></div>';
-  if(s.kind==="semilla"&&layersOf(s)>=2&&!s.nosug)html+='<div class="sug"><span>Esta semilla ya tiene dos capas de contenido. ¿La conviertes en proyecto?</span><div><button class="btn" data-a="setkind" data-k="proyecto">Convertir en proyecto</button><button class="ghost" data-a="nosug">Ahora no</button></div></div>';
+  if(s.kind==="semilla"&&layersOf(s)>=2&&!s.nosug)html+='<div class="sug"><span>Esta idea ya tiene dos capas de contenido. ¿La conviertes en proyecto?</span><div><button class="btn" data-a="setkind" data-k="proyecto">Convertir en proyecto</button><button class="ghost" data-a="nosug">Ahora no</button></div></div>';
   html+=s.mods.map(function(m){return modHTML(s,m)}).join("");
   html+='<div class="foot"><span class="tiny">Arrastra módulos desde el toolbox para seguir nutriéndolo.</span>'+(s.loose?'':'<button class="ghost'+(canToTask(s)?"":" off")+'" data-a="totask" data-id="'+s.id+'" title="'+RULE_TASK+'">Convertir en tarea</button>')+'<button class="ghost" data-a="mvitem" data-id="'+s.id+'">Mover a otro workspace</button><button class="ghost danger" data-a="del">Eliminar seed</button></div></div>';
   el.innerHTML=html;
@@ -1169,7 +1169,7 @@ function modHTML(s,m){
   }else if(k==="brotes"){
     var ch=kids(s),mode=foldMem[s.id]===undefined?(ch.length===0?"crear":null):foldMem[s.id];
     var cand=wsSeeds().filter(function(x){return x.id!==s.id&&!x.loose&&!x.parent&&canHold(s.kind,x.kind)});
-    var ksel=s.kind==="ecosistema"?'<select class="field kselect" id="f-bkind" aria-label="Tipo del nuevo elemento"><option value="semilla">Semilla</option><option value="proyecto">Proyecto</option></select>':'';
+    var ksel=s.kind==="ecosistema"?'<select class="field kselect" id="f-bkind" aria-label="Tipo del nuevo elemento"><option value="semilla">Idea</option><option value="proyecto">Proyecto</option></select>':'';
     h='<div class="tiny" style="margin-bottom:8px">'+RULE[s.kind]+'</div>'+
       (ch.length?ch.map(function(c){var cs=stageOf(c),nc=kids(c).length;return '<div class="li"><span class="stage '+cs+'">'+gico(cs)+'</span><button class="open grow" data-a="open" data-id="'+c.id+'">'+esc(c.title||"sin título")+'</button><span class="tiny">'+(nc?nc+' dentro':stageName(cs))+'</span><button class="chevbtn" data-a="itemmenu" data-id="'+c.id+'" aria-label="Opciones de '+esc(c.title||"sin título")+'" aria-haspopup="menu" aria-expanded="false" title="Opciones"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></div>'}).join(""):'<div class="tiny">Aún no hay elementos.</div>')+
       '<div class="bmode" role="group" aria-label="Agregar elemento"><button class="mode" data-a="bmode" data-m="crear" aria-pressed="'+(mode==="crear")+'">'+ico("plus")+'Crear nuevo</button><button class="mode" data-a="bmode" data-m="vincular" aria-pressed="'+(mode==="vincular")+'">'+ico("links")+'Vincular</button></div>'+
@@ -1306,7 +1306,7 @@ function openTaskMove(s,tk){
   var list=wsSeeds().filter(function(x){return !x.loose}).sort(function(a,b){return ord[stageOf(a)]-ord[stageOf(b)]||(a.title||"").localeCompare(b.title||"","es")});
   var ex=list.map(function(x){return '<option value="'+x.id+'">'+esc(truncW(x.title||"sin título",8))+' ('+stageName(stageOf(x)).toLowerCase()+')'+(x.id===s.id?" · este seed":"")+'</option>'}).join("");
   showDlg('<h2 style="font-size:18px;margin-bottom:8px" class="bar">Mover tarea</h2><p class="tiny" style="margin-bottom:10px">Elige a dónde va "'+esc(truncW(tk.t,10)||"Tarea sin título")+'". Sus módulos se mueven con ella.</p>'+
-    '<label class="tiny" for="mv-to">Mover a</label><select class="field" id="mv-to"><optgroup label="Crear nuevo en el workspace"><option value="new:semilla">Semilla nueva</option><option value="new:proyecto">Proyecto nuevo</option><option value="new:ecosistema">Ecosistema nuevo</option></optgroup>'+(ex?'<optgroup label="Dentro de un seed existente">'+ex+'</optgroup>':'')+'</select>'+
+    '<label class="tiny" for="mv-to">Mover a</label><select class="field" id="mv-to"><optgroup label="Crear nuevo en el workspace"><option value="new:semilla">Idea nueva</option><option value="new:proyecto">Proyecto nuevo</option><option value="new:ecosistema">Ecosistema nuevo</option></optgroup>'+(ex?'<optgroup label="Dentro de un seed existente">'+ex+'</optgroup>':'')+'</select>'+
     '<div id="mv-inw" hidden><label class="tiny" for="mv-in" style="display:block;margin-top:10px">Dentro del módulo</label><select class="field" id="mv-in"></select></div>'+
     '<div class="inline" style="justify-content:flex-end;margin-top:14px"><button class="ghost" data-a="dlgclose">Cancelar</button><button class="btn" data-a="tmoveok">Mover</button></div>');
   $("#mv-to").addEventListener("change",mvFill);mvFill();
@@ -1318,7 +1318,7 @@ function doTaskMove(){
   if(to.indexOf("new:")===0){
     var kind=to.slice(4);dropTask(s,tk);
     var ns=newSeed(txt,null,kind);ns.done=!!tk.done;mods.forEach(function(x){ns.mods.push(x)});sortMods(ns);
-    msg="La tarea ahora es "+(kind==="semilla"?"una semilla nueva":kind==="proyecto"?"un proyecto nuevo":"un ecosistema nuevo");
+    msg="La tarea ahora es "+(kind==="semilla"?"una idea nueva":kind==="proyecto"?"un proyecto nuevo":"un ecosistema nuevo");
   }else{
     var d=byId(to);if(!d||d.loose){closeDlg();return}
     if(where==="tareas"){
@@ -1535,7 +1535,7 @@ function canBecomeProject(t){
 }
 function convDialog(id,pid){
   var d=byId(id),t=byId(pid);if(!d||!t||!canBecomeProject(t))return;
-  showDlg('<h2 style="font-size:18px;margin-bottom:8px" class="bar">Anidar una semilla</h2><p>Una semilla no puede contener otra. Para meter "'+esc(d.title||"seed sin título")+'" dentro de "'+esc(t.title||"seed sin título")+'", esta última se convertiría en proyecto. ¿Quieres hacerlo?</p><div class="inline" style="justify-content:flex-end"><button class="ghost" data-a="dlgclose">Cancelar</button><button class="btn" data-a="conv-ok" data-id="'+id+'" data-pid="'+pid+'">Convertir y anidar</button></div>');
+  showDlg('<h2 style="font-size:18px;margin-bottom:8px" class="bar">Anidar una idea</h2><p>Una idea no puede contener otra. Para meter "'+esc(d.title||"seed sin título")+'" dentro de "'+esc(t.title||"seed sin título")+'", esta última se convertiría en proyecto. ¿Quieres hacerlo?</p><div class="inline" style="justify-content:flex-end"><button class="ghost" data-a="dlgclose">Cancelar</button><button class="btn" data-a="conv-ok" data-id="'+id+'" data-pid="'+pid+'">Convertir y anidar</button></div>');
 }
 function linkSeed(id,pid){
   var d=byId(id),t=byId(pid);if(!d||!t||d.loose||t.loose||!canHold(t.kind,d.kind))return;
@@ -1570,7 +1570,7 @@ document.addEventListener("pointerup",endDrag);
 document.addEventListener("pointercancel",endDrag);
 
 /* ---------- acciones ---------- */
-var RULE_TASK="Solo una semilla sin módulos ni contenido (solo el título) se puede convertir en tarea.";
+var RULE_TASK="Solo una idea sin módulos ni contenido (solo el título) se puede convertir en tarea.";
 function canToTask(x){return !!x&&!x.loose&&x.kind==="semilla"&&!x.mods.length&&!kids(x).length&&!!(x.title||"").trim()}
 function doToTask(id,destId){
   var x=byId(id),d=byId(destId);if(!x||!d||!canToTask(x))return;
@@ -1798,12 +1798,12 @@ function toSeed(id,x0,y0){
   var s=byId(id);if(!s||!s.loose)return;
   unloose(s);save();renderList();if(S.ui.sel===id)renderDetail(true);
   if(x0!==undefined&&!REDUCED)party(x0,y0,22,2.2,9);
-  toast(s.kind==="proyecto"?"Ahora es un proyecto":"Ahora es una semilla");
+  toast(s.kind==="proyecto"?"Ahora es un proyecto":"Ahora es una idea");
 }
 function addModule(k,id){
   var s=byId(id||S.ui.sel);
   if(!s){addLoose(k);return}
-  if(k==="brotes"&&s.kind==="semilla"){toast("Una semilla no contiene otros seeds. Cámbiala a proyecto o ecosistema para usar Contenido.");return}
+  if(k==="brotes"&&s.kind==="semilla"){toast("Una idea no contiene otros seeds. Cámbiala a proyecto o ecosistema para usar Contenido.");return}
   if(mod(s,k)){S.ui.sel=s.id;renderList();renderDetail();var e=$("#mod-"+k);if(e)e.scrollIntoView({block:"center",behavior:"smooth"});toast("Este seed ya tiene "+TOOLNAME[k].n.toLowerCase());return}
   var m=mkMod(k),wasLoose=!!s.loose;
   if(wasLoose)unloose(s);
@@ -1827,7 +1827,7 @@ function addTag(s){var i=$("#f-tag"),v=i.value.trim();if(!v){i.focus();return}va
 function addTask(s){var i=$("#f-task"),v=i.value.trim();if(!v){i.focus();return}mod(s,"tareas").items.push({id:uid(),t:v,done:false});save();renderList();renderDetail(true);$("#f-task").focus()}
 
 function isMobile(){return window.matchMedia("(max-width:860px)").matches}
-function addBrote(s){var i=$("#f-brote"),v=i.value.trim();if(!v){i.focus();return}foldMem[s.id]="crear";var ks=$("#f-bkind"),k=s.kind==="ecosistema"&&ks?ks.value:"semilla";newSeed(v,s.id,k);save();renderList();renderDetail(true);$("#f-brote").focus();toast(k==="proyecto"?"Proyecto agregado":"Semilla agregada")}
+function addBrote(s){var i=$("#f-brote"),v=i.value.trim();if(!v){i.focus();return}foldMem[s.id]="crear";var ks=$("#f-bkind"),k=s.kind==="ecosistema"&&ks?ks.value:"semilla";newSeed(v,s.id,k);save();renderList();renderDetail(true);$("#f-brote").focus();toast(k==="proyecto"?"Proyecto agregado":"Idea agregada")}
 function setKind(s,nk,ok){
   if(s.kind===nk)return;
   var bad=kids(s).filter(function(c){return !canHold(nk,c.kind)});
@@ -2086,7 +2086,7 @@ document.addEventListener("click",function(e){
     if(tx.parent){doToTask(tx.id,tx.parent);return}
     var opts=wsSeeds().filter(function(z){return z.id!==tx.id&&!z.loose});
     if(!opts.length){toast("Crea otro seed para recibir la tarea");return}
-    showDlg('<h2 style="font-size:18px;margin-bottom:8px" class="bar">Convertir en tarea</h2><p class="tiny" style="margin-bottom:10px">Elige el seed que recibirá "'+esc(tx.title)+'" como tarea. Esta semilla dejará de existir por separado.</p><select class="field" id="tt-dest" aria-label="Seed destino">'+opts.map(function(z){return '<option value="'+z.id+'">'+esc(z.title||"sin título")+' ('+stageName(z.kind).toLowerCase()+')</option>'}).join("")+'</select><div class="inline" style="justify-content:flex-end;margin-top:12px"><button class="ghost" data-a="dlgclose">Cancelar</button><button class="btn" data-a="totask-ok" data-id="'+tx.id+'">Convertir</button></div>');
+    showDlg('<h2 style="font-size:18px;margin-bottom:8px" class="bar">Convertir en tarea</h2><p class="tiny" style="margin-bottom:10px">Elige el seed que recibirá "'+esc(tx.title)+'" como tarea. Esta idea dejará de existir por separado.</p><select class="field" id="tt-dest" aria-label="Seed destino">'+opts.map(function(z){return '<option value="'+z.id+'">'+esc(z.title||"sin título")+' ('+stageName(z.kind).toLowerCase()+')</option>'}).join("")+'</select><div class="inline" style="justify-content:flex-end;margin-top:12px"><button class="ghost" data-a="dlgclose">Cancelar</button><button class="btn" data-a="totask-ok" data-id="'+tx.id+'">Convertir</button></div>');
     return;
   }
   if(act==="totask-ok"){var dd=$("#tt-dest");closeDlg();if(dd)doToTask(a.dataset.id,dd.value);return}
@@ -2107,7 +2107,7 @@ document.addEventListener("click",function(e){
     xfApply(s,xf,xt);return;
   }
   if(act==="xfok"){closeDlg();xfApply(s,a.dataset.k,a.dataset.to);return}
-  if(act==="rmmod"&&s.loose){toast("Es un módulo individual. Conviértelo en semilla o elimínalo completo.");return}
+  if(act==="rmmod"&&s.loose){toast("Es un módulo individual. Conviértelo en idea o elimínalo completo.");return}
   if(act==="del"){if(a.dataset.sure){var id2=s.id;S.seeds=S.seeds.filter(function(z){return z.id!==id2});S.seeds.forEach(function(z){if(z.parent===id2)z.parent=null;z.rel=z.rel.filter(function(r){return r!==id2})});S.ui.sel=null;save();renderList();renderDetail();toast("Seed eliminado")}else{a.dataset.sure="1";a.textContent="Confirmar eliminación";setTimeout(function(){if(a.isConnected){delete a.dataset.sure;a.textContent="Eliminar seed"}},3000)}return}
   if(act==="rmmod"&&a.dataset.k==="brotes"){
     var n=kids(s).length;
