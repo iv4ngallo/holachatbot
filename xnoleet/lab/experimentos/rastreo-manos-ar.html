@@ -84,6 +84,10 @@
   .legend li{display:flex;gap:12px;align-items:center;background:rgba(255,255,255,.05);border-radius:12px;padding:10px 12px;font-size:14px}
   .legend svg{width:34px;height:34px;flex:none}
   .steps{margin:8px 0 14px;padding-left:20px;color:var(--muted);line-height:1.6;font-size:14px}
+  .tools{position:absolute;right:calc(12px + var(--sar));top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:8px}
+  .tools[hidden]{display:none}
+  .tools .btn{flex-direction:column;gap:2px;font-size:11px;padding:6px 8px;min-width:56px}
+  .tools .btn[disabled]{opacity:.4;cursor:default}
   .toast{position:absolute;left:50%;bottom:calc(96px + var(--sab));transform:translate(-50%,20px);opacity:0;background:#fff;color:#0b0f14;
     padding:10px 16px;border-radius:12px;font-size:14px;font-weight:600;transition:.2s;pointer-events:none;z-index:9;max-width:90%;text-align:center}
   .toast.show{opacity:1;transform:translate(-50%,0)}
@@ -101,6 +105,13 @@
     <div class="chip meta" id="meta" aria-label="Rendimiento">-- FPS</div>
   </div>
   <div class="hud" id="hud" aria-live="polite"></div>
+
+  <div class="tools" id="tools" hidden>
+    <button class="btn" id="bUndo" aria-label="Deshacer el último trazo" disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg>Deshacer</button>
+    <button class="btn" id="bClear" aria-label="Borrar todos los trazos" disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>Borrar</button>
+  </div>
 
   <div class="bar" id="bar" hidden>
     <button class="btn" id="bSwitch" aria-label="Cambiar de cámara">
@@ -137,7 +148,9 @@
         <button class="sw" data-color="#7dff6b" aria-label="Verde" aria-pressed="false" style="background:#7dff6b"></button>
         <button class="sw" data-color="#ff4fd8" aria-label="Magenta" aria-pressed="false" style="background:#ff4fd8"></button>
       </div></div>
-    <div class="row"><label for="rThick">Grosor de las líneas<small id="vThick">4 px</small></label><input type="range" id="rThick" min="2" max="10" value="4"></div>
+    <div class="row"><div class="lbl" id="lDraw">Dibujar con la pinza<small>Al juntar pulgar e índice deja un punto; si te mueves, traza una línea</small></div><button role="switch" id="tDraw" aria-checked="true" aria-labelledby="lDraw"></button></div>
+    <div class="row"><label for="rInk">Grosor del trazo<small id="vInk">6 px</small></label><input type="range" id="rInk" min="3" max="20" value="6"></div>
+    <div class="row"><label for="rThick">Grosor del esqueleto<small id="vThick">4 px</small></label><input type="range" id="rThick" min="2" max="10" value="4"></div>
     <div class="row"><div class="lbl" id="lMirror">Efecto espejo<small>Recomendado con la cámara frontal</small></div><button role="switch" id="tMirror" aria-checked="true" aria-labelledby="lMirror"></button></div>
     <div class="row"><div class="lbl" id="lNames">Nombres de los dedos<small>Muestra Pulgar, Índice, etc. en las yemas</small></div><button role="switch" id="tNames" aria-checked="true" aria-labelledby="lNames"></button></div>
     <div class="row"><div class="lbl" id="lIdx">Numerar los 21 puntos<small>Útil para desarrollo</small></div><button role="switch" id="tIdx" aria-checked="false" aria-labelledby="lIdx"></button></div>
@@ -157,7 +170,7 @@
     <ul class="legend">
       <li><svg viewBox="0 0 34 34" fill="none" stroke="#35e0ff" stroke-width="2.5" stroke-linecap="round"><path d="M10 28V12M15 28V6M20 28V6M25 28V12M6 20l4 4"/></svg><span><b>Palma abierta</b>: todos los dedos extendidos.</span></li>
       <li><svg viewBox="0 0 34 34" fill="none" stroke="#35e0ff" stroke-width="2.5"><rect x="8" y="12" width="18" height="14" rx="6"/></svg><span><b>Puño</b>: todos los dedos cerrados.</span></li>
-      <li><svg viewBox="0 0 34 34" fill="none" stroke="#35e0ff" stroke-width="2.5" stroke-linecap="round"><path d="M14 28l-4-12 8-6M18 10l6 6"/><circle cx="17" cy="12" r="3"/></svg><span><b>Pinza</b>: pulgar e índice se tocan. Se marca con un círculo.</span></li>
+      <li><svg viewBox="0 0 34 34" fill="none" stroke="#35e0ff" stroke-width="2.5" stroke-linecap="round"><path d="M14 28l-4-12 8-6M18 10l6 6"/><circle cx="17" cy="12" r="3"/></svg><span><b>Pinza</b>: junta pulgar e índice para dejar un punto. Si mueves la mano sin soltar, traza una línea. Usa Deshacer o Borrar para corregir.</span></li>
       <li><svg viewBox="0 0 34 34" fill="none" stroke="#35e0ff" stroke-width="2.5" stroke-linecap="round"><path d="M12 28l2-22M22 28l-2-22"/></svg><span><b>Paz</b>: índice y corazón extendidos.</span></li>
       <li><svg viewBox="0 0 34 34" fill="none" stroke="#35e0ff" stroke-width="2.5" stroke-linecap="round"><path d="M17 28V6"/></svg><span><b>Señalar</b>: solo el índice extendido.</span></li>
     </ul>
@@ -173,7 +186,7 @@
   const video = $("cam"), canvas = $("stage"), ctx = canvas.getContext("2d");
 
   /* ---------- Estado y ajustes ---------- */
-  const DEFAULTS = {color:"finger", thick:4, mirror:true, names:true, idx:false, fps:true};
+  const DEFAULTS = {color:"finger", thick:4, mirror:true, names:true, idx:false, fps:true, draw:true, ink:6};
   let S = Object.assign({}, DEFAULTS);
   try{ const raw = localStorage.getItem("ar-manos"); if(raw) S = Object.assign(S, JSON.parse(raw)); }catch(e){}
   const save = () => { try{ localStorage.setItem("ar-manos", JSON.stringify(S)); }catch(e){} };
@@ -216,13 +229,27 @@
 
   function syncControls(){
     $("rThick").value = S.thick; $("vThick").textContent = S.thick + " px";
-    [["tMirror","mirror"],["tNames","names"],["tIdx","idx"],["tFps","fps"]].forEach(([id,k])=>$(id).setAttribute("aria-checked", String(S[k])));
+    $("rInk").value = S.ink; $("vInk").textContent = S.ink + " px";
+    [["tMirror","mirror"],["tNames","names"],["tIdx","idx"],["tFps","fps"],["tDraw","draw"]].forEach(([id,k])=>$(id).setAttribute("aria-checked", String(S[k])));
     document.querySelectorAll(".sw").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.color === S.color)));
     $("meta").style.display = S.fps ? "" : "none";
   }
-  [["tMirror","mirror"],["tNames","names"],["tIdx","idx"],["tFps","fps"]].forEach(([id,k])=>{
+  [["tMirror","mirror"],["tNames","names"],["tIdx","idx"],["tFps","fps"],["tDraw","draw"]].forEach(([id,k])=>{
     $(id).onclick = () => { S[k] = !S[k]; save(); syncControls(); };
   });
+  $("rInk").oninput = e => { S.ink = +e.target.value; save(); syncControls(); };
+
+  /* ---------- Trazos (galletitas) ---------- */
+  // Cada trazo guarda puntos normalizados (0 a 1) del fotograma de la cámara.
+  let strokes = [];
+  const live = {};            // trazo activo por mano
+  const pinchState = {};      // histéresis de la pinza por mano
+  function refreshTools(){
+    $("bUndo").disabled = strokes.length === 0; $("bClear").disabled = strokes.length === 0;
+  }
+  function endStrokes(){ Object.keys(live).forEach(k => delete live[k]); }
+  $("bUndo").onclick = () => { endStrokes(); strokes.pop(); refreshTools(); toast("Trazo deshecho"); };
+  $("bClear").onclick = () => { endStrokes(); strokes = []; refreshTools(); toast("Trazos borrados"); };
   $("rThick").oninput = e => { S.thick = +e.target.value; save(); syncControls(); };
   document.querySelectorAll(".sw").forEach(b=>b.onclick = () => { S.color = b.dataset.color; save(); syncControls(); });
   $("bReset").onclick = () => { S = Object.assign({}, DEFAULTS); save(); syncControls(); toast("Ajustes restablecidos"); };
@@ -300,7 +327,7 @@
       setStatus("Abriendo la cámara...", "busy");
       await openCamera();
       running = true; lastCount = -1;
-      $("start").hidden = true; $("bar").hidden = false;
+      $("start").hidden = true; $("bar").hidden = false; $("tools").hidden = false; refreshTools();
       S.mirror = (facing === "user") ? S.mirror : false; syncControls();
       setStatus("Muestra tus manos a la cámara", "warn");
       loop();
@@ -320,7 +347,8 @@
   function stop(){
     running = false;
     if(stream){ stream.getTracks().forEach(t=>t.stop()); stream = null; }
-    $("hud").innerHTML = ""; $("bar").hidden = true; $("top").hidden = true; $("start").hidden = false;
+    $("hud").innerHTML = ""; $("bar").hidden = true; $("tools").hidden = true; $("top").hidden = true; $("start").hidden = false;
+    endStrokes(); strokes = [];
     $("bStart").textContent = "Activar cámara"; closeSheets(); drawIdle();
     toast("Cámara detenida");
   }
@@ -329,6 +357,7 @@
   $("bSwitch").onclick = async () => {
     facing = facing === "user" ? "environment" : "user";
     S.mirror = facing === "user"; syncControls();
+    endStrokes(); strokes = []; refreshTools();
     setStatus("Cambiando de cámara...", "busy");
     try{ await openCamera(); toast(facing === "user" ? "Cámara frontal" : "Cámara trasera"); }
     catch(err){ facing = facing === "user" ? "environment" : "user"; try{ await openCamera(); }catch(e){}
@@ -371,13 +400,14 @@
   }
   const D = (a,b) => Math.hypot((a.x-b.x)*vw, (a.y-b.y)*vh);
 
-  function gesture(l){
+  function gesture(l, wasPinch){
     const size = D(l[0], l[9]) || 1;
     const tips = [8,12,16,20], pips = [6,10,14,18];
     const ext = tips.map((t,i) => D(l[t], l[0]) > D(l[pips[i]], l[0]) * 1.08);
     const count = ext.filter(Boolean).length;
-    const pinch = D(l[4], l[8]) / size < 0.28;
-    if(pinch && count >= 2) return {name:"Pinza", pinch:true};
+    // Histéresis: cuesta soltar la pinza una vez iniciada, para que el trazo no se corte.
+    const pinch = D(l[4], l[8]) / size < (wasPinch ? 0.42 : 0.28);
+    if(pinch && (ext[1] || ext[2] || ext[3])) return {name:"Pinza", pinch:true};
     if(count === 0) return {name:"Puño"};
     if(count === 4) return {name:"Palma abierta"};
     if(ext[0] && ext[1] && !ext[2] && !ext[3]) return {name:"Paz"};
@@ -399,24 +429,67 @@
     const list = res.multiHandLandmarks || [];
     const labels = res.multiHandedness || [];
     const hud = [];
-    list.forEach((l, i) => {
+    const seen = {};
+    const analysed = list.map((l, i) => {
       // El modelo asume imagen en espejo; el fotograma crudo no lo está, así que se invierte la etiqueta.
       const raw = labels[i] && labels[i].label;
       const side = raw === "Left" ? "Derecha" : "Izquierda";
-      const g = gesture(l);
-      drawHand(l, g, side);
-      hud.push({side, g});
+      const g = gesture(l, !!pinchState[side]);
+      seen[side] = true; pinchState[side] = !!g.pinch;
+      updateInk(l, g, side);
+      return {l, g, side};
     });
+    // manos que desaparecieron: se cierra su trazo
+    Object.keys(live).forEach(k => { if(!seen[k]) delete live[k]; });
+    Object.keys(pinchState).forEach(k => { if(!seen[k]) pinchState[k] = false; });
+    drawStrokes();
+    analysed.forEach(({l,g,side}) => { drawHand(l, g, side); hud.push({side, g}); });
     renderHud(hud);
 
     if(list.length !== lastCount){
       lastCount = list.length;
       if(list.length === 0) setStatus("Muestra tus manos a la cámara", "warn");
-      else setStatus(list.length === 1 ? "1 mano detectada" : "2 manos detectadas", "ok");
+      else setStatus((list.length === 1 ? "1 mano detectada" : "2 manos detectadas") + ". Junta pulgar e índice para dibujar", "ok");
     }
     frames++;
     const now = performance.now();
     if(now - fpsT >= 1000){ fps = Math.round(frames*1000/(now-fpsT)); frames = 0; fpsT = now; $("meta").textContent = fps + " FPS"; }
+  }
+
+  function inkColor(side){ return S.color === "finger" ? (side === "Derecha" ? "#35e0ff" : "#ff4fd8") : S.color; }
+
+  function updateInk(l, g, side){
+    if(!S.draw){ delete live[side]; return; }
+    if(!g.pinch){ delete live[side]; return; }
+    const nx = (l[4].x + l[8].x)/2, ny = (l[4].y + l[8].y)/2;
+    let st = live[side];
+    if(!st){
+      st = {color: inkColor(side), w: S.ink, pts: [[nx,ny]]};
+      strokes.push(st); live[side] = st; refreshTools();
+      return;
+    }
+    const last = st.pts[st.pts.length-1];
+    if(Math.hypot((nx-last[0])*vw, (ny-last[1])*vh) > 4) st.pts.push([nx,ny]);   // mínimo 4 px de avance
+  }
+
+  function drawStrokes(){
+    ctx.lineCap = "round"; ctx.lineJoin = "round";
+    strokes.forEach(st => {
+      const pts = st.pts.map(p => P({x:p[0], y:p[1]}));
+      ctx.strokeStyle = st.color; ctx.fillStyle = st.color; ctx.lineWidth = st.w;
+      ctx.shadowColor = st.color; ctx.shadowBlur = 12;
+      if(pts.length === 1){
+        ctx.beginPath(); ctx.arc(pts[0][0], pts[0][1], st.w*0.9, 0, 7); ctx.fill();
+      }else{
+        ctx.beginPath(); ctx.moveTo(pts[0][0], pts[0][1]);
+        for(let i = 1; i < pts.length - 1; i++){
+          const mx = (pts[i][0]+pts[i+1][0])/2, my = (pts[i][1]+pts[i+1][1])/2;
+          ctx.quadraticCurveTo(pts[i][0], pts[i][1], mx, my);
+        }
+        ctx.lineTo(pts[pts.length-1][0], pts[pts.length-1][1]); ctx.stroke();
+      }
+      ctx.shadowBlur = 0;
+    });
   }
 
   function strokeSeg(a, b, color, w){
