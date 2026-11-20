@@ -157,7 +157,7 @@
     <div class="row"><div class="lbl" id="lNames">Nombres de los dedos<small>Muestra Pulgar, Índice, etc. en las yemas</small></div><button role="switch" id="tNames" aria-checked="true" aria-labelledby="lNames"></button></div>
     <div class="row"><div class="lbl" id="lIdx">Numerar los 21 puntos<small>Útil para desarrollo</small></div><button role="switch" id="tIdx" aria-checked="false" aria-labelledby="lIdx"></button></div>
     <div class="row"><div class="lbl" id="lFps">Mostrar FPS</div><button role="switch" id="tFps" aria-checked="true" aria-labelledby="lFps"></button></div>
-    <div class="row"><div class="lbl">Versión<small>v4: manos, dibujo con pinza y expresiones faciales</small></div></div>
+    <div class="row"><div class="lbl">Versión<small>v5: manos, dibujo con pinza y expresiones faciales (diagnóstico de rostro)</small></div></div>
     <div class="row"><div class="lbl">Restablecer ajustes</div><button class="btn" id="bReset">Restablecer</button></div>
   </aside>
 
@@ -303,18 +303,21 @@
   let faceDet = null, faceFail = false, faceTick = 0, lastVT = -1, faces = [];
   const prevScores = [], stab = [];
 
+  let faceErr = "", faceRuntimeErr = 0;
   async function ensureFace(){
     if(faceDet || faceFail) return;
     try{
       const mod = await import(TV + "/vision_bundle.mjs");
       const fileset = await mod.FilesetResolver.forVisionTasks(TV + "/wasm");
-      const opts = {runningMode:"VIDEO", numFaces:2, outputFaceBlendshapes:true, minFaceDetectionConfidence:0.5, minTrackingConfidence:0.5};
-      try{
-        faceDet = await mod.FaceLandmarker.createFromOptions(fileset, Object.assign({baseOptions:{modelAssetPath:FACE_MODEL, delegate:"GPU"}}, opts));
-      }catch(e){
-        faceDet = await mod.FaceLandmarker.createFromOptions(fileset, Object.assign({baseOptions:{modelAssetPath:FACE_MODEL, delegate:"CPU"}}, opts));
-      }
-    }catch(e){ faceFail = true; faceDet = null; }
+      faceDet = await mod.FaceLandmarker.createFromOptions(fileset, {
+        baseOptions:{modelAssetPath:FACE_MODEL, delegate:"CPU"},
+        runningMode:"VIDEO", numFaces:2, outputFaceBlendshapes:true,
+        minFaceDetectionConfidence:0.4, minFacePresenceConfidence:0.4, minTrackingConfidence:0.4
+      });
+    }catch(e){
+      faceFail = true; faceDet = null; faceErr = (e && e.message) ? e.message.slice(0, 60) : String(e).slice(0, 60);
+      console.error("Rostro: no cargó", e);
+    }
   }
 
   function classify(s){
@@ -479,7 +482,8 @@
       busy = true;
       if(faceDet && S.face && (faceTick++ % 2 === 0) && video.currentTime !== lastVT){
         lastVT = video.currentTime;
-        try{ updateFaces(faceDet.detectForVideo(video, performance.now())); }catch(e){}
+        try{ updateFaces(faceDet.detectForVideo(video, performance.now())); faceRuntimeErr = 0; }
+        catch(e){ faceRuntimeErr++; faceErr = (e && e.message) ? e.message.slice(0, 60) : "error"; console.error("Rostro: error al detectar", e); }
       }else if(!S.face){ faces = []; }
       try{ await hands.send({image: video}); }catch(e){}
       busy = false;
@@ -545,7 +549,13 @@
     drawFaces();
     analysed.forEach(({l,g,side}) => { drawHand(l, g, side); hud.push({side, g}); });
     drawStrokes();   // encima del esqueleto para que el punto nunca quede tapado por las yemas
-    if(S.face) faces.forEach(f => hud.push({side:"Rostro", g:{name:f.label}}));
+    if(S.face){
+      if(faceFail) hud.push({side:"Rostro", g:{name:"el modelo no cargó (" + faceErr + ")"}});
+      else if(faceRuntimeErr > 2) hud.push({side:"Rostro", g:{name:"error al detectar (" + faceErr + ")"}});
+      else if(!faceDet) hud.push({side:"Rostro", g:{name:"cargando modelo..."}});
+      else if(faces.length === 0) hud.push({side:"Rostro", g:{name:"buscando tu cara..."}});
+      else faces.forEach(f => hud.push({side:"Rostro", g:{name:f.label}}));
+    }
     renderHud(hud);
 
     if(list.length !== lastCount){
