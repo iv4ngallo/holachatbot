@@ -148,6 +148,8 @@
         <button class="sw" data-color="#7dff6b" aria-label="Verde" aria-pressed="false" style="background:#7dff6b"></button>
         <button class="sw" data-color="#ff4fd8" aria-label="Magenta" aria-pressed="false" style="background:#ff4fd8"></button>
       </div></div>
+    <div class="row"><div class="lbl" id="lFace">Expresiones faciales<small>Dibuja un emoji sobre tu cara según tu gesto</small></div><button role="switch" id="tFace" aria-checked="true" aria-labelledby="lFace"></button></div>
+    <div class="row"><div class="lbl" id="lFaceName">Nombre de la expresión<small>Muestra una etiqueta bajo el emoji</small></div><button role="switch" id="tFaceName" aria-checked="true" aria-labelledby="lFaceName"></button></div>
     <div class="row"><div class="lbl" id="lDraw">Dibujar con la pinza<small>Al juntar pulgar e índice deja un punto; si te mueves, traza una línea</small></div><button role="switch" id="tDraw" aria-checked="true" aria-labelledby="lDraw"></button></div>
     <div class="row"><label for="rInk">Grosor del trazo<small id="vInk">6 px</small></label><input type="range" id="rInk" min="3" max="20" value="6"></div>
     <div class="row"><label for="rThick">Grosor del esqueleto<small id="vThick">4 px</small></label><input type="range" id="rThick" min="2" max="10" value="4"></div>
@@ -155,7 +157,7 @@
     <div class="row"><div class="lbl" id="lNames">Nombres de los dedos<small>Muestra Pulgar, Índice, etc. en las yemas</small></div><button role="switch" id="tNames" aria-checked="true" aria-labelledby="lNames"></button></div>
     <div class="row"><div class="lbl" id="lIdx">Numerar los 21 puntos<small>Útil para desarrollo</small></div><button role="switch" id="tIdx" aria-checked="false" aria-labelledby="lIdx"></button></div>
     <div class="row"><div class="lbl" id="lFps">Mostrar FPS</div><button role="switch" id="tFps" aria-checked="true" aria-labelledby="lFps"></button></div>
-    <div class="row"><div class="lbl">Versión<small>v3: dibujo con pinza, trazos sobre el esqueleto</small></div></div>
+    <div class="row"><div class="lbl">Versión<small>v4: manos, dibujo con pinza y expresiones faciales</small></div></div>
     <div class="row"><div class="lbl">Restablecer ajustes</div><button class="btn" id="bReset">Restablecer</button></div>
   </aside>
 
@@ -175,6 +177,16 @@
       <li><svg viewBox="0 0 34 34" fill="none" stroke="#35e0ff" stroke-width="2.5" stroke-linecap="round"><path d="M12 28l2-22M22 28l-2-22"/></svg><span><b>Paz</b>: índice y corazón extendidos.</span></li>
       <li><svg viewBox="0 0 34 34" fill="none" stroke="#35e0ff" stroke-width="2.5" stroke-linecap="round"><path d="M17 28V6"/></svg><span><b>Señalar</b>: solo el índice extendido.</span></li>
     </ul>
+    <h2 style="font-size:16px;margin-top:18px">Expresiones que reconoce</h2>
+    <ul class="legend">
+      <li><span style="font-size:28px;width:34px;text-align:center">&#128516;</span><span><b>Feliz</b> y <b>Sonrisa</b>: según qué tan grande sonríes.</span></li>
+      <li><span style="font-size:28px;width:34px;text-align:center">&#128558;</span><span><b>Sorpresa</b>: boca abierta y cejas arriba.</span></li>
+      <li><span style="font-size:28px;width:34px;text-align:center">&#128546;</span><span><b>Triste</b>: comisuras hacia abajo.</span></li>
+      <li><span style="font-size:28px;width:34px;text-align:center">&#128544;</span><span><b>Enojado</b>: cejas fruncidas hacia abajo.</span></li>
+      <li><span style="font-size:28px;width:34px;text-align:center">&#128521;</span><span><b>Guiño</b>: cierra solo un ojo.</span></li>
+      <li><span style="font-size:28px;width:34px;text-align:center">&#128539;</span><span><b>Lengua</b>: saca la lengua.</span></li>
+      <li><span style="font-size:28px;width:34px;text-align:center">&#128535;</span><span><b>Beso</b>: junta los labios hacia adelante.</span></li>
+    </ul>
   </aside>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -187,7 +199,7 @@
   const video = $("cam"), canvas = $("stage"), ctx = canvas.getContext("2d");
 
   /* ---------- Estado y ajustes ---------- */
-  const DEFAULTS = {color:"finger", thick:4, mirror:true, names:true, idx:false, fps:true, draw:true, ink:6};
+  const DEFAULTS = {color:"finger", thick:4, mirror:true, names:true, idx:false, fps:true, draw:true, ink:6, face:true, faceName:true};
   let S = Object.assign({}, DEFAULTS);
   try{ const raw = localStorage.getItem("ar-manos"); if(raw) S = Object.assign(S, JSON.parse(raw)); }catch(e){}
   const save = () => { try{ localStorage.setItem("ar-manos", JSON.stringify(S)); }catch(e){} };
@@ -231,11 +243,11 @@
   function syncControls(){
     $("rThick").value = S.thick; $("vThick").textContent = S.thick + " px";
     $("rInk").value = S.ink; $("vInk").textContent = S.ink + " px";
-    [["tMirror","mirror"],["tNames","names"],["tIdx","idx"],["tFps","fps"],["tDraw","draw"]].forEach(([id,k])=>$(id).setAttribute("aria-checked", String(S[k])));
+    [["tMirror","mirror"],["tNames","names"],["tIdx","idx"],["tFps","fps"],["tDraw","draw"],["tFace","face"],["tFaceName","faceName"]].forEach(([id,k])=>$(id).setAttribute("aria-checked", String(S[k])));
     document.querySelectorAll(".sw").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.color === S.color)));
     $("meta").style.display = S.fps ? "" : "none";
   }
-  [["tMirror","mirror"],["tNames","names"],["tIdx","idx"],["tFps","fps"],["tDraw","draw"]].forEach(([id,k])=>{
+  [["tMirror","mirror"],["tNames","names"],["tIdx","idx"],["tFps","fps"],["tDraw","draw"],["tFace","face"],["tFaceName","faceName"]].forEach(([id,k])=>{
     $(id).onclick = () => { S[k] = !S[k]; save(); syncControls(); };
   });
   $("rInk").oninput = e => { S.ink = +e.target.value; save(); syncControls(); };
@@ -283,6 +295,88 @@
     });
   }
 
+  /* ---------- Reconocimiento facial ---------- */
+  const TV = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14";
+  const FACE_MODEL = "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task";
+  const EMOJI = {"Sorpresa":"\u{1F62E}","Feliz":"\u{1F604}","Sonrisa":"\u{1F642}","Triste":"\u{1F622}","Enojado":"\u{1F620}",
+    "Guiño":"\u{1F609}","Lengua":"\u{1F61B}","Beso":"\u{1F617}","Ojos cerrados":"\u{1F60C}","Neutral":"\u{1F610}"};
+  let faceDet = null, faceFail = false, faceTick = 0, lastVT = -1, faces = [];
+  const prevScores = [], stab = [];
+
+  async function ensureFace(){
+    if(faceDet || faceFail) return;
+    try{
+      const mod = await import(TV + "/vision_bundle.mjs");
+      const fileset = await mod.FilesetResolver.forVisionTasks(TV + "/wasm");
+      const opts = {runningMode:"VIDEO", numFaces:2, outputFaceBlendshapes:true, minFaceDetectionConfidence:0.5, minTrackingConfidence:0.5};
+      try{
+        faceDet = await mod.FaceLandmarker.createFromOptions(fileset, Object.assign({baseOptions:{modelAssetPath:FACE_MODEL, delegate:"GPU"}}, opts));
+      }catch(e){
+        faceDet = await mod.FaceLandmarker.createFromOptions(fileset, Object.assign({baseOptions:{modelAssetPath:FACE_MODEL, delegate:"CPU"}}, opts));
+      }
+    }catch(e){ faceFail = true; faceDet = null; }
+  }
+
+  function classify(s){
+    const g = k => s[k] || 0;
+    const smile = (g("mouthSmileLeft")+g("mouthSmileRight"))/2, frown = (g("mouthFrownLeft")+g("mouthFrownRight"))/2;
+    const brow = (g("browDownLeft")+g("browDownRight"))/2, bl = g("eyeBlinkLeft"), br = g("eyeBlinkRight");
+    const jaw = g("jawOpen"), inUp = g("browInnerUp"), outUp = (g("browOuterUpLeft")+g("browOuterUpRight"))/2;
+    const pucker = g("mouthPucker"), tongue = g("tongueOut"), sneer = (g("noseSneerLeft")+g("noseSneerRight"))/2;
+    if(tongue > 0.25) return "Lengua";
+    if(Math.abs(bl-br) > 0.45 && Math.max(bl,br) > 0.55) return "Guiño";
+    if(pucker > 0.5 && jaw < 0.3) return "Beso";
+    if(jaw > 0.4 && (inUp > 0.25 || outUp > 0.25)) return "Sorpresa";
+    if(brow > 0.5 && (frown > 0.1 || sneer > 0.25 || smile < 0.2)) return "Enojado";
+    if(frown > 0.3 || (inUp > 0.4 && smile < 0.2)) return "Triste";
+    if(smile > 0.55) return "Feliz";
+    if(smile > 0.3) return "Sonrisa";
+    if(bl > 0.6 && br > 0.6) return "Ojos cerrados";
+    return "Neutral";
+  }
+
+  function updateFaces(r){
+    const lms = r.faceLandmarks || [];
+    faces = lms.map((lm, i) => {
+      const cats = (r.faceBlendshapes && r.faceBlendshapes[i]) ? r.faceBlendshapes[i].categories : [];
+      const raw = {}; cats.forEach(c => raw[c.categoryName] = c.score);
+      const prev = prevScores[i] || raw, sm = {};
+      Object.keys(raw).forEach(k => sm[k] = (prev[k] !== undefined ? prev[k] : raw[k])*0.6 + raw[k]*0.4);
+      prevScores[i] = sm;
+      const cand = classify(sm);
+      const st = stab[i] || (stab[i] = {label:"Neutral", cand:"Neutral", n:0});
+      if(cand === st.cand) st.n++; else { st.cand = cand; st.n = 1; }
+      if(st.n >= 3) st.label = cand;      // se exigen 3 lecturas iguales para evitar parpadeos
+      return {lm, label: st.label};
+    });
+    prevScores.length = stab.length = faces.length;
+  }
+
+  function drawFaces(){
+    if(!S.face) return;
+    faces.forEach(f => {
+      const pts = f.lm.map(P);
+      let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+      pts.forEach(p => { if(p[0]<x0) x0=p[0]; if(p[0]>x1) x1=p[0]; if(p[1]<y0) y0=p[1]; if(p[1]>y1) y1=p[1]; });
+      const size = Math.max(x1-x0, y1-y0) * 1.15, cx = (x0+x1)/2, cy = (y0+y1)/2;
+      const a = pts[33], b = pts[263];
+      let ang = Math.atan2(b[1]-a[1], b[0]-a[0]); if(Math.abs(ang) > Math.PI/2) ang += Math.PI;   // sigue la inclinación de la cabeza
+      ctx.save(); ctx.translate(cx, cy); ctx.rotate(ang);
+      ctx.font = size + 'px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
+      ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.fillStyle = "#fff"; ctx.fillText(EMOJI[f.label] || EMOJI.Neutral, 0, size*0.06);
+      ctx.restore();
+      if(S.faceName){
+        ctx.font = "600 14px system-ui"; ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
+        const tw = ctx.measureText(f.label).width + 18, ty = Math.min(H-70, y1 + 12);
+        ctx.fillStyle = "rgba(11,15,20,.82)"; ctx.beginPath();
+        ctx.roundRect ? ctx.roundRect(cx-tw/2, ty, tw, 26, 10) : ctx.rect(cx-tw/2, ty, tw, 26); ctx.fill();
+        ctx.fillStyle = "#fff"; ctx.fillText(f.label, cx, ty+18); ctx.textAlign = "start";
+      }
+    });
+  }
+
+
   async function ensureModel(){
     if(hands) return;
     if(!window.Hands) await loadScript("https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hands.js");
@@ -324,7 +418,8 @@
     $("bStart").disabled = true; $("bStart").textContent = "Iniciando...";
     $("top").hidden = false; setStatus("Cargando el modelo de detección...", "busy");
     try{
-      await ensureModel();
+      await Promise.all([ensureModel(), ensureFace()]);
+      if(faceFail) toast("No se pudo cargar el reconocimiento facial. Las manos siguen funcionando.");
       setStatus("Abriendo la cámara...", "busy");
       await openCamera();
       running = true; lastCount = -1;
@@ -349,7 +444,7 @@
     running = false;
     if(stream){ stream.getTracks().forEach(t=>t.stop()); stream = null; }
     $("hud").innerHTML = ""; $("bar").hidden = true; $("tools").hidden = true; $("top").hidden = true; $("start").hidden = false;
-    endStrokes(); strokes = [];
+    endStrokes(); strokes = []; faces = []; prevScores.length = stab.length = 0;
     $("bStart").textContent = "Activar cámara"; closeSheets(); drawIdle();
     toast("Cámara detenida");
   }
@@ -382,6 +477,10 @@
     if(!running) return;
     if(!busy && video.readyState >= 2){
       busy = true;
+      if(faceDet && S.face && (faceTick++ % 2 === 0) && video.currentTime !== lastVT){
+        lastVT = video.currentTime;
+        try{ updateFaces(faceDet.detectForVideo(video, performance.now())); }catch(e){}
+      }else if(!S.face){ faces = []; }
       try{ await hands.send({image: video}); }catch(e){}
       busy = false;
     }
@@ -443,8 +542,10 @@
     // manos que desaparecieron: se cierra su trazo
     Object.keys(live).forEach(k => { if(!seen[k]) delete live[k]; });
     Object.keys(pinchState).forEach(k => { if(!seen[k]) pinchState[k] = false; });
+    drawFaces();
     analysed.forEach(({l,g,side}) => { drawHand(l, g, side); hud.push({side, g}); });
     drawStrokes();   // encima del esqueleto para que el punto nunca quede tapado por las yemas
+    if(S.face) faces.forEach(f => hud.push({side:"Rostro", g:{name:f.label}}));
     renderHud(hud);
 
     if(list.length !== lastCount){
@@ -546,7 +647,7 @@
   function renderHud(items){
     const hud = $("hud");
     const html = items.map(({side,g}) =>
-      '<div class="hand" style="border-left-color:' + (side === "Derecha" ? "#35e0ff" : "#ff4fd8") + '"><b>' + side + ':</b> ' + g.name + '</div>').join("");
+      '<div class="hand" style="border-left-color:' + (side === "Derecha" ? "#35e0ff" : side === "Izquierda" ? "#ff4fd8" : "#ffc857") + '"><b>' + side + ':</b> ' + g.name + '</div>').join("");
     if(hud._h !== html){ hud.innerHTML = html; hud._h = html; }
   }
 
