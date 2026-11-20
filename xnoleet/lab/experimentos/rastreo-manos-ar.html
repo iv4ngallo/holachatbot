@@ -157,7 +157,7 @@
     <div class="row"><div class="lbl" id="lNames">Nombres de los dedos<small>Muestra Pulgar, Índice, etc. en las yemas</small></div><button role="switch" id="tNames" aria-checked="true" aria-labelledby="lNames"></button></div>
     <div class="row"><div class="lbl" id="lIdx">Numerar los 21 puntos<small>Útil para desarrollo</small></div><button role="switch" id="tIdx" aria-checked="false" aria-labelledby="lIdx"></button></div>
     <div class="row"><div class="lbl" id="lFps">Mostrar FPS</div><button role="switch" id="tFps" aria-checked="true" aria-labelledby="lFps"></button></div>
-    <div class="row"><div class="lbl">Versión<small>v5: manos, dibujo con pinza y expresiones faciales (diagnóstico de rostro)</small></div></div>
+    <div class="row"><div class="lbl">Versión<small>v6: manos y rostro con un solo motor (tasks-vision)</small></div></div>
     <div class="row"><div class="lbl">Restablecer ajustes</div><button class="btn" id="bReset">Restablecer</button></div>
   </aside>
 
@@ -204,7 +204,7 @@
   try{ const raw = localStorage.getItem("ar-manos"); if(raw) S = Object.assign(S, JSON.parse(raw)); }catch(e){}
   const save = () => { try{ localStorage.setItem("ar-manos", JSON.stringify(S)); }catch(e){} };
 
-  let facing = "user", stream = null, hands = null, running = false, busy = false;
+  let facing = "user", stream = null, handDet = null, running = false, busy = false;
   let W = 0, H = 0, lastCount = -1;
   let frames = 0, fpsT = performance.now(), fps = 0;
 
@@ -288,15 +288,32 @@
   }
 
   /* ---------- Cámara y modelo ---------- */
-  function loadScript(src){
-    return new Promise((res, rej) => {
-      const s = document.createElement("script"); s.src = src; s.crossOrigin = "anonymous";
-      s.onload = res; s.onerror = () => rej(new Error("script")); document.head.appendChild(s);
-    });
-  }
-
   /* ---------- Reconocimiento facial ---------- */
-  const TV = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14";
+  const TV_BASES = ["https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14", "https://unpkg.com/@mediapipe/tasks-vision@0.10.14"];
+  const HAND_MODEL = "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task";
+  let vision = null;
+  async function getVision(){
+    if(vision) return vision;
+    let last;
+    for(const base of TV_BASES){
+      try{
+        const mod = await import(base + "/vision_bundle.mjs");
+        const fileset = await mod.FilesetResolver.forVisionTasks(base + "/wasm");
+        vision = {mod, fileset}; return vision;
+      }catch(e){ last = e; console.error("Visión: falló " + base, e); }
+    }
+    throw last;
+  }
+  let handErr = "";
+  async function ensureHands(){
+    if(handDet) return;
+    try{
+      const {mod, fileset} = await getVision();
+      const opts = {runningMode:"VIDEO", numHands:2, minHandDetectionConfidence:0.6, minHandPresenceConfidence:0.5, minTrackingConfidence:0.5};
+      try{ handDet = await mod.HandLandmarker.createFromOptions(fileset, Object.assign({baseOptions:{modelAssetPath:HAND_MODEL, delegate:"GPU"}}, opts)); }
+      catch(e){ handDet = await mod.HandLandmarker.createFromOptions(fileset, Object.assign({baseOptions:{modelAssetPath:HAND_MODEL, delegate:"CPU"}}, opts)); }
+    }catch(e){ handErr = (e && e.message) ? e.message.slice(0, 80) : String(e).slice(0, 80); console.error("Manos: no cargó", e); const x = new Error("script"); x.detail = handErr; throw x; }
+  }
   const FACE_MODEL = "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task";
   const EMOJI = {"Sorpresa":"\u{1F62E}","Feliz":"\u{1F604}","Sonrisa":"\u{1F642}","Triste":"\u{1F622}","Enojado":"\u{1F620}",
     "Guiño":"\u{1F609}","Lengua":"\u{1F61B}","Beso":"\u{1F617}","Ojos cerrados":"\u{1F60C}","Neutral":"\u{1F610}"};
@@ -307,8 +324,7 @@
   async function ensureFace(){
     if(faceDet || faceFail) return;
     try{
-      const mod = await import(TV + "/vision_bundle.mjs");
-      const fileset = await mod.FilesetResolver.forVisionTasks(TV + "/wasm");
+      const {mod, fileset} = await getVision();
       faceDet = await mod.FaceLandmarker.createFromOptions(fileset, {
         baseOptions:{modelAssetPath:FACE_MODEL, delegate:"CPU"},
         runningMode:"VIDEO", numFaces:2, outputFaceBlendshapes:true,
@@ -380,14 +396,6 @@
   }
 
 
-  async function ensureModel(){
-    if(hands) return;
-    if(!window.Hands) await loadScript("https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hands.js");
-    hands = new window.Hands({locateFile: f => "https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/" + f});
-    hands.setOptions({maxNumHands:2, modelComplexity:1, minDetectionConfidence:0.6, minTrackingConfidence:0.5});
-    hands.onResults(onResults);
-    await hands.initialize();
-  }
 
   async function openCamera(){
     if(stream){ stream.getTracks().forEach(t=>t.stop()); stream = null; }
@@ -402,7 +410,7 @@
   function explainError(err){
     const n = (err && err.name) || "";
     if(err && err.message === "script")
-      return ["No se pudo cargar el modelo de detección","Revisa tu conexión a internet y vuelve a intentar. Si estás dentro de una vista previa que bloquea contenido externo, abre la página directamente en el navegador del celular."];
+      return ["No se pudo cargar el modelo de detección" + (err.detail ? " (" + err.detail + ")" : ""),"Revisa tu conexión a internet y vuelve a intentar. Si estás dentro de una vista previa que bloquea contenido externo, abre la página directamente en el navegador del celular."];
     if(n === "NotAllowedError" || n === "SecurityError")
       return ["No hay permiso para usar la cámara","Permite el acceso a la cámara en la configuración del navegador y toca Reintentar. La cámara solo funciona si la página se abre con HTTPS y no dentro de una vista previa incrustada."];
     if(n === "NotFoundError" || n === "OverconstrainedError")
@@ -421,8 +429,10 @@
     $("bStart").disabled = true; $("bStart").textContent = "Iniciando...";
     $("top").hidden = false; setStatus("Cargando el modelo de detección...", "busy");
     try{
-      await Promise.all([ensureModel(), ensureFace()]);
-      if(faceFail) toast("No se pudo cargar el reconocimiento facial. Las manos siguen funcionando.");
+      await ensureHands();
+      setStatus("Cargando el reconocimiento facial...", "busy");
+      await ensureFace();
+      if(faceFail) toast("No se pudo cargar el reconocimiento facial (" + faceErr + "). Las manos siguen funcionando.");
       setStatus("Abriendo la cámara...", "busy");
       await openCamera();
       running = true; lastCount = -1;
@@ -476,17 +486,37 @@
     }catch(e){ toast("No se pudo guardar la captura"); }
   };
 
-  async function loop(){
+  let handRuntimeErr = 0, handCpu = false, switching = false;
+  async function handSwitch(){
+    switching = true;
+    try{
+      const {mod, fileset} = await getVision();
+      handDet = await mod.HandLandmarker.createFromOptions(fileset, {baseOptions:{modelAssetPath:HAND_MODEL, delegate:"CPU"},
+        runningMode:"VIDEO", numHands:2, minHandDetectionConfidence:0.6, minHandPresenceConfidence:0.5, minTrackingConfidence:0.5});
+      handRuntimeErr = 0;
+    }catch(e){ console.error("Manos: fallo el respaldo en CPU", e); }
+    switching = false;
+  }
+  function loop(){
     if(!running) return;
-    if(!busy && video.readyState >= 2){
-      busy = true;
-      if(faceDet && S.face && (faceTick++ % 2 === 0) && video.currentTime !== lastVT){
-        lastVT = video.currentTime;
+    if(video.readyState >= 2 && video.currentTime !== lastVT){
+      lastVT = video.currentTime;
+      if(faceDet && S.face && (faceTick++ % 2 === 0)){
         try{ updateFaces(faceDet.detectForVideo(video, performance.now())); faceRuntimeErr = 0; }
         catch(e){ faceRuntimeErr++; faceErr = (e && e.message) ? e.message.slice(0, 60) : "error"; console.error("Rostro: error al detectar", e); }
       }else if(!S.face){ faces = []; }
-      try{ await hands.send({image: video}); }catch(e){}
-      busy = false;
+      let res = {image: video, multiHandLandmarks: [], multiHandedness: []};
+      try{
+        if(!handDet) throw new Error("manos no listas");
+        const r = handDet.detectForVideo(video, performance.now());
+        res.multiHandLandmarks = r.landmarks || [];
+        res.multiHandedness = (r.handedness || []).map(c => ({label: c[0] && c[0].categoryName}));
+        handRuntimeErr = 0;
+      }catch(e){
+        handRuntimeErr++; console.error("Manos: error al detectar", e);
+        if(handRuntimeErr === 3 && !handCpu){ handCpu = true; handDet = null; handSwitch(); }   // la GPU falló: se pasa a CPU
+      }
+      onResults(res);
     }
     requestAnimationFrame(loop);
   }
