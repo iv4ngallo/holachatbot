@@ -155,6 +155,7 @@
     <div class="row"><div class="lbl" id="lNames">Nombres de los dedos<small>Muestra Pulgar, Índice, etc. en las yemas</small></div><button role="switch" id="tNames" aria-checked="true" aria-labelledby="lNames"></button></div>
     <div class="row"><div class="lbl" id="lIdx">Numerar los 21 puntos<small>Útil para desarrollo</small></div><button role="switch" id="tIdx" aria-checked="false" aria-labelledby="lIdx"></button></div>
     <div class="row"><div class="lbl" id="lFps">Mostrar FPS</div><button role="switch" id="tFps" aria-checked="true" aria-labelledby="lFps"></button></div>
+    <div class="row"><div class="lbl">Versión<small>v3: dibujo con pinza, trazos sobre el esqueleto</small></div></div>
     <div class="row"><div class="lbl">Restablecer ajustes</div><button class="btn" id="bReset">Restablecer</button></div>
   </aside>
 
@@ -442,8 +443,8 @@
     // manos que desaparecieron: se cierra su trazo
     Object.keys(live).forEach(k => { if(!seen[k]) delete live[k]; });
     Object.keys(pinchState).forEach(k => { if(!seen[k]) pinchState[k] = false; });
-    drawStrokes();
     analysed.forEach(({l,g,side}) => { drawHand(l, g, side); hud.push({side, g}); });
+    drawStrokes();   // encima del esqueleto para que el punto nunca quede tapado por las yemas
     renderHud(hud);
 
     if(list.length !== lastCount){
@@ -480,6 +481,7 @@
       ctx.shadowColor = st.color; ctx.shadowBlur = 12;
       if(pts.length === 1){
         ctx.beginPath(); ctx.arc(pts[0][0], pts[0][1], st.w*0.9, 0, 7); ctx.fill();
+        ctx.shadowBlur = 0; ctx.fillStyle = "#ffffff"; ctx.beginPath(); ctx.arc(pts[0][0], pts[0][1], st.w*0.35, 0, 7); ctx.fill();
       }else{
         ctx.beginPath(); ctx.moveTo(pts[0][0], pts[0][1]);
         for(let i = 1; i < pts.length - 1; i++){
