@@ -1329,7 +1329,7 @@ function boltFX(host,col){
  svg.setAttribute('width',W);svg.setAttribute('aria-hidden','true');
  svg.style.cssText='position:absolute;top:0;left:0;height:100%;overflow:visible;pointer-events:none;color:'+col+';opacity:0';
  const mk=(w,o,c,f)=>{const p=document.createElementNS(NS,'path');p.setAttribute('fill','none');p.setAttribute('stroke',c);p.setAttribute('stroke-width',w);p.setAttribute('stroke-linejoin','miter');p.setAttribute('stroke-linecap','round');p.setAttribute('opacity',o);if(f)p.style.filter=f;svg.appendChild(p);return p};
- const glow=mk(40,.55,'currentColor','blur(14px)'),mid=mk(13,.9,'currentColor','blur(2px)'),core=mk(5,1,'#fff'),br=mk(2.5,.85,'currentColor','drop-shadow(0 0 6px currentColor)'),br2=mk(1,1,'#fff');
+ const glow=mk(80,.55,'currentColor','blur(20px)'),mid=mk(38,.9,'currentColor','blur(3px)'),core=mk(20,1,'#fff'),br=mk(2.5,.85,'currentColor','drop-shadow(0 0 6px currentColor)'),br2=mk(1,1,'#fff');
  host.appendChild(svg);
  const r=Math.random;
  function redraw(){
