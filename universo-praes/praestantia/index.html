@@ -91,6 +91,7 @@ body::before{content:'';position:fixed;inset:0;z-index:2;pointer-events:none;bac
 body::after{content:'';position:fixed;inset:0;z-index:30;pointer-events:none;opacity:.06;background:repeating-linear-gradient(0deg,#fff 0 1px,transparent 1px 3px);animation:scan 9s linear infinite}
 @keyframes scan{from{background-position:0 0}to{background-position:0 60px}}
 #wipe{position:fixed;top:0;bottom:0;left:0;width:3px;z-index:40;pointer-events:none;background:var(--ac);box-shadow:0 0 22px 8px var(--ac),0 0 80px 30px color-mix(in srgb,var(--ac) 45%,transparent);transform:translateX(-10vw);opacity:0}
+#wipe::after{content:attr(data-tag);position:absolute;top:96px;left:14px;font:11px 'Courier Prime','IBM Plex Mono',monospace;letter-spacing:.18em;text-transform:uppercase;color:var(--ac);white-space:nowrap;text-shadow:0 0 10px var(--ac)}
 #prog{display:block;height:2px;background:linear-gradient(90deg,var(--ac),var(--ac2));transform-origin:left;transform:scaleX(0);transition:transform .1s linear}
 #view{transition:opacity .26s ease,transform .26s ease,filter .26s ease}
 #view.leave{opacity:0;transform:translateX(var(--dx,-24px))}
@@ -1323,10 +1324,19 @@ function setTheme(){
  const t=SECS.find(s=>s[0]===sec);
  document.body.dataset.t=t[1];BG.set(t[1]);
 }
+const wipeEl=document.getElementById('wipe');
+function nemesisBeam(s){
+ if(RM||!wipeEl||!wipeEl.animate)return;
+ const t=SECS.find(x=>x[0]===s);
+ wipeEl.dataset.tag='NEMESIS \u00b7 '+(t?L(t[2]):'');
+ wipeEl.getAnimations().forEach(a=>a.cancel());
+ wipeEl.animate([{transform:'translateX(-10vw)',opacity:0},{opacity:1,offset:.12},{opacity:1,offset:.88},{transform:'translateX(105vw)',opacity:0}],{duration:700,easing:'cubic-bezier(.6,0,.3,1)'});
+}
 function go(s,instant){
  if(!SECS.some(x=>x[0]===s))s='vision';
  const e=document.getElementById(s);if(!e)return;
  setHH();
+ if(!instant)nemesisBeam(s);
  if(s==='inicio')window.scrollTo({top:0,behavior:(RM||instant)?'auto':'smooth'});
  else e.scrollIntoView({behavior:(RM||instant)?'auto':'smooth',block:'start'});
  try{history.replaceState(null,'','#'+s)}catch(x){}

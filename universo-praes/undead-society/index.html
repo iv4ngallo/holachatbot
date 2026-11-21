@@ -79,11 +79,11 @@ button{font:inherit;color:inherit}
 @keyframes chIn{0%{opacity:0;clip-path:inset(0 0 100% 0)}35%{opacity:1}100%{opacity:1;clip-path:inset(-40px -40px -40px -40px)}}
 @keyframes rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
 .wipe{position:fixed;inset:0;z-index:50;pointer-events:none;overflow:hidden}
-.wipe::before{content:"";position:absolute;left:0;right:0;top:-4px;height:3px;background:var(--cyan);box-shadow:0 0 28px 8px rgba(53,214,255,.5)}
+.wipe::before{content:"";position:absolute;top:0;bottom:0;left:-4px;width:3px;background:var(--cyan);box-shadow:0 0 28px 8px rgba(53,214,255,.5)}
 .wipe.go::before{animation:sweep .62s cubic-bezier(.6,0,.3,1)}
 .wipe span{position:absolute;right:16px;top:120px;font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--cyan);opacity:0;text-transform:uppercase}
 .wipe.go span{animation:tag .62s steps(6)}
-@keyframes sweep{to{top:100%}}
+@keyframes sweep{to{left:100%}}
 @keyframes tag{0%,100%{opacity:0}20%,80%{opacity:1}}
 
 .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan);margin:0 0 10px}
@@ -765,6 +765,14 @@ function show(id, instant) {
   if (id === 'inicio') window.scrollTo({ top: 0, behavior: beh });
   else el.scrollIntoView({ behavior: beh, block: 'start' });
   if (window.__pulse && !instant && !reduce) window.__pulse(.6);
+  if (!instant) executorBeam(id);
+}
+function executorBeam(id) {
+  if (reduce || !wipe) return;
+  const c = CH.find(x => x.id === id), tag = $('#wipeTag');
+  if (tag) tag.textContent = 'Ejecutor \u00b7 ' + (c ? c.label : '');
+  wipe.classList.remove('go'); void wipe.offsetWidth; wipe.classList.add('go');
+  clearTimeout(executorBeam.t); executorBeam.t = setTimeout(() => wipe.classList.remove('go'), 700);
 }
 function spy() {
   const y = hdrH() + Math.min(180, innerHeight * .28);
