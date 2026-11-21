@@ -79,7 +79,7 @@ button{font:inherit;color:inherit}
 @keyframes chIn{0%{opacity:0;clip-path:inset(0 0 100% 0)}35%{opacity:1}100%{opacity:1;clip-path:inset(-40px -40px -40px -40px)}}
 @keyframes rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
 .wipe{position:fixed;inset:0;z-index:50;pointer-events:none;overflow:hidden}
-.wipe::before{content:"";position:absolute;top:0;bottom:0;left:-4px;width:3px;background:var(--cyan);box-shadow:0 0 28px 8px rgba(53,214,255,.5)}
+.wipe::before{display:none}
 .wipe.go::before{animation:sweep .62s cubic-bezier(.6,0,.3,1)}
 .wipe span{position:absolute;right:16px;top:120px;font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--cyan);opacity:0;text-transform:uppercase}
 .wipe.go span{animation:tag .62s steps(6)}
@@ -767,12 +767,37 @@ function show(id, instant) {
   if (window.__pulse && !instant && !reduce) window.__pulse(.6);
   if (!instant) executorBeam(id);
 }
+function boltFX(host,col){
+ const NS='http://www.w3.org/2000/svg',W=170,svg=document.createElementNS(NS,'svg');
+ svg.setAttribute('width',W);svg.setAttribute('aria-hidden','true');
+ svg.style.cssText='position:absolute;top:0;left:0;height:100%;overflow:visible;pointer-events:none;color:'+col+';opacity:0';
+ const mk=(w,o,c,f)=>{const p=document.createElementNS(NS,'path');p.setAttribute('fill','none');p.setAttribute('stroke',c);p.setAttribute('stroke-width',w);p.setAttribute('stroke-linejoin','miter');p.setAttribute('stroke-linecap','round');p.setAttribute('opacity',o);if(f)p.style.filter=f;svg.appendChild(p);return p};
+ const glow=mk(22,.55,'currentColor','blur(9px)'),mid=mk(6,.9,'currentColor','blur(1.5px)'),core=mk(2,1,'#fff'),br=mk(2.5,.85,'currentColor','drop-shadow(0 0 6px currentColor)'),br2=mk(1,1,'#fff');
+ host.appendChild(svg);
+ const r=Math.random;
+ function redraw(){
+  const H=innerHeight;svg.setAttribute('viewBox','0 0 '+W+' '+H);
+  const pts=[];let x=W/2,y=-12;
+  while(y<H+12){pts.push([x,y]);y+=10+r()*26;x=W/2+(r()-.5)*2*(12+r()*30)*(r()<.16?2:1)}
+  const d='M'+pts.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join('L');
+  glow.setAttribute('d',d);mid.setAttribute('d',d);core.setAttribute('d',d);
+  let b='';const n=3+Math.floor(r()*4);
+  for(let k=0;k<n;k++){const q=pts[1+Math.floor(r()*(pts.length-3))],dir=r()<.5?-1:1;let bx=q[0],by=q[1];b+='M'+bx.toFixed(1)+' '+by.toFixed(1);const segs=2+Math.floor(r()*4);for(let j=0;j<segs;j++){bx+=dir*(8+r()*26);by+=(r()-.25)*30;b+='L'+bx.toFixed(1)+' '+by.toFixed(1)}}
+  br.setAttribute('d',b);br2.setAttribute('d',b);
+  svg.style.opacity=(.45+r()*.55).toFixed(2);
+ }
+ return {svg,redraw};
+}
+const exFX = wipe ? boltFX(wipe, 'var(--cyan)') : null;
 function executorBeam(id) {
-  if (reduce || !wipe) return;
+  if (reduce || !wipe || !wipe.animate) return;
   const c = CH.find(x => x.id === id), tag = $('#wipeTag');
-  if (tag) tag.textContent = 'Ejecutor \u00b7 ' + (c ? c.label : '');
+  if (tag) tag.textContent = 'Ejecutor · ' + (c ? c.label : '');
   wipe.classList.remove('go'); void wipe.offsetWidth; wipe.classList.add('go');
-  clearTimeout(executorBeam.t); executorBeam.t = setTimeout(() => wipe.classList.remove('go'), 700);
+  exFX.svg.getAnimations().forEach(a => a.cancel());
+  clearInterval(executorBeam.t); exFX.redraw(); executorBeam.t = setInterval(exFX.redraw, 45);
+  const an = exFX.svg.animate([{ transform: 'translateX(-200px)' }, { transform: 'translateX(' + (innerWidth + 30) + 'px)' }], { duration: 760, easing: 'cubic-bezier(.55,0,.35,1)', fill: 'forwards' });
+  an.onfinish = () => { clearInterval(executorBeam.t); exFX.svg.style.opacity = 0; wipe.classList.remove('go'); an.cancel(); };
 }
 function spy() {
   const y = hdrH() + Math.min(180, innerHeight * .28);

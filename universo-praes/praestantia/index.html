@@ -90,8 +90,8 @@ main,footer{position:relative;z-index:1}
 body::before{content:'';position:fixed;inset:0;z-index:2;pointer-events:none;background:radial-gradient(ellipse at 50% 40%,transparent 45%,rgba(0,0,0,.55) 100%)}
 body::after{content:'';position:fixed;inset:0;z-index:30;pointer-events:none;opacity:.06;background:repeating-linear-gradient(0deg,#fff 0 1px,transparent 1px 3px);animation:scan 9s linear infinite}
 @keyframes scan{from{background-position:0 0}to{background-position:0 60px}}
-#wipe{position:fixed;top:0;bottom:0;left:0;width:3px;z-index:40;pointer-events:none;background:var(--ac);box-shadow:0 0 22px 8px var(--ac),0 0 80px 30px color-mix(in srgb,var(--ac) 45%,transparent);transform:translateX(-10vw);opacity:0}
-#wipe::after{content:attr(data-tag);position:absolute;top:96px;left:14px;font:11px 'Courier Prime','IBM Plex Mono',monospace;letter-spacing:.18em;text-transform:uppercase;color:var(--ac);white-space:nowrap;text-shadow:0 0 10px var(--ac)}
+#wipe{position:fixed;top:0;bottom:0;left:0;width:170px;z-index:40;pointer-events:none;color:var(--ac);transform:translateX(-200px);opacity:0}
+#wipe::after{content:attr(data-tag);position:absolute;top:96px;left:105px;font:11px 'Courier Prime','IBM Plex Mono',monospace;letter-spacing:.18em;text-transform:uppercase;color:var(--ac);white-space:nowrap;text-shadow:0 0 10px var(--ac)}
 #prog{display:block;height:2px;background:linear-gradient(90deg,var(--ac),var(--ac2));transform-origin:left;transform:scaleX(0);transition:transform .1s linear}
 #view{transition:opacity .26s ease,transform .26s ease,filter .26s ease}
 #view.leave{opacity:0;transform:translateX(var(--dx,-24px))}
@@ -1324,13 +1324,37 @@ function setTheme(){
  const t=SECS.find(s=>s[0]===sec);
  document.body.dataset.t=t[1];BG.set(t[1]);
 }
+function boltFX(host,col){
+ const NS='http://www.w3.org/2000/svg',W=170,svg=document.createElementNS(NS,'svg');
+ svg.setAttribute('width',W);svg.setAttribute('aria-hidden','true');
+ svg.style.cssText='position:absolute;top:0;left:0;height:100%;overflow:visible;pointer-events:none;color:'+col+';opacity:0';
+ const mk=(w,o,c,f)=>{const p=document.createElementNS(NS,'path');p.setAttribute('fill','none');p.setAttribute('stroke',c);p.setAttribute('stroke-width',w);p.setAttribute('stroke-linejoin','miter');p.setAttribute('stroke-linecap','round');p.setAttribute('opacity',o);if(f)p.style.filter=f;svg.appendChild(p);return p};
+ const glow=mk(22,.55,'currentColor','blur(9px)'),mid=mk(6,.9,'currentColor','blur(1.5px)'),core=mk(2,1,'#fff'),br=mk(2.5,.85,'currentColor','drop-shadow(0 0 6px currentColor)'),br2=mk(1,1,'#fff');
+ host.appendChild(svg);
+ const r=Math.random;
+ function redraw(){
+  const H=innerHeight;svg.setAttribute('viewBox','0 0 '+W+' '+H);
+  const pts=[];let x=W/2,y=-12;
+  while(y<H+12){pts.push([x,y]);y+=10+r()*26;x=W/2+(r()-.5)*2*(12+r()*30)*(r()<.16?2:1)}
+  const d='M'+pts.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join('L');
+  glow.setAttribute('d',d);mid.setAttribute('d',d);core.setAttribute('d',d);
+  let b='';const n=3+Math.floor(r()*4);
+  for(let k=0;k<n;k++){const q=pts[1+Math.floor(r()*(pts.length-3))],dir=r()<.5?-1:1;let bx=q[0],by=q[1];b+='M'+bx.toFixed(1)+' '+by.toFixed(1);const segs=2+Math.floor(r()*4);for(let j=0;j<segs;j++){bx+=dir*(8+r()*26);by+=(r()-.25)*30;b+='L'+bx.toFixed(1)+' '+by.toFixed(1)}}
+  br.setAttribute('d',b);br2.setAttribute('d',b);
+  svg.style.opacity=(.45+r()*.55).toFixed(2);
+ }
+ return {svg,redraw};
+}
 const wipeEl=document.getElementById('wipe');
+const nemFX=wipeEl?boltFX(wipeEl,'var(--ac)'):null;
 function nemesisBeam(s){
  if(RM||!wipeEl||!wipeEl.animate)return;
  const t=SECS.find(x=>x[0]===s);
- wipeEl.dataset.tag='NEMESIS \u00b7 '+(t?L(t[2]):'');
+ wipeEl.dataset.tag='NEMESIS · '+(t?L(t[2]):'');
  wipeEl.getAnimations().forEach(a=>a.cancel());
- wipeEl.animate([{transform:'translateX(-10vw)',opacity:0},{opacity:1,offset:.12},{opacity:1,offset:.88},{transform:'translateX(105vw)',opacity:0}],{duration:700,easing:'cubic-bezier(.6,0,.3,1)'});
+ clearInterval(nemesisBeam.t);nemFX.redraw();nemesisBeam.t=setInterval(nemFX.redraw,45);
+ const an=wipeEl.animate([{transform:'translateX(-200px)',opacity:0},{opacity:1,offset:.1},{opacity:1,offset:.9},{transform:'translateX('+(innerWidth+30)+'px)',opacity:0}],{duration:760,easing:'cubic-bezier(.55,0,.35,1)'});
+ an.onfinish=an.oncancel=()=>clearInterval(nemesisBeam.t);
 }
 function go(s,instant){
  if(!SECS.some(x=>x[0]===s))s='vision';
