@@ -473,8 +473,8 @@ footer { padding-block: 36px 120px; }
 .cm .ring { fill: none; stroke: var(--hair); stroke-width: 2; }
 .cm .spoke { stroke: var(--hair); stroke-width: 1.6; }
 .cm .nd { cursor: pointer; transition: opacity .25s; }
-.cm .nd .top, .cm .nd .side { stroke: var(--outline); stroke-width: 3; stroke-linejoin: round; }
-.cm .nd .side { fill: color-mix(in srgb, var(--cat) 70%, #000); }
+.cm .nd .top, .cm .nd .sdw { stroke: var(--outline); stroke-width: 3; stroke-linejoin: round; }
+.cm .nd .sdw { fill: color-mix(in srgb, var(--cat) 70%, #000); }
 .cm .nd .top { fill: var(--cat); transition: filter .15s; }
 .cm .nd .sh { fill: #000; opacity: .16; }
 .cm .nd .num { font: 700 17px var(--mono); fill: var(--on); text-anchor: middle; pointer-events: none; }
@@ -492,7 +492,7 @@ footer { padding-block: 36px 120px; }
 .cm .nd.res .top { stroke-dasharray: 7 5; }
 .cm .nd.task { --cat: var(--surface); --on: var(--ink); }
 .cm .nd.task.done { --cat: var(--blue); }
-.cm .nd.task .top, .cm .nd.task .side { stroke-width: 2; }
+.cm .nd.task .top, .cm .nd.task .sdw { stroke-width: 2; }
 .cm .edge path { fill: none; stroke-linecap: round; }
 .cm .edge .bg { stroke: none; }
 .cm .edge .fg { stroke-width: 3; }
@@ -1115,8 +1115,8 @@ html.reveal .hero .stage { animation: spZoom .9s .2s cubic-bezier(.2, .8, .2, 1)
     { id: 3, t: 'Encendedores y personalizables', cat: 'fisico', estado: 'Idea', ingreso: 'Venta de producto con impresión digital troquelada', inv: 'Media', ret: 'Medio', falta: ['Proveedor', 'Mínimos de compra', 'Costo por unidad', 'Precio'], paso: 'Cotizar con tres proveedores, pedir muestra y definir cinco diseños de prueba.' },
     { id: 4, t: 'Artículos de pole dance', cat: 'fisico', estado: 'Idea', ingreso: 'Venta de aretes, llaveros, mugs y camisetas', inv: 'Baja a media', ret: 'Medio', falta: ['Nicho', 'Diseños', 'Proveedor', 'Canal'], paso: 'Definir el estilo y diseñar diez piezas; medir interés con preventa en la comunidad.' },
     { id: 5, t: 'Juguetería y bebés', cat: 'fisico', estado: 'Línea nueva, sin desarrollo', ingreso: 'Venta de producto físico', inv: 'Media a alta', ret: 'Medio a lento', falta: ['Productos', 'Proveedores', 'Normas de seguridad'], paso: 'Empezar por productos de menor riesgo, como foamy y slime, antes de los de contacto con bebés.' },
-    { id: 6, t: 'Charlas y mentorías', cat: 'servicios', estado: 'Perfil existente', ingreso: 'Servicio por sesión o programa', inv: 'Mínima', ret: 'Rápido', falta: ['Temario', 'Tarifas', 'Audiencia', 'Formato'], paso: 'Definir tres temas de charla, una fecha de prueba en el grupo y una oferta de mentoría posterior.' },
-    { id: 7, t: 'Grupo Diseño UI/UX en Facebook', cat: 'contenido', estado: 'Activo con audiencia', ingreso: 'Patrocinios, avisos de empleo, eventos y captación', inv: 'Mínima', ret: 'Medio', falta: ['Reglas vigentes', 'Oferta comercial', 'Frecuencia de publicación'], paso: 'Definir la oferta comercial: avisos de empleo con tarifa, patrocinios y captación para las charlas.' },
+    { id: 6, t: 'Charlas y mentorías', cat: 'servicios', estado: 'Perfil existente', ingreso: 'Servicio por sesión o programa', inv: 'Mínima', ret: 'Rápido', falta: ['Temario', 'Tarifas', 'Audiencia', 'Formato'], paso: 'Pasa al próximo año. Primero construir el contenido (temas y gráficos); después fijar la fecha de prueba y la oferta de mentoría.' },
+    { id: 7, t: 'Grupo Diseño UI/UX en Facebook', cat: 'contenido', estado: 'Activo con audiencia. Reglas definidas y listas para publicar; gratuito y con un solo moderador', ingreso: 'Sin cobro directo: el grupo es 100% gratuito y sirve de audiencia para las charlas y el portafolio', inv: 'Mínima', ret: 'Medio', falta: ['Publicar las reglas en Facebook', 'Frecuencia de publicación'], paso: 'Publicar las reglas en el grupo y usarlo como audiencia de prueba cuando arranquen las charlas.' },
     { id: 8, t: 'Arte digital en vectores, xNoleet', cat: 'servicios', estado: 'Marca existente', ingreso: 'Comisiones por encargo', inv: 'Mínima', ret: 'Rápido', falta: ['Portafolio', 'Tarifas', 'Canal de venta'], paso: 'Seleccionar doce piezas, definir tres paquetes con precio y abrir un canal de pedidos.' },
     { id: 9, t: 'Hola Chatbot', cat: 'tecno', estado: 'Publicado, MVP probado el 30 de junio de 2026', ingreso: 'Patrocinadores locales y alianzas; ingresos mixtos', inv: 'Por validar', ret: 'Medio', falta: ['Precios', 'Patrocinadores cerrados', 'Costos de operación'], paso: 'Medir usuarios activos y consultas por semana, y definir tres paquetes de patrocinio.' },
     { id: 10, t: 'Chatter', cat: 'servicios', estado: 'Habilitado en algunas plataformas', ingreso: 'Servicio por comisión o tarifa', inv: 'Ninguna', ret: 'Rápido', falta: ['Plataformas', 'Tarifas', 'Horarios', 'Condiciones'], paso: 'Listar las plataformas habilitadas, su modelo de pago y los horarios posibles.' },
@@ -1293,6 +1293,19 @@ html.reveal .hero .stage { animation: spZoom .9s .2s cubic-bezier(.2, .8, .2, 1)
 
   /* Ficha */
   var drawer = $('#drawer'), scrim = $('#scrim'), lastFocus = null;
+  function lineTasksHTML(id) {
+    var ids = []; TODO.forEach(function (tk, i) { if (taskParent(i) === 'L' + id) ids.push(i); });
+    if (!ids.length) return '';
+    var cl = [], op = [], sb = [];
+    ids.forEach(function (i) { if (isVer(i)) cl.push(i); else if (taskGroup(i) === 's') sb.push(i); else op.push(i); });
+    function li(i, extra) { return '<li><b>' + (i + 1) + '.</b> ' + esc(TODO[i][1]) + (extra || '') + '</li>'; }
+    function note(i) { var n = evid[i] && evid[i].nota; return n ? '<br><span class="hyp">' + esc(String(n).length > 180 ? String(n).slice(0, 177) + '…' : String(n)) + '</span>' : ''; }
+    var h = '<div><dt class="mono">Tareas de esta línea · ' + cl.length + ' de ' + ids.length + ' completadas</dt><dd>';
+    if (cl.length) h += '<p style="margin:0 0 4px"><b>Completadas</b></p><ul>' + cl.map(function (i) { return li(i, note(i)); }).join('') + '</ul>';
+    if (op.length) h += '<p style="margin:8px 0 4px"><b>Pendientes</b></p><ul>' + op.map(function (i) { return li(i); }).join('') + '</ul>';
+    if (sb.length) h += '<p style="margin:8px 0 4px"><b>En espera</b></p><ul>' + sb.map(function (i) { return li(i); }).join('') + '</ul>';
+    return h + '</dd></div>';
+  }
   function openDrawer(id, from) {
     var l = byId(id); lastFocus = from || document.activeElement;
     var links = (ADJ[id] || []).slice().sort(function (a, b) { return a - b; }).map(function (n) { return '<button type="button" data-go="' + n + '">' + n + '. ' + esc(byId(n).t) + '</button>'; }).join('');
@@ -1301,6 +1314,7 @@ html.reveal .hero .stage { animation: spZoom .9s .2s cubic-bezier(.2, .8, .2, 1)
       '<h3>' + l.id + '. ' + esc(l.t) + '</h3><p style="margin:0">' + esc(l.estado) + '</p>' +
       '<dl><div><dt class="mono">Tipo de ingreso</dt><dd>' + esc(l.ingreso) + '</dd></div>' +
       '<div><dt class="mono">Inversión y retorno</dt><dd>' + esc(l.inv) + ' de inversión; retorno ' + esc(l.ret.toLowerCase()) + '. <span class="hyp">Hipótesis, por validar.</span></dd></div>' +
+      lineTasksHTML(id) +
       '<div><dt class="mono">Información que falta</dt><dd><ul>' + l.falta.map(function (f) { return '<li>' + esc(f) + '</li>'; }).join('') + '</ul></dd></div>' +
       '<div><dt class="mono">Siguiente paso</dt><dd>' + esc(l.paso) + '</dd></div>' +
       '<div><dt class="mono">Se conecta con</dt><dd>' + (links ? '<div class="links">' + links + '</div>' : 'Sin conexiones registradas.') + (id === 13 ? '<p class="hyp" style="margin-top:8px">El sistema GTM aplica a todas las líneas.</p>' : '') + '</dd></div></dl>';
@@ -1979,11 +1993,11 @@ html.reveal .hero .stage { animation: spZoom .9s .2s cubic-bezier(.2, .8, .2, 1)
     nodes.forEach(function (n) {
       var cls = 'nd ' + (n.kind === 'line' ? 'k-' + n.cat : n.kind), lab = n.kind === 'task' ? 'Tarea ' + (n.i + 1) + ': ' + TODO[n.i][1] : n.kind === 'line' ? 'Línea ' + n.ref.id + ': ' + n.ref.t : n.ref.t;
       var g = mk('g', { 'class': cls, 'data-k': n.id, tabindex: n.kind === 'task' ? '-1' : '0', role: 'button', 'aria-label': lab }, gNodes);
-      n.sh = mk('ellipse', { 'class': 'sh' }, g); n.side = mk('path', { 'class': 'side' }, g); n.top = mk('ellipse', { 'class': 'top' }, g);
+      n.sh = mk('ellipse', { 'class': 'sh' }, g); n.side = mk('path', { 'class': 'sdw' }, g); n.top = mk('ellipse', { 'class': 'top' }, g);
       if (n.kind !== 'task') { n.num = mk('text', { 'class': 'num' }, g); n.num.textContent = n.kind === 'line' ? n.ref.id : (n.id === 'R1' ? '$' : n.id === 'R2' ? '+' : '*'); n.lbl = mk('text', { 'class': 'lbl' }, g); n.lbl.textContent = n.s; }
       n.g = g;
     });
-    function refreshTasks() { nodes.forEach(function (n) { if (n.kind === 'task') n.g.classList.toggle('done', !!done[n.i]); }); }
+    function refreshTasks() { nodes.forEach(function (n) { if (n.kind === 'task') n.g.classList.toggle('done', !!(done[n.i] || isVer(n.i))); }); }
 
     /* Dibujo */
     function render() {
@@ -2073,10 +2087,10 @@ html.reveal .hero .stage { animation: spZoom .9s .2s cubic-bezier(.2, .8, .2, 1)
         return '<span class="chip ' + (e.k === 'syn' ? 'c-contenido' : e.k === 'fund' ? 'c-fisico' : 'c-servicios') + '">' + (e.k === 'syn' ? 'Sinergia' : e.k === 'fund' ? 'Recurso' : 'Dependencia') + '</span><h4>' + esc(e.t) + '</h4><div class="row"><b>Relación</b>' + esc(nm(e.a)) + (e.k === 'syn' ? ' y ' : ' &rarr; ') + esc(nm(e.b)) + '</div><div class="row"><b>Qué significa</b>' + (e.k === 'syn' ? 'Comparten proveedores, audiencia o aprendizajes. Conviene avanzarlas juntas.' : e.k === 'fund' ? 'Este recurso habilita o financia el arranque de la línea.' : esc(nm(e.a)) + ' entrega algo que ' + esc(nm(e.b)) + ' necesita para avanzar.') + '</div><div class="chips"><button type="button" data-jump="' + e.a + '">Ver ' + esc(nm(e.a)) + '</button><button type="button" data-jump="' + e.b + '">Ver ' + esc(nm(e.b)) + '</button></div>';
       }
       if (n.kind === 'task') {
-        var i = n.i, d = !!done[i], hp = HELP[i] || ['', ''], ev = !!(evid && evid[i]);
+        var i = n.i, d = !!(done[i] || isVer(i)), hp = HELP[i] || ['', ''], ev = !!(evid && evid[i]);
         return '<span class="chip">' + esc(TODO[i][0]) + '</span><h4>Tarea ' + (i + 1) + ' de ' + TODO.length + '</h4><div class="row">' + esc(TODO[i][1]) + '</div><div class="row"><b>Qué hacer</b>' + esc(hp[0]) + '</div><div class="row"><b>Listo cuando</b>' + esc(hp[1]) + '</div><div class="row"><b>Estado</b>' + (d ? 'Lista' : 'Pendiente') + (ev ? ' · ' + (EVL[evid[i].estado] || 'con evidencia guardada') : '') + '</div><div class="row"><b>Pertenece a</b><div class="chips"><button type="button" data-jump="' + n.parent + '">' + esc(nm(n.parent)) + '</button></div></div><div class="acts">' + (isVer(i) ? '<button type="button" class="main" disabled>' + (evid[i].estado === 'cerrada' ? 'Cerrada y bloqueada' : 'Verificada y bloqueada') + '</button>' : '<button type="button" class="main" data-toggle="' + i + '">' + (d ? 'Quitar marca' : 'Marcar como lista') + '</button>') + '<button type="button" data-task="' + i + '">Ir a la tarea</button></div>';
       }
-      var r = rel(id), ts = tasksOf(id), dn = ts.filter(function (k) { return done[k]; }).length;
+      var r = rel(id), ts = tasksOf(id), dn = ts.filter(function (k) { return done[k] || isVer(k); }).length;
       var tl = ts.length ? '<div class="row"><b>Tareas</b>' + dn + ' de ' + ts.length + ' listas</div>' : '';
       if (n.kind === 'res') {
         return '<span class="chip c-fisico">Recurso</span><h4>' + esc(n.ref.t) + '</h4><div class="row">' + esc(n.ref.d) + '</div>' + tl + '<div class="row"><b>Aporta a</b>' + chips(r.out.concat(r.inn).filter(function (k, j, a) { return a.indexOf(k) === j; })) + '</div><p class="src">Fuente: ' + esc(n.ref.src) + '</p>';
