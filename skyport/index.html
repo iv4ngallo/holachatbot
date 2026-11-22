@@ -259,6 +259,9 @@ body.live #hint{transform:translate(-50%,0)}
 #pl svg{width:14px;height:14px;fill:currentColor}
 #pl .i2{display:none}#pl.on .i1{display:none}#pl.on .i2{display:block}
 #pl .tx{flex:1;min-width:0}
+#plz{position:absolute;left:-1px;right:-1px;bottom:calc(100% + 6px);height:64px;border:1px solid var(--line);border-bottom:2px solid var(--pa);background:rgba(3,10,40,.78);overflow:hidden;pointer-events:none}
+#plz::before{content:"";position:absolute;inset:0;background:linear-gradient(100deg,color-mix(in srgb,var(--pt) 30%,transparent),color-mix(in srgb,var(--pt) 6%,transparent))}
+#plz canvas{position:relative;display:block;width:100%;height:100%}
 #pl.mo{z-index:30}
 #pl small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;font:600 10px/1 var(--cond);letter-spacing:.22em;text-transform:uppercase;color:var(--dim)}
 #pl .nm{display:block;margin:4px 0 6px;font:700 14px/1 var(--cond);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -564,6 +567,7 @@ label.f textarea{min-height:76px;resize:vertical}
  <button type="button" id="plX" aria-label="Pista siguiente"><svg viewBox="0 0 24 24"><path d="M16 5h2v14h-2zM4 5l11 7L4 19z"/></svg></button>
  <button type="button" id="plM" aria-label="Silenciar"><svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 4V5L7 9zM16.5 12a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4z"/></svg></button>
  <audio id="au" preload="metadata"></audio>
+ <div id="plz" aria-hidden="true"><canvas></canvas></div>
  <div id="plMenu" role="menu" aria-label="Bandas sonoras" hidden></div>
 </div>
 
@@ -1551,6 +1555,44 @@ function savePaused(v){userPaused=v;aSet('paused',v)}
 /* Bandas sonoras: Sky Port es la principal; las demas son los OST conceptos del universo Praestantia (ost.js) */
 var AL=[{id:'sky',title:'Sky Port',series:'Sky Port',cover:'icon-512.png',pa:'#FF3B3B',pb:'#FFC700',pt:'#2455FF'}].concat((window.OST||[]).map(function(a){a.tl=a.tracks.map(function(t){return{name:t.t,url:t.src}});return a})),ai=0;
 function tks(){return AL[ai].id==='sky'?S.tracks:AL[ai].tl}
+/* Visualizador: AnalyserNode sobre el mismo audio (mismo origen, sin CORS). El grafo se crea con el primer gesto del usuario. */
+var AN=null,outG=null,srcN=null,fbuf=null,vc=$('#plz canvas'),vx=vc.getContext('2d'),vbars=[],vpk=[],vraf=0,vlast=0;
+function getCtx(){if(!actx){var AC=window.AudioContext||window.webkitAudioContext;actx=new AC()}return actx}
+function getAn(){if(!AN){var c=getCtx();AN=c.createAnalyser();AN.fftSize=512;AN.smoothingTimeConstant=.72;outG=c.createGain();outG.gain.value=mute?0:1;AN.connect(outG);outG.connect(c.destination);fbuf=new Uint8Array(AN.frequencyBinCount)}return AN}
+function vGraph(){
+ if(srcN||!(window.AudioContext||window.webkitAudioContext))return;
+ try{var c=getCtx();getAn();srcN=c.createMediaElementSource(au);srcN.connect(AN);au.muted=false;c.resume()}catch(e){srcN=null}
+}
+['pointerdown','keydown','touchend'].forEach(function(ev){addEventListener(ev,function g(){vGraph();removeEventListener(ev,g,true)},true)});
+function vStart(){if(!vraf)vraf=requestAnimationFrame(vDraw)}
+function vDraw(t){
+ vraf=0;
+ if(document.hidden)return;
+ if(t-vlast<30){vraf=requestAnimationFrame(vDraw);return}
+ vlast=t;
+ var dpr=Math.min(devicePixelRatio||1,2),w=vc.clientWidth,h=vc.clientHeight;if(!w||!h){vraf=requestAnimationFrame(vDraw);return}
+ if(vc.width!==Math.round(w*dpr)||vc.height!==Math.round(h*dpr)){vc.width=Math.round(w*dpr);vc.height=Math.round(h*dpr)}
+ vx.setTransform(dpr,0,0,dpr,0,0);vx.clearRect(0,0,w,h);
+ var playing=pl.classList.contains('on'),nb=Math.max(16,Math.floor(w/10)),i,k,v,live=false;
+ if(AN&&(srcN||synthOn)&&playing&&!rm){AN.getByteFrequencyData(fbuf);live=true}
+ var cs=getComputedStyle(pl),ca=cs.getPropertyValue('--pa').trim()||'#FF3B3B',cb=cs.getPropertyValue('--pb').trim()||'#FFC700',mid=h/2,bw=w/nb,act=0,n=fbuf?fbuf.length:128;
+ for(i=0;i<nb;i++){
+  if(live){var a0=Math.floor(Math.pow(i/nb,1.7)*n*.75),a1=Math.max(a0+1,Math.floor(Math.pow((i+1)/nb,1.7)*n*.75)),m=0;for(k=a0;k<a1;k++)if(fbuf[k]>m)m=fbuf[k];v=m/255;v=Math.pow(v,1.35)*(1+.35*(1-i/nb))}
+  else if(playing&&!rm){v=.1+.07*Math.sin(t*.004+i*.55)+.05*Math.sin(t*.0023+i*1.3)}  /* sin grafo (antes del primer gesto) */
+  else v=0;
+  if(v>1)v=1;
+  vbars[i]=v>(vbars[i]||0)?v:(vbars[i]||0)*.88;
+  vpk[i]=Math.max(vbars[i],(vpk[i]||0)-.012);
+  act+=vbars[i];
+  var bh=Math.max(1.5,vbars[i]*(mid-4)),x=i*bw+1;
+  vx.globalAlpha=.9;vx.fillStyle=cb;vx.fillRect(x,mid-bh,bw-2,bh*2);
+  vx.globalAlpha=.55;vx.fillStyle=ca;vx.fillRect(x,mid-bh,bw-2,Math.min(3,bh));vx.fillRect(x,mid+bh-Math.min(3,bh),bw-2,Math.min(3,bh));
+  var py=Math.max(1.5,vpk[i]*(mid-4));vx.globalAlpha=.9;vx.fillStyle='#fff';vx.fillRect(x,mid-py-3,bw-2,1.5);vx.fillRect(x,mid+py+1.5,bw-2,1.5);
+ }
+ vx.globalAlpha=1;
+ if(playing||act>.03)vraf=requestAnimationFrame(vDraw);
+}
+setTimeout(vStart,400);
 function trk(){return tks()[ti]||null}
 function applyTheme(a){pl.style.setProperty('--pa',a.pa);pl.style.setProperty('--pb',a.pb);pl.style.setProperty('--pt',a.pt);$('#plI').src=a.cover;$('#plC').setAttribute('aria-label','Banda sonora: '+a.title+'. Elegir otra');$('#plC').title='Banda sonora: '+a.title;}
 function load(k){
@@ -1626,14 +1668,14 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!plM2.hidde
 document.addEventListener('pointerdown',function(e){if(!plM2.hidden&&!pl.contains(e.target))menuOpen(false)});
 function synthStart(){
  try{
-  if(!actx){var AC=window.AudioContext||window.webkitAudioContext;actx=new AC();master=actx.createGain();master.gain.value=0;master.connect(actx.destination);
+  if(!master){getCtx();master=actx.createGain();master.gain.value=0;master.connect(getAn());
    var lp=actx.createBiquadFilter();lp.type='lowpass';lp.frequency.value=520;lp.Q.value=4;lp.connect(master);
    var lfo=actx.createOscillator(),lg=actx.createGain();lfo.frequency.value=.08;lg.gain.value=260;lfo.connect(lg);lg.connect(lp.frequency);lfo.start();
    var oscs=[];[55,82.41,110,165,220.5].forEach(function(f,i){var o=actx.createOscillator(),g=actx.createGain();o.type=i%2?'sawtooth':'triangle';o.frequency.value=f;o.detune.value=(i-2)*7;g.gain.value=.16/(i+1.2);o.connect(g);g.connect(lp);o.start();oscs.push(o)});
    var pulse=setInterval(function(){if(!synthOn||actx.state!=='running')return;var o=actx.createOscillator(),g=actx.createGain(),n=actx.currentTime;o.type='sine';o.frequency.setValueAtTime(90,n);o.frequency.exponentialRampToValueAtTime(40,n+.35);g.gain.setValueAtTime(.0001,n);g.gain.exponentialRampToValueAtTime(.55,n+.02);g.gain.exponentialRampToValueAtTime(.0001,n+.6);o.connect(g);g.connect(master);o.start(n);o.stop(n+.7)},2400);
    sNodes={oscs:oscs,pulse:pulse};
   }
-  actx.resume();synthOn=true;master.gain.cancelScheduledValues(actx.currentTime);master.gain.setTargetAtTime(mute?0:.5,actx.currentTime,1.2);pl.classList.add('on');pp.setAttribute('aria-label','Pausar');
+  actx.resume();synthOn=true;vStart();master.gain.cancelScheduledValues(actx.currentTime);master.gain.setTargetAtTime(mute?0:.5,actx.currentTime,1.2);pl.classList.add('on');pp.setAttribute('aria-label','Pausar');
  }catch(e){}
 }
 function stopSynth(){if(actx&&synthOn){synthOn=false;master.gain.setTargetAtTime(0,actx.currentTime,.2)}}
@@ -1644,7 +1686,7 @@ function play(){
 }
 function pause(){wanted=false;au.pause();stopSynth();pl.classList.remove('on');pp.setAttribute('aria-label','Reproducir')}
 document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a.go');if(a&&a.getAttribute('href')){try{pause()}catch(er){}}},true);
-au.addEventListener('play',function(){pl.classList.add('on');pp.setAttribute('aria-label','Pausar')});
+au.addEventListener('play',function(){vGraph();vStart();pl.classList.add('on');pp.setAttribute('aria-label','Pausar')});
 au.addEventListener('pause',function(){if(!synthOn){pl.classList.remove('on');pp.setAttribute('aria-label','Reproducir')}});
 au.addEventListener('ended',function(){load(ti+1);play()});
 au.addEventListener('error',function(){if(tks().length&&wanted){if(AL[ai].id==='sky'){plS.textContent='Pista no disponible · ambiente sintético';synthStart()}else{plS.textContent=AL[ai].title+' · pista no disponible';pl.classList.remove('on')}}});
@@ -1653,7 +1695,7 @@ plB.addEventListener('click',function(e){var r=plB.getBoundingClientRect();if(au
 pp.addEventListener('click',function(){if(pl.classList.contains('on')){savePaused(true);pause()}else{savePaused(false);play()}});
 $('#plP').addEventListener('click',function(){if(tks().length){savePaused(false);load(ti-1);play()}});
 $('#plX').addEventListener('click',function(){if(tks().length){savePaused(false);load(ti+1);play()}});
-$('#plM').addEventListener('click',function(){mute=!mute;au.muted=mute;if(master)master.gain.setTargetAtTime(mute&&synthOn?0:.5,actx.currentTime,.1);this.style.opacity=mute?.45:1;this.setAttribute('aria-label',mute?'Activar sonido':'Silenciar')});
+$('#plM').addEventListener('click',function(){mute=!mute;au.muted=srcN?false:mute;if(outG)outG.gain.setTargetAtTime(mute?0:1,actx.currentTime,.05);if(master)master.gain.setTargetAtTime(mute&&synthOn?0:.5,actx.currentTime,.1);this.style.opacity=mute?.45:1;this.setAttribute('aria-label',mute?'Activar sonido':'Silenciar')});
 (function(){var id=aGet().album,i=0;AL.forEach(function(a,k){if(a.id===id)i=k});ai=i;applyTheme(AL[ai]);var sv=(aGet().tk||{})[AL[ai].id];load(typeof sv==='number'?sv:0)})();
 
 /* ---------- splash ---------- */
