@@ -1536,7 +1536,7 @@ else{sec='inicio';setTheme()}
  }
  function show(){last=document.activeElement;build();open=true;document.documentElement.classList.add('mm-open');burger.setAttribute('aria-expanded','true');document.documentElement.style.overflow='hidden';var a=pn.querySelector('[aria-current=true]')||pn.querySelector('.mm-it');if(a){a.focus({preventScroll:true});a.scrollIntoView({block:'center'})}}
  function hide(){if(!open)return;open=false;document.documentElement.classList.remove('mm-open');burger.setAttribute('aria-expanded','false');document.documentElement.style.overflow='';if(last&&last.focus)last.focus({preventScroll:true})}
- function label(){var t=tt();burger.setAttribute('aria-label',t.m);var u=row.querySelector(':scope > .mm-uni');if(u){u.setAttribute('aria-label',t.a);u.querySelector('span').textContent=t.u}paintCur();var L=document.querySelector('.dj-legal');if(L)L.textContent='\u00A9 D\u00F4jo 2026 \u00B7 '+(lg()==='en'?'All rights reserved':'Todos los derechos reservados')}
+ function label(){var t=tt();burger.setAttribute('aria-label',t.m);var u=row.querySelector(':scope > .mm-uni');if(u){u.setAttribute('aria-label',t.a);u.querySelector('span').textContent=t.u}paintCur();var L=document.querySelector('.dj-legal');if(L)var en=lg()==='en';L.innerHTML='<span class="dj-cp" style="display:block;margin-bottom:8px;text-transform:none;letter-spacing:.04em;font-size:12px;opacity:1">'+(en?'Praestantia © 2026 Iván Gallo. All rights reserved':'Praestantia © 2026 Iván Gallo. Todos los derechos reservados')+'</span>'+'\u00A9 D\u00F4jo 2026 \u00B7 '+(en?'All rights reserved':'Todos los derechos reservados')}
  function mount(){
   nav=document.querySelector(CFG.row);if(!nav)return;
   row=document.createElement('div');row.className='mm-row';
