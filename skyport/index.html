@@ -189,7 +189,11 @@ html.resume #splash{display:none}
 body.vzl #visor{visibility:visible}
 body:not(.visor) #visor{pointer-events:none}
 #hexT{position:fixed;inset:0;width:100%;height:100%;z-index:5;pointer-events:none;display:none}
-body.visor #lbls,body.visor #fx,body.visor #lead,body.visor #aur,body.visor #ghost,body.visor #hint,body.visor #coord,body.visor .stat,body.visor #skh{display:none!important}
+#lbls,#fx,#lead,#ghost{transition:opacity .9s ease}
+body.live:not(.visor) #aur{transition:opacity .9s ease}
+body.live:not(.visor) :is(#hint,#coord,.stat){transition-delay:0s}
+body.visor :is(#lbls,#fx,#lead,#aur,#ghost,#hint,#coord,.stat){opacity:0!important;visibility:hidden;pointer-events:none;transition:opacity .9s ease,visibility 0s linear .9s!important}
+body.visor #skh{display:none!important}
 .tools .chip{width:36px;padding:0;justify-content:center}
 .tools .chip .tx{display:none}
 #bVis.on{border-color:var(--y);color:#fff;background:rgba(255,199,0,.22);box-shadow:0 0 14px rgba(255,199,0,.45)}
