@@ -941,7 +941,6 @@ function cardHTML(id){
   +'<h3>'+esc(n.name)+'</h3><p class="kind">'+esc(n.kind)+'</p>';
  h+='<div class="act">'+(n.url?'<a class="go" href="'+esc(n.url)+'" target="'+'_self'+'" rel="noopener">Lanzar <b>&rarr;</b></a>':'<button type="button" class="go off" data-edit>Asignar enlace</button>')+'<button type="button" class="ed" data-edit aria-label="Editar nodo">&#9998;</button></div>';
  h+='<p class="ds">'+esc(n.desc)+'</p>';
- if(n.subs&&n.subs.length)h+='<h5>Incluye</h5><div class="chips">'+n.subs.map(function(s){return '<span>'+esc(s)+'</span>'}).join('')+'</div>';
  var sn={};sn[id]=1;var kt=kidTree(id,1,sn);
  if(kt)h+='<h5>Anidados</h5><div class="kt">'+kt+'</div>';
  return {h:h+'</div>',c:g.c};
