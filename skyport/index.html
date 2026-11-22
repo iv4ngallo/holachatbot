@@ -185,8 +185,8 @@ html.resume #splash{display:none}
 #skp button:active{background:var(--r);border-color:var(--r)}
 #bIdx svg{color:var(--r)}
 /* Visor: capa de vidrio entre el mundo 3D y la interfaz. Activa por defecto: fondo borroso y menos elementos. */
-#visor{position:fixed;inset:0;z-index:5;background:rgba(2,8,30,.38);-webkit-backdrop-filter:blur(14px) saturate(1.1);backdrop-filter:blur(14px) saturate(1.1);opacity:0;visibility:hidden;transition:opacity .5s ease,visibility 0s linear .5s}
-body.visor #visor{opacity:1;visibility:visible;transition:opacity .5s ease}
+#visor{position:fixed;inset:0;z-index:5;background:rgba(2,8,30,.38);-webkit-backdrop-filter:blur(14px) saturate(1.1);backdrop-filter:blur(14px) saturate(1.1);opacity:0;visibility:hidden;transition:opacity 1s ease,visibility 0s linear 1s}
+body.visor #visor{opacity:1;visibility:visible;transition:opacity 1s ease}
 #hexT{position:fixed;inset:0;width:100%;height:100%;z-index:5;pointer-events:none;display:none}
 body.visor #lbls,body.visor #fx,body.visor #lead,body.visor #aur,body.visor #ghost,body.visor #hint,body.visor #coord,body.visor .stat,body.visor #skh{display:none!important}
 .tools .chip{width:36px;padding:0;justify-content:center}
@@ -1501,31 +1501,30 @@ requestAnimationFrame(frame);
 window.__vz=true;
 var hxc=$('#hexT'),hxx=hxc.getContext('2d'),hxRun=0;
 function visorBtn(on){var b=$('#bVis');b.classList.toggle('on',on);b.setAttribute('aria-pressed',on?'true':'false');var t=on?'Desactivar visor (V)':'Activar visor (V)';b.title=t;b.setAttribute('aria-label',t.replace(' (V)',''))}
-function hexOut(from,done){
+function hexWave(from,rev){
  var W=innerWidth,H=innerHeight,dpr=Math.min(devicePixelRatio||1,2),R=Math.max(26,Math.min(W,H)/15),hw=R*Math.sqrt(3),vh=R*1.5,cells=[],r0=from.getBoundingClientRect(),ox=r0.left+r0.width/2,oy=r0.top+r0.height/2,maxd=1,row,col,x,y,d;
  hxc.width=Math.round(W*dpr);hxc.height=Math.round(H*dpr);hxx.setTransform(dpr,0,0,dpr,0,0);hxc.style.display='block';
- for(row=-1;row*vh<H+R;row++)for(col=-1;col*hw<W+hw;col++){x=col*hw+(row&1?hw/2:0);y=row*vh;d=Math.hypot(x-ox,y-oy);if(d>maxd)maxd=d;cells.push({x:x,y:y,d:d,j:Math.random()*.12})}
- var T=1150,t0=performance.now(),id=++hxRun;
+ for(row=-1;row*vh<H+R;row++)for(col=-1;col*hw<W+hw;col++){x=col*hw+(row&1?hw/2:0);y=row*vh;d=Math.hypot(x-ox,y-oy);if(d>maxd)maxd=d;cells.push({x:x,y:y,d:d,j:Math.random()*.1})}
+ var T=1500,t0=performance.now(),id=++hxRun;
  function hexPath(x,y,r){hxx.beginPath();for(var k=0;k<6;k++){var a=Math.PI/180*(60*k-30);hxx[k?'lineTo':'moveTo'](x+r*Math.cos(a),y+r*Math.sin(a))}hxx.closePath()}
  (function f(now){
   if(id!==hxRun)return;
-  var p=Math.min(1,(now-t0)/T),i,c,q,sc;
+  var p=Math.min(1,(now-t0)/T),i,c,q,e,w;
   hxx.clearRect(0,0,W,H);
-  for(i=0;i<cells.length;i++){c=cells[i];q=(p*1.7-(c.d/maxd)*.7-c.j)/.55;q=q<0?0:q>1?1:q;sc=1-q*q*(3-2*q);if(sc<=.01)continue;
-   hexPath(c.x,c.y,R*sc*.97);hxx.fillStyle='rgba(5,14,56,'+(.8*sc).toFixed(2)+')';hxx.fill();
-   hxx.lineWidth=1.2;hxx.strokeStyle='rgba(46,242,255,'+(.55*sc).toFixed(2)+')';hxx.stroke()}
-  if(p<1)requestAnimationFrame(f);else{hxx.clearRect(0,0,W,H);hxc.style.display='none';hxc.width=hxc.height=1;if(done)done()}
+  for(i=0;i<cells.length;i++){c=cells[i];w=c.d/maxd;if(rev)w=1-w;q=(p*1.65-w*.65-c.j)/.42;if(q<=0||q>=1)continue;
+   e=Math.sin(Math.PI*q);e=e*e;
+   hexPath(c.x,c.y,R*.95*(.4+.6*e));hxx.fillStyle='rgba(46,242,255,'+(.09*e).toFixed(3)+')';hxx.fill();
+   hxx.lineWidth=1;hxx.strokeStyle='rgba(120,210,255,'+(.5*e).toFixed(3)+')';hxx.stroke()}
+  if(p<1)requestAnimationFrame(f);else{hxx.clearRect(0,0,W,H);hxc.style.display='none';hxc.width=hxc.height=1}
  })(t0);
 }
 function visorSet(on,from){
  on=!!on;if(on===window.__vz)return;
  var b=document.body,src=from?$(from):$('#bVis');
- if(on){hxRun++;hxc.style.display='none';window.__vz=true;b.classList.add('visor');visorBtn(true);return}
- window.__vz=false;visorBtn(false);
- if(rm||!src){b.classList.remove('visor');return}
- hexOut(src);
- /* los hexagonos ya cubren la pantalla en el primer cuadro: se retira el vidrio debajo */
- requestAnimationFrame(function(){requestAnimationFrame(function(){b.classList.remove('visor')})});
+ window.__vz=on;visorBtn(on);
+ /* el vidrio se desvanece o aparece mientras una ola de hexagonos cruza la pantalla (inversa al activar) */
+ b.classList.toggle('visor',on);
+ if(!rm&&src)hexWave(src,on);else{hxRun++;hxc.style.display='none'}
 }
 document.body.classList.add('visor');
 $('#bVis').addEventListener('click',function(){visorSet(!window.__vz)});
