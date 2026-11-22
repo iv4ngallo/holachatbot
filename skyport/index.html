@@ -185,8 +185,9 @@ html.resume #splash{display:none}
 #skp button:active{background:var(--r);border-color:var(--r)}
 #bIdx svg{color:var(--r)}
 /* Visor: capa de vidrio entre el mundo 3D y la interfaz. Activa por defecto: fondo borroso y menos elementos. */
-#visor{position:fixed;inset:0;z-index:5;background:rgba(2,8,30,.38);-webkit-backdrop-filter:blur(14px) saturate(1.1);backdrop-filter:blur(14px) saturate(1.1);opacity:0;visibility:hidden;transition:opacity 1s ease,visibility 0s linear 1s}
-body.visor #visor{opacity:1;visibility:visible;transition:opacity 1s ease}
+#visor{position:fixed;inset:0;z-index:5;background:rgba(2,8,30,.38);-webkit-backdrop-filter:blur(14px) saturate(1.1);backdrop-filter:blur(14px) saturate(1.1);visibility:hidden}
+body.vzl #visor{visibility:visible}
+body:not(.visor) #visor{pointer-events:none}
 #hexT{position:fixed;inset:0;width:100%;height:100%;z-index:5;pointer-events:none;display:none}
 body.visor #lbls,body.visor #fx,body.visor #lead,body.visor #aur,body.visor #ghost,body.visor #hint,body.visor #coord,body.visor .stat,body.visor #skh{display:none!important}
 .tools .chip{width:36px;padding:0;justify-content:center}
@@ -1501,32 +1502,39 @@ requestAnimationFrame(frame);
 window.__vz=true;
 var hxc=$('#hexT'),hxx=hxc.getContext('2d'),hxRun=0;
 function visorBtn(on){var b=$('#bVis');b.classList.toggle('on',on);b.setAttribute('aria-pressed',on?'true':'false');var t=on?'Desactivar visor (V)':'Activar visor (V)';b.title=t;b.setAttribute('aria-label',t.replace(' (V)',''))}
-function hexWave(from,rev){
- var W=innerWidth,H=innerHeight,dpr=Math.min(devicePixelRatio||1,2),R=Math.max(26,Math.min(W,H)/15),hw=R*Math.sqrt(3),vh=R*1.5,cells=[],r0=from.getBoundingClientRect(),ox=r0.left+r0.width/2,oy=r0.top+r0.height/2,maxd=1,row,col,x,y,d;
+/* El visor es un teselado de hexagonos unidos (sin lineas visibles). Al desactivarlo cada hexagono se encoge hasta desaparecer;
+   al activarlo ocurre lo inverso. La malla recorta la capa borrosa con clip-path. */
+var vzl=$('#visor');
+function hexWave(from,rev,done){
+ var W=innerWidth,H=innerHeight,dpr=Math.min(devicePixelRatio||1,2),R=Math.max(26,Math.min(W,H)/(W<820?13:22)),hw=R*Math.sqrt(3),vh=R*1.5,cells=[],r0=from.getBoundingClientRect(),ox=r0.left+r0.width/2,oy=r0.top+r0.height/2,maxd=1,row,col,x,y,d,k,C=[],S6=[];
+ for(k=0;k<6;k++){var an=Math.PI/180*(60*k-30);C.push(Math.cos(an));S6.push(Math.sin(an))}
  hxc.width=Math.round(W*dpr);hxc.height=Math.round(H*dpr);hxx.setTransform(dpr,0,0,dpr,0,0);hxc.style.display='block';
- for(row=-1;row*vh<H+R;row++)for(col=-1;col*hw<W+hw;col++){x=col*hw+(row&1?hw/2:0);y=row*vh;d=Math.hypot(x-ox,y-oy);if(d>maxd)maxd=d;cells.push({x:x,y:y,d:d,j:Math.random()*.1})}
- var T=1500,t0=performance.now(),id=++hxRun;
- function hexPath(x,y,r){hxx.beginPath();for(var k=0;k<6;k++){var a=Math.PI/180*(60*k-30);hxx[k?'lineTo':'moveTo'](x+r*Math.cos(a),y+r*Math.sin(a))}hxx.closePath()}
+ for(row=-1;row*vh<H+R;row++)for(col=-1;col*hw<W+hw;col++){x=col*hw+(row&1?hw/2:0);y=row*vh;d=Math.hypot(x-ox,y-oy);if(d>maxd)maxd=d;cells.push({x:x,y:y,d:d,j:Math.random()*.08})}
+ var T=1600,t0=performance.now(),id=++hxRun;
  (function f(now){
   if(id!==hxRun)return;
-  var p=Math.min(1,(now-t0)/T),i,c,q,e,w;
-  hxx.clearRect(0,0,W,H);
-  for(i=0;i<cells.length;i++){c=cells[i];w=c.d/maxd;if(rev)w=1-w;q=(p*1.65-w*.65-c.j)/.42;if(q<=0||q>=1)continue;
-   e=Math.sin(Math.PI*q);e=e*e;
-   hexPath(c.x,c.y,R*.95*(.4+.6*e));hxx.fillStyle='rgba(46,242,255,'+(.09*e).toFixed(3)+')';hxx.fill();
-   hxx.lineWidth=1;hxx.strokeStyle='rgba(120,210,255,'+(.5*e).toFixed(3)+')';hxx.stroke()}
-  if(p<1)requestAnimationFrame(f);else{hxx.clearRect(0,0,W,H);hxc.style.display='none';hxc.width=hxc.height=1}
+  var p=Math.min(1,(now-t0)/T),i,c,q,e,w,sc,r,path='',nz=0;
+  hxx.clearRect(0,0,W,H);hxx.lineWidth=1;
+  for(i=0;i<cells.length;i++){c=cells[i];w=c.d/maxd;q=((rev?1-p:p)*1.6-w*.6-c.j)/.4;q=q<0?0:q>1?1:q;   /* inversa: tiempo invertido, nacen en orden contrario al que desaparecen */
+   e=q*q*(3-2*q);sc=1.03*(1-e);if(sc<=.015)continue;nz++;
+   r=R*sc;
+   for(k=0;k<6;k++)path+=(k?'L':'M')+(c.x+r*C[k]).toFixed(1)+' '+(c.y+r*S6[k]).toFixed(1);
+   path+='Z';
+   if(e>.03){hxx.beginPath();for(k=0;k<6;k++)hxx[k?'lineTo':'moveTo'](c.x+r*C[k],c.y+r*S6[k]);hxx.closePath();hxx.strokeStyle='rgba(120,215,255,'+Math.min(.55,e*1.3).toFixed(2)+')';hxx.stroke()}
+  }
+  var cp=nz?'path("'+path+'")':'polygon(0 0,0 0,0 0)';vzl.style.clipPath=cp;vzl.style.webkitClipPath=cp;
+  if(p<1)requestAnimationFrame(f);else{hxx.clearRect(0,0,W,H);hxc.style.display='none';hxc.width=hxc.height=1;vzl.style.clipPath='';vzl.style.webkitClipPath='';if(done)done()}
  })(t0);
 }
 function visorSet(on,from){
  on=!!on;if(on===window.__vz)return;
  var b=document.body,src=from?$(from):$('#bVis');
- window.__vz=on;visorBtn(on);
- /* el vidrio se desvanece o aparece mientras una ola de hexagonos cruza la pantalla (inversa al activar) */
- b.classList.toggle('visor',on);
- if(!rm&&src)hexWave(src,on);else{hxRun++;hxc.style.display='none'}
+ window.__vz=on;visorBtn(on);b.classList.toggle('visor',on);
+ if(rm||!src){hxRun++;hxc.style.display='none';vzl.style.clipPath='';b.classList.toggle('vzl',on);return}
+ if(on){b.classList.add('vzl');vzl.style.clipPath='polygon(0 0,0 0,0 0)';hexWave(src,true)}
+ else hexWave(src,false,function(){if(!window.__vz)b.classList.remove('vzl')});
 }
-document.body.classList.add('visor');
+document.body.classList.add('visor','vzl');
 $('#bVis').addEventListener('click',function(){visorSet(!window.__vz)});
 addEventListener('keydown',function(e){
  if((e.key==='v'||e.key==='V')&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&live&&!admOn&&!/INPUT|TEXTAREA|SELECT/.test((e.target&&e.target.tagName)||'')&&!(e.target&&e.target.isContentEditable)){e.preventDefault();visorSet(!window.__vz)}
