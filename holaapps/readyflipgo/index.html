@@ -71,16 +71,9 @@ h1,h2,h3,h4{margin:0}
 .sec-top h2 small{display:block;font:600 11px/1.3 var(--cond);letter-spacing:.2em;color:var(--dim);margin-top:3px}
 .sec-top .sp{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
 .banner{flex:none;margin:4px 16px 0;padding:8px 12px;border:1px solid rgba(255,199,0,.5);border-left:3px solid var(--y);background:rgba(255,199,0,.08);font-size:13.5px;line-height:1.4;color:#F6E7A8}
-.stage{flex:1;min-height:0;position:relative;perspective:2400px;display:flex;align-items:center;justify-content:center;touch-action:pan-y;overflow:hidden}
-.book{position:relative;width:var(--bw);height:var(--ph);transition:transform .9s cubic-bezier(.5,.1,.2,1);transform-style:preserve-3d;filter:drop-shadow(0 22px 28px rgba(0,0,0,.5))}
-.book.cf{transform:translateX(calc(var(--pw) * -.5))}
-.book.cb{transform:translateX(calc(var(--pw) * .5))}
-.leaf{position:absolute;top:0;left:var(--lx);width:var(--pw);height:var(--ph);transform-origin:left center;transform-style:preserve-3d;transition:transform .9s cubic-bezier(.5,.1,.2,1),opacity .6s}
-.leaf.flip{transform:rotateY(-180deg)}
-.book.na,.book.na .leaf{transition:none!important}
-.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden}
-.face.back{transform:rotateY(180deg)}
-.book.mob .leaf.flip{transform:rotateY(-100deg) translateX(-14%);opacity:0;pointer-events:none}
+.stage{flex:1;min-height:0;position:relative;display:flex;align-items:center;justify-content:center;touch-action:pan-y;overflow:hidden}
+.book{position:relative;display:flex;justify-content:center;height:var(--ph);filter:drop-shadow(0 22px 28px rgba(0,0,0,.5))}
+.face{position:relative;flex:none;width:var(--pw);height:var(--ph);overflow:hidden}
 .edge{position:absolute;top:0;bottom:0;width:min(10%,70px);z-index:600;all:unset;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;opacity:0;transition:opacity .2s;background:linear-gradient(90deg,rgba(2,7,24,.5),transparent)}
 .edge.r{right:0;transform:scaleX(-1)}.edge.l{left:0}
 .stage:hover .edge:not([aria-disabled=true]){opacity:.9}
@@ -97,6 +90,32 @@ input[type=range]{width:100%;accent-color:var(--y);height:24px;margin:0}
 .empty{margin:auto;max-width:440px;text-align:center;padding:20px}
 .empty h3{font:900 italic 30px/1 var(--cond);text-transform:uppercase;margin-bottom:10px}
 .empty p{color:#D7E1FF;line-height:1.5}
+/* barra superior de la revista (pantalla completa) */
+.fs .top{display:none}
+.sec{position:relative}
+.sbar{flex:none;display:flex;align-items:center;gap:8px;min-height:54px;padding:calc(7px + var(--sat)) 10px 7px;background:rgba(2,7,24,.92);border-bottom:1px solid var(--line);border-top:3px solid var(--ac)}
+.ib{all:unset;box-sizing:border-box;cursor:pointer;width:40px;height:40px;flex:none;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);background:rgba(4,14,52,.75);color:var(--w);clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px))}
+.ib:hover{border-color:var(--y)}
+.ib.p{background:var(--y);color:var(--ink);border-color:var(--y)}
+.ib[aria-expanded=true]{background:#fff;color:var(--ink)}
+.ib[aria-disabled=true]{opacity:.4;pointer-events:none}
+.ib svg{display:block}
+.stl{flex:1;min-width:0}
+.stl h2{font:900 italic clamp(17px,2.4vw,24px)/1 var(--cond);text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stl small{display:block;margin-top:3px;font:600 10.5px/1.2 var(--cond);letter-spacing:.18em;text-transform:uppercase;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mode{font:700 10px/1 var(--cond);letter-spacing:.14em;text-transform:uppercase;padding:6px 8px;border:1px solid var(--line);color:var(--dim);white-space:nowrap}
+.mode:empty{display:none}.mode.demo{color:var(--y);border-color:rgba(255,199,0,.5)}.mode.live{color:#3DFF9A;border-color:rgba(61,255,154,.5)}.mode.bad{color:#FF9A9A;border-color:rgba(255,59,59,.5)}
+.pgnav{display:flex;align-items:center;gap:6px}
+.plbl{font:700 12px/1 var(--cond);letter-spacing:.14em;text-transform:uppercase;color:var(--dim);min-width:104px;text-align:center}
+.menu{position:absolute;right:10px;top:calc(60px + var(--sat));z-index:40;width:min(310px,calc(100vw - 20px));padding:8px;background:linear-gradient(180deg,rgba(6,20,78,.98),rgba(2,8,34,.99));border:1px solid var(--line);border-top:2px solid var(--y);box-shadow:0 18px 40px rgba(0,0,0,.55);display:flex;flex-direction:column;gap:2px}
+.menu[hidden]{display:none}
+.menu button,.menu a{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:10px;min-height:42px;padding:0 12px;font:600 15px/1.2 var(--sans);color:var(--w)}
+.menu button:hover,.menu a:hover,.menu button:focus-visible,.menu a:focus-visible{background:rgba(255,255,255,.1)}
+.menu svg{flex:none;color:var(--y)}
+.menu .msep{height:1px;background:var(--line);margin:4px 0}
+.menu .mnote{padding:8px 12px 10px;font-size:13px;line-height:1.4;color:var(--dim)}
+.menu .mh{padding:6px 12px 2px;font:700 11px/1 var(--cond);letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
+@media(max-width:520px){.mode{display:none}.plbl{min-width:70px;font-size:11px;letter-spacing:.08em}.pgnav{gap:4px}}
 /* pages (container query units) */
 .pg{container-type:size;width:100%;height:100%;background:var(--paper);color:var(--ink);position:relative;overflow:hidden;font-family:var(--sans)}
 .pg::after{content:"";position:absolute;top:0;bottom:0;width:9%;pointer-events:none}
@@ -562,64 +581,45 @@ function buildPages(k,arts){
 }
 
 /* ---------- Libro ---------- */
-let BK=null,TOK=0,zt=0;
+let BK=null,TOK=0;
 function two(){const st=$('#stage');return st&&st.clientWidth>=860}
 function mountBook(){
  const st=$('#stage');if(!st||!BK)return;
  const t2=two();
- if(BK.two!==undefined&&BK.two!==t2){ // conversión de posición entre modos
-  BK.pos=t2?Math.floor((BK.pos+1)/2):Math.min(BK.pos*2,BK.pages.length-1);
- }
+ if(BK.two!==undefined&&BK.two!==t2)BK.pos=t2?Math.floor((BK.pos+1)/2):Math.min(BK.pos*2,BK.pages.length-1);
  BK.two=t2;
- const P=BK.pages,n=t2?P.length/2:P.length;
+ const n=t2?BK.pages.length/2:BK.pages.length;
  BK.n=n;BK.max=t2?n:n-1;BK.pos=clamp(BK.pos,0,BK.max);
- let h='';
- for(let k=0;k<n;k++)h+=`<div class="leaf"><div class="face front">${t2?P[2*k]:P[k]}</div>${t2?`<div class="face back">${P[2*k+1]}</div>`:''}</div>`;
  let book=$('#book');
- if(!book){book=document.createElement('div');book.id='book';book.className='book';st.prepend(book)}
- book.className='book'+(t2?'':' mob');
- book.innerHTML=h;BK.leaves=[...book.children];
+ if(!book){book=document.createElement('div');book.id='book';st.prepend(book)}
  sizeBook();paint();
- book.classList.add('na');requestAnimationFrame(()=>requestAnimationFrame(()=>book.classList.remove('na')));
 }
 function sizeBook(){
  const st=$('#stage'),book=$('#book');if(!st||!book)return;
  const W=st.clientWidth,H=st.clientHeight,r=.74,t2=BK.two;
- let ph=t2?Math.min(H-12,(W-30)/2/r):Math.min(H-8,(W-12)/r);
- ph=Math.max(200,ph);const pw=ph*r;
- book.style.setProperty('--pw',pw+'px');book.style.setProperty('--ph',ph+'px');
- book.style.setProperty('--bw',(t2?pw*2:pw)+'px');book.style.setProperty('--lx',(t2?pw:0)+'px');
+ let ph=t2?Math.min(H-8,(W-16)/2/r):Math.min(H-8,(W-8)/r);
+ ph=Math.max(200,ph);
+ book.style.setProperty('--pw',ph*r+'px');book.style.setProperty('--ph',ph+'px');
 }
-function paintZ(){
- BK.leaves.forEach((el,k)=>{el.style.zIndex=k<BK.pos?k+1:BK.n-k});
-}
+const face=(c,html)=>`<div class="face ${c}">${html}</div>`;
 function paint(){
- paintZ();
- BK.leaves.forEach((el,k)=>{
-  const fl=k<BK.pos;el.classList.toggle('flip',fl);
-  if(!BK.two)el.style.visibility=(k<BK.pos-1)?'hidden':'visible';
-  el.setAttribute('aria-hidden',BK.two?'false':String(!(k===BK.pos)));
-  el.inert=BK.two?false:(k!==BK.pos);
- });
- const book=$('#book');
- book.classList.toggle('cf',BK.two&&BK.pos===0);
- book.classList.toggle('cb',BK.two&&BK.pos===BK.n);
- const rg=$('#rng');
- if(rg){rg.max=BK.max;rg.value=BK.pos}
+ const book=$('#book');if(!book||!BK)return;
+ const P=BK.pages,pos=BK.pos;
+ book.className='book'+(BK.two?'':' mob');
+ let h='';
+ if(BK.two){if(pos>0)h+=face('back',P[2*pos-1]);if(pos<BK.n)h+=face('front',P[2*pos])}
+ else h=face('front',P[pos]);
+ book.innerHTML=h;
  let lbl;
- if(BK.two){lbl=BK.pos===0?'Portada':BK.pos===BK.n?'Contraportada':`Págs. ${2*BK.pos-1}–${2*BK.pos} de ${BK.pages.length-1}`}
- else lbl=BK.pos===0?'Portada':`Pág. ${BK.pos} de ${BK.pages.length-1}`;
+ if(BK.two)lbl=pos===0?'Portada':pos===BK.n?'Contraportada':`Págs. ${2*pos-1}–${2*pos} de ${P.length-1}`;
+ else lbl=pos===0?'Portada':`Pág. ${pos} de ${P.length-1}`;
  const l=$('#plbl');if(l)l.textContent=lbl;
- const pv=$('#bPrev'),nx=$('#bNext');
- [pv,$('.edge.l')].forEach(e=>e&&e.setAttribute('aria-disabled',String(BK.pos===0)));
- [nx,$('.edge.r')].forEach(e=>e&&e.setAttribute('aria-disabled',String(BK.pos===BK.max)));
+ [$('#bPrev'),$('.edge.l')].forEach(e=>e&&e.setAttribute('aria-disabled',String(pos===0)));
+ [$('#bNext'),$('.edge.r')].forEach(e=>e&&e.setAttribute('aria-disabled',String(pos===BK.max)));
 }
 function go(p){
  if(!BK)return;p=clamp(p,0,BK.max);if(p===BK.pos)return;
- const a=Math.min(p,BK.pos),b=Math.max(p,BK.pos);
  BK.pos=p;paint();
- for(let k=a;k<b;k++)if(BK.leaves[k])BK.leaves[k].style.zIndex=500+k;
- clearTimeout(zt);zt=setTimeout(paintZ,1000);
 }
 const goPage=pi=>go(BK.two?Math.floor((pi+1)/2):pi);
 
@@ -630,7 +630,7 @@ function setNav(){
  $('#nInicio').setAttribute('aria-current',h==='inicio'?'page':'false');
  $('#nCat').setAttribute('aria-current',h==='catalogo'?'page':'false');
 }
-function setStatus(txt,cls){const s=$('#stat');s.textContent=txt;s.className='stat '+(cls||'')}
+function setStatus(txt,cls){const s=$('#stat');s.textContent=txt;s.className='stat '+(cls||'');const m=$('#mode');if(m){m.textContent=txt;m.className='mode '+(cls||'')}}
 function srcCount(k){const a=allSources(k);return `${activeSources(k).length} de ${a.length} fuentes activas`}
 
 function viewHome(){
@@ -640,10 +640,23 @@ function viewHome(){
  `<section class="how" aria-label="Cómo funciona"><div><b>1. Escoge un interés</b><span>Cada interés trae 20 fuentes del mundo ya listas para leer.</span></div><div><b>2. Hojea la edición</b><span>Pasa las páginas con las flechas, deslizando el dedo o con el teclado.</span></div><div><b>3. Arma tu mezcla</b><span>Activa o apaga fuentes del catálogo y agrega tus propios feeds RSS.</span></div></section></div>`;
 }
 
+const IC={
+ back:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
+ next:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>',
+ more:'<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>',
+ list:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/></svg>',
+ ref:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 10-2.3 5.7M20 4v6h-6"/></svg>',
+ src:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 5a14 14 0 0114 14M5 11a8 8 0 018 8M6 18h.01"/></svg>',
+ add:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+ fs:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>',
+ help:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 114 2c-.9.6-1.5 1-1.5 2M12 17h.01"/></svg>',
+ cat:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="7" height="7"/><rect x="13" y="4" width="7" height="7"/><rect x="4" y="13" width="7" height="7"/><rect x="13" y="13" width="7" height="7"/></svg>'
+};
 function secShell(k){
  const I=INT[k];
- return `<div class="sec" style="--ac:${I.ac}"><div class="sec-top"><a class="chip" href="#inicio" aria-label="Volver a intereses"><span>‹</span><span class="tx">Intereses</span></a><h2>${esc(I.name)}<small id="sub">${srcCount(k)}</small></h2><div class="sp">${KEYS.filter(x=>x!==k).map(x=>`<a class="chip hide-s" href="#${x}"><span>${esc(INT[x].name)}</span></a>`).join('')}<button class="chip" type="button" data-act="sources"><span>Fuentes</span></button></div></div><div id="banner"></div><div class="stage" id="stage"><div class="load" role="status"><h3>Preparando la edición</h3><div class="bar"><i id="lp"></i></div><p id="lt">Conectando con las fuentes…</p><button class="chip" id="lskip" type="button"><span>Abrir con lo que ya cargó</span></button></div></div>`+
- `<div class="ctrl"><button class="chip" id="bPrev" type="button" aria-label="Página anterior" aria-disabled="true"><span>‹</span><span class="tx">Anterior</span></button><div class="mid"><input id="rng" type="range" min="0" max="1" value="0" aria-label="Ir a una página" disabled><div class="lbl" id="plbl" aria-live="polite">—</div></div><button class="chip" id="bRef" type="button" aria-label="Actualizar edición"><span>↻</span><span class="tx hide-s">Actualizar</span></button><button class="chip p" id="bNext" type="button" aria-label="Página siguiente" aria-disabled="true"><span class="tx">Siguiente</span><span>›</span></button></div></div>`;
+ return `<div class="sec" style="--ac:${I.ac}"><div class="sbar"><a class="ib" href="#inicio" aria-label="Volver a intereses" title="Intereses">${IC.back}</a><div class="stl"><h2>${esc(I.name)}</h2><small id="sub">${srcCount(k)}</small></div><span class="mode" id="mode"></span><div class="pgnav"><button class="ib" id="bPrev" type="button" aria-label="Página anterior" title="Anterior" aria-disabled="true">${IC.back}</button><span class="plbl" id="plbl" aria-live="polite">—</span><button class="ib p" id="bNext" type="button" aria-label="Página siguiente" title="Siguiente" aria-disabled="true">${IC.next}</button></div><button class="ib" id="bMenu" type="button" aria-label="Más opciones" title="Más opciones" aria-haspopup="true" aria-expanded="false">${IC.more}</button></div>`+
+ `<div class="menu" id="menu" role="menu" hidden><div class="mnote" id="mnote"></div><button role="menuitem" type="button" data-act="sumario">${IC.list}Sumario</button><button role="menuitem" type="button" data-act="refresh">${IC.ref}Actualizar edición</button><button role="menuitem" type="button" data-act="sources">${IC.src}Fuentes de este interés</button><button role="menuitem" type="button" data-act="add">${IC.add}Agregar RSS</button><div class="msep"></div><div class="mh">Otros intereses</div>${KEYS.filter(x=>x!==k).map(x=>`<a role="menuitem" href="#${x}">${IC.cat}${esc(INT[x].name)}</a>`).join('')}<div class="msep"></div><button role="menuitem" type="button" data-act="fs">${IC.fs}Pantalla completa</button><button role="menuitem" type="button" data-act="help">${IC.help}Ayuda y atajos</button></div>`+
+ `<div class="stage" id="stage"><div class="load" role="status"><h3>Preparando la edición</h3><div class="bar"><i id="lp"></i></div><p id="lt">Conectando con las fuentes…</p><button class="chip" id="lskip" type="button"><span>Abrir con lo que ya cargó</span></button></div></div></div>`;
 }
 
 let LOAD=null;
@@ -695,8 +708,7 @@ function buildSection(k,tok){
  const arts=collect(k);ARTS=arts;
  const stg=$('#stage');
  setStatusFor(k);
- const ban=$('#banner');
- ban.innerHTML=demo?`<div class="banner" role="note">Estás viendo una edición de muestra con notas reales del 20 de noviembre de 2026, porque este entorno no permite conectarse a los feeds. Al abrir ReadyFlipGo en tu navegador o en tu hosting, se actualiza en vivo.</div>`:'';
+ const mn=$('#mnote');if(mn)mn.textContent=demo?'Estás viendo una edición de muestra con notas reales del 20 de noviembre de 2026, porque este entorno no permite conectarse a los feeds. Al abrir ReadyFlipGo en tu navegador o en tu hosting, se actualiza en vivo.':'Edición en vivo con las fuentes activas.';
  $('#sub').textContent=`${arts.length} notas · ${srcCount(k)} · ${demo?'muestra':'en vivo'}`;
  if(!arts.length){
   stg.innerHTML=`<div class="empty"><h3>No pudimos traer notas</h3><p>${activeSources(k).length?'Ninguna de las fuentes activas respondió. Revisa tu conexión o intenta de nuevo.':'Apagaste todas las fuentes de este interés. Activa al menos una en el catálogo.'}</p><div class="row" style="justify-content:center;margin-top:16px"><button class="chip p" type="button" data-act="refresh"><span>Reintentar</span></button><button class="chip" type="button" data-act="sources"><span>Gestionar fuentes</span></button></div></div>`;
@@ -705,7 +717,6 @@ function buildSection(k,tok){
  const prevPos=BK&&BK.k===k?BK.pos:0;
  BK={k,pages:buildPages(k,arts),pos:0};
  stg.innerHTML=`<button class="edge l" type="button" tabindex="-1" aria-label="Página anterior" aria-disabled="true"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 5l-7 7 7 7"/></svg></button><button class="edge r" type="button" tabindex="-1" aria-label="Página siguiente"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 5l-7 7 7 7"/></svg></button>`;
- $('#rng').disabled=false;
  mountBook();
  if(prevPos)go(Math.min(prevPos,BK.max));
 }
@@ -730,6 +741,7 @@ function route(){
  const h=location.hash.replace('#','')||'inicio';
  setNav();TOK++;
  closeModal();
+ document.body.classList.toggle('fs',!!INT[h]);
  if(h==='catalogo')viewCatalog();
  else if(INT[h])viewSection(h);
  else viewHome();
@@ -748,6 +760,12 @@ function openModal(html){
  const d=$('.dlg',m);(d.querySelector('input,select')||d).focus();
  return m;
 }
+function closeMenu(){const m=$('#menu'),b=$('#bMenu');if(m&&!m.hidden){m.hidden=true;b&&b.setAttribute('aria-expanded','false')}}
+function toggleMenu(){const m=$('#menu'),b=$('#bMenu');if(!m)return;const o=m.hidden;m.hidden=!o;b.setAttribute('aria-expanded',String(o));if(o){const f=m.querySelector('button,a');f&&f.focus()}}
+function toggleFs(){
+ const d=document,el=d.documentElement,fail=()=>toast('Tu navegador no permitió la pantalla completa.');
+ try{if(d.fullscreenElement){d.exitFullscreen()}else{const p=el.requestFullscreen&&el.requestFullscreen();if(p&&p.catch)p.catch(fail);else if(!p)fail()}}catch(e){fail()}
+}
 function closeModal(){if(MODAL){MODAL.remove();MODAL=null;if(LASTF&&document.contains(LASTF))try{LASTF.focus()}catch(e){}}}
 function toast(msg,label,fn){
  const t=document.createElement('div');t.className='ts';
@@ -763,7 +781,7 @@ function openArticle(i){
  openModal(`${xBtn}<p class="meta">${esc(a.src)}${a.d?' · '+esc(rel(a.d)):''}</p><h2 id="dt" style="font-size:28px;line-height:1.05">${esc(a.t)}</h2>${im(a)}<p class="body">${esc(a.s)||'Esta fuente no incluye un resumen.'}</p><div class="acts"><button class="chip" type="button" data-close><span>Seguir hojeando</span></button><a class="chip p" href="${esc(a.l)}" target="_blank" rel="noopener noreferrer"><span>Leer en ${esc(a.src)}</span><span>↗</span></a></div>`);
 }
 function openHelp(){
- openModal(`${xBtn}<h2 id="dt">Ayuda rápida</h2><ul><li><kbd>←</kbd> <kbd>→</kbd> pasan de página; <kbd>Inicio</kbd> y <kbd>Fin</kbd> van a la portada y al final.</li><li>En el celular, desliza el dedo hacia los lados para hojear.</li><li>Toca una nota para ver su resumen y abrirla en el sitio original.</li><li><kbd>Esc</kbd> cierra cualquier ventana.</li><li>En el catálogo puedes apagar fuentes y agregar tus propios feeds con <b>+ Agregar RSS</b>. Puedes pegar la dirección del feed o la del sitio.</li></ul><div class="acts"><button class="chip p" type="button" data-close><span>Entendido</span></button></div>`);
+ openModal(`${xBtn}<h2 id="dt">Ayuda rápida</h2><ul><li><kbd>←</kbd> <kbd>→</kbd> pasan de página; <kbd>Inicio</kbd> y <kbd>Fin</kbd> van a la portada y al final.</li><li>En el celular, desliza el dedo hacia los lados para hojear.</li><li>Toca una nota para ver su resumen y abrirla en el sitio original.</li><li><kbd>Esc</kbd> cierra cualquier ventana o menú.</li><li>En la revista, el botón de tres puntos guarda el sumario, la actualización, las fuentes y la pantalla completa.</li><li>En el catálogo puedes apagar fuentes y agregar tus propios feeds con <b>+ Agregar RSS</b>. Puedes pegar la dirección del feed o la del sitio.</li></ul><div class="acts"><button class="chip p" type="button" data-close><span>Entendido</span></button></div>`);
 }
 function openAdd(){
  const cur=INT[location.hash.replace('#','')]?location.hash.replace('#',''):catTab;
@@ -810,6 +828,9 @@ view.addEventListener('pointerup',e=>{
 });
 view.addEventListener('click',e=>{
  const t=e.target;
+ if(t.closest('#bMenu')){toggleMenu();return}
+ if(!t.closest('#menu'))closeMenu();
+ else if(t.closest('a'))closeMenu();
  const art=t.closest('[data-art]');
  if(art){e.preventDefault();if(!moved)openArticle(+art.dataset.art);moved=false;return}
  const gt=t.closest('[data-goto]');if(gt){goPage(+gt.dataset.goto);return}
@@ -821,6 +842,10 @@ view.addEventListener('click',e=>{
  const ac=t.closest('[data-act]');
  if(ac){
   const a=ac.dataset.act,k=(BK&&BK.k)||location.hash.replace('#','');
+  closeMenu();
+  if(a==='sumario'){if(BK)goPage(1);return}
+  if(a==='fs'){toggleFs();return}
+  if(a==='help'){openHelp();return}
   if(a==='refresh'&&INT[k]){viewSection(k,true)}
   else if(a==='sources'){catTab=INT[k]?k:catTab;location.hash==='#catalogo'?viewCatalog():(location.hash='#catalogo')}
   else if(a==='add')openAdd();
@@ -842,7 +867,7 @@ view.addEventListener('input',e=>{
 });
 document.addEventListener('click',e=>{if(e.target.closest('[data-close]'))closeModal()});
 document.addEventListener('keydown',e=>{
- if(e.key==='Escape'){closeModal();return}
+ if(e.key==='Escape'){closeModal();closeMenu();return}
  if(MODAL){
   if(e.key==='Tab'){
    const f=[...MODAL.querySelectorAll('a[href],button:not([hidden]):not([disabled]),input,select')].filter(x=>x.offsetParent!==null);
