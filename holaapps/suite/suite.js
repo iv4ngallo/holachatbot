@@ -11,6 +11,7 @@
     organic: '<path d="M12 21v-8"/><path d="M12 13c0-4 2.6-6.4 7-6.4 0 4.2-2.7 6.4-7 6.4Z"/><path d="M12 15.5c0-3-2-4.9-5.5-4.9 0 3.2 2.1 4.9 5.5 4.9Z"/>',
     platia: '<path d="M19 7V5a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h14a1 1 0 0 1 1 1v3"/><path d="M3 6v12a2 2 0 0 0 2 2h14a1 1 0 0 0 1-1v-3"/><path d="M21 12v4h-4a2 2 0 0 1 0-4Z"/>',
     numerica: '<rect x="3.5" y="3.5" width="17" height="17" rx="3"/><path d="M8 16V9l8 7V9"/>',
+    readyflipgo: '<path d="M5 3h10l4 4v14H5z"/><path d="M15 3v4h4"/><path d="M8 12h8M8 16h5"/>',
     gamers: '<path d="M6 8h12a4 4 0 0 1 4 4v2a3 3 0 0 1-5.4 1.8L15 14H9l-1.6 1.8A3 3 0 0 1 2 14v-2a4 4 0 0 1 4-4z"/><path d="M7 11v3M5.5 12.5h3"/><circle cx="15.5" cy="11.5" r=".6"/><circle cx="18" cy="13" r=".6"/>',
     palabritas: '<path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H10l-4 3.5V17H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z"/><path d="M8 10h8M8 13h5"/>',
     habitos: '<circle cx="12" cy="12" r="1.7"/><ellipse cx="12" cy="12" rx="9" ry="3.8"/><ellipse cx="12" cy="12" rx="9" ry="3.8" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9" ry="3.8" transform="rotate(120 12 12)"/>'
@@ -23,7 +24,8 @@
     { id: 'platia', nombre: 'PlatIA', color: '#3D3A86' },
     { id: 'numerica', nombre: 'Numérica', color: '#C0398B' },
     { id: 'palabritas', nombre: 'Palabritas', color: '#1D8FD1' },
-    { id: 'gamers', nombre: 'Hola Gamers', color: '#d62b26' }
+    { id: 'gamers', nombre: 'Hola Gamers', color: '#d62b26' },
+    { id: 'readyflipgo', nombre: 'ReadyFlipGo', color: '#ffc800' }
   ];
   var svg = function (inner, extra) { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"' + (extra || '') + '>' + inner + '</svg>'; };
   var $ = function (s, r) { return (r || document).querySelector(s); };

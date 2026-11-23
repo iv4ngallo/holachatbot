@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>ReadyFlipGo</title>
 <meta name="theme-color" content="#061246">
-<meta name="description" content="ReadyFlipGo: lector de noticias y RSS con formato de revista.">
+<meta name="description" content="ReadyFlipGo: lector de noticias y RSS con formato de revista. Usa tu cuenta de Hola Apps.">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="../suite/suite.css?v=7">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:ital,wght@0,500;0,600;0,700;0,800;0,900;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
 <style>
@@ -20,7 +21,11 @@ button{cursor:pointer}
 a{color:inherit;text-decoration:none}
 :focus-visible{outline:3px solid var(--y);outline-offset:2px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-#app{height:100dvh;display:flex;flex-direction:column}
+body{display:flex;flex-direction:column;height:100dvh}
+#app{flex:1;min-height:0;display:flex;flex-direction:column}
+/* En la revista la barra de la suite se oculta; se abre desde el menú (Cuenta y Hola Apps) */
+.fs .suite-bar{display:none}
+.fs.peek .suite-bar{display:flex;position:fixed;left:0;right:0;top:0;z-index:2147482000}
 .cut{clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px))}
 /* header */
 .top{flex:none;display:flex;align-items:center;gap:12px;padding:calc(10px + var(--sat)) 16px 10px;border-bottom:1px solid var(--line);background:rgba(2,7,24,.72);backdrop-filter:blur(10px);z-index:5}
@@ -264,6 +269,9 @@ kbd{font:600 12px var(--sans);border:1px solid var(--line);padding:2px 7px;backg
 </div>
 <div id="toasts" aria-live="polite"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../suite/config.js?v=2"></script>
+<script src="../suite/suite.js?v=12"></script>
 <script>
 (()=>{
 'use strict';
@@ -386,19 +394,65 @@ tech12:[
 
 /* ---------- Persistencia (opcional, nunca obligatoria) ---------- */
 const MEM={};
+let NS=''; // prefijo por usuario: cada cuenta guarda lo suyo en este dispositivo
 const store={
- get(k,d){try{const v=localStorage.getItem('rfg.'+k);return v?JSON.parse(v):(k in MEM?MEM[k]:d)}catch(e){return k in MEM?MEM[k]:d}},
- set(k,v){MEM[k]=v;try{localStorage.setItem('rfg.'+k,JSON.stringify(v))}catch(e){}}
+ get(k,d){const kk=NS+k;try{const v=localStorage.getItem('rfg.'+kk);return v?JSON.parse(v):(kk in MEM?MEM[kk]:d)}catch(e){return kk in MEM?MEM[kk]:d}},
+ set(k,v){const kk=NS+k;MEM[kk]=v;try{localStorage.setItem('rfg.'+kk,JSON.stringify(v))}catch(e){}}
 };
-let custom=store.get('custom',[]);
-let off=new Set(store.get('off',[]));
+let custom=[];
+let off=new Set();
 /* Solo fuentes de acceso libre: dominios con muro de pago (total o por medidor) */
 const PAID=['nytimes.com','wsj.com','ft.com','bloomberg.com','economist.com','hbr.org','wired.com','technologyreview.com','newscientist.com','scientificamerican.com','theinformation.com','washingtonpost.com','newyorker.com','theatlantic.com','businessinsider.com','forbes.com','fastcompany.com','statista.com','medium.com','uxdesign.cc','uxplanet.org','nature.com','science.org','lennysnewsletter.com','thetimes.co.uk','telegraph.co.uk'];
 const isPaid=u=>{try{const x=new URL(u).hostname.replace(/^www\./,'');return PAID.some(d=>x===d||x.endsWith('.'+d))}catch(e){return false}};
 const allSources=k=>CATALOG.concat(custom).filter(s=>!k||s.i===k);
 const activeSources=k=>allSources(k).filter(s=>!off.has(s.id));
-const saveOff=()=>store.set('off',[...off]);
-const saveCustom=()=>store.set('custom',custom);
+const saveOff=()=>{store.set('off',[...off]);syncSoon()};
+const saveCustom=()=>{store.set('custom',custom);syncSoon()};
+/* ---------- Cuenta de Hola Apps: sincroniza fuentes propias y fuentes apagadas ---------- */
+let SB=null,UID=null,READY=false,syncT=0,syncWarned=false;
+function syncSoon(){
+ if(!SB||!UID)return;
+ clearTimeout(syncT);
+ syncT=setTimeout(async()=>{
+  try{
+   const r=await SB.from('readyflipgo_docs').upsert({user_id:UID,json:JSON.stringify({custom,off:[...off]}),updated_at:new Date().toISOString()});
+   if(r&&r.error)throw r.error;
+  }catch(e){if(!syncWarned){syncWarned=true;toast('No pudimos guardar tus fuentes en tu cuenta. Quedan en este dispositivo.')}}
+ },800);
+}
+async function boot(user,sb){
+ SB=sb;UID=user.id;NS=user.id+'.';READY=false;syncWarned=false;
+ // Migra lo que se guardaba antes sin cuenta (solo la primera vez en este dispositivo)
+ try{
+  if(!localStorage.getItem('rfg.'+NS+'custom')&&!localStorage.getItem('rfg.'+NS+'off')){
+   const c=localStorage.getItem('rfg.custom'),o=localStorage.getItem('rfg.off');
+   if(c)localStorage.setItem('rfg.'+NS+'custom',c);if(o)localStorage.setItem('rfg.'+NS+'off',o);
+  }
+ }catch(e){}
+ custom=store.get('custom',[]);off=new Set(store.get('off',[]));
+ let remote=false;
+ try{
+  const r=await sb.from('readyflipgo_docs').select('json').maybeSingle();
+  if(r&&!r.error&&r.data&&r.data.json){
+   const d=JSON.parse(r.data.json);
+   if(Array.isArray(d.custom))custom=d.custom.filter(s=>s&&s.id&&s.f&&INT[s.i]&&!isPaid(s.f));
+   if(Array.isArray(d.off))off=new Set(d.off);
+   store.set('custom',custom);store.set('off',[...off]);remote=true;
+  }
+ }catch(e){}
+ if(!remote)syncSoon();
+ READY=true;route();
+}
+function logout(){
+ READY=false;SB=null;UID=null;NS='';custom=[];off=new Set();BK=null;TOK++;
+ closeModal();document.body.classList.remove('fs','peek');
+ view.innerHTML='';
+}
+function peekSuite(){
+ document.body.classList.add('peek');
+ const off=e=>{if(!e.target.closest('.suite-bar,.suite-um,.suite-pop')){document.body.classList.remove('peek');document.removeEventListener('click',off,true)}};
+ setTimeout(()=>document.addEventListener('click',off,true),0);
+}
 
 /* ---------- Utilidades de fecha y texto ---------- */
 const RTF=(()=>{try{return new Intl.RelativeTimeFormat('es-CO',{numeric:'auto'})}catch(e){return null}})();
@@ -683,7 +737,7 @@ const IC={
 function secShell(k){
  const I=INT[k];
  return `<div class="sec" style="--ac:${I.ac}"><div class="sbar"><a class="ib" href="#inicio" aria-label="Volver a intereses" title="Intereses">${IC.back}</a><div class="stl"><h2>${esc(I.name)}</h2><small id="sub">${srcCount(k)}</small></div><span class="mode" id="mode"></span><div class="pgnav"><button class="ib lb" id="bPrev" type="button" aria-label="Página anterior" title="Anterior" aria-disabled="true">${IC.back}<span class="tx">Anterior</span></button><span class="plbl" id="plbl" aria-live="polite">—</span><button class="ib p lb" id="bNext" type="button" aria-label="Página siguiente" title="Siguiente" aria-disabled="true"><span class="tx">Siguiente</span>${IC.next}</button></div><button class="ib" id="bMenu" type="button" aria-label="Más opciones" title="Más opciones" aria-haspopup="true" aria-expanded="false">${IC.more}</button><div class="prog" aria-hidden="true"><i id="pgi"></i></div></div>`+
- `<div class="menu" id="menu" role="menu" hidden><div class="mnote" id="mnote"></div><button role="menuitem" type="button" data-act="sumario">${IC.list}Sumario</button><button role="menuitem" type="button" data-act="refresh">${IC.ref}Actualizar edición</button><button role="menuitem" type="button" data-act="sources">${IC.src}Fuentes de este interés</button><button role="menuitem" type="button" data-act="add">${IC.add}Agregar RSS</button><div class="msep"></div><div class="mh">Otros intereses</div>${KEYS.filter(x=>x!==k).map(x=>`<a role="menuitem" href="#${x}">${IC.cat}${esc(INT[x].name)}</a>`).join('')}<div class="msep"></div><button role="menuitem" type="button" data-act="fs">${IC.fs}Pantalla completa</button><button role="menuitem" type="button" data-act="help">${IC.help}Ayuda y atajos</button></div>`+
+ `<div class="menu" id="menu" role="menu" hidden><div class="mnote" id="mnote"></div><button role="menuitem" type="button" data-act="sumario">${IC.list}Sumario</button><button role="menuitem" type="button" data-act="refresh">${IC.ref}Actualizar edición</button><button role="menuitem" type="button" data-act="sources">${IC.src}Fuentes de este interés</button><button role="menuitem" type="button" data-act="add">${IC.add}Agregar RSS</button><div class="msep"></div><div class="mh">Otros intereses</div>${KEYS.filter(x=>x!==k).map(x=>`<a role="menuitem" href="#${x}">${IC.cat}${esc(INT[x].name)}</a>`).join('')}<div class="msep"></div><button role="menuitem" type="button" data-act="suite">${IC.cat}Cuenta y Hola Apps</button><button role="menuitem" type="button" data-act="fs">${IC.fs}Pantalla completa</button><button role="menuitem" type="button" data-act="help">${IC.help}Ayuda y atajos</button></div>`+
  `<div class="stage" id="stage"><div class="load" role="status"><h3>Preparando la edición</h3><div class="bar"><i id="lp"></i></div><p id="lt">Conectando con las fuentes…</p><button class="chip" id="lskip" type="button"><span>Abrir con lo que ya cargó</span></button></div></div></div>`;
 }
 
@@ -767,6 +821,7 @@ let catTab='pm',catQ='';
 
 /* ---------- Ruteo ---------- */
 function route(){
+ if(!READY)return;
  const h=location.hash.replace('#','')||'inicio';
  setNav();TOK++;
  closeModal();
@@ -877,6 +932,7 @@ view.addEventListener('click',e=>{
   if(a==='sumario'){if(BK)goPage(1);return}
   if(a==='fs'){toggleFs();return}
   if(a==='help'){openHelp();return}
+  if(a==='suite'){peekSuite();return}
   if(a==='refresh'&&INT[k]){viewSection(k,true)}
   else if(a==='sources'){catTab=INT[k]?k:catTab;location.hash==='#catalogo'?viewCatalog():(location.hash='#catalogo')}
   else if(a==='add')openAdd();
@@ -919,7 +975,12 @@ document.addEventListener('keydown',e=>{
 let rz=0;
 window.addEventListener('resize',()=>{cancelAnimationFrame(rz);rz=requestAnimationFrame(()=>{if(!BK||!$('#stage'))return;if(two()!==BK.two)mountBook();else{sizeBook();fit()}})});
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{if(BK&&$('#book'))fit()});
-route();
+if(window.Suite){
+ Suite.init({app:'readyflipgo',gate:true,onUser:boot,onLogout:logout});
+}else{
+ // Sin el servicio de acceso no se puede abrir la app: lo decimos en lugar de dejar la pantalla vacía.
+ view.innerHTML='<div class="wrap"><div class="empty"><h3>No pudimos cargar el acceso</h3><p>Revisa tu conexión y recarga la página para entrar con tu cuenta de Hola Apps.</p></div></div>';
+}
 })();
 </script>
 </body>
