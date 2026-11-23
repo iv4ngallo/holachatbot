@@ -29,7 +29,11 @@
   ];
   var svg = function (inner, extra) { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"' + (extra || '') + '>' + inner + '</svg>'; };
   var $ = function (s, r) { return (r || document).querySelector(s); };
-  var Suite = window.Suite = { user: null, sb: null, opts: {} };
+  var Suite = window.Suite = { user: null, sb: null, opts: {}, APPS: APPS, ICONS: ICONS, svg: svg };
+  /* Apps que el usuario deshabilitó desde su perfil (user_metadata.apps_deshabilitadas). */
+  function appsOff(u) { var m = (u && u.user_metadata) || {}; return Array.isArray(m.apps_deshabilitadas) ? m.apps_deshabilitadas.filter(function (x) { return typeof x === 'string'; }) : []; }
+  Suite.appsOff = function () { return appsOff(Suite.user); };
+  var rutaPerfil = function (hash) { return new URL('../perfil/', location.href).pathname + (hash ? '#' + hash : ''); };
   var SIN_SERVICIO = 'No se pudo cargar el servicio de acceso. Recarga la página.';
 
   function msgError(e) {
@@ -47,7 +51,7 @@
   /* ---------- menú superior ---------- */
   function montarBarra(app) {
     if ($('.suite-bar')) return;
-    var actual = APPS.filter(function (a) { return a.id === app; })[0];
+    var actual = APPS.filter(function (a) { return a.id === app; })[0] || (app === 'perfil' ? { nombre: 'Mi perfil' } : null);
     var bar = document.createElement('div');
     bar.className = 'suite-bar';
     bar.setAttribute('role', 'navigation');
@@ -64,6 +68,7 @@
       '</span>' +
       '<div class="suite-um" id="suite-um" role="menu" hidden>' +
         '<div class="suite-um-quien"><button type="button" class="suite-av suite-av-grande" id="suite-av-grande" title="Cambiar avatar" aria-label="Cambiar avatar"></button><div class="suite-um-txt"><strong id="suite-um-nombre"></strong><small id="suite-um-correo"></small></div></div>' +
+        '<a class="suite-um-op" role="menuitem" id="suite-perfil" href="' + rutaPerfil('') + '">Mi perfil</a>' +
         '<button type="button" class="suite-um-op" role="menuitem" id="suite-av-cambiar">Cambiar avatar</button>' +
         '<button type="button" class="suite-um-op" role="menuitem" id="suite-av-quitar" hidden>Quitar avatar</button>' +
         '<div id="suite-um-extra"></div>' +
@@ -72,12 +77,7 @@
         '<p class="suite-um-msg" id="suite-um-msg" role="status" hidden></p>' +
         '<input type="file" id="suite-av-file" accept="image/png,image/jpeg,image/webp" hidden>' +
       '</div>' +
-      '<div class="suite-pop" id="suite-pop" role="menu" hidden>' +
-        APPS.map(function (a) {
-          return '<a class="suite-app" role="menuitem" href="' + new URL('../' + a.id + '/', location.href).pathname + '"' + (a.id === app ? ' aria-current="page"' : '') + '>' +
-            '<span class="suite-ico" style="background:' + a.color + '">' + svg(ICONS[a.id]) + '</span>' + a.nombre + '</a>';
-        }).join('') +
-      '</div>';
+      '<div class="suite-pop" id="suite-pop" role="menu" hidden></div>';
     document.body.insertBefore(bar, document.body.firstChild);
     document.body.classList.add('suite-on');
     var btn = $('#suite-abrir'), pop = $('#suite-pop');
@@ -88,10 +88,34 @@
     });
     document.addEventListener('click', function (e) { if (!pop.hidden && !e.target.closest('.suite-pop') && !e.target.closest('#suite-abrir')) cerrar(false); });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !pop.hidden) { e.stopPropagation(); cerrar(true); } }, true);
+    pintarApps();
     montarMenuUsuario();
     pintarUsuario();
     var fit = Suite.opts.fit;
     if (fit) { var st = document.createElement('style'); st.textContent = 'body.suite-on ' + fit + '{height:calc(100% - 44px) !important}'; document.head.appendChild(st); }
+  }
+  function pintarApps() {
+    var pop = $('#suite-pop'); if (!pop) return;
+    var off = appsOff(Suite.user), app = Suite.opts.app;
+    pop.innerHTML = APPS.filter(function (a) { return off.indexOf(a.id) < 0; }).map(function (a) {
+      return '<a class="suite-app" role="menuitem" href="' + new URL('../' + a.id + '/', location.href).pathname + '"' + (a.id === app ? ' aria-current="page"' : '') + '>' +
+        '<span class="suite-ico" style="background:' + a.color + '">' + svg(ICONS[a.id]) + '</span>' + a.nombre + '</a>';
+    }).join('') + '<a class="suite-pop-mas" role="menuitem" href="' + rutaPerfil('') + '">' + (Suite.user ? 'Administrar mis apps' : 'Mi perfil') + '</a>';
+  }
+  /* App deshabilitada: se cubre con un aviso y se explica cómo volver a habilitarla. */
+  function bloqueada() { var a = Suite.opts.app; return !!(Suite.user && a && appsOff(Suite.user).indexOf(a) >= 0); }
+  function pintarBloqueo() {
+    var b = $('#suite-bloqueo'), app = Suite.opts.app;
+    if (!bloqueada()) { if (b) { b.remove(); if (Suite.user) location.reload(); } return; }
+    if (b) return;
+    var a = APPS.filter(function (x) { return x.id === app; })[0] || { nombre: 'Esta app' };
+    b = document.createElement('div'); b.id = 'suite-bloqueo'; b.className = 'suite-bloqueo'; b.setAttribute('role', 'region'); b.setAttribute('aria-labelledby', 'sb-titulo');
+    b.innerHTML = '<div class="suite-card"><h1>Hola Apps</h1><h2 id="sb-titulo"></h2>' +
+      '<p class="suite-ayuda">La deshabilitaste desde tu perfil. Tus datos siguen guardados y vuelven a estar disponibles apenas la habilites.</p>' +
+      '<a class="suite-ok" href="' + rutaPerfil(app) + '">Habilitar en mi perfil</a>' +
+      '<div class="suite-pie"><a class="suite-link" href="' + rutaPerfil('') + '">Ver todas mis apps</a></div></div>';
+    $('#sb-titulo', b).textContent = a.nombre + ' está deshabilitada';
+    document.body.appendChild(b);
   }
   /* ---------- menú de usuario y avatar ---------- */
   var extras = [];
@@ -106,13 +130,16 @@
   }
   function pintarUsuario() {
     var u = Suite.user, box = $('#suite-user');
+    pintarBloqueo();
     if (!box) return;
     box.hidden = !u;
-    if (!u) { cerrarMenu(false); return; }
+    pintarApps();
+    if (!u) { cerrarMenu(false); if (Suite.onUserChange) Suite.onUserChange(null); return; }
     $('#suite-mail').textContent = nombreDe(u);
     $('#suite-um-nombre').textContent = nombreDe(u); $('#suite-um-correo').textContent = u.email || '';
     pintarAvatar($('#suite-av-mini'), u); pintarAvatar($('#suite-av-grande'), u);
     $('#suite-av-quitar').hidden = !avatarDe(u);
+    if (Suite.onUserChange) Suite.onUserChange(u);
   }
   function pintarExtras() {
     var box = $('#suite-um-extra'); if (!box) return;
@@ -128,7 +155,7 @@
   var opsMenu = function () { return [].slice.call(document.querySelectorAll('#suite-um .suite-um-op')).filter(function (b) { return !b.hidden; }); };
   function abrirMenu(foco) { var m = $('#suite-um'); if (!m) return; m.hidden = false; $('#suite-av-btn').setAttribute('aria-expanded', 'true'); msg(''); if (foco) { var o = opsMenu()[0]; if (o) o.focus(); } }
   function cerrarMenu(devolver) { var m = $('#suite-um'); if (!m || m.hidden) return; m.hidden = true; $('#suite-av-btn').setAttribute('aria-expanded', 'false'); if (devolver) $('#suite-av-btn').focus(); }
-  function msg(t, error) { var p = $('#suite-um-msg'); if (!p) return; p.textContent = t; p.hidden = !t; p.classList.toggle('error', !!error); }
+  function msg(t, error) { if (Suite.onMsg) Suite.onMsg(t, !!error); var p = $('#suite-um-msg'); if (!p) return; p.textContent = t; p.hidden = !t; p.classList.toggle('error', !!error); }
   function montarMenuUsuario() {
     var btn = $('#suite-av-btn'), m = $('#suite-um'), file = $('#suite-av-file');
     btn.addEventListener('click', function () { if (m.hidden) abrirMenu(false); else cerrarMenu(false); });
@@ -180,7 +207,7 @@
     if (!/^image\/(png|jpeg|webp)$/.test(f.type)) { msg('Usa una imagen JPG, PNG o WebP.', true); return; }
     if (f.size > 10 * 1024 * 1024) { msg('La imagen pesa más de 10 MB.', true); return; }
     msg('Subiendo…');
-    reducir(f).then(function (blob) {
+    return reducir(f).then(function (blob) {
       var ruta = u.id + '/avatar-' + Date.now() + '.jpg';
       return sb.storage.from('avatars').upload(ruta, blob, { contentType: 'image/jpeg', cacheControl: '31536000', upsert: false }).then(function (r) {
         if (r.error) throw r.error;
@@ -189,6 +216,9 @@
       });
     }).catch(function (e) { console.warn('Hola Apps: no se pudo subir el avatar', e); msg('No se pudo subir la imagen. Inténtalo de nuevo.', true); });
   }
+
+  Suite.subirAvatar = function (f) { return subirAvatar(f); };
+  Suite.quitarAvatar = function () { return guardarAvatar('', 'Avatar quitado.'); };
 
   /* ---------- acceso ---------- */
   var AM = {
@@ -274,6 +304,7 @@
     if (Suite.user && Suite.user.id === u.id) { Suite.user = u; pintarUsuario(); return; }
     if (recuperando) return;
     Suite.user = u; pintarUsuario(); ocultar();
+    if (bloqueada()) return;
     if (Suite.opts.onUser) Suite.opts.onUser(u, Suite.sb);
   }
   function salir() {

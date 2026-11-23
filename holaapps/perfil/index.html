@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mi perfil · Hola Apps</title>
+<meta name="description" content="Administra tu cuenta de Hola Apps: tus datos, tu avatar, tu seguridad y la configuración de cada app.">
+<meta name="robots" content="noindex">
+<style>/* Un elemento con el atributo hidden nunca se muestra. */[hidden]:not([hidden=until-found i]){display:none!important}</style>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32.png">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<link rel="stylesheet" href="../suite/suite.css?v=8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Climate+Crisis&family=Work+Sans:wght@400..800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --surface:#FEFEFE; --surface-raised:#F1F0F8; --card:#FFFFFF; --ink:#1E1C46; --ink-muted:#5B5D60;
+  --brand:#3D3A86; --on-brand:#FEFEFE; --accent:#8C3F71; --line:#D4D5DA; --control-border:#767880; --focus-ring:#3D3A86;
+  --ok:#1b6e3a; --ok-bg:#e6f4ea; --danger:#b3261e; --danger-bg:#fdecea;
+  --font-display:"Climate Crisis",Impact,"Arial Black",sans-serif;
+  --font-sans:"Work Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --radius-sm:8px; --radius-md:12px; --radius-lg:20px;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --surface:#15142E; --surface-raised:#1F1D44; --card:#1B1A3B; --ink:#F4F3FB; --ink-muted:#B4B6BA;
+    --brand:#B9B6F2; --on-brand:#15142E; --accent:#E3A0CB; --line:#3a3963; --control-border:#8A8C92; --focus-ring:#B9B6F2;
+    --ok:#7fd69b; --ok-bg:#17301f; --danger:#ff9d95; --danger-bg:#3b1a18;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--surface);color:var(--ink);font:400 16px/1.55 var(--font-sans);-webkit-font-smoothing:antialiased}
+:focus-visible{outline:3px solid var(--focus-ring);outline-offset:2px}
+.skip{position:absolute;left:12px;top:-64px;background:var(--brand);color:var(--on-brand);padding:8px 16px;border-radius:var(--radius-md);z-index:100;font-weight:600;text-decoration:none}
+.skip:focus{top:52px}
+.wrap{max-width:1120px;margin:0 auto;padding:28px 20px 72px}
+.eyebrow{margin:0 0 6px;font:600 13px/1.2 var(--font-sans);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+h1.titulo{margin:0;font:400 clamp(28px,4.4vw,40px)/1.15 var(--font-display);text-transform:uppercase;color:var(--brand)}
+.lead{margin:10px 0 0;color:var(--ink-muted);max-width:60ch}
+
+/* Estructura: pestañas laterales + panel */
+.layout{display:grid;grid-template-columns:268px minmax(0,1fr);gap:28px;margin-top:28px;align-items:start}
+.tabs{display:flex;flex-direction:column;gap:4px;position:sticky;top:12px}
+.tabs-tit{margin:10px 12px 4px;font:600 12px/1.2 var(--font-sans);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-muted)}
+.tabs-tit:first-child{margin-top:0}
+.tab{display:flex;align-items:center;gap:12px;width:100%;min-height:48px;padding:6px 12px;border:0;border-radius:var(--radius-md);background:transparent;color:var(--ink);font:600 15px/1.2 var(--font-sans);text-align:left;cursor:pointer}
+.tab:hover{background:var(--surface-raised)}
+.tab[aria-selected="true"]{background:var(--surface-raised);box-shadow:inset 3px 0 0 var(--brand)}
+.tab .ico{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;color:#fff;flex:none}
+.tab .ico svg{width:18px;height:18px}
+.tab .ico.gen{background:var(--brand);color:var(--on-brand)}
+.tab .txt{display:flex;flex-direction:column;min-width:0}
+.tab .estado{font:500 12px/1.2 var(--font-sans);color:var(--ink-muted)}
+.tab .estado.off{color:var(--danger)}
+
+.panel{min-width:0}
+.panel:focus{outline:none}
+.panel-cab{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+.panel-cab .ico{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;color:#fff;flex:none}
+.panel-cab .ico svg{width:28px;height:28px}
+.panel-cab h2{margin:0;font:700 26px/1.2 var(--font-sans);color:var(--ink)}
+.panel-cab p{margin:2px 0 0;color:var(--ink-muted)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius-lg);padding:22px;margin-bottom:18px}
+.card h3{margin:0 0 4px;font:700 18px/1.3 var(--font-sans)}
+.card .ayuda{margin:0 0 16px;color:var(--ink-muted);font-size:14.5px}
+.card h3+.campos,.card h3+.fila{margin-top:14px}
+
+/* Formularios */
+.campos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 16px}
+.campo{display:flex;flex-direction:column;gap:6px;min-width:0}
+.campo.ancho{grid-column:1/-1}
+label,.etq{font:600 14px/1.3 var(--font-sans);color:var(--ink)}
+.opc{font-weight:400;color:var(--ink-muted)}
+input[type=text],input[type=email],input[type=tel],input[type=password],select{width:100%;min-height:46px;padding:0 14px;border:1.5px solid var(--control-border);border-radius:var(--radius-md);background:var(--card);color:var(--ink);font:400 16px/1.2 var(--font-sans)}
+input:focus,select:focus{outline:none;border-color:var(--focus-ring);box-shadow:0 0 0 4px color-mix(in srgb,var(--focus-ring) 22%,transparent)}
+input[aria-invalid="true"]{border-color:var(--danger)}
+input[readonly]{background:var(--surface-raised);color:var(--ink-muted)}
+.nota{font:400 13.5px/1.4 var(--font-sans);color:var(--ink-muted)}
+.err{font:500 13.5px/1.4 var(--font-sans);color:var(--danger)}
+.chk{display:inline-flex;align-items:center;gap:8px;font:400 14px/1.3 var(--font-sans);color:var(--ink-muted);cursor:pointer}
+.chk input{width:18px;height:18px;accent-color:var(--brand)}
+.fila{display:flex;flex-wrap:wrap;align-items:center;gap:10px 12px}
+.acciones{display:flex;flex-wrap:wrap;align-items:center;gap:10px 12px;margin-top:18px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 20px;border:1.5px solid transparent;border-radius:999px;font:700 15px/1 var(--font-sans);cursor:pointer;text-decoration:none;white-space:nowrap}
+.btn.prim{background:var(--brand);color:var(--on-brand)}
+.btn.prim:hover{filter:brightness(1.08)}
+.btn.sec{background:transparent;color:var(--brand);border-color:var(--brand)}
+.btn.sec:hover{background:var(--surface-raised)}
+.btn.peligro{background:transparent;color:var(--danger);border-color:var(--danger)}
+.btn.peligro:hover{background:var(--danger-bg)}
+.btn.peligro.lleno{background:var(--danger);color:#fff}
+.btn[disabled],.btn[aria-disabled="true"]{opacity:.55;cursor:not-allowed;filter:none}
+.estado-msg{min-height:22px;font:500 14px/1.4 var(--font-sans)}
+.estado-msg.ok{color:var(--ok)}
+.estado-msg.mal{color:var(--danger)}
+.estado-msg.pend{color:var(--ink-muted)}
+
+/* Avatar */
+.avatar-fila{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.avatar{width:88px;height:88px;border-radius:50%;display:grid;place-items:center;overflow:hidden;background:var(--brand);color:var(--on-brand);font:700 34px/1 var(--font-sans);flex:none}
+.avatar img{width:100%;height:100%;object-fit:cover;display:block}
+
+/* Interruptor */
+.sw{display:inline-flex;align-items:center;gap:12px;padding:0;border:0;background:none;color:var(--ink);font:600 15px/1.2 var(--font-sans);cursor:pointer;min-height:44px}
+.sw-pista{position:relative;width:52px;height:30px;border-radius:999px;background:var(--control-border);flex:none;transition:background .15s}
+.sw-pista::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:transform .15s}
+.sw[aria-checked="true"] .sw-pista{background:var(--ok)}
+.sw[aria-checked="true"] .sw-pista::after{transform:translateX(22px)}
+.sw[disabled]{opacity:.6;cursor:wait}
+@media (prefers-reduced-motion:reduce){.sw-pista,.sw-pista::after{transition:none}}
+
+/* Lista de apps (resumen en General) */
+.apps-lista{display:flex;flex-direction:column;gap:2px;margin:0;padding:0;list-style:none}
+.apps-lista li{display:flex;align-items:center;gap:14px;padding:10px 6px;border-radius:var(--radius-md);flex-wrap:wrap}
+.apps-lista li:hover{background:var(--surface-raised)}
+.apps-lista .ico{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;color:#fff;flex:none}
+.apps-lista .ico svg{width:20px;height:20px}
+.apps-lista .nom{flex:1;min-width:150px;display:flex;flex-direction:column}
+.apps-lista .nom strong{font-size:15.5px}
+.apps-lista .nom span{font-size:13px;color:var(--ink-muted)}
+.apps-lista .ir{font:600 14px/1.2 var(--font-sans);color:var(--brand)}
+
+/* Datos por app */
+.datos-resumen{display:flex;flex-wrap:wrap;gap:8px 28px;margin:0 0 4px}
+.datos-resumen div{display:flex;flex-direction:column}
+.datos-resumen dt{font:600 12px/1.2 var(--font-sans);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-muted)}
+.datos-resumen dd{margin:2px 0 0;font:600 16px/1.3 var(--font-sans)}
+.zona-peligro{border-color:color-mix(in srgb,var(--danger) 45%,var(--line))}
+.banda-off{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:var(--radius-md);background:var(--danger-bg);color:var(--danger);font:500 14.5px/1.4 var(--font-sans);margin-bottom:18px}
+
+/* Aviso con deshacer */
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:3000;display:flex;align-items:center;gap:14px;max-width:min(520px,calc(100vw - 24px));padding:12px 16px;border-radius:var(--radius-md);background:#111;color:#fff;font:500 14.5px/1.35 var(--font-sans);box-shadow:0 10px 34px rgba(0,0,0,.35)}
+.toast button{border:0;background:none;color:#cfd0ff;font:700 14.5px/1 var(--font-sans);text-decoration:underline;cursor:pointer;padding:8px 4px;min-height:36px}
+.toast.error{background:var(--danger);color:#fff}
+
+/* Diálogo de confirmación */
+dialog{width:min(460px,calc(100vw - 24px));border:0;border-radius:var(--radius-lg);padding:24px;background:var(--card);color:var(--ink);box-shadow:0 20px 60px rgba(0,0,0,.45)}
+dialog::backdrop{background:rgba(10,10,20,.6)}
+dialog h2{margin:0 0 8px;font:700 21px/1.25 var(--font-sans)}
+dialog p{margin:0 0 12px}
+
+.cargando{padding:60px 0;text-align:center;color:var(--ink-muted)}
+
+@media (max-width:860px){
+  .layout{grid-template-columns:minmax(0,1fr);gap:16px}
+  .tabs{position:static;flex-direction:row;overflow-x:auto;padding-bottom:8px;gap:6px;scroll-snap-type:x proximity}
+  .tabs-tit{display:none}
+  .tab{width:auto;flex:none;scroll-snap-align:start;border:1.5px solid var(--line)}
+  .tab[aria-selected="true"]{box-shadow:none;border-color:var(--brand)}
+  .campos{grid-template-columns:minmax(0,1fr)}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#contenido">Saltar al contenido</a>
+<main class="wrap" id="contenido">
+  <p class="eyebrow">Hola Apps</p>
+  <h1 class="titulo">Mi perfil</h1>
+  <p class="lead">Tus datos de cuenta valen para todas las apps. Cada app tiene además su propia pestaña para habilitarla, abrirla y administrar tus datos.</p>
+
+  <div class="layout" id="layout" hidden>
+    <div class="tabs" id="tabs" role="tablist" aria-label="Secciones del perfil" aria-orientation="vertical"></div>
+    <div id="paneles"></div>
+  </div>
+  <p class="cargando" id="cargando" role="status">Cargando tu perfil…</p>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<dialog id="dlg" aria-labelledby="dlg-t">
+  <form method="dialog" id="dlg-form" novalidate>
+    <h2 id="dlg-t"></h2>
+    <div id="dlg-cuerpo"></div>
+    <div class="acciones">
+      <button class="btn peligro lleno" type="submit" id="dlg-ok" value="ok"></button>
+      <button class="btn sec" type="button" id="dlg-no">Cancelar</button>
+    </div>
+  </form>
+</dialog>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../suite/config.js?v=4"></script>
+<script src="../suite/suite.js?v=13"></script>
+<script>
+(function () {
+  'use strict';
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var esc = function (t) { return String(t == null ? '' : t).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+
+  /* Datos propios de cada app: textos y tablas de Supabase donde guarda lo del usuario (todas con RLS por user_id). */
+  var INFO = {
+    precia:      { tag: 'Compras',   desc: 'Tus listas de compras, claras y a la mano.', tablas: [{ t: 'precia_docs', c: 'updated_at' }] },
+    agendia:     { tag: 'Agenda',    desc: 'Tu agenda del día, sin enredos.', tablas: [{ t: 'agendia_docs', c: 'updated_at' }] },
+    organic:     { tag: 'Ideas',     desc: 'Planta una idea y mírala crecer.', tablas: [{ t: 'organic_docs', c: 'updated_at' }] },
+    habitos:     { tag: 'Bienestar', desc: 'Cambios pequeños, resultados grandes.', tablas: [{ t: 'habitos_docs', c: 'updated_at' }] },
+    platia:      { tag: 'Finanzas',  desc: 'Tu presupuesto en pesos, mes a mes.', tablas: [{ t: 'presupuesto_docs', c: 'updated_at' }] },
+    numerica:    { tag: 'Redes',     desc: 'Piezas para redes con tu sistema de diseño.', tablas: [{ t: 'numerica_docs', c: 'updated_at' }, { t: 'numerica_files', c: 'updated_at' }] },
+    palabritas:  { tag: 'Inglés',    desc: 'Inglés para niños con memoria asociativa.', tablas: [{ t: 'palabritas_docs', c: 'updated_at' }] },
+    gamers:      { tag: 'Gamers',    desc: 'Foro y red social para gamers, con tu biblioteca de Steam.', tablas: [{ t: 'gamers_steam', c: 'vinculado_en' }, { t: 'gamers_biblioteca', c: 'creado_en' }] },
+    readyflipgo: { tag: 'Noticias',  desc: 'Lector de noticias y RSS con formato de revista.', tablas: [{ t: 'readyflipgo_docs', c: 'updated_at' }] }
+  };
+  var ZONAS_FRECUENTES = ['America/Bogota', 'America/Lima', 'America/Guayaquil', 'America/Caracas', 'America/Mexico_City', 'America/Santiago', 'America/Argentina/Buenos_Aires', 'America/New_York', 'Europe/Madrid'];
+  var IDIOMAS = [['es-CO', 'Español (Colombia)'], ['es', 'Español'], ['en', 'English']];
+
+  var sb = null, user = null, pestana = 'general', datosApp = {}, montado = false, tareaAvatar = false;
+  var apps = function () { return Suite.APPS; };
+  var meta = function () { return (user && user.user_metadata) || {}; };
+  var off = function () { return Suite.appsOff(); };
+  var nombreApp = function (id) { var a = apps().filter(function (x) { return x.id === id; })[0]; return a ? a.nombre : id; };
+  var colorApp = function (id) { var a = apps().filter(function (x) { return x.id === id; })[0]; return a ? a.color : '#3D3A86'; };
+  var icono = function (id) { return Suite.svg(Suite.ICONS[id]); };
+
+  /* ---------- mensajes ---------- */
+  var hTimer;
+  function aviso(texto, opts) {
+    opts = opts || {};
+    var t = $('#toast'); t.className = 'toast' + (opts.error ? ' error' : ''); t.textContent = '';
+    var s = document.createElement('span'); s.textContent = texto; t.appendChild(s);
+    if (opts.deshacer) { var b = document.createElement('button'); b.type = 'button'; b.textContent = 'Deshacer'; b.addEventListener('click', function () { t.hidden = true; opts.deshacer(); }); t.appendChild(b); }
+    t.hidden = false; clearTimeout(hTimer); hTimer = setTimeout(function () { t.hidden = true; }, opts.deshacer ? 8000 : 4500);
+  }
+  function estado(el, texto, tipo) { if (!el) return; el.textContent = texto || ''; el.className = 'estado-msg' + (tipo ? ' ' + tipo : ''); }
+  function errorTexto(e) {
+    var c = (e && (e.code || e.error_code)) || '', m = String((e && e.message) || '').toLowerCase();
+    if (c === 'weak_password') return 'La contraseña es muy débil. Usa al menos 8 caracteres, con letras y números.';
+    if (c === 'same_password') return 'La contraseña nueva debe ser distinta de la actual.';
+    if (c === 'reauthentication_needed' || /reauth/.test(m)) return 'Por seguridad, cierra sesión y vuelve a entrar antes de hacer este cambio.';
+    if (c === 'email_exists' || c === 'user_already_exists') return 'Ya existe una cuenta con ese correo.';
+    if (c === 'over_email_send_rate_limit' || c === 'over_request_rate_limit') return 'Demasiados intentos. Espera unos minutos e inténtalo de nuevo.';
+    if (c === 'email_address_invalid' || /invalid.*email/.test(m)) return 'Ese correo no es válido. Revisa que esté bien escrito.';
+    if (/fetch|network/.test(m)) return 'No hay conexión con el servicio. Revisa tu internet.';
+    return 'No se pudo completar la acción. Inténtalo de nuevo.';
+  }
+
+  /* ---------- guardar en la cuenta ---------- */
+  function guardarMeta(datos) {
+    return sb.auth.updateUser({ data: datos }).then(function (r) {
+      if (r.error) throw r.error;
+      user = r.data.user; Suite.setUser(user);
+      return user;
+    });
+  }
+
+  /* ---------- armado de la página ---------- */
+  function avatarHTML() {
+    var u = meta().avatar_url, ini = (meta().nombre || (user.email || 'U').split('@')[0]).trim().charAt(0).toUpperCase() || 'U';
+    return typeof u === 'string' && /^https:\/\//.test(u) ? '<img src="' + esc(u) + '" alt="">' : esc(ini);
+  }
+  function opcionesZona() {
+    var todas = [];
+    try { todas = Intl.supportedValuesOf('timeZone'); } catch (e) {}
+    var actual = meta().zona_horaria || (function () { try { return Intl.DateTimeFormat().resolvedOptions().timeZone; } catch (e) { return 'America/Bogota'; } })();
+    var resto = todas.filter(function (z) { return ZONAS_FRECUENTES.indexOf(z) < 0; });
+    var o = function (z) { return '<option value="' + esc(z) + '"' + (z === actual ? ' selected' : '') + '>' + esc(z.replace(/_/g, ' ')) + '</option>'; };
+    var frec = ZONAS_FRECUENTES.slice(); if (frec.indexOf(actual) < 0 && resto.indexOf(actual) < 0) frec.push(actual);
+    return '<optgroup label="Frecuentes">' + frec.map(o).join('') + '</optgroup>' + (resto.length ? '<optgroup label="Todas las zonas">' + resto.map(o).join('') + '</optgroup>' : '');
+  }
+  function panelGeneral() {
+    var m = meta(), idioma = m.idioma || 'es-CO';
+    return '' +
+    '<div class="panel-cab"><span class="ico gen" style="background:var(--brand);color:var(--on-brand)">' + Suite.svg('<circle cx="12" cy="8" r="3.6"/><path d="M4.5 20c.8-3.6 3.7-5.6 7.5-5.6s6.7 2 7.5 5.6"/>') + '</span><div><h2 id="t-general" tabindex="-1">General</h2><p>Datos de tu cuenta, seguridad y tus apps.</p></div></div>' +
+
+    '<section class="card" aria-labelledby="h-avatar"><h3 id="h-avatar">Foto de perfil</h3><p class="ayuda">Se muestra en el menú superior de todas las apps. Acepta JPG, PNG o WebP de hasta 10 MB; la recortamos al centro en formato cuadrado.</p>' +
+      '<div class="avatar-fila"><div class="avatar" id="p-avatar" aria-hidden="true">' + avatarHTML() + '</div>' +
+      '<div><div class="fila"><button class="btn prim" type="button" id="p-av-subir">Cambiar foto</button><button class="btn sec" type="button" id="p-av-quitar"' + (m.avatar_url ? '' : ' hidden') + '>Quitar foto</button></div>' +
+      '<p class="estado-msg" id="p-av-msg" role="status"></p></div></div><input type="file" id="p-av-file" accept="image/png,image/jpeg,image/webp" hidden></section>' +
+
+    '<form class="card" id="f-datos" aria-labelledby="h-datos" novalidate><h3 id="h-datos">Datos personales</h3><p class="ayuda">Las apps usan estos datos para saludarte y mostrar fechas y horas en tu zona.</p>' +
+      '<div class="campos">' +
+        '<div class="campo ancho"><label for="d-nombre">Nombre</label><input id="d-nombre" type="text" autocomplete="name" maxlength="80" value="' + esc(m.nombre || '') + '"></div>' +
+        '<div class="campo"><label for="d-tel">Teléfono <span class="opc">(opcional)</span></label><input id="d-tel" type="tel" autocomplete="tel" inputmode="tel" maxlength="24" placeholder="Ej.: 300 123 4567" value="' + esc(m.telefono || '') + '"></div>' +
+        '<div class="campo"><label for="d-ciudad">Ciudad <span class="opc">(opcional)</span></label><input id="d-ciudad" type="text" autocomplete="address-level2" maxlength="60" placeholder="Ej.: Ibagué" value="' + esc(m.ciudad || '') + '"></div>' +
+        '<div class="campo"><label for="d-zona">Zona horaria</label><select id="d-zona">' + opcionesZona() + '</select></div>' +
+        '<div class="campo"><label for="d-idioma">Idioma</label><select id="d-idioma">' + IDIOMAS.map(function (i) { return '<option value="' + i[0] + '"' + (i[0] === idioma ? ' selected' : '') + '>' + i[1] + '</option>'; }).join('') + '</select></div>' +
+      '</div>' +
+      '<div class="acciones"><button class="btn prim" type="submit" id="d-guardar">Guardar cambios</button><button class="btn sec" type="button" id="d-descartar">Descartar cambios</button><span class="estado-msg" id="d-msg" role="status"></span></div></form>' +
+
+    '<form class="card" id="f-correo" aria-labelledby="h-correo" novalidate><h3 id="h-correo">Correo</h3><p class="ayuda">Es el correo con el que entras. Si lo cambias, te enviamos un enlace de confirmación y el cambio se aplica cuando lo abras.</p>' +
+      '<div class="campos"><div class="campo"><label for="c-actual">Correo actual</label><input id="c-actual" type="email" readonly value="' + esc(user.email || '') + '"></div>' +
+      '<div class="campo"><label for="c-nuevo">Correo nuevo</label><input id="c-nuevo" type="email" autocomplete="email" inputmode="email" placeholder="tucorreo@ejemplo.com" aria-describedby="c-ayuda c-err"><span class="err" id="c-err" role="alert"></span></div></div>' +
+      '<p class="nota" id="c-ayuda">' + (user.new_email ? 'Cambio pendiente: falta confirmar ' + esc(user.new_email) + '. Revisa tu bandeja de entrada y el spam.' : 'Verifica que puedas abrir el correo nuevo antes de continuar.') + '</p>' +
+      '<div class="acciones"><button class="btn prim" type="submit">Cambiar correo</button><span class="estado-msg" id="c-msg" role="status"></span></div></form>' +
+
+    '<form class="card" id="f-clave" aria-labelledby="h-clave" novalidate><h3 id="h-clave">Contraseña y sesiones</h3><p class="ayuda">Usa al menos 8 caracteres, con letras y números.</p>' +
+      '<div class="campos"><div class="campo"><label for="k-nueva">Contraseña nueva</label><input id="k-nueva" type="password" autocomplete="new-password" minlength="8" aria-describedby="k-err"></div>' +
+      '<div class="campo"><label for="k-rep">Repite la contraseña</label><input id="k-rep" type="password" autocomplete="new-password" minlength="8" aria-describedby="k-err"></div>' +
+      '<div class="campo ancho"><label class="chk"><input type="checkbox" id="k-ver"> Mostrar contraseñas</label><span class="err" id="k-err" role="alert"></span></div></div>' +
+      '<div class="acciones"><button class="btn prim" type="submit">Cambiar contraseña</button><span class="estado-msg" id="k-msg" role="status"></span></div>' +
+      '<div class="acciones"><button class="btn sec" type="button" id="k-global">Cerrar sesión en todos los dispositivos</button></div>' +
+      '<p class="nota">Cierra tu sesión en este y en los demás equipos y celulares donde hayas entrado. Tendrás que iniciar sesión de nuevo.</p></form>' +
+
+    '<section class="card" aria-labelledby="h-apps"><h3 id="h-apps">Mis apps</h3><p class="ayuda">Habilita solo las que uses. Una app deshabilitada desaparece del menú y no se puede abrir, pero tus datos se conservan.</p>' +
+      '<ul class="apps-lista" id="lista-apps"></ul></section>';
+  }
+  function interruptor(id) {
+    var on = off().indexOf(id) < 0;
+    return '<button type="button" class="sw" role="switch" aria-checked="' + on + '" data-sw="' + id + '" aria-label="' + esc(nombreApp(id)) + ': ' + (on ? 'habilitada' : 'deshabilitada') + '"><span class="sw-pista" aria-hidden="true"></span><span class="sw-txt">' + (on ? 'Habilitada' : 'Deshabilitada') + '</span></button>';
+  }
+  function listaApps() {
+    return apps().map(function (a) {
+      var on = off().indexOf(a.id) < 0;
+      return '<li><span class="ico" style="background:' + a.color + '" aria-hidden="true">' + icono(a.id) + '</span>' +
+        '<span class="nom"><strong>' + esc(a.nombre) + '</strong><span>' + esc(INFO[a.id].tag) + '</span></span>' +
+        '<a class="ir" href="#' + a.id + '" data-ir="' + a.id + '">Configurar<span class="sr" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)"> ' + esc(a.nombre) + '</span></a>' + interruptor(a.id) + '</li>';
+    }).join('');
+  }
+  function panelApp(id) {
+    var inf = INFO[id], on = off().indexOf(id) < 0, href = new URL('../' + id + '/', location.href).pathname;
+    return '' +
+    '<div class="panel-cab"><span class="ico" style="background:' + colorApp(id) + '" aria-hidden="true">' + icono(id) + '</span><div><h2 id="t-' + id + '" tabindex="-1">' + esc(nombreApp(id)) + '</h2><p>' + esc(inf.desc) + '</p></div></div>' +
+    (on ? '' : '<div class="banda-off" role="note">Esta app está deshabilitada. No aparece en el menú y, si abres su dirección, verás un aviso. Tus datos siguen guardados.</div>') +
+
+    '<section class="card" aria-labelledby="h-est-' + id + '"><h3 id="h-est-' + id + '">Estado y acceso</h3><p class="ayuda">Habilita o deshabilita ' + esc(nombreApp(id)) + ' en tu cuenta. Puedes revertirlo cuando quieras.</p>' +
+      '<div class="fila">' + interruptor(id) + (on ? '<a class="btn prim" href="' + href + '">Abrir ' + esc(nombreApp(id)) + '</a>' : '<span class="btn prim" aria-disabled="true" role="link">Abrir ' + esc(nombreApp(id)) + '</span>') + '</div>' +
+      (on ? '' : '<p class="nota">Habilítala para poder abrirla.</p>') + '</section>' +
+
+    '<section class="card" aria-labelledby="h-conf-' + id + '"><h3 id="h-conf-' + id + '">Configuración de la app</h3><p class="ayuda">Los ajustes propios de ' + esc(nombreApp(id)) + ' (por ejemplo, su apariencia o sus opciones de uso) se cambian dentro de la app. Lo que configures allí se guarda en tu cuenta.</p></section>' +
+
+    '<section class="card" aria-labelledby="h-datos-' + id + '"><h3 id="h-datos-' + id + '">Tus datos en ' + esc(nombreApp(id)) + '</h3>' +
+      '<dl class="datos-resumen" id="resumen-' + id + '"><div><dt>Último cambio</dt><dd>Consultando…</dd></div></dl>' +
+      '<div class="acciones"><button class="btn sec" type="button" data-exportar="' + id + '">Exportar mis datos</button><span class="estado-msg" id="exp-msg-' + id + '" role="status"></span></div>' +
+      '<p class="nota">Descarga un archivo .json con todo lo que ' + esc(nombreApp(id)) + ' guarda de ti.</p></section>' +
+
+    '<section class="card zona-peligro" aria-labelledby="h-del-' + id + '"><h3 id="h-del-' + id + '">Borrar mis datos de ' + esc(nombreApp(id)) + '</h3><p class="ayuda">Elimina para siempre todo lo que esta app guarda en tu cuenta. Tu cuenta de Hola Apps y las demás apps no se tocan. Esta acción no se puede deshacer.</p>' +
+      '<div class="acciones" style="margin-top:0"><button class="btn peligro" type="button" data-borrar="' + id + '">Borrar mis datos</button></div></section>';
+  }
+  function pestañaBoton(id, nombre, sub, ic, color) {
+    return '<button class="tab" type="button" role="tab" id="tab-' + id + '" data-tab="' + id + '" aria-controls="panel" aria-selected="false" tabindex="-1">' + ic + '<span class="txt"><span>' + esc(nombre) + '</span>' + sub + '</span></button>';
+  }
+  function pintarTabs() {
+    var h = '<p class="tabs-tit">Cuenta</p>' +
+      pestañaBoton('general', 'General', '', '<span class="ico gen" aria-hidden="true">' + Suite.svg('<circle cx="12" cy="8" r="3.6"/><path d="M4.5 20c.8-3.6 3.7-5.6 7.5-5.6s6.7 2 7.5 5.6"/>') + '</span>') +
+      '<p class="tabs-tit">Apps</p>';
+    apps().forEach(function (a) {
+      var on = off().indexOf(a.id) < 0;
+      h += pestañaBoton(a.id, a.nombre, '<span class="estado' + (on ? '' : ' off') + '">' + (on ? 'Habilitada' : 'Deshabilitada') + '</span>', '<span class="ico" style="background:' + a.color + '" aria-hidden="true">' + icono(a.id) + '</span>');
+    });
+    $('#tabs').innerHTML = h;
+    marcarTab();
+  }
+  function marcarTab() {
+    [].forEach.call(document.querySelectorAll('.tab'), function (b) {
+      var s = b.getAttribute('data-tab') === pestana; b.setAttribute('aria-selected', String(s)); b.tabIndex = s ? 0 : -1;
+    });
+  }
+  function validaPestana(id) { return id === 'general' || !!INFO[id]; }
+  function mostrar(id, foco) {
+    if (!validaPestana(id)) id = 'general';
+    pestana = id;
+    var cont = $('#paneles');
+    cont.innerHTML = '<div id="panel" class="panel" role="tabpanel" aria-labelledby="tab-' + id + '">' + (id === 'general' ? panelGeneral() : panelApp(id)) + '</div>';
+    marcarTab();
+    if (id === 'general') { $('#lista-apps').innerHTML = listaApps(); ligarGeneral(); }
+    else cargarResumen(id);
+    try { history.replaceState(null, '', '#' + (id === 'general' ? '' : id)); } catch (e) {}
+    document.title = (id === 'general' ? 'Mi perfil' : nombreApp(id) + ' · Mi perfil') + ' · Hola Apps';
+    if (foco) { var t = $('#t-' + id); if (t) t.focus({ preventScroll: false }); }
+  }
+
+  /* ---------- General ---------- */
+  function ligarGeneral() {
+    var file = $('#p-av-file'), msg = $('#p-av-msg');
+    Suite.onMsg = function (t, error) { estado(msg, t, error ? 'mal' : (/…$/.test(t) ? 'pend' : 'ok')); };
+    $('#p-av-subir').addEventListener('click', function () { file.value = ''; file.click(); });
+    file.addEventListener('change', function () { if (file.files && file.files[0]) Suite.subirAvatar(file.files[0]); });
+    $('#p-av-quitar').addEventListener('click', function () { Suite.quitarAvatar(); });
+
+    var fd = $('#f-datos'), dm = $('#d-msg');
+    fd.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var b = $('#d-guardar'); b.disabled = true; estado(dm, 'Guardando…', 'pend');
+      guardarMeta({ nombre: $('#d-nombre').value.trim(), telefono: $('#d-tel').value.trim(), ciudad: $('#d-ciudad').value.trim(), zona_horaria: $('#d-zona').value, idioma: $('#d-idioma').value })
+        .then(function () { estado(dm, 'Cambios guardados.', 'ok'); })
+        .catch(function (x) { estado(dm, errorTexto(x), 'mal'); })
+        .then(function () { b.disabled = false; });
+    });
+    $('#d-descartar').addEventListener('click', function () { mostrar('general'); estado($('#d-msg'), 'Cambios descartados.', 'pend'); });
+
+    var fc = $('#f-correo'), ce = $('#c-err'), cm = $('#c-msg');
+    fc.addEventListener('submit', function (e) {
+      e.preventDefault(); var inp = $('#c-nuevo'), v = inp.value.trim();
+      ce.textContent = ''; inp.removeAttribute('aria-invalid'); estado(cm, '');
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)) { ce.textContent = 'Escribe un correo válido, por ejemplo tucorreo@ejemplo.com.'; inp.setAttribute('aria-invalid', 'true'); inp.focus(); return; }
+      if (v.toLowerCase() === (user.email || '').toLowerCase()) { ce.textContent = 'Ese ya es tu correo actual.'; inp.setAttribute('aria-invalid', 'true'); inp.focus(); return; }
+      estado(cm, 'Enviando…', 'pend');
+      sb.auth.updateUser({ email: v }, { emailRedirectTo: location.origin + location.pathname }).then(function (r) {
+        if (r.error) throw r.error;
+        user = r.data.user; Suite.setUser(user); inp.value = '';
+        $('#c-ayuda').textContent = 'Cambio pendiente: falta confirmar ' + v + '. Revisa tu bandeja de entrada y el spam.';
+        estado(cm, 'Listo. Te enviamos un enlace de confirmación.', 'ok');
+      }).catch(function (x) { estado(cm, errorTexto(x), 'mal'); });
+    });
+
+    var fk = $('#f-clave'), ke = $('#k-err'), km = $('#k-msg');
+    $('#k-ver').addEventListener('change', function () { var t = this.checked ? 'text' : 'password'; $('#k-nueva').type = t; $('#k-rep').type = t; });
+    fk.addEventListener('submit', function (e) {
+      e.preventDefault(); var a = $('#k-nueva'), b = $('#k-rep');
+      ke.textContent = ''; a.removeAttribute('aria-invalid'); b.removeAttribute('aria-invalid'); estado(km, '');
+      if (a.value.length < 8) { ke.textContent = 'La contraseña debe tener al menos 8 caracteres.'; a.setAttribute('aria-invalid', 'true'); a.focus(); return; }
+      if (a.value !== b.value) { ke.textContent = 'Las contraseñas no coinciden. Escríbelas de nuevo.'; b.setAttribute('aria-invalid', 'true'); b.focus(); return; }
+      estado(km, 'Guardando…', 'pend');
+      sb.auth.updateUser({ password: a.value }).then(function (r) {
+        if (r.error) throw r.error;
+        a.value = ''; b.value = ''; estado(km, 'Contraseña actualizada.', 'ok');
+      }).catch(function (x) { estado(km, errorTexto(x), 'mal'); });
+    });
+    $('#k-global').addEventListener('click', function () {
+      confirmar({ titulo: 'Cerrar sesión en todos los dispositivos', cuerpo: '<p>Se cerrará tu sesión en este equipo y en todos los demás donde hayas entrado. Tendrás que iniciar sesión de nuevo.</p>', ok: 'Cerrar todas las sesiones' }).then(function (si) {
+        if (!si) return;
+        sb.auth.signOut({ scope: 'global' }).catch(function () { aviso('No se pudieron cerrar todas las sesiones. Inténtalo de nuevo.', { error: true }); });
+      });
+    });
+  }
+
+  /* ---------- habilitar / deshabilitar ---------- */
+  function cambiarApp(id, habilitar, esDeshacer) {
+    var previa = off().slice(), nueva = previa.filter(function (x) { return x !== id; });
+    if (!habilitar) nueva.push(id);
+    document.querySelectorAll('[data-sw="' + id + '"]').forEach(function (b) { b.disabled = true; });
+    return guardarMeta({ apps_deshabilitadas: nueva }).then(function () {
+      refrescarApps();
+      if (!esDeshacer) aviso(nombreApp(id) + (habilitar ? ' habilitada.' : ' deshabilitada. Tus datos se conservan.'), { deshacer: function () { cambiarApp(id, !habilitar, true); } });
+      else aviso('Cambio revertido.');
+    }).catch(function (x) {
+      refrescarApps(); aviso(errorTexto(x) + ' No se cambió el estado de ' + nombreApp(id) + '.', { error: true });
+    });
+  }
+  function refrescarApps() {
+    var f = document.activeElement && document.activeElement.getAttribute && document.activeElement.getAttribute('data-sw');
+    pintarTabs();
+    /* En General solo se repinta la lista, para no perder lo que el usuario esté escribiendo en los formularios. */
+    if (pestana === 'general') $('#lista-apps').innerHTML = listaApps(); else mostrar(pestana, false);
+    if (f) { var b = $('[data-sw="' + f + '"]'); if (b) b.focus(); }
+  }
+
+  /* ---------- datos por app ---------- */
+  var sinTabla = function (e) { return e && (e.code === '42P01' || e.code === 'PGRST205' || /does not exist|schema cache/i.test(e.message || '')); };
+  function fechaLarga(iso) { try { return new Date(iso).toLocaleString('es-CO', { dateStyle: 'long', timeStyle: 'short' }); } catch (e) { return iso; } }
+  function cargarResumen(id) {
+    var el = $('#resumen-' + id); if (!el) return;
+    Promise.all(INFO[id].tablas.map(function (x) {
+      return sb.from(x.t).select(x.c).order(x.c, { ascending: false }).limit(1).then(function (r) {
+        if (r.error) { if (sinTabla(r.error)) return null; throw r.error; }
+        return r.data && r.data[0] ? r.data[0][x.c] : null;
+      });
+    })).then(function (fs) {
+      fs = fs.filter(Boolean).sort(); var ult = fs[fs.length - 1];
+      datosApp[id] = !!ult;
+      el = $('#resumen-' + id); if (!el || pestana !== id) return;
+      el.innerHTML = '<div><dt>Último cambio</dt><dd>' + (ult ? esc(fechaLarga(ult)) : 'Aún no hay datos guardados') + '</dd></div>';
+    }).catch(function () {
+      el = $('#resumen-' + id); if (el) el.innerHTML = '<div><dt>Último cambio</dt><dd>No se pudo consultar. Recarga la página.</dd></div>';
+    });
+  }
+  function exportar(id) {
+    var msg = $('#exp-msg-' + id), btn = $('[data-exportar="' + id + '"]');
+    btn.disabled = true; estado(msg, 'Preparando archivo…', 'pend');
+    Promise.all(INFO[id].tablas.map(function (x) {
+      return sb.from(x.t).select('*').then(function (r) { if (r.error) { if (sinTabla(r.error)) return [x.t, []]; throw r.error; } return [x.t, r.data || []]; });
+    })).then(function (pares) {
+      var tablas = {}; pares.forEach(function (p) { tablas[p[0]] = p[1]; });
+      var total = pares.reduce(function (n, p) { return n + p[1].length; }, 0);
+      if (!total) { estado(msg, 'No hay datos para exportar todavía.', 'pend'); return; }
+      var obj = { app: id, nombre: nombreApp(id), exportado: new Date().toISOString(), cuenta: user.email, tablas: tablas };
+      var blob = new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json' }), url = URL.createObjectURL(blob), a = document.createElement('a');
+      a.href = url; a.download = 'hola-apps-' + id + '-' + new Date().toISOString().slice(0, 10) + '.json'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+      estado(msg, 'Archivo descargado.', 'ok');
+    }).catch(function () { estado(msg, 'No se pudo exportar. Inténtalo de nuevo.', 'mal'); }).then(function () { btn.disabled = false; });
+  }
+  function borrar(id) {
+    confirmar({
+      titulo: 'Borrar tus datos de ' + nombreApp(id),
+      cuerpo: '<p>Se eliminarán para siempre todos los datos que ' + esc(nombreApp(id)) + ' guarda en tu cuenta. No se puede deshacer.</p>' +
+              '<p class="nota">Si tienes la app abierta en otra pestaña o equipo, ciérrala antes: podría volver a guardar su información.</p>' +
+              '<div class="campo"><label for="dlg-conf">Para confirmar, escribe <strong>' + esc(nombreApp(id)) + '</strong></label><input id="dlg-conf" type="text" autocomplete="off" autocapitalize="off" spellcheck="false"></div>',
+      ok: 'Borrar mis datos', requiere: nombreApp(id)
+    }).then(function (si) {
+      if (!si) return;
+      aviso('Borrando…');
+      Promise.all(INFO[id].tablas.map(function (x) {
+        return sb.from(x.t).delete().eq('user_id', user.id).then(function (r) { if (r.error && !sinTabla(r.error)) throw r.error; });
+      })).then(function () { aviso('Datos de ' + nombreApp(id) + ' borrados.'); if (pestana === id) cargarResumen(id); })
+        .catch(function () { aviso('No se pudieron borrar todos los datos. Inténtalo de nuevo.', { error: true }); if (pestana === id) cargarResumen(id); });
+    });
+  }
+
+  /* ---------- diálogo de confirmación ---------- */
+  var dlg, resolver;
+  function confirmar(o) {
+    return new Promise(function (ok) {
+      resolver = ok;
+      $('#dlg-t').textContent = o.titulo; $('#dlg-cuerpo').innerHTML = o.cuerpo;
+      var btn = $('#dlg-ok'); btn.textContent = o.ok; btn.disabled = !!o.requiere;
+      var inp = $('#dlg-conf');
+      if (inp && o.requiere) inp.addEventListener('input', function () { btn.disabled = inp.value.trim().toLowerCase() !== o.requiere.toLowerCase(); });
+      dlg.returnValue = ''; dlg.showModal(); if (inp) inp.focus(); else $('#dlg-no').focus();
+    });
+  }
+  function ligarDialogo() {
+    dlg = $('#dlg');
+    $('#dlg-no').addEventListener('click', function () { dlg.close('no'); });
+    $('#dlg-form').addEventListener('submit', function (e) { if ($('#dlg-ok').disabled) e.preventDefault(); });
+    dlg.addEventListener('close', function () { var r = resolver; resolver = null; if (r) r(dlg.returnValue === 'ok'); });
+  }
+
+  /* ---------- eventos globales ---------- */
+  function ligarGlobal() {
+    var tabs = $('#tabs');
+    tabs.addEventListener('click', function (e) { var b = e.target.closest('[data-tab]'); if (b) mostrar(b.getAttribute('data-tab'), true); });
+    tabs.addEventListener('keydown', function (e) {
+      var bs = [].slice.call(tabs.querySelectorAll('[data-tab]')), i = bs.indexOf(document.activeElement), horiz = window.matchMedia('(max-width:860px)').matches, n = -1;
+      var sig = horiz ? 'ArrowRight' : 'ArrowDown', ant = horiz ? 'ArrowLeft' : 'ArrowUp';
+      if (i < 0) return;
+      if (e.key === sig) n = (i + 1) % bs.length; else if (e.key === ant) n = (i - 1 + bs.length) % bs.length; else if (e.key === 'Home') n = 0; else if (e.key === 'End') n = bs.length - 1;
+      if (n < 0) return; e.preventDefault(); bs[n].focus(); mostrar(bs[n].getAttribute('data-tab'), false);
+    });
+    $('#paneles').addEventListener('click', function (e) {
+      var s = e.target.closest('[data-sw]'); if (s) { cambiarApp(s.getAttribute('data-sw'), s.getAttribute('aria-checked') !== 'true'); return; }
+      var ir = e.target.closest('[data-ir]'); if (ir) { e.preventDefault(); mostrar(ir.getAttribute('data-ir'), true); return; }
+      var ex = e.target.closest('[data-exportar]'); if (ex) { exportar(ex.getAttribute('data-exportar')); return; }
+      var bo = e.target.closest('[data-borrar]'); if (bo) borrar(bo.getAttribute('data-borrar'));
+    });
+    window.addEventListener('hashchange', function () { var h = location.hash.replace('#', '') || 'general'; if (h !== pestana) { mostrar(h, false); } });
+    ligarDialogo();
+  }
+
+  /* ---------- arranque ---------- */
+  function alEntrar(u, cliente) {
+    sb = cliente || Suite.sb; user = u;
+    $('#cargando').hidden = true; $('#layout').hidden = false;
+    if (!montado) { ligarGlobal(); montado = true; }
+    pintarTabs();
+    mostrar(location.hash.replace('#', '') || 'general', false);
+  }
+  function alSalir() { user = null; $('#layout').hidden = true; $('#paneles').innerHTML = ''; $('#cargando').hidden = false; }
+  Suite.onUserChange = function (u) {
+    if (!u) return; user = u;
+    var av = $('#p-avatar'); if (av) av.innerHTML = avatarHTML();
+    var q = $('#p-av-quitar'); if (q) q.hidden = !meta().avatar_url;
+  };
+  Suite.init({ app: 'perfil', gate: true, onUser: alEntrar, onLogout: alSalir });
+})();
+</script>
+</body>
+</html>

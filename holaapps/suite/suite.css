@@ -60,3 +60,11 @@
 .suite-ok:disabled{opacity:.6;cursor:default}
 .suite-pie{display:flex;flex-wrap:wrap;gap:6px 14px}
 .suite-link{background:none;border:0;padding:0;color:#4B3FC4;text-decoration:underline;font:600 13.5px/1.2 inherit;cursor:pointer}
+
+/* Perfil, selector de apps y apps deshabilitadas */
+a.suite-um-op{text-decoration:none}
+.suite-pop-mas{grid-column:1/-1;display:block;text-align:center;padding:10px 8px;border-radius:12px;color:#4B3FC4;text-decoration:none;font:600 13.5px/1.2 "Segoe UI",system-ui,sans-serif;background:#f5f4fd}
+.suite-pop-mas:hover{background:#e9e6fb}
+.suite-pop-mas:focus-visible{outline:2px solid #8ab4f8;outline-offset:2px}
+.suite-bloqueo{position:fixed;left:0;right:0;bottom:0;top:44px;z-index:100000;background:#0b0b0f;display:grid;place-items:center;padding:16px;overflow:auto;font-family:"Segoe UI",system-ui,-apple-system,sans-serif}
+.suite-bloqueo .suite-ok{display:flex;align-items:center;justify-content:center;text-decoration:none}
