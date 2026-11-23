@@ -825,7 +825,7 @@ button:active:not(:disabled){transform:scale(.93)}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
-<script src="../suite/suite.js?v=13"></script>
+<script src="../suite/suite.js?v=15"></script>
 <script>
 (function(){
 "use strict";
@@ -2681,10 +2681,6 @@ iniciarAuth();
 </script>
 <script>
 Suite.init({ app: 'organic', fit: '.app', onSignOut: function () { OrganicApp.salir(); } });
-Suite.addMenuItems([
-  { label: 'Exportar datos', onClick: function () { OrganicApp.exportar(); } },
-  { label: 'Importar datos', onClick: function () { OrganicApp.importar(); } }
-]);
 </script>
 </body>
 </html>

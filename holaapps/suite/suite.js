@@ -67,15 +67,10 @@
         '<button class="suite-av-btn" type="button" id="suite-av-btn" aria-haspopup="true" aria-expanded="false" aria-controls="suite-um" aria-label="Menú de usuario"><span class="suite-av" id="suite-av-mini"></span><span class="suite-mail" id="suite-mail"></span></button>' +
       '</span>' +
       '<div class="suite-um" id="suite-um" role="menu" hidden>' +
-        '<div class="suite-um-quien"><button type="button" class="suite-av suite-av-grande" id="suite-av-grande" title="Cambiar avatar" aria-label="Cambiar avatar"></button><div class="suite-um-txt"><strong id="suite-um-nombre"></strong><small id="suite-um-correo"></small></div></div>' +
+        '<div class="suite-um-quien"><span class="suite-av suite-av-grande" id="suite-av-grande" aria-hidden="true"></span><div class="suite-um-txt"><strong id="suite-um-nombre"></strong><small id="suite-um-correo"></small></div></div>' +
         '<a class="suite-um-op" role="menuitem" id="suite-perfil" href="' + rutaPerfil('') + '">Mi perfil</a>' +
-        '<button type="button" class="suite-um-op" role="menuitem" id="suite-av-cambiar">Cambiar avatar</button>' +
-        '<button type="button" class="suite-um-op" role="menuitem" id="suite-av-quitar" hidden>Quitar avatar</button>' +
-        '<div id="suite-um-extra"></div>' +
         '<div class="suite-um-sep" role="separator"></div>' +
         '<button type="button" class="suite-um-op suite-um-salir" role="menuitem" id="suite-salir">Cerrar sesión</button>' +
-        '<p class="suite-um-msg" id="suite-um-msg" role="status" hidden></p>' +
-        '<input type="file" id="suite-av-file" accept="image/png,image/jpeg,image/webp" hidden>' +
       '</div>' +
       '<div class="suite-pop" id="suite-pop" role="menu" hidden></div>';
     document.body.insertBefore(bar, document.body.firstChild);
@@ -118,7 +113,6 @@
     document.body.appendChild(b);
   }
   /* ---------- menú de usuario y avatar ---------- */
-  var extras = [];
   function nombreDe(u) { var m = (u && u.user_metadata) || {}; return m.nombre || (u && u.email ? u.email.split('@')[0] : 'Usuario'); }
   function avatarDe(u) { var m = (u && u.user_metadata) || {}; return typeof m.avatar_url === 'string' && /^https:\/\//.test(m.avatar_url) ? m.avatar_url : ''; }
   function pintarAvatar(el, u) {
@@ -138,26 +132,17 @@
     $('#suite-mail').textContent = nombreDe(u);
     $('#suite-um-nombre').textContent = nombreDe(u); $('#suite-um-correo').textContent = u.email || '';
     pintarAvatar($('#suite-av-mini'), u); pintarAvatar($('#suite-av-grande'), u);
-    $('#suite-av-quitar').hidden = !avatarDe(u);
     if (Suite.onUserChange) Suite.onUserChange(u);
   }
-  function pintarExtras() {
-    var box = $('#suite-um-extra'); if (!box) return;
-    box.innerHTML = '';
-    extras.forEach(function (it) {
-      var b = document.createElement('button'); b.type = 'button'; b.className = 'suite-um-op'; b.setAttribute('role', 'menuitem'); b.textContent = it.label;
-      b.addEventListener('click', function () { cerrarMenu(false); it.onClick(); });
-      box.appendChild(b);
-    });
-  }
-  Suite.addMenuItems = function (items) { extras = extras.concat(items || []); pintarExtras(); };
+  /* El menú de usuario solo tiene Mi perfil y Cerrar sesión; las opciones propias de cada app viven en su pestaña del perfil. Se conserva por compatibilidad. */
+  Suite.addMenuItems = function () {};
   Suite.setUser = function (u, sb) { if (sb) Suite.sb = sb; Suite.user = u || null; pintarUsuario(); };
   var opsMenu = function () { return [].slice.call(document.querySelectorAll('#suite-um .suite-um-op')).filter(function (b) { return !b.hidden; }); };
   function abrirMenu(foco) { var m = $('#suite-um'); if (!m) return; m.hidden = false; $('#suite-av-btn').setAttribute('aria-expanded', 'true'); msg(''); if (foco) { var o = opsMenu()[0]; if (o) o.focus(); } }
   function cerrarMenu(devolver) { var m = $('#suite-um'); if (!m || m.hidden) return; m.hidden = true; $('#suite-av-btn').setAttribute('aria-expanded', 'false'); if (devolver) $('#suite-av-btn').focus(); }
   function msg(t, error) { if (Suite.onMsg) Suite.onMsg(t, !!error); var p = $('#suite-um-msg'); if (!p) return; p.textContent = t; p.hidden = !t; p.classList.toggle('error', !!error); }
   function montarMenuUsuario() {
-    var btn = $('#suite-av-btn'), m = $('#suite-um'), file = $('#suite-av-file');
+    var btn = $('#suite-av-btn'), m = $('#suite-um');
     btn.addEventListener('click', function () { if (m.hidden) abrirMenu(false); else cerrarMenu(false); });
     btn.addEventListener('keydown', function (e) { if (e.key === 'ArrowDown') { e.preventDefault(); abrirMenu(true); } });
     m.addEventListener('keydown', function (e) {
@@ -168,13 +153,7 @@
       else if (e.key === 'Tab') cerrarMenu(false);
     });
     document.addEventListener('click', function (e) { if (!m.hidden && !e.target.closest('#suite-um') && !e.target.closest('#suite-av-btn')) cerrarMenu(false); });
-    var elegir = function () { file.value = ''; file.click(); };
-    $('#suite-av-cambiar').addEventListener('click', elegir);
-    $('#suite-av-grande').addEventListener('click', elegir);
-    file.addEventListener('change', function () { if (file.files && file.files[0]) subirAvatar(file.files[0]); });
-    $('#suite-av-quitar').addEventListener('click', function () { guardarAvatar('', 'Avatar quitado.'); });
     $('#suite-salir').addEventListener('click', function () { cerrarMenu(false); Suite.signOut(); });
-    pintarExtras();
   }
   /* Recorta al centro y reduce a 256×256 JPEG para que pese poco. */
   function reducir(f) {

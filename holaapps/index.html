@@ -320,6 +320,7 @@ footer a:hover{color:var(--brand);text-decoration:underline}
           <p class="small" id="whomail" style="margin:0"></p>
           <p class="small" style="margin:0">Esta misma cuenta abre las siete apps. Elige una:</p>
           <div class="openapps" id="openapps"></div>
+          <div class="openapps"><a href="perfil/" id="miperfil">Mi perfil y mis apps</a></div>
           <button class="hc-btn hc-btn--secondary" id="logout" type="button" style="align-self:flex-start">Cerrar sesión</button>
         </div>
       </div>
@@ -549,8 +550,9 @@ function bad(t,el){F.err.textContent=t;F.err.hidden=false;if(el){el.setAttribute
 function setUser(u){
   var nm=(u.user_metadata&&u.user_metadata.nombre)||(u.email||"").split("@")[0]||"vecino";
   $("#who").textContent="Hola, "+nm;$("#whomail").textContent=u.email||"";
-  $("#openapps").innerHTML=APPS.map(function(a){return '<a href="'+a.href+'">'+ic(a.icon)+esc(a.name)+"</a>"}).join("");
-  eco.classList.add("logged");cap.textContent="Tu cuenta abrió las siete apps.";
+  var offs=(u.user_metadata&&Array.isArray(u.user_metadata.apps_deshabilitadas))?u.user_metadata.apps_deshabilitadas:[];
+  $("#openapps").innerHTML=APPS.filter(function(a){return offs.indexOf(a.id)<0}).map(function(a){return '<a href="'+a.href+'">'+ic(a.icon)+esc(a.name)+"</a>"}).join("");
+  eco.classList.add("logged");cap.textContent="Tu cuenta abrió tus apps habilitadas.";
   var h=$(".top .hc-btn");h.textContent="Mi cuenta";
 }
 function clearUser(){

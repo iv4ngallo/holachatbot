@@ -127,7 +127,7 @@ button[disabled]{cursor:default}
 <div id="toast" role="status" aria-live="polite"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../suite/config.js?v=2"></script>
-<script src="../suite/suite.js?v=13"></script>
+<script src="../suite/suite.js?v=15"></script>
 <script src="datos.js?v=1"></script>
 <script>
 (()=>{
@@ -508,7 +508,6 @@ app.addEventListener('submit',e=>{
 
 /* ===== Arranque con la suite ===== */
 Suite.init({app:'palabritas',gate:true,onUser:alEntrar,onLogout:alSalir});
-Suite.addMenuItems([{label:'Cómo funciona Palabritas',onClick:()=>{if(S)ir('ayuda')}}]);
 })();
 </script>
 </body>

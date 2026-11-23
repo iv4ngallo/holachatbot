@@ -123,6 +123,7 @@ input[readonly]{background:var(--surface-raised);color:var(--ink-muted)}
 .apps-lista .ir{font:600 14px/1.2 var(--font-sans);color:var(--brand)}
 
 /* Datos por app */
+.card h4.sub{margin:6px 0 0;font:700 15px/1.3 var(--font-sans)}
 .datos-resumen{display:flex;flex-wrap:wrap;gap:8px 28px;margin:0 0 4px}
 .datos-resumen div{display:flex;flex-direction:column}
 .datos-resumen dt{font:600 12px/1.2 var(--font-sans);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-muted)}
@@ -182,7 +183,7 @@ dialog p{margin:0 0 12px}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../suite/config.js?v=4"></script>
-<script src="../suite/suite.js?v=13"></script>
+<script src="../suite/suite.js?v=15"></script>
 <script>
 (function () {
   'use strict';
@@ -316,12 +317,15 @@ dialog p{margin:0 0 12px}
       '<div class="fila">' + interruptor(id) + (on ? '<a class="btn prim" href="' + href + '">Abrir ' + esc(nombreApp(id)) + '</a>' : '<span class="btn prim" aria-disabled="true" role="link">Abrir ' + esc(nombreApp(id)) + '</span>') + '</div>' +
       (on ? '' : '<p class="nota">Habilítala para poder abrirla.</p>') + '</section>' +
 
-    '<section class="card" aria-labelledby="h-conf-' + id + '"><h3 id="h-conf-' + id + '">Configuración de la app</h3><p class="ayuda">Los ajustes propios de ' + esc(nombreApp(id)) + ' (por ejemplo, su apariencia o sus opciones de uso) se cambian dentro de la app. Lo que configures allí se guarda en tu cuenta.</p></section>' +
+    '<section class="card" aria-labelledby="h-conf-' + id + '"><h3 id="h-conf-' + id + '">Configuración de la app</h3><p class="ayuda">Los ajustes propios de ' + esc(nombreApp(id)) + ' (por ejemplo, su apariencia o sus opciones de uso) se cambian dentro de la app y se guardan en tu cuenta. Aquí puedes llevar tus datos a otro lugar o recuperarlos desde un respaldo.</p>' +
+      '<h4 class="sub">Respaldo de datos</h4>' +
+      '<div class="acciones" style="margin-top:8px"><button class="btn sec" type="button" data-exportar="' + id + '">Exportar datos</button><button class="btn sec" type="button" data-importar="' + id + '">Importar datos</button><span class="estado-msg" id="exp-msg-' + id + '" role="status"></span></div>' +
+      '<input type="file" id="imp-file-' + id + '" accept="application/json,.json" hidden>' +
+      '<p class="nota">Exportar descarga un archivo .json con todo lo que ' + esc(nombreApp(id)) + ' guarda de ti. Importar lee un archivo exportado desde aquí y te deja elegir si lo combina con tus datos actuales o los reemplaza.</p></section>' +
 
     '<section class="card" aria-labelledby="h-datos-' + id + '"><h3 id="h-datos-' + id + '">Tus datos en ' + esc(nombreApp(id)) + '</h3>' +
       '<dl class="datos-resumen" id="resumen-' + id + '"><div><dt>Último cambio</dt><dd>Consultando…</dd></div></dl>' +
-      '<div class="acciones"><button class="btn sec" type="button" data-exportar="' + id + '">Exportar mis datos</button><span class="estado-msg" id="exp-msg-' + id + '" role="status"></span></div>' +
-      '<p class="nota">Descarga un archivo .json con todo lo que ' + esc(nombreApp(id)) + ' guarda de ti.</p></section>' +
+      '</section>' +
 
     '<section class="card zona-peligro" aria-labelledby="h-del-' + id + '"><h3 id="h-del-' + id + '">Borrar mis datos de ' + esc(nombreApp(id)) + '</h3><p class="ayuda">Elimina para siempre todo lo que esta app guarda en tu cuenta. Tu cuenta de Hola Apps y las demás apps no se tocan. Esta acción no se puede deshacer.</p>' +
       '<div class="acciones" style="margin-top:0"><button class="btn peligro" type="button" data-borrar="' + id + '">Borrar mis datos</button></div></section>';
@@ -469,6 +473,46 @@ dialog p{margin:0 0 12px}
       estado(msg, 'Archivo descargado.', 'ok');
     }).catch(function () { estado(msg, 'No se pudo exportar. Inténtalo de nuevo.', 'mal'); }).then(function () { btn.disabled = false; });
   }
+  var LIMITE_IMPORTAR = 20 * 1024 * 1024;
+  function importar(id, archivo) {
+    var msg = $('#exp-msg-' + id), nom = nombreApp(id), tablas = INFO[id].tablas.map(function (x) { return x.t; });
+    if (archivo.size > LIMITE_IMPORTAR) { estado(msg, 'El archivo pesa más de 20 MB y no se puede importar.', 'mal'); return; }
+    estado(msg, 'Leyendo archivo…', 'pend');
+    archivo.text().then(function (txt) {
+      var d; try { d = JSON.parse(txt); } catch (e) { throw new Error('El archivo no es un respaldo válido. Revisa que esté completo.'); }
+      if (!d || d.app !== id || !d.tablas || typeof d.tablas !== 'object') throw new Error('Este archivo no es un respaldo de ' + nom + '. Exporta primero desde aquí y usa ese archivo.');
+      var cuentas = {}, total = 0;
+      Object.keys(d.tablas).forEach(function (t) {
+        if (tablas.indexOf(t) < 0) throw new Error('El archivo trae datos que ' + nom + ' no reconoce.');
+        var filas = d.tablas[t];
+        if (!Array.isArray(filas) || filas.some(function (r) { return !r || typeof r !== 'object' || Array.isArray(r); })) throw new Error('El archivo está dañado o incompleto.');
+        cuentas[t] = filas.length; total += filas.length;
+      });
+      if (!total) throw new Error('El archivo no tiene datos para importar.');
+      estado(msg, '');
+      var resumen = Object.keys(cuentas).filter(function (t) { return cuentas[t]; }).map(function (t) { return '<li>' + esc(t) + ': ' + cuentas[t] + (cuentas[t] === 1 ? ' registro' : ' registros') + '</li>'; }).join('');
+      return confirmar({
+        titulo: 'Importar datos en ' + nom, ok: 'Importar datos', neutro: true,
+        cuerpo: '<p>El respaldo es del ' + esc(d.exportado ? fechaLarga(d.exportado) : 'archivo elegido') + ' e incluye:</p><ul>' + resumen + '</ul>' +
+          '<fieldset style="border:0;padding:0;margin:0 0 8px"><legend class="etq">¿Cómo lo importamos?</legend>' +
+          '<label class="chk" style="display:flex;margin:6px 0"><input type="radio" name="imp-modo" value="combinar" checked> Combinar: agrega y actualiza, sin borrar lo que ya tienes</label>' +
+          '<label class="chk" style="display:flex;margin:6px 0"><input type="radio" name="imp-modo" value="reemplazar"> Reemplazar: borra tus datos actuales de ' + esc(nom) + ' y deja los del archivo</label></fieldset>' +
+          '<p class="nota">Si tienes la app abierta en otra pestaña o equipo, ciérrala antes.</p>'
+      }).then(function (si) {
+        if (!si) { estado(msg, 'Importación cancelada.', 'pend'); return; }
+        var modo = ($('input[name="imp-modo"]:checked') || {}).value || 'combinar';
+        estado(msg, 'Importando…', 'pend');
+        var previo = modo === 'reemplazar' ? Promise.all(tablas.map(function (t) { return sb.from(t).delete().eq('user_id', user.id).then(function (r) { if (r.error && !sinTabla(r.error)) throw r.error; }); })) : Promise.resolve();
+        return previo.then(function () {
+          return Object.keys(d.tablas).reduce(function (p, t) {
+            var filas = d.tablas[t].map(function (r) { var o = Object.assign({}, r); o.user_id = user.id; return o; });
+            var lotes = []; for (var i = 0; i < filas.length; i += 100) lotes.push(filas.slice(i, i + 100));
+            return lotes.reduce(function (q, lote) { return q.then(function () { return sb.from(t).upsert(lote).then(function (r) { if (r.error) throw r.error; }); }); }, p);
+          }, Promise.resolve());
+        }).then(function () { estado(msg, 'Datos importados. Abre ' + nom + ' para verlos.', 'ok'); if (pestana === id) cargarResumen(id); });
+      });
+    }).catch(function (x) { estado(msg, x && x.message && !x.code ? x.message : 'No se pudo importar. Inténtalo de nuevo; si usaste «Reemplazar», revisa tus datos.', 'mal'); if (pestana === id) cargarResumen(id); });
+  }
   function borrar(id) {
     confirmar({
       titulo: 'Borrar tus datos de ' + nombreApp(id),
@@ -492,7 +536,7 @@ dialog p{margin:0 0 12px}
     return new Promise(function (ok) {
       resolver = ok;
       $('#dlg-t').textContent = o.titulo; $('#dlg-cuerpo').innerHTML = o.cuerpo;
-      var btn = $('#dlg-ok'); btn.textContent = o.ok; btn.disabled = !!o.requiere;
+      var btn = $('#dlg-ok'); btn.textContent = o.ok; btn.disabled = !!o.requiere; btn.className = 'btn ' + (o.neutro ? 'prim' : 'peligro lleno');
       var inp = $('#dlg-conf');
       if (inp && o.requiere) inp.addEventListener('input', function () { btn.disabled = inp.value.trim().toLowerCase() !== o.requiere.toLowerCase(); });
       dlg.returnValue = ''; dlg.showModal(); if (inp) inp.focus(); else $('#dlg-no').focus();
@@ -520,7 +564,11 @@ dialog p{margin:0 0 12px}
       var s = e.target.closest('[data-sw]'); if (s) { cambiarApp(s.getAttribute('data-sw'), s.getAttribute('aria-checked') !== 'true'); return; }
       var ir = e.target.closest('[data-ir]'); if (ir) { e.preventDefault(); mostrar(ir.getAttribute('data-ir'), true); return; }
       var ex = e.target.closest('[data-exportar]'); if (ex) { exportar(ex.getAttribute('data-exportar')); return; }
+      var im = e.target.closest('[data-importar]'); if (im) { var fi = $('#imp-file-' + im.getAttribute('data-importar')); fi.value = ''; fi.click(); return; }
       var bo = e.target.closest('[data-borrar]'); if (bo) borrar(bo.getAttribute('data-borrar'));
+    });
+    $('#paneles').addEventListener('change', function (e) {
+      var f = e.target.closest('input[type=file][id^="imp-file-"]'); if (f && f.files && f.files[0]) importar(f.id.replace('imp-file-', ''), f.files[0]);
     });
     window.addEventListener('hashchange', function () { var h = location.hash.replace('#', '') || 'general'; if (h !== pestana) { mostrar(h, false); } });
     ligarDialogo();

@@ -2100,7 +2100,7 @@ dialog.dlg-land[open] { animation: dlgEntra 320ms cubic-bezier(.2,.8,.2,1); }
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
-<script src="../suite/suite.js?v=13"></script>
+<script src="../suite/suite.js?v=15"></script>
 <script>
 (() => {
 'use strict';
@@ -6208,8 +6208,4 @@ iniciarLanding();
 </script>
 <script>
 Suite.init({ app: 'precia', onSignOut: function () { document.getElementById('mu-salir').click(); } });
-Suite.addMenuItems([
-  { label: 'Exportar datos', onClick: function () { document.getElementById('mu-exportar').click(); } },
-  { label: 'Importar datos', onClick: function () { document.getElementById('mu-importar').click(); } }
-]);
 </script>

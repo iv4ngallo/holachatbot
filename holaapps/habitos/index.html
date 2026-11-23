@@ -795,7 +795,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../suite/config.js?v=4"></script>
-<script src="../suite/suite.js?v=13"></script>
+<script src="../suite/suite.js?v=15"></script>
 <script>
 /* ================= Utilidades ================= */
 const $=(s,r=document)=>r.querySelector(s);
@@ -2401,7 +2401,6 @@ function alSalir(){
 fromHash();render();
 setInterval(()=>{if(ui.view==='calendario'||ui.view==='inicio'){const m=$('#modal-root').classList.contains('open');if(!m&&!document.activeElement.matches('textarea,input'))render()}},5*60*1000);
 Suite.init({app:'habitos',gate:true,onUser:iniciarUsuario,onLogout:alSalir});
-Suite.addMenuItems([{label:'Ajustes y respaldo',onClick:function(){settingsModal()}}]);
 </script>
 <script src="gcal.js?v=1"></script>
 </body>
