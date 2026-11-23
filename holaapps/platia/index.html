@@ -382,9 +382,18 @@ tr.cur td { background: var(--brand-tint); }
 
 /* Reordenar categorías */
 .group-head h2.hasgrip { display: flex; align-items: center; gap: var(--space-2); min-width: 0; }
-.grip { margin-left: auto; display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 36px; padding: 0; flex: none; background: var(--surface); border: 2px solid var(--control-border); border-radius: var(--radius-md); color: var(--ink); -webkit-user-select: none; user-select: none; opacity: .75; cursor: pointer; touch-action: auto; transition: background .15s ease, opacity .15s ease; }
-.grip svg { width: 16px; height: 20px; }
-@media (max-width: 640px) { .group-head .grip { order: 1; } .group-head .group-stats { order: 2; flex: 1 1 100%; } .group-head h2 { flex: 1 1 0; } }
+.grip, .selb { margin-left: auto; display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 36px; padding: 0; flex: none; background: var(--surface); border: 2px solid var(--control-border); border-radius: var(--radius-md); color: var(--ink); -webkit-user-select: none; user-select: none; opacity: .75; cursor: pointer; touch-action: auto; transition: background .15s ease, opacity .15s ease; }
+.grip svg, .selb svg { width: 16px; height: 20px; }
+.selb + .grip { margin-left: 0; }
+.selb.on { opacity: 1; background: var(--brand); color: var(--on-brand); border-color: var(--brand); }
+.selb:hover { background: var(--brand-tint); }
+.selb.on:hover { background: var(--brand); }
+.selb:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 2px; }
+.row.picked { background: var(--brand-tint); }
+.selbar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); width: 100%; }
+.selbar .selcount { font-weight: 700; font-size: 13px; margin-right: auto; }
+.bulklist { margin: 0 0 var(--space-3); padding-left: var(--space-5); max-height: 40vh; overflow: auto; }
+@media (max-width: 640px) { .group-head .grip, .group-head .selb { order: 1; } .group-head .group-stats { order: 2; flex: 1 1 100%; } .group-head h2 { flex: 1 1 0; } }
 .grip.on { opacity: 1; cursor: grab; touch-action: none; background: var(--brand); color: var(--on-brand); border-color: var(--brand); }
 .grip:hover { background: var(--brand-tint); }
 .grip.on:hover { background: var(--brand); }
@@ -455,7 +464,7 @@ body.dragging { -webkit-user-select: none; user-select: none; cursor: grabbing; 
   var sb = null, session = null;
   var months = [], items = [], cats = [], catMap = {};
   var sel = null, busy = false, loadedM = false, loadedI = false, loadedC = false, slow = false, modal = null;
-  var dragState = null, dragDirty = false, unlocked = {}, lastDragEnd = 0;
+  var dragState = null, dragDirty = false, unlocked = {}, lastDragEnd = 0, selMode = {}, selVisible = {};
   var menuOpen = false, view = "tarjetas", collapsed = {}, calDay = 0, tabla = { cat: "", est: "", sort: "cat", dir: 1 };
   var queues = {};
 
@@ -734,6 +743,7 @@ body.dragging { -webkit-user-select: none; user-select: none; cursor: grabbing; 
     if (!modal) { modalRoot.innerHTML = ""; return; }
     if (modal.kind === "month") { drawMonthModal(); return; }
     if (modal.kind === "cats") { drawCatsModal(); return; }
+    if (modal.kind === "bulk") { drawBulkModal(); return; }
     var it = modal.item || {};
     var cur = it.grupo || modal.grupo;
     var opts = cats.map(function (g) { return '<option value="' + esc(g.id) + '"' + (g.id === cur ? " selected" : "") + ">" + esc(g.nombre) + "</option>"; }).join("");
@@ -755,7 +765,25 @@ body.dragging { -webkit-user-select: none; user-select: none; cursor: grabbing; 
       '</div><div class="grp"><button class="btn small" data-act="m-cancel">Cancelar</button><button class="btn small primary" data-act="m-save">Guardar</button></div></div>' +
       "</div></div>";
   }
+  function drawBulkModal() {
+    var sel1 = modal.ids.map(findItem).filter(Boolean), n = sel1.length;
+    var tot = sel1.reduce(function (a, b) { return a + (b.valor || 0); }, 0);
+    modalRoot.innerHTML =
+      '<div class="scrim" data-act="scrim"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="m-title">' +
+      '<h2 id="m-title">Eliminar ' + n + (n === 1 ? " item" : " items") + "</h2>" +
+      '<p class="muted" style="font-size:13px">Vas a eliminar estos items de ' + monthLabel(sel) + ' (programado ' + money(tot) + "). Esta acción no se puede deshacer.</p>" +
+      '<ul class="bulklist">' + sel1.slice(0, 12).map(function (x) { return "<li>" + esc(x.nombre) + " · " + money(x.valor || 0) + "</li>"; }).join("") + (n > 12 ? "<li>y " + (n - 12) + " más</li>" : "") + "</ul>" +
+      '<div class="acts"><div class="grp"><button class="btn small danger" data-act="bulk-confirm" id="bulk-ok">Eliminar ' + n + (n === 1 ? " item" : " items") + '</button></div>' +
+      '<div class="grp"><button class="btn small" data-act="m-cancel">Cancelar</button></div></div>' +
+      "</div></div>";
+  }
+  function bulkDelete() {
+    var ids = modal.ids.slice(), cid = modal.cat; closeModal();
+    var ps = ids.map(function (id) { return write(id, function () { return ref(id).delete(); }); });
+    Promise.all(ps).then(function () { delete selMode[cid]; toast(ids.length === 1 ? "Eliminaste 1 item." : "Eliminaste " + ids.length + " items."); render(); });
+  }
   function saveModal() {
+    if (modal && modal.kind === "bulk") return;
     if (modal && modal.kind === "month") { saveMonth(); return; }
     if (modal && modal.kind === "cats") { if (modal.view === "form") saveCat(); return; }
     var nombre = document.getElementById("m-nombre").value.trim();
@@ -792,7 +820,7 @@ body.dragging { -webkit-user-select: none; user-select: none; cursor: grabbing; 
     }
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(ok, fallback); else fallback();
   }
-  function rowHTML(it, showCat) {
+  function rowHTML(it, showCat, selState) {
     var st = estado(it, sel), c = catOf(it), ing = isIng(it);
     var dis = canWrite ? "" : " disabled";
     var meta = [];
@@ -800,8 +828,11 @@ body.dragging { -webkit-user-select: none; user-select: none; cursor: grabbing; 
     if (it.nota) meta.push(it.nota);
     var po = !!it.pospuesto, dis2 = (canWrite && !po) ? "" : " disabled";
     if (po) meta.push("Pospuesto a " + monthLabel(it.pospuestoA || nextKey(it.mes)));
-    return '<li class="row' + (it.pagado ? " paid" : "") + (po ? " posp" : "") + '">' +
-      '<label class="chk"><input type="checkbox" id="c-' + esc(it.id) + '" data-act="toggle" data-id="' + esc(it.id) + '"' + (it.pagado ? " checked" : "") + dis2 + ' aria-label="Marcar ' + esc(it.nombre) + (ing ? " como recibido" : " como pagado") + '"><span class="box"></span></label>' +
+    var picked = !!(selState && selState.ids[it.id]);
+    var firstCell = selState
+      ? '<label class="chk"><input type="checkbox" id="s-' + esc(it.id) + '" data-act="pick" data-id="' + esc(it.id) + '"' + (picked ? " checked" : "") + ' aria-label="Seleccionar ' + esc(it.nombre) + '"><span class="box"></span></label>'
+      : '<label class="chk"><input type="checkbox" id="c-' + esc(it.id) + '" data-act="toggle" data-id="' + esc(it.id) + '"' + (it.pagado ? " checked" : "") + dis2 + ' aria-label="Marcar ' + esc(it.nombre) + (ing ? " como recibido" : " como pagado") + '"><span class="box"></span></label>';
+    return '<li class="row' + (it.pagado ? " paid" : "") + (po ? " posp" : "") + (picked ? " picked" : "") + '">' + firstCell +
       '<div class="nm"><strong>' + esc(it.nombre) + "</strong>" + ((showCat || meta.length) ? "<small>" + (showCat ? tag(c) + (meta.length ? " · " : "") : "") + esc(meta.join(" · ")) + "</small>" : "") + refHTML(it) + "</div>" +
       '<div class="field f-valor"><span class="mini">Programado</span><input type="text" inputmode="numeric" id="f-' + esc(it.id) + '-valor" data-field="valor" data-id="' + esc(it.id) + '" value="' + group(it.valor || 0) + '" aria-label="Valor programado de ' + esc(it.nombre) + '"' + dis + "></div>" +
       '<div class="field f-pagado"><span class="mini">' + (ing ? "Recibido" : "Pagado") + '</span><input type="text" inputmode="numeric" id="f-' + esc(it.id) + '-valorPagado" data-field="valorPagado" data-id="' + esc(it.id) + '" value="' + (it.valorPagado == null ? "" : group(it.valorPagado)) + '" placeholder="0" aria-label="Valor pagado de ' + esc(it.nombre) + '"' + dis2 + "></div>" +
@@ -840,6 +871,12 @@ body.dragging { -webkit-user-select: none; user-select: none; cursor: grabbing; 
   }
   var LOCK_SVG = '<svg viewBox="0 0 16 20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="10" height="8" rx="2" fill="currentColor" fill-opacity=".25"/><path d="M5 9 V6.5 A3 3 0 0 1 11 6.5 V9"/></svg>';
   var DOTS_SVG = '<svg viewBox="0 0 16 20" aria-hidden="true" fill="currentColor"><circle cx="5" cy="4" r="1.8"/><circle cx="11" cy="4" r="1.8"/><circle cx="5" cy="10" r="1.8"/><circle cx="11" cy="10" r="1.8"/><circle cx="5" cy="16" r="1.8"/><circle cx="11" cy="16" r="1.8"/></svg>';
+  var SEL_SVG = '<svg viewBox="0 0 16 20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="12" height="14" rx="2" fill="currentColor" fill-opacity=".25"/><path d="M5 10 L7.2 12.2 L11 7.8"/></svg>';
+  function selCount(cid) { var m = selMode[cid]; if (!m) return 0; var vis = selVisible[cid] || []; return vis.filter(function (id) { return m.ids[id]; }).length; }
+  function SELB(c) {
+    var on = !!selMode[c.id];
+    return '<button class="selb' + (on ? " on" : "") + '" id="sl-' + esc(c.id) + '" data-act="selmode" data-cat="' + esc(c.id) + '" aria-pressed="' + on + '" title="' + (on ? "Salir de la selección" : "Seleccionar varios items para eliminarlos") + '" aria-label="' + (on ? "Salir de la selección múltiple de " : "Seleccionar varios items de ") + esc(c.nombre) + '">' + SEL_SVG + "</button>";
+  }
   function GRIP(c) {
     var on = !!unlocked[c.id];
     return '<button class="grip' + (on ? " on" : "") + '" id="gr-' + esc(c.id) + '" data-act="grip" data-grip="' + esc(c.id) + '" aria-pressed="' + on + '" title="' + (on ? "Arrastra para reordenar. Toca para bloquear." : "Toca para desbloquear y poder reordenar.") + '" aria-label="' + (on ? "Reordenar " + esc(c.nombre) + ": desbloqueado. Arrastra, usa las flechas arriba y abajo, o toca para bloquear." : "Reordenar " + esc(c.nombre) + ": bloqueado. Toca para desbloquear.") + '">' + (on ? DOTS_SVG : LOCK_SVG) + "</button>";
@@ -877,12 +914,15 @@ body.dragging { -webkit-user-select: none; user-select: none; cursor: grabbing; 
   function viewTarjetas(list) {
     var h = '<div class="toolbar"><button class="btn small" data-act="collapseall">Contraer todas</button><button class="btn small" data-act="expandall">Expandir todas</button></div>';
     catGroups(list).forEach(function (g) {
-      var c = g.c, s = sums(g.list), ing = c.tipo === "ingreso", closed = !!collapsed[c.id], done = catDone(g.list), vacia = !g.list.length;
+      var c = g.c, s = sums(g.list), ing = c.tipo === "ingreso", sm = (canWrite && !c.orphan) ? selMode[c.id] : null;
+      selVisible[c.id] = g.list.map(function (x) { return x.id; });
+      var vacia0 = !g.list.length; if (sm && vacia0) { delete selMode[c.id]; sm = null; }
+      var closed = !!collapsed[c.id], done = catDone(g.list), vacia = !g.list.length;
       h += '<section class="card' + (closed ? " closed" : "") + (done ? " done" : "") + (vacia ? " empty" : "") + '"' + (c.orphan ? "" : ' data-cat="' + esc(c.id) + '"') + ' aria-labelledby="g-' + esc(c.id) + '"><div class="group-head"><h2 id="g-' + esc(c.id) + '"><button class="gtoggle" id="gt-' + esc(c.id) + '" data-act="collapse" data-g="' + esc(c.id) + '" aria-expanded="' + (!closed) + '" aria-controls="gb-' + esc(c.id) + '"><span class="chev"></span><span class="dot" style="background:' + safeColor(c.color) + '"></span><span>' + esc(c.nombre) + "</span></button></h2>" + (done ? '<span class="doneflag">¡Todo al día!</span>' : "") + (vacia ? '<span class="emptyflag">' + EMPTY_ICON + "Categoría vacía</span>" : "") +
-        '<div class="group-stats num"><span>Programado <b>' + money(s.prog) + "</b></span><span>" + (ing ? "Recibido" : "Pagado") + " <b>" + money(s.pag) + "</b></span><span>" + (ing ? "Por recibir" : "Pendiente") + " <b>" + money(s.pend) + "</b></span></div>" + (canWrite && !c.orphan && cats.length > 1 ? GRIP(c) : "") + "</div>" +
+        '<div class="group-stats num"><span>Programado <b>' + money(s.prog) + "</b></span><span>" + (ing ? "Recibido" : "Pagado") + " <b>" + money(s.pag) + "</b></span><span>" + (ing ? "Por recibir" : "Pendiente") + " <b>" + money(s.pend) + "</b></span></div>" + (canWrite && !c.orphan && g.list.length ? SELB(c) : "") + (canWrite && !c.orphan && cats.length > 1 ? GRIP(c) : "") + "</div>" +
         '<div id="gb-' + esc(c.id) + '"' + (closed ? " hidden" : "") + ">" +
-        (g.list.length ? colsHTML().replace("<span>Pagado</span>", "<span>" + (ing ? "Recibido" : "Pagado") + "</span>") + '<ul class="rows">' + g.list.map(function (it) { return rowHTML(it, false); }).join("") + "</ul>" : '<div class="empty-g vacia">' + EMPTY_ICON + "<span>Esta categoría está vacía en " + monthLabel(sel) + "." + (canWrite ? " Usa Agregar item para empezar." : "") + "</span></div>") +
-        (canWrite ? '<div class="group-foot"><span class="muted num" style="font-weight:700;font-size:13px">' + s.npag + " de " + s.n + (ing ? " recibidos" : " pagados") + "</span>" + (c.orphan ? "" : '<button class="btn small" data-act="add" data-g="' + esc(c.id) + '">Agregar item</button>') + "</div>" : "") +
+        (g.list.length ? colsHTML().replace("<span>Pagado</span>", "<span>" + (ing ? "Recibido" : "Pagado") + "</span>") + '<ul class="rows">' + g.list.map(function (it) { return rowHTML(it, false, sm); }).join("") + "</ul>" : '<div class="empty-g vacia">' + EMPTY_ICON + "<span>Esta categoría está vacía en " + monthLabel(sel) + "." + (canWrite ? " Usa Agregar item para empezar." : "") + "</span></div>") +
+        (sm ? '<div class="group-foot"><div class="selbar"><span class="selcount num" aria-live="polite">' + selCount(c.id) + " de " + g.list.length + (selCount(c.id) === 1 ? " seleccionado" : " seleccionados") + '</span><button class="btn small" data-act="pickall" data-cat="' + esc(c.id) + '">' + (selCount(c.id) === g.list.length ? "Quitar selección" : "Seleccionar todo") + '</button><button class="btn small danger" data-act="bulkdel" data-cat="' + esc(c.id) + '"' + (selCount(c.id) ? "" : " disabled") + ">Eliminar" + (selCount(c.id) ? " (" + selCount(c.id) + ")" : "") + '</button><button class="btn small" data-act="selmode" data-cat="' + esc(c.id) + '">Cancelar</button></div></div>' : canWrite ? '<div class="group-foot"><span class="muted num" style="font-weight:700;font-size:13px">' + s.npag + " de " + s.n + (ing ? " recibidos" : " pagados") + "</span>" + (c.orphan ? "" : '<button class="btn small" data-act="add" data-g="' + esc(c.id) + '">Agregar item</button>') + "</div>" : "") +
         "</div></section>";
     });
     return h + totalsHTML(list);
@@ -1310,6 +1350,10 @@ body.dragging { -webkit-user-select: none; user-select: none; cursor: grabbing; 
     else if (a === "sort") { var k = t.getAttribute("data-k"); if (tabla.sort === k) tabla.dir = -tabla.dir; else { tabla.sort = k; tabla.dir = 1; } render(); }
     else if (a === "gomonth") { sel = t.getAttribute("data-m"); calDay = 0; store("pp-mes", sel); view = "tarjetas"; store("pp-vista", view); render(); }
     else if (a === "grip") { if (Date.now() - lastDragEnd < 450) return; var gid = t.getAttribute("data-grip"); unlocked[gid] = !unlocked[gid]; render(); var gb = document.getElementById("gr-" + gid); if (gb) { try { gb.focus({ preventScroll: true }); } catch (x) { /* ignorar */ } } }
+    else if (a === "selmode") { var sc = t.getAttribute("data-cat"); if (selMode[sc]) delete selMode[sc]; else selMode[sc] = { ids: {} }; render(); var sb2 = document.getElementById("sl-" + sc); if (sb2) { try { sb2.focus({ preventScroll: true }); } catch (x) { /* ignorar */ } } }
+    else if (a === "pickall") { var pc = t.getAttribute("data-cat"), pm = selMode[pc]; if (pm) { var all = selCount(pc) === (selVisible[pc] || []).length; pm.ids = {}; if (!all) (selVisible[pc] || []).forEach(function (id) { pm.ids[id] = true; }); render(); var pb = document.querySelector('[data-act="pickall"][data-cat="' + pc + '"]'); if (pb) { try { pb.focus({ preventScroll: true }); } catch (x) { /* ignorar */ } } } }
+    else if (a === "bulkdel") { var bc = t.getAttribute("data-cat"), bm = selMode[bc]; if (!bm) return; var bids = (selVisible[bc] || []).filter(function (id) { return bm.ids[id]; }); if (!bids.length) return; openModal({ kind: "bulk", cat: bc, ids: bids }); var ok = document.getElementById("bulk-ok"); if (ok) ok.focus(); }
+    else if (a === "bulk-confirm") bulkDelete();
     else if (a === "edit") openModal({ item: findItem(t.getAttribute("data-id")) });
     else if (a === "add") { if (!cats.length) { toast("Crea una categoría primero."); return; } openModal({ grupo: t.getAttribute("data-g"), dia: t.getAttribute("data-d") || "" }); }
     else if (a === "newmonth") createMonth();
@@ -1334,10 +1378,11 @@ body.dragging { -webkit-user-select: none; user-select: none; cursor: grabbing; 
   document.addEventListener("change", function (e) {
     var t = e.target;
     if (t.id === "tema") { applyTheme(t.value); store("pp-tema", t.value); return; }
-    if (t.id === "mes") { sel = t.value; calDay = 0; store("pp-mes", sel); render(); return; }
+    if (t.id === "mes") { selMode = {}; sel = t.value; calDay = 0; store("pp-mes", sel); render(); return; }
     if (t.id === "m-grupo") { var gc = catMap[t.value], rw = document.getElementById("m-ref-wrap"); if (rw) rw.hidden = !!(gc && gc.tipo === "ingreso"); return; }
     if (t.id === "tb-cat") { tabla.cat = t.value; render(); return; }
     if (t.id === "tb-est") { tabla.est = t.value; render(); return; }
+    if (t.getAttribute("data-act") === "pick") { var it0 = findItem(t.getAttribute("data-id")); if (!it0) return; var pm0 = selMode[it0.grupo]; if (!pm0) return; if (t.checked) pm0.ids[it0.id] = true; else delete pm0.ids[it0.id]; render(); var pf = document.getElementById("s-" + it0.id); if (pf) { try { pf.focus({ preventScroll: true }); } catch (x) { /* ignorar */ } } return; }
     if (t.getAttribute("data-act") === "toggle") { toggle(t.getAttribute("data-id"), t.checked); return; }
     var f = t.getAttribute("data-field"); if (f) editField(t.getAttribute("data-id"), f, t.value);
   });
