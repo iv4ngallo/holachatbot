@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EconomIA: economía y finanzas desde cero</title>
+<meta name="theme-color" content="#102033">
+<meta name="description" content="EconomIA: economía y finanzas desde cero, con ruta por niveles, simuladores y laboratorio de bolsa. De Hola Apps.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=1">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=1">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=1">
+<link rel="stylesheet" href="../suite/suite.css?v=7">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="EconomIA">
+<script data-pwa-tag src="/pwa.js" data-sw="sw.js" data-name="EconomIA" data-icon="icon-192.png" data-accent="#102033" data-on="#FFFFFF" data-bg="#f3f6f9" data-fg="#102033" data-muted="#4d5f74" defer></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* Idea de diseño: mapa de metro. Una línea vertical por nivel, cada tema es una estación; el estudio ocurre en tarjetas de una sola columna. */
+:root{
+  --ink:#102033; --paper:#f3f6f9; --card:#ffffff; --line:#d5dde6; --muted:#4d5f74;
+  --l1:#0a7c78; --l2:#2358b0; --l3:#a3245f; --ok:#146c3a; --bad:#b3261e; --warn:#8a5200;
+  --l1s:#e1f3f2; --l2s:#e3ebf8; --l3s:#f8e4ed; --oks:#e2f3e8; --bads:#fbe6e4; --warns:#fbefd9;
+  --fd:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif; --fb:"Source Sans 3","Segoe UI",system-ui,sans-serif;
+  --r:14px; --nav:62px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 1.0625rem/1.55 var(--fb);padding-bottom:calc(var(--nav) + 70px)}
+body.big{font-size:1.25rem}
+h1,h2,h3{font-family:var(--fd);line-height:1.15;margin:0 0 .5rem;letter-spacing:-.01em}
+h1{font-size:clamp(2rem,7vw,3rem);font-weight:800}
+h2{font-size:clamp(1.4rem,4.6vw,1.9rem);font-weight:800}
+h3{font-size:1.05rem;font-weight:800}
+p{margin:.4rem 0 .8rem}
+a{color:var(--l2)}
+.skip{position:absolute;left:-999px;top:0;background:#fff;padding:.6rem 1rem;z-index:50}
+.skip:focus{left:8px;top:8px}
+:focus-visible{outline:3px solid #1b6ef3;outline-offset:2px;border-radius:6px}
+.wrap{max-width:760px;margin:0 auto;padding:0 18px}
+.top{position:sticky;top:0;z-index:20;background:rgba(243,246,249,.96);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;min-height:54px;gap:12px}
+.brand{font:800 1.15rem var(--fd);color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:8px}
+.brand i{width:26px;height:26px;border-radius:8px;background:conic-gradient(var(--l1) 0 33%,var(--l2) 0 66%,var(--l3) 0);display:inline-block}
+nav#nav{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);display:flex;z-index:30;height:var(--nav)}
+nav#nav a{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-decoration:none;color:var(--muted);font:600 .8rem var(--fb);gap:2px;position:relative;min-height:44px}
+nav#nav a[aria-current=page]{color:var(--ink);box-shadow:inset 0 3px 0 var(--l1);font-weight:700}
+nav#nav .bd{position:absolute;top:6px;left:calc(50% + 12px);background:var(--bad);color:#fff;border-radius:99px;font:700 .7rem var(--fb);padding:0 6px;min-width:18px;text-align:center}
+main{display:block;padding:20px 0 0;outline:none}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px;margin:0 0 16px}
+.kick{font:700 .8rem var(--fb);text-transform:uppercase;letter-spacing:.08em;color:var(--l1);margin:0 0 6px}
+.muted{color:var(--muted)}
+.small{font-size:.9rem}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:48px;padding:0 20px;border-radius:12px;border:2px solid var(--ink);background:var(--ink);color:#fff;font:700 1rem var(--fb);cursor:pointer;text-decoration:none}
+.btn.sec{background:#fff;color:var(--ink)}
+.btn.ok{background:var(--l1);border-color:var(--l1)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.btn.sm{min-height:40px;padding:0 14px;font-size:.92rem}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row.sp{justify-content:space-between}
+.bar{height:10px;background:#e4eaf0;border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--l1);border-radius:99px;transition:width .3s}
+.hero{padding:6px 0 18px}
+.hero p.lead{font-size:1.15rem;max-width:34em}
+.lvl{margin:26px 0 8px}
+.lvl h2{display:flex;align-items:center;gap:10px;margin:0}
+.lvl .tag{font:700 .78rem var(--fb);padding:3px 10px;border-radius:99px;color:#fff;text-transform:uppercase;letter-spacing:.05em}
+.t1 .tag{background:var(--l1)} .t2 .tag{background:var(--l2)} .t3 .tag{background:var(--l3)}
+.line{position:relative;margin:12px 0 0;padding-left:34px}
+.line:before{content:"";position:absolute;left:11px;top:14px;bottom:14px;width:6px;border-radius:4px;background:var(--lc)}
+.t1{--lc:var(--l1);--ls:var(--l1s)} .t2{--lc:var(--l2);--ls:var(--l2s)} .t3{--lc:var(--l3);--ls:var(--l3s)}
+.st{position:relative;display:block;text-decoration:none;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;margin:0 0 10px}
+.st:hover{border-color:var(--lc)}
+.st:before{content:"";position:absolute;left:-31px;top:50%;margin-top:-10px;width:20px;height:20px;border-radius:50%;background:#fff;border:5px solid var(--lc)}
+.st[data-s=done]:before{background:var(--lc)}
+.st b{font:800 1.05rem var(--fd);display:block}
+.st span.m{display:block;color:var(--muted);font-size:.92rem}
+.st em{font-style:normal;font-weight:700;font-size:.82rem;color:var(--lc)}
+.crumbs{font-size:.92rem;color:var(--muted);margin:0 0 10px}
+.crumbs a{color:var(--muted)}
+.stage{background:#fff;border:1px solid var(--line);border-top:6px solid var(--lc,var(--l1));border-radius:var(--r);padding:22px 20px;min-height:260px}
+.stage .lead{font-size:1.13rem}
+.ex{background:var(--ls,var(--l1s));border-radius:12px;padding:14px 16px;margin:14px 0}
+.ex ol{margin:.4rem 0 0;padding-left:1.3rem}
+.ex li{margin:.35rem 0}
+.key{border-left:6px solid var(--lc,var(--l1));background:#f7fafc;padding:12px 14px;border-radius:0 12px 12px 0;margin:14px 0;font-weight:600}
+.note{font-size:.92rem;color:var(--muted);margin:10px 0}
+details.pre{border:1px dashed var(--muted);border-radius:12px;padding:10px 14px;margin:14px 0;background:#fff}
+details.pre summary{cursor:pointer;font-weight:700;min-height:32px}
+details.pre p{margin:.5rem 0 0}
+.srcs{margin:16px 0 0;padding-top:10px;border-top:1px solid var(--line);font-size:.88rem;color:var(--muted)}
+.srcs a{margin-right:10px;display:inline-block}
+.nav2{display:flex;gap:10px;margin-top:14px;align-items:center}
+.nav2 .btn{flex:1}
+.dots{display:flex;gap:6px;justify-content:center;margin:10px 0 0}
+.dots i{width:10px;height:10px;border-radius:50%;background:#cfd8e2}
+.dots i.on{background:var(--lc,var(--l1))}
+.dots i.cur{outline:2px solid var(--ink);outline-offset:2px}
+.tools{display:flex;gap:8px;flex-wrap:wrap}
+.pill{border:1.5px solid var(--line);background:#fff;border-radius:99px;min-height:40px;padding:0 14px;font:600 .9rem var(--fb);cursor:pointer;color:var(--ink)}
+.pill[aria-pressed=true]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.opt{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;background:#fff;border:2px solid var(--line);border-radius:12px;padding:12px 14px;margin:10px 0;font:600 1rem var(--fb);color:var(--ink);cursor:pointer;min-height:52px}
+.opt b{flex:none;width:28px;height:28px;border-radius:50%;background:#e7edf3;display:grid;place-items:center;font:800 .85rem var(--fd)}
+.opt.ok{border-color:var(--ok);background:var(--oks)} .opt.bad{border-color:var(--bad);background:var(--bads)}
+.opt .v{display:block;font-weight:700;font-size:.85rem;margin-top:2px}
+.opt.ok .v{color:var(--ok)} .opt.bad .v{color:var(--bad)}
+.fb{padding:12px 14px;border-radius:12px;margin:12px 0;background:var(--warns)}
+.fb.ok{background:var(--oks)} .fb.bad{background:var(--bads)}
+.sim{background:#f7fafc;border:1px solid var(--line);border-radius:12px;padding:14px;margin:14px 0}
+.ctl{display:block;margin:10px 0}
+.ctl span{display:flex;justify-content:space-between;gap:10px;font-weight:600;font-size:.95rem}
+.ctl b{color:var(--l2)}
+input[type=range]{width:100%;height:32px;accent-color:var(--l1)}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:12px 0}
+.stat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.stat small{display:block;color:var(--muted);font-size:.8rem;line-height:1.25}
+.stat strong{font:800 1.25rem var(--fd)}
+svg.ch{width:100%;height:auto;display:block;margin:8px 0}
+svg.ch text{font:600 11px var(--fb);fill:#4d5f74}
+svg.ch .g{stroke:#e1e7ee;stroke-width:1}
+svg.ch .s1{stroke:var(--l1)} svg.ch .s2{stroke:var(--l2)} svg.ch .s3{stroke:var(--l3)}
+svg.ch polyline{fill:none;stroke-width:3;stroke-linejoin:round;stroke-linecap:round}
+svg.ch .dash{stroke-dasharray:7 5}
+svg.ch .dot{stroke:none}
+.lgs{display:flex;gap:14px;flex-wrap:wrap;font-size:.88rem;font-weight:600}
+.sw{display:inline-block;width:26px;border-top:4px solid var(--l1);vertical-align:middle;margin-right:6px}
+.sw.s2{border-color:var(--l2)} .sw.s3{border-color:var(--l3)} .sw.d{border-top-style:dashed}
+.tl{display:flex;flex-direction:column;gap:6px;margin:10px 0}
+.tl button{display:flex;gap:12px;text-align:left;padding:10px 12px;border:1.5px solid var(--line);background:#fff;border-radius:12px;font:600 .98rem var(--fb);cursor:pointer;min-height:48px;color:var(--ink)}
+.tl button b{flex:none;min-width:92px;font-family:var(--fd);color:var(--l2)}
+.tl button[aria-pressed=true]{border-color:var(--l2);background:var(--l2s)}
+.tlx{background:var(--l2s);border-radius:12px;padding:14px;margin:8px 0}
+table.t{width:100%;border-collapse:collapse;font-size:.95rem}
+table.t th,table.t td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+table.t th{font-size:.8rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+table.t td.n{text-align:right;font-variant-numeric:tabular-nums}
+.up{color:var(--ok);font-weight:700} .dn{color:var(--bad);font-weight:700}
+.field{width:100%;min-height:48px;border:2px solid var(--line);border-radius:12px;padding:0 14px;font:600 1rem var(--fb)}
+.gl{margin:0;padding:0;list-style:none}
+.gl li{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:0 0 8px}
+.gl b{font:800 1.02rem var(--fd)}
+.chk label{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line);cursor:pointer;min-height:44px}
+.chk input{width:24px;height:24px;flex:none;accent-color:var(--l1);margin-top:2px}
+.alert{background:var(--warns);border:1px solid #e5c98f;border-radius:12px;padding:10px 14px;margin:12px 0;font-size:.95rem}
+.boxes{display:flex;gap:8px;align-items:flex-end;height:90px;margin:10px 0}
+.boxes div{flex:1;text-align:center;font-size:.8rem;font-weight:700}
+.boxes i{display:block;background:var(--l2);border-radius:6px 6px 0 0;margin-bottom:4px}
+footer.f{max-width:760px;margin:10px auto 0;padding:0 18px;font-size:.85rem;color:var(--muted)}
+.ord{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end}
+input.qty{width:90px;min-height:48px;border:2px solid var(--line);border-radius:12px;padding:0 10px;font:700 1.05rem var(--fb)}
+@media (min-width:860px){
+  body{padding-bottom:40px}
+  nav#nav{position:static;height:auto;background:transparent;border:0;gap:4px;flex:none}
+  nav#nav a{flex:none;flex-direction:row;padding:0 14px;min-height:40px;border-radius:10px;font-size:.95rem}
+  nav#nav a[aria-current=page]{box-shadow:none;background:var(--ink);color:#fff}
+  nav#nav .bd{position:static;margin-left:6px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Saltar al contenido</a>
+<header class="top"><div class="wrap"><a class="brand" href="#inicio"><i aria-hidden="true"></i>EconomIA</a><nav id="nav" aria-label="Principal"></nav></div></header>
+<main id="main" tabindex="-1"><div class="wrap" id="app"></div></main>
+<footer class="f"><p>Contenido educativo con fines de aprendizaje. No es asesoría financiera, legal ni tributaria. Las cifras de los simuladores son supuestos ilustrativos, no promesas de rendimiento.</p></footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../suite/config.js?v=2"></script>
+<script src="../suite/suite.js?v=11"></script>
+<script>
+'use strict';
+/*M-START*/
+const M={
+  fv(P,pmt,r,fee,infl,yrs){
+    const i=(r-fee)/100/12,n=Math.round(yrs*12);let v=P;
+    const nom=[P],real=[P],con=[P];
+    for(let m=1;m<=n;m++){
+      v=v*(1+i)+pmt;
+      if(m%12===0){const y=m/12;nom.push(v);real.push(v/Math.pow(1+infl/100,y));con.push(P+pmt*m);}
+    }
+    return{nom,real,con};
+  },
+  bond(face,cp,y,n){
+    const c=face*cp/100,r=y/100;
+    if(r===0)return face+c*n;
+    return c*(1-Math.pow(1+r,-n))/r+face*Math.pow(1+r,-n);
+  },
+  gordon(D1,r,g){return r>g?D1/((r-g)/100):null;},
+  loan(P,r,n){const i=r/100/12;return i===0?P/n:P*i/(1-Math.pow(1+i,-n));},
+  vol(n,s,rho){return s*Math.sqrt(1/n+(1-1/n)*rho);},
+  eq(sd,ss){const A=100+sd,C=10+ss,b=10,d=10;const p=(A-C)/(b+d);return{p,q:A-b*p,A,C,b,d};},
+  grow(price,r,y){return price*Math.pow(1+r/100,y);},
+  mul(seed){let a=seed>>>0;return function(){a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296;};},
+  gauss(r){let u=r();if(u<1e-9)u=1e-9;const v=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+};
+/*M-END*/
+
+const FM=(o)=>new Intl.NumberFormat('es-CO',o);
+const usd=n=>FM({style:'currency',currency:'USD',maximumFractionDigits:0}).format(n);
+const usd2=n=>FM({style:'currency',currency:'USD',minimumFractionDigits:2,maximumFractionDigits:2}).format(n);
+const pc=(n,d=1)=>FM({minimumFractionDigits:d,maximumFractionDigits:d}).format(n)+' %';
+const nf=(n,d=2)=>FM({minimumFractionDigits:d,maximumFractionDigits:d}).format(n);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+const SRC={
+ fd:['FMI, serie Back to Basics','https://www.imf.org/en/publications/fandd/issues/series/back-to-basics'],
+ lydia:['World History Encyclopedia: primeras monedas de Lidia','https://www.worldhistory.org/article/1793/the-invention-of-the-first-coinage-in-ancient-lydia/'],
+ money:['American Numismatic Association: Lidia y la primera moneda','https://money.org/uploads/virtualexhibits/hom/case1/Case%201-Lydia.pdf'],
+ bls_cpi:['BLS: Índice de precios al consumidor','https://www.bls.gov/cpi/'],
+ fedfaq:['Reserva Federal: cómo afecta la inflación y el empleo','https://www.federalreserve.gov/faqs/money_12856.htm'],
+ fedmp:['Reserva Federal: objetivos de la política monetaria','https://www.federalreserve.gov/monetarypolicy/monetary-policy-what-are-its-goals-how-does-it-work.htm'],
+ stl_exp:['Fed de St. Louis: política expansiva y restrictiva','https://www.stlouisfed.org/in-plain-english/expansionary-and-contractionary-policy'],
+ stl_ci:['Fed de St. Louis: cómo funciona el interés compuesto','https://www.stlouisfed.org/open-vault/2018/september/how-compound-interest-works'],
+ moneysense:['MoneySense (Singapur): efectos del interés compuesto','https://moneysense.gov.sg/effects-of-compounding-interest'],
+ inv_start:['Investor.gov: primeros pasos para invertir','https://www.investor.gov/introduction-investing/getting-started'],
+ bea:['BEA: qué es el PIB','https://www.bea.gov/resources/learning-center/what-to-know/GDP'],
+ bea_gl:['BEA: glosario del PIB','https://www.bea.gov/help/glossary?page=3'],
+ stl_gdp:['Fed de St. Louis: qué es el PIB','https://www.stlouisfed.org/open-vault/2019/march/what-is-gdp-why-important'],
+ bls:['BLS: definiciones de empleo y desempleo','https://www.bls.gov/cps/definitions.htm'],
+ pew:['Pew Research: lo que dice (y no dice) la tasa de desempleo','https://www.pewresearch.org/?p=11993'],
+ finra_st:['FINRA: acciones','https://www.finra.org/investors/learn-to-invest/types-investments/stocks'],
+ inv_st:['Investor.gov: acciones','https://investor.gov/introduction-investing/basics/investment-products/stocks'],
+ nyag:['Fiscalía de Nueva York: inversiones en acciones','https://ag.ny.gov/resources/individuals/investing-finance/stocks'],
+ nerd:['NerdWallet: qué es una acción','https://www.nerdwallet.com/blog/investing/what-is-a-stock/'],
+ euronext:['Euronext: la Bolsa de Ámsterdam y la VOC','https://www.euronext.com/en/about/media/bell-ceremony-archive/417th-anniversary-amsterdam-exchange'],
+ petram:['Petram, The World’s First Stock Exchange','https://www.degruyterbrill.com/document/doi/10.7312/petr16378/html'],
+ dfi:['Depto. de Instituciones Financieras de Washington: acciones','https://dfi.wa.gov/financial-education/information/basics-investing-stocks'],
+ sec_ir:['SEC: riesgo de tasa de interés en bonos','https://www.sec.gov/files/ib_interestraterisk.pdf'],
+ stl_bond:['Fed de St. Louis: por qué bonos y tasas se mueven al revés','https://www.stlouisfed.org/publications/page-one-economics/2023/11/03/why-do-bond-prices-and-interest-rates-move-in-opposite-directions'],
+ etf:['Investor.gov: fondos mutuos y ETF','https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/characteristics-mutual-funds-exchange-traded-funds'],
+ fees:['Investor.gov: costos de fondos y ETF','https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-bulletins/mutual-fund-and-etf-fees-and-expenses-investor-bulletin'],
+ nasaa:['NASAA: razón de gastos de los fondos','https://www.nasaa.org/57682/informed-investor-advisory-expense-ratios/'],
+ wto:['OMC: el argumento a favor del comercio abierto','https://www.wto.org/english/thewto_e/whatis_e/tif_e/fact3_e.htm'],
+ imf_trade:['FMI: comercio internacional','https://www.imf.org/en/publications/fandd/issues/series/back-to-basics/trade'],
+ britfx:['Britannica: cómo se determinan los tipos de cambio','https://www.britannica.com/story/how-are-currency-exchange-rates-determined'],
+ wise:['Wise: tipo de cambio fijo y flotante','https://wise.com/au/blog/fixed-floating-exchange-rate-difference'],
+ fid_pe:['Fidelity: razón precio-utilidad','https://www.fidelity.com/learning-center/trading-investing/pe-ratio'],
+ nas_pe:['Nasdaq: razón precio-utilidad','https://www.nasdaq.com/articles/what-is-the-price-to-earnings-p-e-ratio'],
+ schwab_pe:['Schwab: cómo usar la razón precio-utilidad','https://international.schwab.com/story/stock-analysis-using-pe-ratio'],
+ gordon:['Wikipedia: modelo de crecimiento de Gordon','https://en.wikipedia.org/wiki/Gordon_growth_model'],
+ ia_guide:['Investor.gov: guía de asignación de activos','https://www.investor.gov/additional-resources/general-resources/publications-research/info-sheets/beginners-guide-asset'],
+ ia:['Investor.gov: asignación de activos y diversificación','https://investor.gov/investing-basics/guiding-principles/assessing-your-risk-tolerance'],
+ jove:['JoVE: teoría de las perspectivas y aversión a la pérdida','https://app.jove.com/v/18732'],
+ nepjol:['Estudio sobre exceso de confianza y aversión a la pérdida','https://nepjol.info/index.php/fwr/article/download/70499/53752/205546'],
+ fh_gd:['Federal Reserve History: la Gran Depresión','https://www.federalreservehistory.org/essays/great_depression'],
+ fh_crash:['Federal Reserve History: el crash de 1929','https://www.federalreservehistory.org/essays/stock-market-crash-of-1929'],
+ fh_panic:['Federal Reserve History: pánicos bancarios de 1930-31','https://federalreservehistory.org/essay/banking-panics-1930-31'],
+ fdic:['History.com: la FDIC','https://www.history.com/topics/great-depression/history-of-the-fdic'],
+ fh_bw:['Federal Reserve History: Bretton Woods','https://www.federalreservehistory.org/essays/bretton_woods_created'],
+ fh_nixon:['Federal Reserve History: fin de la convertibilidad al oro','https://www.federalreservehistory.org/essays/gold_convertibility_ends'],
+ wiki_bw:['Wikipedia: sistema de Bretton Woods','https://en.wikipedia.org/wiki/Bretton_Woods_system'],
+ fh_gr:['Federal Reserve History: la Gran Recesión','https://www.federalreservehistory.org/essays/great-recession-and-its-aftermath'],
+ brit08:['Britannica: crisis financiera de 2007-08','https://www.britannica.com/event/financial-crisis-of-2007-2008/Key-events-of-the-crisis'],
+ hist08:['History.com: cronología de la Gran Recesión','https://www.history.com/topics/great-recession-timeline'],
+ bern:['Bernanke: conferencia sobre pánicos financieros','https://www.federalreserve.gov/newsevents/files/bernanke-lecture-one-20120320.pdf'],
+ dunlosky:['Dunlosky y colegas: técnicas de aprendizaje eficaces','https://www.psychologicalscience.org/journals/pspi/1529100612453266/'],
+ roediger:['Brame y Biel: aprendizaje potenciado por pruebas','https://pmc.ncbi.nlm.nih.gov/articles/PMC4477741'],
+ mayer:['Principios de aprendizaje multimedia de Mayer','https://u.osu.edu/multimedialearning/?p=11'],
+ nn:['Nielsen Norman Group: diez heurísticas de usabilidad','https://www.nngroup.com/articles/ten-usability-heuristics/']
+};
+
+/* Gráfico de líneas simple. series:[{n,c:'s1|s2|s3',d:bool,v:[]}] */
+function lineChart(o){
+  const W=640,H=250,L=58,R=18,T=14,B=30,xs=o.xs,N=xs.length;
+  let mx=0;o.series.forEach(s=>s.v.forEach(v=>{if(isFinite(v)&&v>mx)mx=v;}));
+  if(mx<=0)mx=1;
+  const mag=Math.pow(10,Math.floor(Math.log10(mx))),u=mx/mag;
+  const nice=(u<=1?1:u<=2?2:u<=2.5?2.5:u<=5?5:10)*mag;
+  const X=i=>L+(N<2?0:(W-L-R)*i/(N-1)),Y=v=>T+(H-T-B)*(1-v/nice);
+  let g='';
+  for(let k=0;k<=4;k++){const v=nice*k/4,y=Y(v);g+=`<line class="g" x1="${L}" x2="${W-R}" y1="${y}" y2="${y}"/><text x="${L-6}" y="${y+4}" text-anchor="end">${esc(o.yf(v))}</text>`;}
+  const step=Math.max(1,Math.ceil(N/6));
+  for(let i=0;i<N;i+=step)g+=`<text x="${X(i)}" y="${H-8}" text-anchor="middle">${esc(xs[i])}</text>`;
+  const lines=o.series.map(s=>`<polyline class="${s.c}${s.d?' dash':''}" points="${s.v.map((v,i)=>X(i).toFixed(1)+','+Y(v).toFixed(1)).join(' ')}"/>`).join('');
+  const lg=o.series.map(s=>`<span><i class="sw ${s.c}${s.d?' d':''}"></i>${esc(s.n)}</span>`).join('');
+  return `<svg class="ch" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(o.label)}">${g}${lines}${o.extra?o.extra(X,Y):''}</svg><div class="lgs">${lg}</div>`;
+}
+const stat=(l,v)=>`<div class="stat"><small>${l}</small><strong>${v}</strong></div>`;
+
+const SIMS={
+ interes:{ctl:[
+   {k:'P',l:'Dinero inicial',a:0,b:50000,s:500,v:2000,f:usd},
+   {k:'m',l:'Aporte mensual',a:0,b:2000,s:25,v:200,f:usd},
+   {k:'r',l:'Rendimiento anual supuesto (antes de costos)',a:0,b:15,s:.5,v:7,f:v=>pc(v)},
+   {k:'c',l:'Costo anual del fondo',a:0,b:3,s:.1,v:.2,f:v=>pc(v)},
+   {k:'i',l:'Inflación anual supuesta',a:0,b:10,s:.5,v:3,f:v=>pc(v)},
+   {k:'y',l:'Años',a:1,b:40,s:1,v:25,f:v=>v+' años'}],
+  out(v){
+   const r=M.fv(v.P,v.m,v.r,v.c,v.i,v.y),n=r.nom.length-1,fin=r.nom[n],con=r.con[n],gain=fin-con;
+   const xs=r.nom.map((_,i)=>String(i));
+   return `<div class="stats">${stat('Valor final (dólares futuros)',usd(fin))}${stat('Valor final en poder de compra de hoy',usd(r.real[n]))}${stat('Lo que aportaste',usd(con))}${stat('Ganado por intereses',usd(gain)+' ('+pc(fin?gain/fin*100:0,0)+')')}</div>`+
+   lineChart({xs,yf:usd,label:'Evolución del dinero año a año con tres líneas: valor nominal, valor real y lo aportado',series:[{n:'Valor nominal',c:'s1',v:r.nom},{n:'Valor real (ajustado por inflación)',c:'s2',d:true,v:r.real},{n:'Lo que aportaste',c:'s3',v:r.con}]})+
+   '<p class="note">Eje horizontal: años. Es un supuesto de rendimiento constante; en la vida real el rendimiento sube y baja.</p>';}},
+ pe:{ctl:[
+   {k:'p',l:'Precio de la acción',a:5,b:300,s:1,v:60,f:usd},
+   {k:'e',l:'Utilidad por acción en el último año',a:.5,b:20,s:.1,v:4,f:usd2}],
+  out(v){
+   const pe=v.p/v.e,ey=v.e/v.p*100;
+   const q=pe<10?'bajo':pe<=25?'intermedio':'alto';
+   return `<div class="stats">${stat('Razón precio-utilidad (P/U)',nf(pe,1)+' veces')}${stat('Rentabilidad por utilidades',pc(ey))}</div><p>Pagas <b>${usd2(v.p)}</b> por una empresa que ganó <b>${usd2(v.e)}</b> por acción. A este ritmo, las utilidades de ${nf(pe,1)} años igualarían el precio. Un P/U ${q} no es bueno ni malo por sí solo: depende del sector y de cuánto se espera que crezca la empresa.</p>`;}},
+ ddm:{ctl:[
+   {k:'d',l:'Dividendo esperado el próximo año',a:.1,b:10,s:.1,v:2,f:usd2},
+   {k:'r',l:'Rentabilidad que exiges (r)',a:4,b:14,s:.5,v:8,f:v=>pc(v)},
+   {k:'g',l:'Crecimiento perpetuo del dividendo (g)',a:0,b:8,s:.5,v:3,f:v=>pc(v)}],
+  out(v){
+   const p=M.gordon(v.d,v.r,v.g);
+   if(p===null)return `<div class="alert">Con r menor o igual que g el modelo no funciona: nadie puede crecer más rápido que la rentabilidad exigida para siempre. Baja g o sube r.</div>`;
+   const p2=M.gordon(v.d,v.r,v.g+1);
+   return `<div class="stats">${stat('Valor teórico por acción',usd2(p))}${stat('Si g fuera 1 punto mayor',p2===null?'no definido':usd2(p2))}</div><p>La fórmula es <b>valor = dividendo ÷ (r − g)</b>. Fíjate cómo un cambio pequeño en g mueve mucho el resultado: por eso los modelos son brújulas, no relojes exactos.</p>`;}},
+ bonos:{ctl:[
+   {k:'c',l:'Cupón anual del bono',a:0,b:10,s:.25,v:4,f:v=>pc(v,2)},
+   {k:'n',l:'Años que faltan para el vencimiento',a:1,b:30,s:1,v:10,f:v=>v+' años'},
+   {k:'y',l:'Tasa de mercado hoy para bonos parecidos',a:0,b:12,s:.25,v:4,f:v=>pc(v,2)}],
+  out(v){
+   const P=M.bond(1000,v.c,v.y,v.n),up=M.bond(1000,v.c,v.y+1,v.n),dn=M.bond(1000,v.c,Math.max(0,v.y-1),v.n);
+   const lab=Math.abs(P-1000)<.5?'a la par':P>1000?'con prima (sobre 1.000)':'con descuento (bajo 1.000)';
+   return `<div class="stats">${stat('Precio del bono de 1.000 dólares',usd2(P))}${stat('Situación',lab)}${stat('Si las tasas suben 1 punto',usd2(up)+' ('+pc((up/P-1)*100)+')')}${stat('Si las tasas bajan 1 punto',usd2(dn)+' ('+pc((dn/P-1)*100)+')')}</div><p class="note">Pagos anuales de cupón. Prueba con vencimientos cortos y largos: mientras más largo el bono, más se mueve su precio cuando cambian las tasas.</p>`;}},
+ riesgo:{ctl:[
+   {k:'n',l:'Número de acciones distintas',a:1,b:40,s:1,v:1,f:v=>v+''},
+   {k:'s',l:'Volatilidad anual de cada acción',a:10,b:60,s:1,v:30,f:v=>pc(v,0)},
+   {k:'rho',l:'Correlación promedio entre acciones',a:0,b:1,s:.05,v:.3,f:v=>nf(v,2)}],
+  out(v){
+   const cur=M.vol(v.n,v.s,v.rho),floor=Math.sqrt(v.rho)*v.s,xs=[],a=[],b=[];
+   for(let n=1;n<=40;n++){xs.push(String(n));a.push(M.vol(n,v.s,v.rho));b.push(floor);}
+   return `<div class="stats">${stat('Volatilidad de tu cartera',pc(cur))}${stat('Piso que no se elimina (riesgo de mercado)',pc(floor))}</div>`+
+   lineChart({xs,yf:v=>pc(v,0),label:'La volatilidad de la cartera baja al sumar acciones pero se acerca a un piso',series:[{n:'Volatilidad de la cartera',c:'s1',v:a},{n:'Riesgo de mercado que no se diversifica',c:'s3',d:true,v:b}],extra:(X,Y)=>`<circle class="dot" cx="${X(v.n-1)}" cy="${Y(cur)}" r="6" fill="#102033"/>`})+
+   '<p class="note">Eje horizontal: cantidad de acciones. Con pocas acciones, casi todo el riesgo se elimina rápido; el resto depende de qué tan juntas se mueven.</p>';}},
+ inflacion:{ctl:[
+   {k:'p',l:'Precio de algo hoy',a:1,b:500,s:1,v:100,f:usd},
+   {k:'r',l:'Inflación anual',a:0,b:15,s:.5,v:3.5,f:v=>pc(v)},
+   {k:'y',l:'Años',a:1,b:40,s:1,v:10,f:v=>v+' años'}],
+  out(v){
+   const f=M.grow(v.p,v.r,v.y),pw=v.p/Math.pow(1+v.r/100,v.y);
+   return `<div class="stats">${stat('Lo mismo costará',usd2(f))}${stat('Tus '+usd(v.p)+' de hoy comprarán lo de',usd2(pw))}</div><p>Si tu ingreso o tus ahorros no crecen al menos al ritmo de la inflación, pierdes poder adquisitivo aunque el número en tu cuenta no cambie.</p>`;}},
+ prestamo:{ctl:[
+   {k:'P',l:'Monto prestado',a:500,b:50000,s:500,v:5000,f:usd},
+   {k:'r',l:'Tasa anual',a:0,b:60,s:1,v:20,f:v=>pc(v,0)},
+   {k:'n',l:'Plazo en meses',a:3,b:120,s:1,v:24,f:v=>v+' meses'}],
+  out(v){
+   const c=M.loan(v.P,v.r,v.n),tot=c*v.n,h=Math.max(1,Math.round(v.n/2)),c2=M.loan(v.P,v.r,h);
+   return `<div class="stats">${stat('Cuota mensual',usd2(c))}${stat('Total que pagas',usd(tot))}${stat('Intereses totales',usd(tot-v.P))}${stat('Con la mitad del plazo ('+h+' meses)',usd2(c2)+' · intereses '+usd(c2*h-v.P))}</div><p class="note">Cuota fija mensual. Plazos más cortos suben la cuota pero bajan mucho los intereses totales.</p>`;}},
+ divisas:{ctl:[
+   {k:'u',l:'Precio de un producto estadounidense en dólares',a:1,b:500,s:1,v:100,f:usd},
+   {k:'x',l:'Euros por 1 dólar hoy',a:.6,b:1.4,s:.01,v:.92,f:v=>nf(v,2)},
+   {k:'c',l:'Cambio del dólar frente al euro',a:-20,b:20,s:1,v:10,f:v=>(v>0?'+':'')+pc(v,0)}],
+  out(v){
+   const x2=v.x*(1+v.c/100),e1=v.u*v.x,e2=v.u*x2,eu1=100/v.x,eu2=100/x2;
+   const dir=v.c>0?'más fuerte':v.c<0?'más débil':'igual';
+   return `<div class="stats">${stat('Producto de EE. UU. en euros, antes',nf(e1,2)+' €')}${stat('Después del cambio',nf(e2,2)+' €')}${stat('Producto europeo de 100 € en dólares, antes',usd2(eu1))}${stat('Después del cambio',usd2(eu2))}</div><p>Con un dólar ${dir}, lo estadounidense ${v.c>0?'se encarece':v.c<0?'se abarata':'cuesta igual'} para un europeo y lo europeo ${v.c>0?'se abarata':v.c<0?'se encarece':'cuesta igual'} para un estadounidense. Por eso el tipo de cambio afecta a importadores, exportadores y turistas.</p>`;}},
+ equilibrio:{ctl:[
+   {k:'sd',l:'Cambio en la demanda (más compradores a la derecha)',a:-30,b:30,s:1,v:0,f:v=>(v>0?'+':'')+v},
+   {k:'ss',l:'Cambio en la oferta (más vendedores a la derecha)',a:-30,b:30,s:1,v:0,f:v=>(v>0?'+':'')+v}],
+  out(v){
+   const e=M.eq(v.sd,v.ss),xs=[],D=[],S=[];
+   for(let p=0;p<=10;p++){xs.push(String(p));D.push(Math.max(0,e.A-e.b*p));S.push(Math.max(0,e.C+e.d*p));}
+   const base=M.eq(0,0),dp=e.p-base.p;
+   const ch=lineChart({xs,yf:v=>nf(v,0),label:'Cantidad demandada y ofrecida según el precio',series:[{n:'Cantidad que los compradores quieren (demanda)',c:'s1',v:D},{n:'Cantidad que los vendedores ofrecen (oferta)',c:'s3',v:S}]});
+   return `<div class="stats">${stat('Precio de equilibrio',usd2(e.p))}${stat('Cantidad de equilibrio',nf(e.q,1)+' unidades')}</div>${ch}<p class="note">Eje horizontal: precio en dólares; eje vertical: cantidad. El equilibrio es donde ambas líneas se cruzan. ${Math.abs(dp)<.005?'Estás en el punto de partida.':'Frente al punto de partida el precio '+(dp>0?'subió':'bajó')+' '+usd2(Math.abs(dp))+'.'}</p>`;}}
+};
+const LV=[
+ {n:'Nivel 1',t:'Fundamentos',d:'Las ideas base: escasez, dinero, precios, inflación, interés y cómo se mide una economía. No necesitas saber nada antes.'},
+ {n:'Nivel 2',t:'Intermedio',d:'Cómo funcionan los bancos centrales, las bolsas, los bonos, los fondos, el comercio y las divisas, con historia incluida.'},
+ {n:'Nivel 3',t:'Avanzado',d:'Valorar acciones, entender riesgo y diversificación, tus sesgos como inversor y las grandes crisis. Termina con un plan propio.'}
+];
+
+const TL=[
+ {y:'c. 600 a. C.',t:'Primeras monedas en Lidia',d:'Reyes de Lidia, en la actual Turquía, sellan piezas de electro con peso y pureza garantizados. Nace la moneda como confianza grabada en metal.',l:'El dinero necesita una autoridad que garantice su valor.',s:['lydia','money']},
+ {y:'1602',t:'La VOC emite acciones',d:'La Compañía Neerlandesa de las Indias Orientales vende acciones transferibles al público y su negociación en Ámsterdam da origen a la primera bolsa moderna.',l:'Separar propiedad y gestión permite financiar empresas enormes con muchos pequeños inversores.',s:['euronext','petram']},
+ {y:'Siglos XVIII y XIX',t:'Smith y Ricardo fundan el argumento del libre comercio',d:'Adam Smith y David Ricardo establecen la base económica de las ganancias del comercio; Ricardo muestra que los países ganan al especializarse según su ventaja comparativa.',l:'El comercio puede beneficiar a ambas partes, aunque produce ganadores y perdedores internos.',s:['imf_trade','wto']},
+ {y:'1929 a 1941',t:'Crash y Gran Depresión',d:'Tras el desplome bursátil de octubre de 1929, una serie de pánicos bancarios convirtió una recesión en la caída más larga y profunda de la economía industrial moderna.',l:'Una crisis financiera mal contenida se vuelve crisis de toda la economía.',s:['fh_gd','fh_crash','fh_panic']},
+ {y:'1933',t:'Nace el seguro de depósitos (FDIC)',d:'Estados Unidos crea la FDIC para proteger a los depositantes y recuperar la confianza en los bancos tras la ola de quiebras.',l:'Proteger los depósitos reduce el incentivo a correr al banco.',s:['fdic']},
+ {y:'1944',t:'Bretton Woods',d:'Delegados de 44 naciones diseñan un sistema monetario con tipos de cambio fijos frente al dólar y crean el FMI y lo que sería el Banco Mundial.',l:'Las reglas internacionales de las monedas se pueden diseñar, y también pueden romperse.',s:['fh_bw','wiki_bw']},
+ {y:'1971',t:'Fin de la convertibilidad dólar-oro',d:'El presidente Nixon suspende la conversión del dólar a oro para los bancos centrales extranjeros, lo que termina con el sistema de Bretton Woods.',l:'Desde entonces las grandes monedas son dinero fiat y sus valores flotan en el mercado.',s:['fh_nixon']},
+ {y:'2007 a 2009',t:'Crisis financiera global',d:'El colapso de hipotecas de alto riesgo y la quiebra de Lehman Brothers en septiembre de 2008 desataron la peor crisis financiera desde la Gran Depresión.',l:'Deuda excesiva, productos complejos y pérdida de confianza se contagian entre bancos y países.',s:['fh_gr','brit08']}
+];
+
+const MODS=[
+/* ===================== NIVEL 1 ===================== */
+{id:'dinero',lv:0,t:'Escasez, trueque y dinero',r:'Por qué existe la economía y cómo nació el dinero.',
+ obj:['Explicar escasez y costo de oportunidad','Nombrar las tres funciones del dinero','Contar cómo aparecieron las primeras monedas'],
+ cards:[
+ {t:'Escasez: querer más de lo que hay',p:'Tus deseos casi no tienen límite, pero tu tiempo, tu plata y los recursos del planeta sí. A esa diferencia se le llama escasez, y la economía es la ciencia de cómo personas, empresas y países eligen frente a ella.',e:['Imagina que tienes 200 dólares libres este mes.','Opción A: un celular usado. Opción B: ahorrarlos. Opción C: un curso.','Si eliges el curso, renuncias a A y a B. Lo mejor a lo que renunciaste es tu costo de oportunidad.'],i:'Elegir una cosa siempre significa renunciar a otra. Ese precio invisible es el costo de oportunidad.',q:['Si pasas la tarde trabajando extra en vez de descansar, ¿cuál es tu costo de oportunidad?','El descanso (o lo mejor que habrías hecho con ese tiempo), no solo el dinero que dejas de gastar.'],s:['fd']},
+ {t:'Antes del dinero: el trueque',p:'En el trueque cambias una cosa por otra directamente. Funciona mal porque necesitas encontrar a alguien que tenga lo que quieres y que además quiera lo que tú tienes, justo al mismo tiempo.',e:['Tú cultivas papa y quieres sandalias.','El zapatero ya tiene papa de sobra, pero quiere sal.','Ahora tienes que buscar a alguien con sal que quiera papa. Cada compra se vuelve una cadena de búsquedas.'],i:'El dinero resuelve la coincidencia de deseos: todos aceptan lo mismo como pago.',s:['fd']},
+ {t:'Los tres trabajos del dinero',p:'Para que algo funcione como dinero debe cumplir tres funciones. Si falla en una, la gente busca otra cosa para usar.',e:['Medio de pago: lo aceptas para vender y lo entregas para comprar.','Unidad de cuenta: todo se mide con la misma regla, así puedes comparar precios.','Reserva de valor: lo guardas hoy y conserva su poder de compra mañana.'],i:'Cuando la inflación es muy alta, el dinero falla en su tercer trabajo y la gente huye hacia otros bienes.',q:['¿Qué función falla si el precio de todo se duplica cada pocos meses?','La reserva de valor: guardar dinero deja de ser seguro para conservar poder de compra.'],s:['fd']},
+ {t:'Las primeras monedas',p:'Según la mayoría de historiadores, las primeras monedas emitidas por una autoridad aparecieron en el reino de Lidia, en la actual Turquía, hacia el 600 a. C. Eran de electro, una aleación natural de oro y plata. Antes, el metal se pagaba por peso y había que verificarlo en cada compra.',e:['El rey estampaba un sello en cada pieza para garantizar peso y pureza.','Así dejaba de hacer falta la balanza: se confiaba en el sello.','Más tarde, el rey Creso separó monedas de oro y de plata, un sistema con dos metales.'],i:'Una moneda es confianza grabada en metal: el sello del emisor reemplaza a la balanza.',n:'Hay teorías que ubican monedas tempranas en Grecia, India o China. Lidia es la versión más citada por los historiadores.',s:['lydia','money']}
+ ],
+ quiz:[
+ {q:'¿Cuál NO es una función del dinero?',o:['Medio de pago','Unidad de cuenta','Reserva de valor','Garantía de que su precio nunca cambie'],c:3,x:'Las tres funciones son medio de pago, unidad de cuenta y reserva de valor. Ningún dinero garantiza que su poder de compra sea fijo.'},
+ {q:'¿Qué problema del trueque resolvió el dinero?',o:['Que los metales pesaban demasiado','La necesidad de coincidir en lo que cada uno ofrece y quiere','La falta de mercados','Los impuestos altos'],c:1,x:'En el trueque hace falta una coincidencia de deseos. Con dinero, quien vende acepta algo que podrá gastar con cualquiera.'},
+ {q:'Según el consenso más citado, ¿dónde y cuándo aparecieron las primeras monedas oficiales?',o:['Lidia, hacia el 600 a. C.','Roma, hacia el año 100','Holanda, en 1602','Estados Unidos, en 1792'],c:0,x:'Lidia, en la actual Turquía, hacia el 600 a. C. La VOC holandesa de 1602 es un hito de las acciones, no de las monedas.'}
+ ]},
+
+{id:'oferta',lv:0,t:'Oferta y demanda: cómo nacen los precios',r:'Por qué algo cuesta lo que cuesta y por qué los precios se mueven.',
+ obj:['Describir demanda y oferta','Encontrar el precio de equilibrio','Predecir hacia dónde se mueve el precio ante un cambio'],
+ cards:[
+ {t:'Demanda: cuánto queremos comprar',p:'Cuando el precio de algo baja, normalmente compras más. Cuando sube, compras menos o buscas un sustituto. La demanda es esa relación entre el precio y la cantidad que los compradores aceptan comprar.',e:['Café a 2 dólares: compras 5 por semana.','Café a 4 dólares: compras 2 y preparas el resto en casa.','Si dibujas esos puntos obtienes una línea que baja: más precio, menos cantidad.'],i:'Mayor precio, menor cantidad demandada.',s:['fd']},
+ {t:'Oferta: cuánto queremos vender',p:'Para los vendedores es al revés. Un precio más alto hace rentable producir más y atrae a más productores. La oferta es la cantidad que los vendedores aceptan ofrecer a cada precio.',e:['Una panadería vende pan a 1 dólar y le sobra poco.','Si el pan sube a 2 dólares, hornea más tandas y abre más temprano.','Su línea sube: más precio, más cantidad ofrecida.'],i:'Mayor precio, mayor cantidad ofrecida.',q:['¿Por qué un precio más alto atrae a más productores?','Porque cada unidad deja más ganancia, así que compensa producir más.'],s:['fd']},
+ {t:'El punto de equilibrio',p:'Donde la línea de demanda y la de oferta se cruzan, la cantidad que quieren comprar y la que quieren vender coinciden. Ese es el precio de equilibrio. Si el precio está por encima, sobran productos y los vendedores bajan precios. Si está por debajo, faltan productos y el precio sube.',sim:'equilibrio',i:'Los precios se ajustan hasta que el mercado se despeja: nadie se queda con sobrantes ni con faltantes.',s:['fd']},
+ {t:'Choques: cuando algo se mueve',p:'Los precios cambian cuando se desplaza la oferta o la demanda. Prueba los controles de la tarjeta anterior para ver cada caso.',e:['Una helada daña la cosecha de café: la oferta baja y el precio sube.','Una moda hace que más gente tome café: la demanda sube y el precio sube.','Llega una máquina que abarata producir: la oferta sube y el precio baja.'],i:'Para predecir el precio, pregunta primero qué se movió: ¿los compradores o los vendedores?',s:['fd']}
+ ],
+ quiz:[
+ {q:'Si la oferta de un producto baja por una mala cosecha y la demanda no cambia, ¿qué pasa con el precio?',o:['Baja','Sube','No cambia','Primero baja y luego sube sin razón'],c:1,x:'Hay menos producto para los mismos compradores, así que el precio de equilibrio sube.'},
+ {q:'Si el precio está por encima del equilibrio, ¿qué esperas?',o:['Faltantes y precios al alza','Sobrantes y presión a la baja','Nada, el precio queda fijo','Menos vendedores y más compradores'],c:1,x:'A un precio alto los vendedores quieren vender más de lo que los compradores quieren comprar, así que quedan sobrantes y bajan precios.'},
+ {q:'Una moda duplica el interés por unas zapatillas. ¿Qué se desplaza?',o:['La oferta hacia la izquierda','La demanda hacia la derecha','Ninguna','La oferta hacia la derecha'],c:1,x:'Más compradores dispuestos a cada precio desplazan la demanda hacia la derecha y el precio sube.'}
+ ]},
+
+{id:'inflacion',lv:0,t:'Inflación: por qué tu plata rinde menos',r:'Qué es, cómo se mide y qué hacen los bancos centrales.',
+ obj:['Definir inflación y poder adquisitivo','Calcular el efecto de la inflación en el tiempo','Explicar la meta de inflación de los bancos centrales'],
+ cards:[
+ {t:'Qué es la inflación',p:'Es el aumento general y sostenido de los precios. No se trata de que un producto suba, sino de que la canasta completa cueste más con el tiempo. Por eso cada unidad de dinero compra menos.',e:['Hoy una canasta de mercado cuesta 100 dólares.','Con inflación de 5 % anual, el próximo año cuesta 105.','Tus mismos 100 dólares ahora compran lo que antes costaba cerca de 95.'],i:'Inflación es perder poder adquisitivo: el mismo dinero compra menos.',q:['Si ganas lo mismo todos los años y hay inflación, ¿tu salario subió o bajó en términos reales?','Bajó: el número es igual pero alcanza para menos cosas.'],s:['bls_cpi']},
+ {t:'Cómo se mide',p:'Las oficinas de estadística siguen mes a mes el precio de una canasta de bienes y servicios típicos de los hogares, como comida, vivienda, transporte y salud. Esa canasta se resume en un índice de precios al consumidor (IPC). La inflación es el porcentaje en que ese índice cambia entre dos fechas.',e:['Índice hace un año: 200.','Índice hoy: 210.','Inflación anual: (210 − 200) ÷ 200 = 5 %.'],i:'La inflación es la variación porcentual de un índice de precios.',n:'Tu inflación personal puede diferir de la oficial según qué compras más.',s:['bls_cpi']},
+ {t:'Simulador: el poder adquisitivo',p:'Mueve el precio, la inflación y los años para ver cuánto costará algo en el futuro y cuánto alcanzará tu dinero de hoy.',sim:'inflacion',s:['bls_cpi']},
+ {t:'Qué hacen los bancos centrales',p:'Muchos bancos centrales buscan inflación baja y estable. La Reserva Federal de EE. UU., por ejemplo, tiene como metas el máximo empleo y la estabilidad de precios, y fija una meta de inflación de 2 % anual en promedio. Su herramienta principal es la tasa de interés de corto plazo, que veremos en el Nivel 2.',i:'Ni inflación muy alta ni deflación: se busca estabilidad, no cero.',s:['fedmp','fedfaq']}
+ ],
+ quiz:[
+ {q:'Un índice de precios pasa de 250 a 260 en un año. ¿Cuál es la inflación anual?',o:['2 %','4 %','10 %','26 %'],c:1,x:'(260 − 250) ÷ 250 = 0,04, es decir 4 %.'},
+ {q:'Tu cuenta paga 2 % al año y la inflación es 5 %. ¿Qué ocurre con tu poder adquisitivo?',o:['Sube cerca de 3 puntos','Baja cerca de 3 puntos','No cambia','Depende solo del banco'],c:1,x:'Tu dinero crece 2 % pero los precios 5 %, así que pierdes poder de compra en términos reales.'},
+ {q:'¿Qué objetivo suelen buscar los bancos centrales con la inflación?',o:['Que sea siempre negativa','Que sea cero exacto','Que sea baja y estable','Que cambie mucho para estimular'],c:2,x:'La estabilidad de precios, con inflación baja y predecible, ayuda a planear gastos e inversiones.'}
+ ]},
+
+{id:'interes',lv:0,t:'Interés compuesto: el tiempo trabaja por ti',r:'La idea financiera más poderosa, a favor y en contra.',
+ obj:['Distinguir interés simple y compuesto','Aplicar la regla del 72','Usar el simulador para ver el efecto del tiempo y de los costos'],
+ cards:[
+ {t:'Interés simple y compuesto',p:'Con interés simple ganas siempre sobre el dinero inicial. Con interés compuesto ganas sobre el dinero inicial y también sobre los intereses que ya ganaste. Es interés sobre interés.',e:['Pones 1.000 dólares al 10 % anual.','Simple: ganas 100 cada año, así que en 3 años tienes 1.300.','Compuesto: año 1 = 1.100, año 2 = 1.210, año 3 = 1.331.'],i:'El interés compuesto crece cada vez más rápido porque la base también crece.',q:['¿Por qué empezar a ahorrar joven importa tanto?','Porque más años permiten más ciclos de interés sobre interés, y el efecto es exponencial.'],s:['stl_ci','moneysense']},
+ {t:'La regla del 72',p:'Un atajo mental: divide 72 entre la tasa anual y obtienes aproximadamente los años que tarda en duplicarse tu dinero.',e:['Tasa 8 %: 72 ÷ 8 = 9 años para duplicar.','Tasa 4 %: 72 ÷ 4 = 18 años.','Tasa 12 %: 72 ÷ 12 = 6 años.'],i:'Es una aproximación, útil para comparar. Para precisión usa la fórmula completa o el simulador.',s:['stl_ci']},
+ {t:'Simulador de crecimiento',p:'Cambia los controles. Mira la línea de arriba (lo que tienes) frente a la línea de abajo (lo que aportaste): la diferencia son intereses.',sim:'interes',s:['stl_ci']},
+ {t:'Cuando juega en tu contra: las deudas',p:'El interés compuesto no distingue entre ahorrar y deber. En una deuda, los intereses no pagados se suman al saldo y generan más intereses.',e:['Deuda de 1.000 dólares al 36 % anual sin pagar.','Año 1: 1.360. Año 2: 1.850. Año 3: 2.515.','En 3 años una deuda de 1.000 se vuelve más del doble.'],i:'Una tasa alta de deuda es como una inversión al revés: el tiempo trabaja en tu contra.',s:['moneysense']}
+ ],
+ quiz:[
+ {q:'¿Cuántos años tarda en duplicarse tu dinero al 6 % anual según la regla del 72?',o:['6 años','12 años','18 años','36 años'],c:1,x:'72 ÷ 6 = 12 años.'},
+ {q:'¿Qué distingue al interés compuesto del simple?',o:['Que la tasa es mayor','Que se gana también sobre los intereses acumulados','Que se paga al final','Que solo aplica a deudas'],c:1,x:'Con interés compuesto, los intereses ganados se suman al capital y ellos mismos generan intereses.'},
+ {q:'¿Qué hace más para aumentar el valor final de un ahorro a 30 años?',o:['Empezar antes y mantenerse en el tiempo','Revisar el saldo todos los días','Esperar a que suban las tasas','Gastar primero y ahorrar después'],c:0,x:'El tiempo es el ingrediente central del interés compuesto: más años, más ciclos de interés sobre interés.'}
+ ]},
+
+{id:'ahorro',lv:0,t:'Presupuesto, ahorro y deuda',r:'Ordenar tu flujo de plata y entender el costo de endeudarte.',
+ obj:['Armar un presupuesto sencillo','Explicar para qué sirve un fondo de emergencia','Calcular la cuota y los intereses de un préstamo'],
+ cards:[
+ {t:'Tu mapa de plata: ingresos, gastos y saldo',p:'Un presupuesto no es una prohibición, es un mapa. Te muestra a dónde se va tu plata para que decidas tú, no la costumbre.',e:['Anota tus ingresos netos del mes, lo que realmente te llega.','Lista gastos fijos (arriendo, servicios, cuotas) y variables (mercado, salidas, transporte).','Resta: ingresos − gastos = saldo. Si es negativo, estás financiando tu vida con deuda.','Decide una cantidad de ahorro y sepárala el día que te pagan, antes de gastar.'],i:'Paga primero tu ahorro: lo que queda después es lo que puedes gastar.',n:'Muchas personas usan reglas prácticas como dividir entre necesidades, gustos y ahorro. No son leyes: ajústalas a tu realidad.',s:['inv_start']},
+ {t:'Fondo de emergencia',p:'Es una reserva de dinero fácil de sacar para imprevistos: una calamidad médica, un daño en el carro, perder el empleo. Su trabajo no es rendir mucho, es evitar que un problema te obligue a endeudarte caro o a vender inversiones en mal momento.',e:['Calcula tus gastos esenciales de un mes.','Muchas guías proponen cubrir varios meses de esos gastos. Más si tu ingreso es variable.','Guárdalo aparte, en una cuenta de fácil acceso.'],i:'Primero la red de seguridad, después las inversiones.',q:['¿Por qué el fondo de emergencia no se invierte en bolsa?','Porque lo necesitas disponible y estable; la bolsa puede estar baja justo cuando lo necesites.'],s:['inv_start']},
+ {t:'Simulador de préstamo',p:'Mira cómo se comportan la cuota y los intereses al cambiar tasa y plazo. Observa la última tarjeta de resultados: con la mitad del plazo la cuota sube, pero los intereses totales bajan mucho.',sim:'prestamo',s:['moneysense']},
+ {t:'Deuda cara y deuda barata',p:'No toda deuda es igual. Lo que importa es la tasa, el plazo y para qué la usas. Una deuda con tasa baja que financia algo que mejora tus ingresos es muy distinta de una con tasa alta que financia consumo.',e:['Lista tus deudas con su tasa anual.','Paga el mínimo en todas y destina el extra a la de mayor tasa (método avalancha).','Cuando la termines, pasa ese dinero a la siguiente.'],i:'Pagar primero la deuda de mayor tasa es lo que más intereses ahorra.',s:['moneysense','inv_start']}
+ ],
+ quiz:[
+ {q:'¿Para qué sirve principalmente un fondo de emergencia?',o:['Para obtener la máxima rentabilidad','Para evitar endeudarte o vender inversiones a la fuerza ante un imprevisto','Para pagar vacaciones','Para comprar acciones baratas'],c:1,x:'Es una red de seguridad: su valor está en estar disponible cuando algo sale mal.'},
+ {q:'Tienes dos deudas, una al 12 % y otra al 40 %, y plata extra. ¿Cuál conviene atacar primero?',o:['La del 12 %','La del 40 %','La más pequeña siempre','Ninguna, mejor invertir'],c:1,x:'La de 40 % genera más intereses por dólar, así que pagarla primero ahorra más.'},
+ {q:'Si acortas el plazo de un préstamo, ¿qué ocurre normalmente?',o:['La cuota baja y los intereses suben','La cuota sube y los intereses totales bajan','Todo queda igual','Solo cambia la tasa'],c:1,x:'Pagas más rápido, con cuotas más altas, pero el dinero genera intereses durante menos tiempo.'}
+ ]},
+
+{id:'medir',lv:0,t:'Medir una economía: PIB y empleo',r:'Los dos números que más aparecen en las noticias económicas.',
+ obj:['Definir PIB y sus cuatro componentes','Distinguir PIB nominal y real','Explicar cómo se mide el desempleo y qué no dice'],
+ cards:[
+ {t:'PIB: cuánto produce un país',p:'El producto interno bruto (PIB) mide el valor de los bienes y servicios finales producidos dentro de un país en un periodo. Se cuentan solo los bienes finales para no contar dos veces lo mismo.',e:['Un agricultor vende trigo por 1 dólar a una panadería.','La panadería hace pan y lo vende por 3 dólares.','El PIB suma 3 (el pan final), no 1 + 3, porque el trigo ya está dentro del pan.'],i:'PIB = valor de lo producido y vendido como producto final.',s:['bea','stl_gdp']},
+ {t:'Los cuatro bloques del PIB',p:'Se puede ver el PIB por el lado del gasto. Todo lo producido lo compra alguien: los hogares, las empresas, el gobierno o el exterior.',e:['C, consumo de los hogares.','I, inversión de las empresas (máquinas, edificios, inventarios).','G, gasto del gobierno.','X − M, exportaciones menos importaciones.'],i:'PIB = C + I + G + (X − M).',q:['Si los hogares compran más, ¿qué bloque del PIB sube?','El consumo (C).'],s:['bea_gl']},
+ {t:'PIB nominal y PIB real',p:'El PIB nominal usa precios del momento, así que puede subir solo porque subieron los precios. El PIB real descuenta la inflación y mide si realmente se produjo más.',e:['PIB nominal crece 6 %.','La inflación fue 4 %.','El crecimiento real es de cerca de 2 %.'],i:'Para saber si una economía creció, mira el PIB real.',s:['bea','stl_gdp']},
+ {t:'Desempleo: quién cuenta como desempleado',p:'Una persona se clasifica como desempleada si no tiene trabajo, está disponible y buscó empleo activamente. La tasa de desempleo es esa cifra dividida entre la fuerza laboral, que suma a empleados y desempleados.',e:['Fuerza laboral: 100 personas, 94 empleadas y 6 desempleadas.','Tasa de desempleo: 6 ÷ 100 = 6 %.','Si 3 de las 6 se desaniman y dejan de buscar, ya no cuentan: la tasa baja a 3 ÷ 97 ≈ 3,1 % sin que nadie haya conseguido trabajo.'],i:'La tasa de desempleo puede bajar por malas razones. Mírala junto con la participación laboral.',s:['bls','pew']}
+ ],
+ quiz:[
+ {q:'¿Por qué el PIB cuenta solo bienes finales?',o:['Porque los intermedios son ilegales','Para no contar dos veces el mismo valor','Porque no tienen precio','Porque se exportan'],c:1,x:'El trigo ya está incluido en el valor del pan. Sumarlo aparte duplicaría su valor.'},
+ {q:'El PIB nominal crece 7 % y la inflación es 5 %. ¿Cuánto creció aproximadamente el PIB real?',o:['12 %','7 %','2 %','Nada'],c:2,x:'El crecimiento real es cercano a nominal menos inflación: 7 − 5 = 2 %.'},
+ {q:'¿Quién no cuenta como desempleado en la medición oficial?',o:['Quien buscó trabajo activamente este mes','Quien está disponible y sin empleo y envió solicitudes','Quien dejó de buscar trabajo hace meses','Quien perdió su empleo y busca otro'],c:2,x:'Quien no buscó activamente queda fuera de la fuerza laboral, por eso el desempleo oficial no cuenta a todas las personas sin trabajo.'}
+ ]},
+
+/* ===================== NIVEL 2 ===================== */
+{id:'bancos',lv:1,t:'Bancos centrales y política fiscal',r:'Quién mueve las tasas, cómo lo hace y qué hace el gobierno.',
+ obj:['Describir los objetivos de un banco central','Explicar cómo la tasa de política llega a tu bolsillo','Diferenciar política monetaria y fiscal'],
+ cards:[
+ {t:'Qué hace un banco central',p:'Un banco central es la institución encargada de la política monetaria de un país o región. En EE. UU., la Reserva Federal tiene por ley metas de máximo empleo y precios estables. Otros bancos centrales tienen metas parecidas, a veces con diferencias en el detalle.',i:'Su trabajo es dar estabilidad: precios predecibles y una economía que no se enfríe ni se recaliente.',s:['fedmp']},
+ {t:'La tasa de política y su cadena',p:'La herramienta principal de la Reserva Federal es la tasa de fondos federales, lo que los bancos se cobran por préstamos de un día. Al moverla, cambian los costos de crédito de hogares y empresas y las condiciones financieras en general.',e:['El banco central sube su tasa.','Los bancos suben las tasas de los créditos.','Hogares y empresas piden menos prestado y gastan menos.','Con menos demanda, la presión sobre los precios baja, aunque el empleo puede resentirse.'],i:'Subir tasas enfría la economía y la inflación. Bajarlas la estimula.',q:['Si el banco central baja la tasa, ¿qué esperas que pase con el crédito?','Que se abarate y aumente, impulsando consumo e inversión.'],s:['fedfaq','fedmp']},
+ {t:'Política expansiva y restrictiva',p:'Cuando la economía se debilita y la inflación está por debajo de la meta, el banco central puede bajar tasas (política expansiva). Cuando la inflación supera la meta por un tiempo, puede subirlas (política restrictiva). Los efectos no son inmediatos: pueden tardar bastante en notarse.',i:'La política monetaria funciona con rezago, por eso se decide mirando hacia adelante.',n:'En la crisis de 2008 la Fed llevó su tasa casi a cero y recurrió a otras medidas extraordinarias.',s:['stl_exp','fedfaq']},
+ {t:'Política fiscal: gasto e impuestos',p:'La política fiscal la maneja el gobierno con su presupuesto: cuánto gasta y cuánto cobra en impuestos. El gasto público es uno de los bloques del PIB. En una recesión, un gobierno puede gastar más o cobrar menos impuestos para sostener la demanda; con mucha inflación, puede hacer lo contrario. Si gasta más de lo que recauda, tiene déficit y se financia con deuda.',e:['Política monetaria: la maneja el banco central, con tasas.','Política fiscal: la maneja el gobierno, con gasto e impuestos.','Ambas buscan estabilidad, pero con herramientas distintas.'],i:'Banco central = tasas y dinero. Gobierno = gasto e impuestos.',s:['bea_gl','fedmp']}
+ ],
+ quiz:[
+ {q:'El banco central sube su tasa de interés. ¿Qué efecto esperas sobre el crédito y la inflación?',o:['Crédito más barato e inflación al alza','Crédito más caro y presión a la baja sobre la inflación','Ningún efecto','Solo cambian los impuestos'],c:1,x:'Tasas más altas encarecen el crédito, reducen la demanda y ayudan a frenar los precios.'},
+ {q:'¿Quién maneja la política fiscal?',o:['El banco central','El gobierno, con gasto e impuestos','Los bancos comerciales','La bolsa'],c:1,x:'La política fiscal es del gobierno. La monetaria es del banco central.'},
+ {q:'¿Por qué los efectos de la política monetaria no se notan de inmediato?',o:['Porque no funciona','Porque actúa con rezagos en crédito, gasto y precios','Porque solo funciona los viernes','Porque se anuncia con un año de aviso'],c:1,x:'Las decisiones tardan en trasladarse a créditos, decisiones de gasto y finalmente a los precios.'}
+ ]},
+
+{id:'ciclos',lv:1,t:'Ciclos económicos y pánicos',r:'Por qué las economías suben y bajan, y qué es un pánico financiero.',
+ obj:['Nombrar las fases del ciclo','Explicar por qué la bolsa mira hacia adelante','Describir qué es un pánico bancario'],
+ cards:[
+ {t:'Las fases del ciclo',p:'Las economías no crecen en línea recta. Pasan por periodos de expansión, llegan a un pico, entran en contracción (recesión) y tocan un fondo antes de recuperarse.',e:['Expansión: la producción y el empleo crecen.','Pico: el punto más alto antes de caer.','Recesión: caída de la actividad durante un tiempo.','Valle: el punto más bajo, desde donde empieza la recuperación.'],i:'Los ciclos son normales. Lo importante es su duración y su profundidad.',s:['fd']},
+ {t:'Cómo se ven desde afuera',p:'En una recesión suele caer la producción, subir el desempleo y bajar la confianza. En una expansión sucede lo contrario. Los gobiernos y bancos centrales usan sus políticas para suavizar los golpes, no para eliminar los ciclos.',q:['¿Qué indicador mirarías para saber si se está contrayendo la economía?','El PIB real y el desempleo, entre otros.'],i:'Un solo indicador no basta: se miran varios a la vez.',s:['bea','bls']},
+ {t:'La bolsa mira hacia adelante',p:'El precio de una acción refleja lo que los inversores esperan sobre el futuro de la empresa, no solo su presente. Por eso la bolsa puede caer antes de que empiece una recesión o subir antes de que termine.',e:['Una empresa gana mucho hoy, pero se espera que sus ganancias caigan el próximo año.','Los inversores venden hoy.','El precio baja aunque la empresa esté ganando dinero ahora.'],i:'Los mercados cotizan expectativas. Las noticias importan por lo que cambian en esas expectativas.',s:['finra_st','dfi']},
+ {t:'Pánicos y corridas bancarias',p:'Un pánico financiero ocurre cuando muchas personas pierden la confianza al mismo tiempo y corren a retirar su dinero o a vender activos. Eso puede provocar corridas bancarias, quiebras de bancos, caídas de bolsa y contracciones de la economía.',e:['Circula el rumor de que un banco está en problemas.','Muchos clientes retiran su dinero a la vez.','El banco no tiene tanto efectivo disponible porque prestó buena parte.','Aunque el rumor sea falso, la corrida puede hacerlo quebrar.'],i:'La confianza sostiene al sistema financiero. Los seguros de depósitos y los bancos centrales existen para frenar estas espirales.',s:['bern','fdic']}
+ ],
+ quiz:[
+ {q:'¿Cuál es la secuencia correcta de un ciclo económico?',o:['Pico, expansión, valle, recesión','Expansión, pico, recesión, valle','Valle, recesión, pico, expansión','Recesión, expansión, valle, pico'],c:1,x:'La economía crece (expansión), llega a un pico, se contrae (recesión) y toca un valle antes de recuperarse.'},
+ {q:'¿Por qué una acción puede caer aunque la empresa tenga buenas ganancias hoy?',o:['Porque el precio refleja expectativas futuras','Porque la bolsa es aleatoria sin explicación','Porque las ganancias no importan','Porque el gobierno lo ordena'],c:0,x:'El precio descuenta lo que se espera a futuro. Si empeoran las expectativas, puede caer pese a buenos resultados actuales.'},
+ {q:'¿Qué es una corrida bancaria?',o:['Una competencia entre bancos','Muchos clientes retirando su dinero al mismo tiempo por falta de confianza','Un aumento de tasas','Una fusión de bancos'],c:1,x:'Es un retiro masivo y simultáneo de depósitos. Los bancos no guardan todo el dinero en efectivo y pueden no resistirlo.'}
+ ]},
+
+{id:'historia',lv:1,t:'Historia económica en una línea del tiempo',r:'De las primeras monedas a la crisis de 2008, con la lección de cada hito.',
+ obj:['Ubicar los grandes hitos en orden','Explicar la lección de cada uno','Conectar el pasado con las reglas actuales'],
+ cards:[
+ {t:'Explora la línea del tiempo',p:'Toca cada hito para ver qué pasó, por qué importa y de dónde sale la información.',tl:true,s:['lydia','euronext','imf_trade','fh_gd','fdic','fh_bw','fh_nixon','fh_gr']},
+ {t:'Del oro al dinero fiat',p:'En 1944, delegados de 44 naciones acordaron en Bretton Woods un sistema de tipos de cambio fijos frente al dólar, y el dólar era convertible en oro para gobiernos y bancos centrales a 35 dólares la onza. En 1971 Estados Unidos suspendió esa convertibilidad y el sistema se acabó.',e:['Antes de 1971: moneda ligada al dólar, y dólar ligado al oro.','1971: se rompe el vínculo con el oro.','Hoy: las monedas valen por la confianza en el país y su banco central, y sus tipos de cambio flotan o se manejan según cada país.'],i:'El dinero fiat vale por confianza y reglas, no por estar respaldado por un metal.',s:['fh_bw','fh_nixon','wiki_bw']},
+ {t:'Patrón repetido: auge, deuda, pánico',p:'Las grandes crisis comparten rasgos: un auge con crédito abundante, activos que suben mucho, deuda excesiva, un golpe de desconfianza y un contagio que pasa de un sector al resto. Lo que cambia es el detalle de cada época.',q:['¿Qué rasgos de 1929 y 2008 se parecen?','Crédito abundante y especulación antes, pérdida de confianza y contagio después.'],i:'Reconocer el patrón no predice la fecha, pero ayuda a desconfiar de los auges con deuda fácil.',s:['fh_crash','fh_gr']},
+ {t:'Lo que se aprendió',p:'Tras 1929 se crearon protecciones como el seguro de depósitos. Tras 2008 se reformó la regulación financiera. Las lecciones suelen ser: contener los pánicos rápido, cuidar la liquidez de los bancos y no dejar que el miedo se contagie.',i:'Cada crisis deja reglas nuevas. También deja nuevos riesgos que nadie estaba vigilando.',s:['fdic','fh_gr']}
+ ],
+ quiz:[
+ {q:'¿Qué ocurrió en 1971 con el dólar?',o:['Se creó el FMI','Se suspendió su convertibilidad en oro','Se fijó su valor al euro','Se emitió por primera vez'],c:1,x:'El presidente Nixon suspendió la conversión del dólar a oro para los bancos centrales extranjeros y terminó el sistema de Bretton Woods.'},
+ {q:'¿Qué se creó en 1933 para recuperar la confianza en los bancos de EE. UU.?',o:['La Reserva Federal','El seguro de depósitos (FDIC)','La bolsa de Nueva York','El FMI'],c:1,x:'La FDIC protege a los depositantes y reduce el incentivo a correr al banco.'},
+ {q:'¿Cuál de estos hitos corresponde al nacimiento de la bolsa moderna?',o:['Primeras monedas de Lidia','La VOC emite acciones en 1602','Bretton Woods en 1944','La crisis de 2008'],c:1,x:'La VOC emitió acciones transferibles y su negociación en Ámsterdam dio origen a la primera bolsa moderna.'}
+ ]},
+
+{id:'acciones',lv:1,t:'Acciones y bolsa de valores',r:'Qué compras cuando compras una acción y cómo funciona el mercado.',
+ obj:['Definir acción, dividendo y ganancia de capital','Explicar qué hace una bolsa','Entender qué mueve el precio de una acción'],
+ cards:[
+ {t:'Qué es una acción',p:'Una acción es una parte de la propiedad de una empresa. Si una pizzería se divide en 100 acciones y compras una, eres dueño del uno por ciento. Los dueños de acciones comunes pueden votar en las juntas y recibir dividendos si la empresa los reparte.',e:['La empresa necesita dinero para crecer.','Emite acciones y los inversores las compran.','La empresa recibe el dinero. Los inversores se vuelven dueños de una parte.'],i:'Comprar una acción es comprar un pedacito de empresa, no prestarle dinero.',q:['¿En qué se diferencia ser dueño de una empresa de ser su acreedor?','El dueño comparte ganancias y riesgos; el acreedor solo cobra lo pactado.'],s:['nyag','inv_st']},
+ {t:'Cómo ganas con acciones',p:'Hay dos formas principales: dividendos, que son pagos que la empresa reparte entre sus accionistas, y ganancias de capital, que ocurren cuando vendes por más de lo que pagaste. No todas las empresas pagan dividendos.',e:['Compras 10 acciones a 50 dólares: inviertes 500.','La empresa paga 1 dólar por acción: recibes 10.','El precio sube a 58 y vendes: ganas 80 por precio.','Retorno total: (80 + 10) ÷ 500 = 18 %.'],i:'Retorno total = ganancia por precio + dividendos.',s:['finra_st','inv_st']},
+ {t:'La bolsa: dónde se encuentran compradores y vendedores',p:'Cuando una empresa vende acciones por primera vez al público hace una oferta pública inicial (IPO). Después, esas acciones se compran y se venden entre inversores en la bolsa. Normalmente no le compras a la empresa, sino a otro inversor, a través de un corredor.',e:['Tú quieres comprar y otro quiere vender.','Cada uno usa un corredor (broker).','La bolsa los pone en contacto y fija el precio de la operación.'],i:'La bolsa es un mercado organizado donde se negocian participaciones de empresas.',n:'La Compañía de las Indias Orientales (VOC) hizo la primera oferta pública y su negociación en Ámsterdam, desde 1602, se considera el origen de la bolsa moderna.',s:['nerd','euronext','petram']},
+ {t:'Qué mueve el precio',p:'En el corto plazo, el precio de una acción lo mueven las expectativas de ganancias futuras y el equilibrio entre quienes quieren comprar y quienes quieren vender. Mucha demanda por una acción empuja su precio hacia arriba.',e:['Una empresa reporta ganancias menores a las esperadas.','Muchos inversores deciden vender.','Hay más vendedores que compradores y el precio baja, aunque la empresa siga siendo rentable.'],i:'El precio refleja expectativas, no solo resultados pasados.',q:['¿Qué pasa con el precio si muchos inversores quieren comprar y pocos vender?','Sube: más demanda que oferta.'],s:['dfi','finra_st']},
+ {t:'Tipos de acciones',p:'Las acciones de crecimiento reinvierten casi todo y pagan pocos dividendos. Las de ingreso reparten dividendos con regularidad. Las blue chip son empresas grandes, conocidas y con historial sólido. Las acciones preferentes pagan dividendos antes que las comunes y suelen no votar.',i:'Cada tipo responde a un objetivo distinto: crecimiento, ingreso o estabilidad.',s:['inv_st','dfi']}
+ ],
+ quiz:[
+ {q:'¿Qué significa tener una acción de una empresa?',o:['Haberle prestado dinero','Ser dueño de una parte de la empresa','Ser su cliente','Tener derecho a un sueldo'],c:1,x:'Una acción es una participación en la propiedad, no un préstamo.'},
+ {q:'Compras 20 acciones a 10 dólares, recibes 1 dólar por acción en dividendos y luego vendes a 12. ¿Cuál es el retorno total?',o:['10 %','20 %','30 %','12 %'],c:2,x:'Invertiste 200. Ganaste 40 por precio y 20 por dividendos: 60 ÷ 200 = 30 %.'},
+ {q:'Cuando compras una acción ya cotizada, ¿normalmente a quién se la compras?',o:['A la empresa directamente','A otro inversor, mediante un corredor','Al gobierno','Al banco central'],c:1,x:'Tras la IPO, el mercado secundario conecta a inversores entre sí.'}
+ ]},
+
+{id:'bonos',lv:1,t:'Bonos y tasas de interés',r:'Prestarle a un gobierno o a una empresa, y por qué sus precios se mueven al revés que las tasas.',
+ obj:['Explicar qué es un bono y qué paga','Entender el balancín tasas-precios','Identificar los riesgos de un bono'],
+ cards:[
+ {t:'Un bono es un préstamo que haces tú',p:'Cuando compras un bono le prestas dinero al emisor, que puede ser un gobierno o una empresa. A cambio, te paga intereses periódicos llamados cupones y te devuelve el valor nominal en la fecha de vencimiento.',e:['Compras un bono de 1.000 dólares con cupón de 4 % a 5 años.','Cada año recibes 40 dólares.','Al final recuperas los 1.000.'],i:'Bono = préstamo con pagos conocidos. Acción = propiedad con resultados inciertos.',s:['stl_bond']},
+ {t:'El balancín: si las tasas suben, el precio del bono baja',p:'Los bonos existentes pagan cupones fijos. Si salen bonos nuevos que pagan más, nadie querrá pagar el precio completo por uno que paga menos, así que el bono viejo baja de precio hasta que su rendimiento se iguale al del mercado. Con tasas a la baja ocurre lo contrario.',e:['Tienes un bono con cupón de 3 %.','Las tasas del mercado suben a 4 %.','Un comprador no pagará 1.000 por un bono de 3 % si puede comprar uno nuevo de 4 %.','El precio de tu bono baja hasta que su rendimiento sea competitivo.'],i:'Tasas y precios de bonos se mueven en sentidos opuestos, como un balancín.',n:'Ejemplo de la SEC: un bono comprado a 1.000 con rendimiento de 3 % valdría unos 1.082 un año después si el rendimiento de mercado bajara a 2 %.',q:['Si el banco central baja tasas, ¿qué espera que pase con el precio de tus bonos existentes?','Que suba, porque pagan más que los nuevos.'],s:['sec_ir','stl_bond']},
+ {t:'Simulador de bonos',p:'Cambia el cupón, el plazo y la tasa de mercado. Observa cuánto se mueve el precio cuando las tasas suben o bajan un punto.',sim:'bonos',s:['sec_ir']},
+ {t:'Los riesgos de un bono',p:'Un bono no es libre de riesgo. Riesgo de tasa de interés: el precio baja si suben las tasas. Riesgo de inflación: los cupones fijos compran menos si suben los precios. Riesgo de crédito: el emisor puede no pagar. Mientras más largo es el bono, más sensible es su precio a las tasas.',i:'Un bono mantenido hasta el vencimiento paga lo prometido, pero si lo vendes antes, el precio puede ser menor.',s:['sec_ir','stl_bond']}
+ ],
+ quiz:[
+ {q:'Las tasas de mercado suben. ¿Qué pasa con el precio de un bono existente de cupón fijo?',o:['Sube','Baja','No cambia','Se duplica'],c:1,x:'El bono viejo paga menos que los nuevos y su precio baja hasta igualar el rendimiento del mercado.'},
+ {q:'¿Qué recibe quien compra un bono?',o:['Una parte de la propiedad','Cupones periódicos y el valor nominal al vencimiento','Dividendos variables','Derecho a voto'],c:1,x:'Un bono es un préstamo con pagos pactados.'},
+ {q:'¿Qué tipo de bono es normalmente más sensible a cambios de tasas?',o:['Uno de vencimiento muy corto','Uno de vencimiento muy largo','Todos igual','Ninguno'],c:1,x:'Mientras más largo el plazo, más tiempo recibes un cupón que puede quedar desactualizado, y más se mueve el precio.'}
+ ]},
+
+{id:'fondos',lv:1,t:'Fondos y ETF: comprar la canasta',r:'Cómo invertir en cientos de empresas a la vez y por qué los costos importan.',
+ obj:['Explicar qué es un fondo y un ETF','Entender la razón de gastos','Ver el efecto de los costos con el simulador'],
+ cards:[
+ {t:'Fondos mutuos y ETF',p:'Un fondo junta el dinero de muchos inversores para comprar una canasta de activos, como acciones o bonos, que gestiona un administrador. Un ETF (fondo cotizado) es un tipo de fondo que se compra y se vende en la bolsa durante el día, como una acción.',e:['Mil inversores aportan al mismo fondo.','El fondo compra cientos de acciones.','Cada inversor tiene una parte proporcional de toda la canasta.'],i:'Con un solo fondo accedes a muchas empresas a la vez, lo que da diversificación.',s:['etf']},
+ {t:'Costos: la razón de gastos',p:'Todo fondo cobra por existir. La razón de gastos es el porcentaje anual de los activos que se destina a cubrir los costos de operación. Ese costo sale de tu rentabilidad cada año, aunque no veas una factura.',e:['Fondo A cobra 0,1 % anual. Fondo B cobra 1,5 % anual.','Si ambos rinden 7 % antes de costos, A te deja 6,9 % y B te deja 5,5 %.','Parece poco, pero se acumula año tras año.'],i:'Un fondo más caro debe rendir más para darte lo mismo.',q:['¿Por qué importa una diferencia de 1 % en costos?','Porque se aplica cada año sobre todo tu saldo y el efecto se compone con el tiempo.'],s:['fees','nasaa']},
+ {t:'Simulador: el costo de 1 %',p:'Compara dos escenarios con el mismo aporte y rendimiento: primero con costo de 0,2 % y luego con 1,5 %. Fíjate en la diferencia en el valor final a 30 años.',sim:'interes',sv:{P:5000,m:300,r:7,c:1.5,i:3,y:30},s:['fees']},
+ {t:'Indexado y gestión activa',p:'Un fondo indexado copia un índice, como una lista de las mayores empresas, y compra lo mismo que el índice. Un fondo de gestión activa intenta superar al mercado eligiendo activos. La gestión activa suele costar más. Los ETF suelen tener razones de gastos menores porque muchos replican índices.',i:'Antes de pagar más por un fondo, pregúntate qué te da a cambio.',s:['nasaa','fees']}
+ ],
+ quiz:[
+ {q:'¿Qué diferencia práctica tiene un ETF frente a un fondo mutuo tradicional?',o:['Se negocia en bolsa durante el día','No tiene costos','Solo invierte en bonos','Garantiza ganancias'],c:0,x:'Un ETF cotiza en bolsa y se puede comprar o vender durante el horario del mercado.'},
+ {q:'¿Qué mide la razón de gastos?',o:['La rentabilidad esperada','El porcentaje anual de activos que se usa para cubrir los costos del fondo','Los dividendos','El riesgo'],c:1,x:'Es un cobro anual en porcentaje que reduce lo que ganas.'},
+ {q:'Un fondo rinde 7 % antes de costos y cobra 1,5 %. ¿Cuánto te queda aproximadamente?',o:['8,5 %','7 %','5,5 %','1,5 %'],c:2,x:'7 − 1,5 = 5,5 % aproximadamente, año tras año.'}
+ ]},
+
+{id:'divisas',lv:1,t:'Comercio, divisas y tipo de cambio',r:'Por qué los países comercian, qué es un tipo de cambio y cómo afecta tu bolsillo.',
+ obj:['Explicar la ventaja comparativa','Distinguir tipo de cambio fijo y flotante','Anticipar el efecto de una moneda más fuerte o más débil'],
+ cards:[
+ {t:'Ventaja comparativa',p:'El economista David Ricardo mostró que los países se benefician del comercio aunque uno sea mejor en todo. Lo que importa no es quién produce más, sino a quién le cuesta menos renunciar a otra cosa para producirlo.',e:['En una hora, Ana hace 6 empanadas o 3 jugos. Beto hace 2 empanadas o 2 jugos.','Ana es mejor en ambos, pero para hacer 1 jugo renuncia a 2 empanadas. Beto renuncia a 1.','Beto tiene ventaja comparativa en jugos, Ana en empanadas.','Si Beto hace jugos y los cambia a 1,5 empanadas por jugo, ambos terminan con más que solos.'],i:'Especializarse en lo que se hace con menor costo de oportunidad aumenta lo que todos pueden consumir.',s:['wto','imf_trade']},
+ {t:'Qué es un tipo de cambio',p:'Es el precio de una moneda en términos de otra. Puede ser flotante, cuando lo fijan la oferta y la demanda en el mercado de divisas, o fijo, cuando el gobierno o el banco central lo mantiene en un nivel determinado. Muchos países usan algo intermedio.',e:['Flotante: el valor sube y baja con el mercado.','Fijo o anclado: el banco central compra o vende divisas para mantenerlo.'],i:'Una moneda se aprecia cuando sube su valor frente a otra y se deprecia cuando baja.',q:['¿Qué pasa con el precio de tus importaciones si tu moneda se debilita?','Se encarecen: necesitas más moneda local para pagar lo mismo.'],s:['britfx','wise']},
+ {t:'Simulador de divisas',p:'Mueve el valor del dólar frente al euro y mira cómo cambia el precio de productos importados y exportados.',sim:'divisas',s:['britfx']},
+ {t:'Aranceles y comercio abierto',p:'Un arancel es un impuesto a los productos importados. Encarece lo importado y protege a algunos productores locales, pero los compradores pagan más. En general, quien compra gana más de lo que pierde el vendedor local desplazado, aunque las pérdidas se concentran en pocas personas y por eso generan resistencia. Tras la Segunda Guerra Mundial, los aranceles sobre productos industriales cayeron mucho y el comercio creció más rápido que la producción.',i:'El comercio crea ganancias para muchos y pérdidas visibles para pocos. Una buena política mira ambos lados.',s:['wto','imf_trade']}
+ ],
+ quiz:[
+ {q:'Tu moneda se deprecia frente al dólar. ¿Qué pasa normalmente con lo importado desde EE. UU.?',o:['Se abarata','Se encarece','No cambia','Desaparece del mercado'],c:1,x:'Necesitas más moneda local para conseguir cada dólar, así que lo importado cuesta más.'},
+ {q:'¿Qué dice la ventaja comparativa?',o:['Un país debe producir todo','Conviene especializarse en lo que cuesta menos renunciar, aunque otro sea mejor en todo','Solo comercian los países ricos','Importar siempre es malo'],c:1,x:'Lo que cuenta es el costo de oportunidad, no la capacidad absoluta.'},
+ {q:'En un tipo de cambio flotante, ¿qué determina su valor?',o:['Solo el gobierno','Oferta y demanda en el mercado de divisas','El precio del oro','El PIB per cápita'],c:1,x:'En un sistema flotante, el mercado fija el valor de la moneda.'}
+ ]},
+
+/* ===================== NIVEL 3 ===================== */
+{id:'valoracion',lv:2,t:'Valoración: ¿cuánto vale una acción?',r:'Precio no es lo mismo que valor. Herramientas básicas y sus límites.',
+ obj:['Calcular e interpretar la razón precio-utilidad','Usar el modelo de dividendos descontados','Entender por qué todo modelo depende de supuestos'],
+ cards:[
+ {t:'Precio no es valor',p:'El precio es lo que el mercado paga hoy. El valor es lo que, según tus cálculos, justifican los flujos de dinero que la empresa generará. Cuando el precio está por debajo del valor, la acción puede ser una oportunidad. Cuando está por encima, puede ser cara. Pero el valor es una estimación tuya y puede estar equivocada.',i:'Valorar es comparar lo que pagas con lo que crees que recibirás.',s:['schwab_pe']},
+ {t:'La razón precio-utilidad (P/U)',p:'Divide el precio de la acción entre la utilidad por acción del último año. Dice cuánto pagas por cada dólar de utilidades.',e:['Precio: 20 dólares. Utilidad por acción: 2.','P/U = 20 ÷ 2 = 10.','Pagas 10 veces las utilidades de un año.'],i:'Un P/U alto puede reflejar optimismo y crecimiento esperado, o simplemente sobreprecio. Uno bajo puede ser una ganga o un negocio con problemas.',s:['fid_pe','nas_pe','schwab_pe']},
+ {t:'Simulador: P/U',p:'Mueve el precio y la utilidad por acción para ver el P/U y la rentabilidad por utilidades.',sim:'pe',q:['¿Por qué no se puede decir que una acción es barata solo porque su P/U es bajo?','Porque puede reflejar que se espera que sus utilidades caigan o que el negocio tiene riesgos.'],s:['nas_pe','schwab_pe']},
+ {t:'Dividendos descontados (modelo de Gordon)',p:'Si una empresa paga un dividendo que crece a una tasa constante g para siempre, y tú exiges una rentabilidad r, su valor teórico es el dividendo del próximo año dividido entre (r − g). Es un modelo simple que ayuda a ver cómo se relacionan dividendos, crecimiento y rentabilidad exigida.',sim:'ddm',i:'Cuando r y g se acercan, el valor se dispara. Pequeños cambios en los supuestos producen grandes cambios en el resultado.',s:['gordon']}
+ ],
+ quiz:[
+ {q:'Una acción cuesta 45 dólares y su utilidad por acción es 3. ¿Cuál es su P/U?',o:['3','15','135','0,07'],c:1,x:'45 ÷ 3 = 15.'},
+ {q:'En el modelo de Gordon, ¿qué pasa si r se acerca a g?',o:['El valor se reduce a cero','El valor teórico se dispara','No cambia','El modelo da el precio de mercado'],c:1,x:'El denominador (r − g) se vuelve muy pequeño y el valor crece mucho, por eso es tan sensible a los supuestos.'},
+ {q:'¿Cuál es una limitación de usar solo el P/U?',o:['No usa precios','Ignora el crecimiento esperado y los riesgos del negocio','Solo sirve para bonos','Es demasiado difícil de calcular'],c:1,x:'Un P/U aislado no dice si el precio se justifica por crecimiento futuro o si la acción está cara.'}
+ ]},
+
+{id:'riesgo',lv:2,t:'Riesgo, retorno y diversificación',r:'Por qué no poner todos los huevos en la misma canasta, y hasta dónde llega eso.',
+ obj:['Relacionar riesgo y retorno esperado','Distinguir clases de activos','Medir el efecto de diversificar y definir rebalanceo'],
+ cards:[
+ {t:'Riesgo y retorno van juntos',p:'En general, para aceptar más riesgo los inversores exigen un posible retorno mayor. Toda inversión implica algún riesgo, y una que promete alto retorno sin riesgo debería generar desconfianza.',i:'No hay retorno alto garantizado. Quien lo ofrece suele estar vendiendo algo.',q:['¿Por qué un ahorro seguro suele rendir menos que una acción?','Porque asumes menos riesgo, y el mercado paga más por el riesgo que se asume.'],s:['ia','ia_guide']},
+ {t:'Tres clases de activos',p:'Las más comunes son acciones, bonos y efectivo. Las acciones históricamente han tenido el mayor riesgo y el mayor retorno. Los bonos suelen ser menos volátiles. El efectivo es el más estable, pero su principal riesgo es que la inflación erosione su poder de compra.',e:['Acciones: más crecimiento potencial, más altibajos.','Bonos: ingresos más estables, riesgo de tasas y crédito.','Efectivo: estabilidad, pero riesgo de inflación.'],i:'Cada clase cumple un papel distinto en una cartera.',s:['ia_guide']},
+ {t:'Diversificar: efectos y límites',p:'Repartir tu dinero entre muchas inversiones reduce el riesgo propio de cada empresa, porque no todas fallan al mismo tiempo. Pero no elimina el riesgo de mercado, el que afecta a casi todas a la vez. En el simulador, sube el número de acciones y mira cómo la volatilidad baja rápido y luego se acerca a un piso.',sim:'riesgo',i:'Diversificar elimina el riesgo de empresas individuales, no el riesgo de todo el mercado.',s:['ia','ia_guide']},
+ {t:'Horizonte, tolerancia y rebalanceo',p:'La mezcla adecuada depende de tu horizonte (cuándo necesitarás el dinero) y de tu tolerancia al riesgo (cuánta caída aguantas sin entrar en pánico). Con el tiempo, lo que sube pesa más y la mezcla se desvía. Rebalancear es volver a la mezcla original.',e:['Defines 70 % acciones y 30 % bonos.','Las acciones suben y pasan a ser 80 % de tu cartera.','Rebalanceas: vendes algo de acciones y compras bonos para volver a 70/30.'],i:'Rebalancear obliga a hacer lo contrario de lo que el entusiasmo pide: vender un poco de lo que subió.',s:['ia','ia_guide']}
+ ],
+ quiz:[
+ {q:'¿Qué riesgo NO se elimina diversificando entre muchas acciones?',o:['El de una empresa individual','El de mercado, que afecta a casi todas','El de un solo sector concentrado','El de elegir mal una acción'],c:1,x:'El riesgo de mercado es común a casi todas las acciones, así que no se diversifica entre ellas.'},
+ {q:'Tu cartera objetivo es 60/40 y las acciones suben hasta 70 %. ¿Qué es rebalancear?',o:['Comprar más acciones','Vender algo de acciones y comprar bonos para volver a 60/40','No hacer nada','Vender todo'],c:1,x:'Rebalancear devuelve la cartera a la proporción que definiste según tu riesgo y horizonte.'},
+ {q:'¿Cuál es el principal riesgo de mantener todo el dinero en efectivo por décadas?',o:['Que desaparezca','Que la inflación erosione su poder de compra','Que suba demasiado','Que sea ilegal'],c:1,x:'El efectivo es estable en cifras, pero pierde poder adquisitivo con la inflación.'}
+ ]},
+
+{id:'psicologia',lv:2,t:'Psicología del inversor',r:'Los sesgos que más cuestan dinero y cómo protegerte de ti mismo.',
+ obj:['Describir la aversión a la pérdida','Reconocer el exceso de confianza y el efecto manada','Armar reglas que reduzcan decisiones emocionales'],
+ cards:[
+ {t:'Aversión a la pérdida',p:'Los psicólogos Daniel Kahneman y Amos Tversky mostraron que evaluamos ganancias y pérdidas frente a un punto de referencia, y que una pérdida duele más que lo que alegra una ganancia del mismo tamaño. Eso lleva a conservar demasiado tiempo lo que pierde, con la esperanza de recuperarse, y a vender muy pronto lo que gana.',e:['Compraste una acción a 100 y hoy vale 70.','Vender confirma la pérdida, así que esperas.','Pero la pregunta útil es otra: ¿la comprarías hoy a 70?'],i:'Tu precio de compra no le importa al mercado.',q:['¿Por qué cuesta tanto vender una acción que está en pérdida?','Porque vender hace real la pérdida y duele más que una ganancia equivalente.'],s:['jove']},
+ {t:'Exceso de confianza',p:'Muchos inversores creen saber más de lo que saben. Los estudios de finanzas conductuales asocian el exceso de confianza con operar demasiado y asumir riesgos mal calculados. Cada operación cuesta comisiones y puede acertar o fallar por azar.',e:['Tuviste tres aciertos seguidos.','Concluyes que eres bueno eligiendo y aumentas el riesgo.','Pero la suerte también produce rachas.'],i:'Una racha corta no demuestra habilidad.',s:['nepjol']},
+ {t:'Efecto manada y ruido',p:'Cuando todos compran, comprar se siente seguro. Cuando todos venden, quedarse se siente peligroso. Seguir a la multitud suele significar comprar cuando está caro y vender cuando está barato.',e:['Un activo sube mucho y todos hablan de él.','Compras por miedo a quedarte afuera.','Cuando baja, vendes por miedo a perder más.'],i:'El precio ya incorpora lo que todos saben. Lo que importa es tu plan, no el ruido.',s:['nepjol']},
+ {t:'Reglas que te protegen de ti',p:'Es difícil controlar las emociones, pero sí puedes diseñar el entorno. Escribe tu plan antes de que haya pánico o euforia. Automatiza los aportes. Diversifica. Revisa tu cartera con menos frecuencia. Desconfía de lo que promete resultados garantizados.',e:['Antes de comprar: escribe por qué compras y qué te haría vender.','Aporta una suma fija cada mes.','Revisa la cartera en fechas fijas, no cada vez que hay noticias.'],i:'Un buen plan es el que puedes seguir cuando el mercado cae.',s:['inv_st','jove']}
+ ],
+ quiz:[
+ {q:'Tu acción está 30 % por debajo de lo que pagaste. ¿Cuál es la pregunta más útil?',o:['¿Cuándo volverá a mi precio de compra?','¿La compraría hoy a este precio?','¿Quién me recomendó comprarla?','¿Cuánto perdí ya?'],c:1,x:'El mercado no conoce tu precio de compra. Decide con lo que sabes hoy.'},
+ {q:'¿Qué describe mejor la aversión a la pérdida?',o:['Las ganancias y pérdidas pesan igual','Las pérdidas duelen más que lo que alegra una ganancia equivalente','Nadie siente dolor por perder','Solo los profesionales la sienten'],c:1,x:'Es uno de los hallazgos centrales de la teoría de las perspectivas.'},
+ {q:'¿Cuál de estas reglas ayuda a reducir decisiones emocionales?',o:['Operar al ritmo de las noticias','Escribir un plan y automatizar los aportes','Concentrar todo en lo que más sube','Revisar la cartera cada hora'],c:1,x:'Un plan escrito y aportes automáticos reducen la influencia de la euforia y del miedo.'}
+ ]},
+
+{id:'crisis',lv:2,t:'Casos de estudio: 1929 y 2008',r:'Dos grandes crisis, qué las provocó y cómo se respondió.',
+ obj:['Contar la secuencia de 1929 a 1933','Contar la secuencia de 2007 a 2009','Comparar causas y respuestas'],
+ cards:[
+ {t:'1929 a 1941: de un crash a una depresión',p:'El 28 de octubre de 1929, el índice Dow Jones cayó cerca de 13 % en un día. La Gran Depresión, que se extendió hasta 1941, fue la caída más larga y profunda de la economía industrial moderna. Su gravedad se explica en buena medida por una serie de pánicos bancarios en 1930 y 1931 que convirtieron lo que podía ser una recesión corta en un desplome prolongado.',e:['Auge de los años veinte, crédito abundante y especulación.','Octubre de 1929: el desplome bursátil asusta a inversores y consumidores.','1930 y 1931: pánicos bancarios, quiebras y retiros masivos.','1933: se crea el seguro de depósitos para recuperar la confianza.'],i:'El crash fue el detonante visible, pero el colapso bancario hizo la crisis mucho más grave y larga.',s:['fh_crash','fh_gd','fh_panic','fdic']},
+ {t:'2007 a 2009: hipotecas, titulización y Lehman',p:'Entre 2004 y 2006 las tasas de la Reserva Federal subieron de 1,25 % a 5,25 %, lo que aumentó el impago de deudores con hipotecas de alto riesgo y tasa variable. Muchas de esas hipotecas se habían empaquetado en valores y vendido a inversores de todo el mundo. En abril de 2007 quebró un gran prestamista de hipotecas de alto riesgo, y el 15 de septiembre de 2008 quebró Lehman Brothers, la mayor bancarrota de la historia de EE. UU.',e:['Se concedieron hipotecas a deudores de alto riesgo y subió el precio de las casas.','Las hipotecas se empaquetaron en valores y se vendieron por todo el sistema financiero.','Los precios de las casas bajaron y subieron los impagos.','Nadie sabía quién tenía las pérdidas: se congeló el crédito y quebraron entidades.'],i:'Deuda excesiva más productos complejos más pérdida de confianza producen contagio.',s:['brit08','fh_gr','hist08']},
+ {t:'Cómo se respondió en 2008',p:'La Reserva Federal llevó las tasas de corto plazo a casi cero, creó programas especiales de liquidez y crédito, y apoyó a instituciones clave. Más adelante hubo reformas importantes en la regulación bancaria y financiera. La lección de 1929 pesó: hubo una reacción mucho más rápida y amplia que entonces.',q:['¿Qué hizo la Fed con las tasas en diciembre de 2008?','Las bajó a 0 %, por primera vez en su historia.'],i:'En una crisis de confianza, el banco central actúa como prestamista de última instancia.',s:['fh_gr','hist08']},
+ {t:'Qué tienen en común',p:'Ambas crisis tuvieron un auge alimentado por crédito, activos que subieron mucho, una pérdida de confianza y un contagio a todo el sistema. En ambas, la forma de contener el pánico marcó la diferencia en la profundidad de la caída.',i:'Los detalles cambian cada vez. El patrón de auge, deuda y pánico se repite.',s:['fh_gd','fh_gr']}
+ ],
+ quiz:[
+ {q:'¿Qué convirtió el crash de 1929 en una depresión prolongada, según la historia de la Reserva Federal?',o:['Solo la caída de la bolsa','Los pánicos bancarios de 1930 y 1931','El descubrimiento de petróleo','Una guerra comercial con Asia'],c:1,x:'Una serie de pánicos bancarios convirtió una posible recesión corta en el inicio de la Gran Depresión.'},
+ {q:'¿Qué ocurrió el 15 de septiembre de 2008?',o:['Se creó la Reserva Federal','Quebró Lehman Brothers, la mayor bancarrota de EE. UU.','Cayó el Muro de Berlín','Nació el euro'],c:1,x:'La quiebra de Lehman intensificó la crisis financiera global.'},
+ {q:'¿Qué rasgo comparten las crisis de 1929 y 2008?',o:['Fueron causadas por falta de crédito','Auge con crédito abundante y luego pérdida de confianza','Ocurrieron solo en un país','No hubo respuesta de los gobiernos'],c:1,x:'En ambas hubo crédito abundante, burbujas y contagio por pérdida de confianza.'}
+ ]},
+
+{id:'plan',lv:2,t:'Tu plan: reglas simples para empezar',r:'De la teoría a una lista concreta de pasos, con precauciones.',
+ obj:['Ordenar tus prioridades antes de invertir','Reconocer señales de fraude','Armar un plan de cinco pasos'],
+ cards:[
+ {t:'Antes de invertir',p:'Antes de poner un dólar en inversiones conviene tener claro para qué es el dinero, cuándo lo necesitarás y cuánto riesgo puedes tolerar. También conviene contar con un fondo de emergencia y no estar pagando deudas muy caras.',e:['Meta: ¿para qué es el dinero?','Plazo: ¿cuándo lo necesitas?','Riesgo: ¿cuánta caída aguantarías sin vender?','Base: fondo de emergencia y deudas caras bajo control.'],i:'La meta y el plazo deciden la inversión, no al revés.',s:['inv_start','ia']},
+ {t:'Costos y señales de fraude',p:'Los costos reducen tu retorno cada año, así que compáralos. Desconfía de promesas de retornos altos y garantizados, de la presión para decidir ya y de quien no puede explicarte con claridad dónde está tu dinero. Verifica que quien te asesora esté registrado ante el regulador de tu país.',q:['¿Cuál es una señal de alerta en una oferta de inversión?','Prometer retornos altos y garantizados, o presionar para decidir rápido.'],i:'Si suena demasiado bueno para ser cierto, probablemente lo es.',s:['inv_st','fees']},
+ {t:'Tu plan en cinco pasos',p:'Marca los pasos que ya tienes. Se guardan en este dispositivo.',chk:['Tengo una meta con plazo definido.','Tengo un fondo de emergencia o un plan para armarlo.','Sé cuánto pago de intereses por mis deudas y cuál pagar primero.','Elegí una mezcla de activos según mi horizonte y mi tolerancia al riesgo.','Escribí mis reglas: cuánto aporto, cuándo reviso y qué me haría vender.'],i:'Un plan simple y sostenido supera a uno perfecto que abandonas.',s:['inv_start','ia_guide']},
+ {t:'Practica sin riesgo',p:'Antes de usar plata real, practica en el laboratorio de bolsa de esta app con dinero ficticio. Prueba diversificar, ver cómo reaccionan los precios a las noticias y notar cómo te sientes en una caída.',i:'Practicar sin riesgo te muestra tus hábitos antes de que cuesten dinero.',s:['inv_st']}
+ ],
+ quiz:[
+ {q:'¿Cuál debería ir primero en tu orden de prioridades?',o:['Comprar la acción de moda','Una base de emergencia y deudas caras bajo control','Pedir un préstamo para invertir','Esperar a que bajen todas las tasas'],c:1,x:'Una base sólida evita que un imprevisto te obligue a vender inversiones o a endeudarte caro.'},
+ {q:'¿Cuál es señal de alerta de fraude?',o:['Un contrato claro','Prometer retornos altos y garantizados','Un asesor registrado','Costos explicados por escrito'],c:1,x:'Ninguna inversión puede garantizar retornos altos sin riesgo.'},
+ {q:'¿Por qué practicar en un simulador antes de invertir plata real?',o:['Porque da ganancias reales','Para ver tus reacciones y errores sin que cuesten dinero','Porque reemplaza el estudio','Porque predice el mercado'],c:1,x:'Un simulador permite equivocarse y aprender sin perder dinero real.'}
+ ]}
+];
+
+const GLOS=[
+['Acción','Parte de la propiedad de una empresa. Da derecho a votar y, si la empresa lo reparte, a recibir dividendos.','acciones'],
+['Arancel','Impuesto a los productos importados.','divisas'],
+['Balanza comercial','Diferencia entre lo que un país exporta y lo que importa.','medir'],
+['Banco central','Institución que maneja la política monetaria de un país o región.','bancos'],
+['Bono','Préstamo que haces a un gobierno o empresa a cambio de cupones y la devolución del valor nominal.','bonos'],
+['Burbuja','Alza de precios sostenida por entusiasmo y deuda, no por el valor real, que suele terminar en caída fuerte.','crisis'],
+['Capital (ganancia de)','Ganancia por vender un activo a un precio mayor al de compra.','acciones'],
+['Ciclo económico','Sucesión de expansión, pico, recesión y valle de la actividad económica.','ciclos'],
+['Corrida bancaria','Retiro masivo y simultáneo de depósitos por pérdida de confianza.','ciclos'],
+['Costo de oportunidad','Lo mejor a lo que renuncias al elegir una opción.','dinero'],
+['Cupón','Pago periódico de intereses de un bono.','bonos'],
+['Déficit fiscal','Cuando el gobierno gasta más de lo que recauda.','bancos'],
+['Demanda','Cantidad que los compradores quieren comprar a cada precio.','oferta'],
+['Depreciación (de una moneda)','Pérdida de valor de una moneda frente a otra.','divisas'],
+['Desempleo (tasa de)','Porcentaje de la fuerza laboral que no tiene trabajo y lo busca activamente.','medir'],
+['Diversificación','Repartir el dinero entre muchas inversiones para reducir el riesgo propio de cada una.','riesgo'],
+['Dividendo','Pago que una empresa reparte entre sus accionistas.','acciones'],
+['Dinero fiat','Dinero que vale por confianza y ley, no por estar respaldado por un metal.','historia'],
+['ETF','Fondo cotizado: fondo que se compra y se vende en bolsa durante el día como una acción.','fondos'],
+['Equilibrio (precio de)','Precio en el que la cantidad demandada coincide con la ofrecida.','oferta'],
+['Escasez','Diferencia entre deseos ilimitados y recursos limitados.','dinero'],
+['Fondo de emergencia','Reserva líquida para imprevistos.','ahorro'],
+['Fondo mutuo','Fondo que junta dinero de muchos inversores para comprar una canasta de activos.','fondos'],
+['Inflación','Aumento general y sostenido de los precios.','inflacion'],
+['Interés compuesto','Interés que se calcula sobre el capital y sobre los intereses ya acumulados.','interes'],
+['IPC','Índice de precios al consumidor: mide el cambio en el precio de una canasta típica.','inflacion'],
+['IPO','Primera oferta pública de acciones de una empresa.','acciones'],
+['Liquidez','Facilidad para convertir un activo en dinero sin perder valor.','ahorro'],
+['Oferta','Cantidad que los vendedores quieren vender a cada precio.','oferta'],
+['P/U','Razón precio-utilidad: precio de la acción dividido entre la utilidad por acción.','valoracion'],
+['PIB','Valor de los bienes y servicios finales producidos en un país en un periodo.','medir'],
+['Poder adquisitivo','Cantidad de bienes y servicios que puedes comprar con una suma de dinero.','inflacion'],
+['Política fiscal','Uso del gasto y los impuestos del gobierno para influir en la economía.','bancos'],
+['Política monetaria','Uso de las tasas y el dinero por el banco central para influir en la economía.','bancos'],
+['Razón de gastos','Porcentaje anual de los activos de un fondo que se usa para cubrir sus costos.','fondos'],
+['Rebalanceo','Volver a la mezcla de activos original tras desviarse por los movimientos de precios.','riesgo'],
+['Recesión','Caída de la actividad económica durante un tiempo.','ciclos'],
+['Riesgo de mercado','Riesgo que afecta a casi todas las inversiones a la vez y que no se elimina diversificando.','riesgo'],
+['Tasa de interés','Precio del dinero prestado, expresado como porcentaje.','bancos'],
+['Tipo de cambio','Precio de una moneda en términos de otra.','divisas'],
+['Ventaja comparativa','Capacidad de producir algo con menor costo de oportunidad que otro.','divisas'],
+['Volatilidad','Qué tanto sube y baja el precio de un activo.','riesgo'],
+['Vencimiento','Fecha en que un bono devuelve el valor nominal.','bonos']
+];
+/* ===== Motor de la app ===== */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const APP=$('#app');
+const KEY=uid=>'economia:'+(uid||'anon');
+const INT=[0,1,3,7,14,30];
+const START=10000,FEE=0.001;
+const blank=()=>({done:{},seen:{},best:{},lb:{},big:0,T:null,chk:{},ts:0});
+let S=blank();
+const ctx={uid:null,sb:null,nubeOk:false};
+let tmr=null;
+const loadLocal=uid=>{try{const raw=localStorage.getItem(KEY(uid));if(raw)return Object.assign(blank(),JSON.parse(raw));}catch(e){}return blank();};
+const nube=()=>{
+  if(!ctx.sb||!ctx.nubeOk||!ctx.uid)return;
+  const uid=ctx.uid,snap=JSON.stringify(S);
+  ctx.sb.from('economia_docs').upsert({user_id:uid,json:snap,updated_at:new Date().toISOString()}).then(()=>{});
+};
+const save=()=>{S.ts=Date.now();try{localStorage.setItem(KEY(ctx.uid),JSON.stringify(S));}catch(e){}clearTimeout(tmr);tmr=setTimeout(nube,1500);};
+const today=()=>Math.floor(Date.now()/864e5);
+
+const MOD={};MODS.forEach((m,i)=>{m.i=i;MOD[m.id]=m;});
+let QZ=null,tlSel=-1,armed=false,lastKey='';
+
+/* ---------- utilidades de vista ---------- */
+const srcLine=a=>!a||!a.length?'':'<div class="srcs"><b>Fuentes:</b> '+a.map(k=>SRC[k]?`<a href="${SRC[k][1]}" target="_blank" rel="noopener noreferrer">${esc(SRC[k][0])}</a>`:'').join('')+'</div>';
+const lvClass=m=>'t'+(m.lv+1);
+const stateOf=m=>S.done[m.id]?'done':'todo';
+const statusText=m=>S.done[m.id]?'Completado':S.seen[m.id]?'En curso':'Sin empezar';
+const dueIds=()=>Object.keys(S.lb).filter(id=>S.lb[id].d<=today());
+const nextMod=()=>MODS.find(m=>!S.done[m.id])||null;
+function itemById(id){const[a,b]=id.split('.');const m=MOD[a];if(!m||!m.quiz[+b])return null;return Object.assign({},m.quiz[+b],{id,mod:a});}
+
+/* ---------- vistas ---------- */
+function vHome(){
+  const done=MODS.filter(m=>S.done[m.id]).length,tot=MODS.length,nx=nextMod();
+  let h=`<section class="hero"><p class="kick">Curso gratuito de economía y finanzas</p><h1>EconomIA</h1><p class="lead">Empieza sin saber nada y llega a entender inflación, bolsa, bonos, divisas y crisis. Un tema a la vez, con ejemplos paso a paso, práctica y fuentes verificables.</p>
+  <div class="card"><div class="row sp"><b>Tu avance</b><span>${done} de ${tot} temas</span></div><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${tot}" aria-valuenow="${done}" aria-label="Temas completados"><i style="width:${done/tot*100}%"></i></div>
+  <div class="row" style="margin-top:14px">${nx?`<a class="btn ok" href="#t-${nx.id}-${S.seen[nx.id]?Math.min(S.seen[nx.id],nx.cards.length):0}">${done?'Continuar':'Empezar'}: ${esc(nx.t)}</a>`:'<b>Completaste toda la ruta. Sigue con el repaso y el laboratorio de bolsa.</b>'}<a class="btn sec" href="#ayuda">Cómo funciona</a></div></div></section>`;
+  LV.forEach((L,li)=>{
+    const ms=MODS.filter(m=>m.lv===li);
+    h+=`<section class="lvl t${li+1}" aria-labelledby="lv${li}"><h2 id="lv${li}"><span class="tag">${L.n}</span>${L.t}</h2><p class="muted">${L.d}</p><div class="line">`;
+    ms.forEach(m=>{h+=`<a class="st" data-s="${stateOf(m)}" href="#t-${m.id}-0"><b>${esc(m.t)}</b><span class="m">${esc(m.r)}</span><span class="m">${m.cards.length} tarjetas y ${m.quiz.length} preguntas · <em>${statusText(m)}</em></span></a>`;});
+    h+='</div></section>';
+  });
+  h+=`<section class="card" style="margin-top:22px"><h2>Practica lo aprendido</h2><p>El repaso espaciado te devuelve las preguntas justo antes de olvidarlas. El laboratorio de bolsa te deja practicar con dinero ficticio.</p><div class="row"><a class="btn sec" href="#repaso">Repaso${dueIds().length?' ('+dueIds().length+' pendientes)':''}</a><a class="btn sec" href="#bolsa">Laboratorio de bolsa</a><a class="btn sec" href="#glosario">Glosario</a></div></section>`;
+  return h;
+}
+
+function vIntro(m){
+  const q=S.best[m.id];
+  return `<p class="crumbs"><a href="#inicio">Ruta</a> / ${LV[m.lv].n}</p><div class="card ${lvClass(m)}" style="border-top:6px solid var(--lc)"><p class="kick" style="color:var(--lc)">${LV[m.lv].n}: ${LV[m.lv].t}</p><h1 id="ttl" tabindex="-1">${esc(m.t)}</h1><p class="lead">${esc(m.r)}</p>
+  <h3>Al terminar podrás</h3><ul>${m.obj.map(o=>`<li>${esc(o)}</li>`).join('')}</ul>
+  <p class="muted small">${m.cards.length} tarjetas y ${m.quiz.length} preguntas de práctica. Unos ${Math.round(m.cards.length*1.5+m.quiz.length*.7)} minutos.${q!==undefined?' Mejor resultado: '+q+' de '+m.quiz.length+'.':''}</p>
+  <div class="row"><a class="btn ok" href="#t-${m.id}-1">Empezar tarjetas</a><a class="btn sec" href="#t-${m.id}-q">Ir directo a las preguntas</a></div></div>`;
+}
+
+function simBox(c){return `<div class="sim" data-sim="${c.sim}"${c.sv?` data-sv='${JSON.stringify(c.sv)}'`:''}></div>`;}
+function tlBox(){
+  let h='<div class="tl" role="group" aria-label="Hitos">'+TL.map((e,i)=>`<button type="button" data-act="tl" data-i="${i}" aria-pressed="${i===tlSel}"><b>${esc(e.y)}</b><span>${esc(e.t)}</span></button>`).join('')+'</div>';
+  if(tlSel>=0){const e=TL[tlSel];h+=`<div class="tlx" role="region" aria-label="Detalle del hito"><h3>${esc(e.y)}: ${esc(e.t)}</h3><p>${esc(e.d)}</p><p><b>Lección:</b> ${esc(e.l)}</p>${srcLine(e.s)}</div>`;}
+  else h+='<p class="note">Elige un hito para ver el detalle.</p>';
+  return h;
+}
+function chkBox(c){
+  return '<div class="chk">'+c.chk.map((t,i)=>`<label><input type="checkbox" data-act="chk" data-i="${i}"${S.chk[i]?' checked':''}><span>${esc(t)}</span></label>`).join('')+'</div>';
+}
+function cardHTML(m,c){
+  let h=`<h2 id="ttl" tabindex="-1">${esc(c.t)}</h2><p class="lead">${esc(c.p)}</p>`;
+  if(c.e)h+=`<div class="ex"><h3>Ejemplo paso a paso</h3><ol>${c.e.map(x=>`<li>${esc(x)}</li>`).join('')}</ol></div>`;
+  if(c.sim)h+=simBox(c);
+  if(c.tl)h+=tlBox();
+  if(c.chk)h+=chkBox(c);
+  if(c.i)h+=`<div class="key"><b>Idea clave.</b> ${esc(c.i)}</div>`;
+  if(c.q)h+=`<details class="pre"><summary>Piensa antes de seguir</summary><p><b>${esc(c.q[0])}</b></p><p>Respuesta: ${esc(c.q[1])}</p></details>`;
+  if(c.n)h+=`<p class="note">${esc(c.n)}</p>`;
+  return h+srcLine(c.s);
+}
+function vCard(m,s){
+  const N=m.cards.length,c=m.cards[s-1];
+  if(!S.seen[m.id]||S.seen[m.id]<s){S.seen[m.id]=s;save();}
+  const dots=m.cards.map((_,i)=>`<i class="${i<s?'on':''}${i===s-1?' cur':''}"></i>`).join('');
+  return `<div class="${lvClass(m)}"><p class="crumbs"><a href="#inicio">Ruta</a> / <a href="#t-${m.id}-0">${esc(m.t)}</a></p>
+  <div class="row sp" style="margin-bottom:8px"><b aria-live="polite">Tarjeta ${s} de ${N}</b><div class="tools"><button type="button" class="pill" data-act="tts">Escuchar</button><button type="button" class="pill" data-act="big" aria-pressed="${!!S.big}">Letra grande</button></div></div>
+  <div class="bar" aria-hidden="true"><i style="width:${s/N*100}%"></i></div>
+  <article class="stage" style="margin-top:12px">${cardHTML(m,c)}</article>
+  <div class="dots" aria-hidden="true">${dots}</div>
+  <div class="nav2"><a class="btn sec" href="#t-${m.id}-${s-1}">Anterior</a><a class="btn ok" href="#t-${m.id}-${s<N?s+1:'q'}">${s<N?'Siguiente':'Ir a las preguntas'}</a></div>
+  <p class="note" style="text-align:center">Atajo: flechas izquierda y derecha del teclado.</p></div>`;
+}
+
+/* ---------- preguntas y repaso espaciado ---------- */
+function startQuiz(items,mode,modId){QZ={items,mode,modId,i:0,pick:null,ok:0,wrong:[],done:false};}
+function lbUpdate(id,ok){
+  const t=today(),b=S.lb[id]?S.lb[id].b:0;
+  if(ok){const nb=Math.min(5,b+1);S.lb[id]={b:nb,d:t+INT[nb]};}else S.lb[id]={b:1,d:t};
+}
+function vQuiz(m){
+  if(!QZ||QZ.mode!=='mod'||QZ.modId!==m.id)startQuiz(m.quiz.map((q,i)=>Object.assign({},q,{id:m.id+'.'+i,mod:m.id})),'mod',m.id);
+  return quizBody(m);
+}
+function quizBody(m){
+  const z=QZ,cls=m?lvClass(m):'t1';
+  const head=m?`<p class="crumbs"><a href="#inicio">Ruta</a> / <a href="#t-${m.id}-0">${esc(m.t)}</a> / Preguntas</p>`:'<p class="crumbs"><a href="#inicio">Ruta</a> / <a href="#repaso">Repaso</a></p>';
+  if(z.done){
+    const n=z.items.length,nm=m?MODS[m.i+1]:null;
+    const msg=z.ok===n?'Perfecto. Esto ya empieza a quedarse en tu memoria.':z.ok>=n/2?'Buen avance. Repasa lo que fallaste y vuelve a intentar.':'Aún está fresco. Repasa las tarjetas y vuelve a intentar: equivocarse también enseña.';
+    return `<div class="${cls}">${head}<div class="card"><p class="kick">Resultado</p><h2 id="ttl" tabindex="-1">${z.ok} de ${n} correctas</h2><p>${msg}</p><p class="muted small">Las preguntas que fallaste volverán pronto en el repaso; las que acertaste, más adelante.</p>
+    <div class="row">${m?`<a class="btn sec" href="#t-${m.id}-1">Repasar tarjetas</a><button type="button" class="btn sec" data-act="retry">Repetir preguntas</button>${nm?`<a class="btn ok" href="#t-${nm.id}-0">Siguiente: ${esc(nm.t)}</a>`:'<a class="btn ok" href="#inicio">Volver a la ruta</a>'}`:`<a class="btn ok" href="#inicio">Volver a la ruta</a><a class="btn sec" href="#repaso">Ver repaso</a>`}</div></div></div>`;
+  }
+  const it=z.items[z.i],n=z.items.length,letters='ABCD';
+  const opts=it.o.map((o,i)=>{
+    let c='opt',v='';
+    if(z.pick!==null){if(i===it.c){c+=' ok';v='<span class="v">Correcta</span>';}else if(i===z.pick){c+=' bad';v='<span class="v">Tu respuesta: incorrecta</span>';}}
+    return `<button type="button" class="${c}" data-act="pick" data-i="${i}"${z.pick!==null?' disabled':''}><b>${letters[i]}</b><span>${esc(o)}${v}</span></button>`;
+  }).join('');
+  let fb='';
+  if(z.pick!==null){const ok=z.pick===it.c;fb=`<div class="fb ${ok?'ok':'bad'}" role="status"><b>${ok?'Correcto.':'Todavía no.'}</b> ${esc(it.x)}</div><button type="button" class="btn ok" id="nxt" data-act="nxt">${z.i<n-1?'Siguiente pregunta':'Ver resultado'}</button>`;}
+  return `<div class="${cls}">${head}<div class="row sp" style="margin-bottom:8px"><b>Pregunta ${z.i+1} de ${n}</b>${z.mode==='rev'?'<span class="muted small">Repaso espaciado</span>':''}</div><div class="bar" aria-hidden="true"><i style="width:${(z.i)/n*100}%"></i></div>
+  <div class="card" style="margin-top:12px"><h2 id="ttl" tabindex="-1" style="font-size:1.3rem">${esc(it.q)}</h2><div role="group" aria-label="Opciones">${opts}</div>${fb}</div></div>`;
+}
+function vReview(){
+  const due=dueIds(),all=Object.keys(S.lb),cnt=[0,0,0,0,0,0];
+  all.forEach(id=>cnt[S.lb[id].b]++);
+  const mx=Math.max(1,...cnt.slice(1));
+  const bx=[1,2,3,4,5].map(b=>`<div><i style="height:${cnt[b]/mx*60}px"></i>Caja ${b}<br>${cnt[b]}</div>`).join('');
+  return `<h1 id="ttl" tabindex="-1">Repaso espaciado</h1><p class="lead">Recordar una respuesta con esfuerzo fortalece la memoria más que releer. Aquí las preguntas vuelven cada vez más espaciadas: si aciertas, tardan más en volver; si fallas, vuelven pronto.</p>
+  <div class="card"><div class="stats">${stat('Preguntas aprendidas',all.length)}${stat('Pendientes hoy',due.length)}</div><div class="boxes" aria-label="Preguntas por caja de repaso">${bx}</div>
+  ${due.length?`<button type="button" class="btn ok" data-act="startrev">Empezar repaso (${Math.min(10,due.length)} preguntas)</button>`:`<p><b>${all.length?'Nada pendiente por ahora. Vuelve mañana.':'Aún no tienes preguntas para repasar.'}</b> ${all.length?'':'Completa las preguntas de un tema y aparecerán aquí.'}</p><a class="btn sec" href="#inicio">Ir a la ruta</a>`}</div>
+  <p class="note">Las cajas 1 a 5 espacian el repaso: hoy, 1, 3, 7, 14 y 30 días. Se mezclan temas distintos a propósito, porque alternar temas ayuda a distinguir ideas parecidas.</p>${srcLine(['dunlosky','roediger'])}`;
+}
+
+/* ---------- glosario ---------- */
+function glList(q){
+  const t=q.trim().toLowerCase();
+  const r=GLOS.filter(g=>!t||g[0].toLowerCase().includes(t)||g[1].toLowerCase().includes(t));
+  if(!r.length)return '<li>No hay términos con esa búsqueda. Prueba con otra palabra.</li>';
+  return r.map(g=>`<li><b>${esc(g[0])}</b><br>${esc(g[1])}<br><a href="#t-${g[2]}-0" class="small">Ver el tema: ${esc(MOD[g[2]].t)}</a></li>`).join('');
+}
+function vGlos(){return `<h1 id="ttl" tabindex="-1">Glosario</h1><p class="lead">Busca cualquier término. Cada uno te lleva al tema donde se explica.</p><label for="gq" class="small muted">Buscar término</label><input id="gq" class="field" type="search" autocomplete="off" placeholder="Por ejemplo: inflación"><p class="note" id="gcount"></p><ul class="gl" id="gl">${glList('')}</ul>`;}
+
+/* ---------- ayuda ---------- */
+function vHelp(){
+  const keys=Object.keys(SRC);
+  return `<h1 id="ttl" tabindex="-1">Cómo funciona esta app</h1>
+  <div class="card"><h2>El método</h2><ul>
+  <li><b>Tarjetas cortas, una idea por vez.</b> Aprendes mejor con lecciones en segmentos que tú controlas y con palabras y ejemplos juntos.</li>
+  <li><b>Piensa antes de ver la respuesta.</b> Intentar recordar o razonar fortalece la memoria más que releer.</li>
+  <li><b>Preguntas con explicación.</b> Los ejercicios de práctica con retroalimentación son de las técnicas con mejor evidencia.</li>
+  <li><b>Repaso espaciado.</b> Repartir el estudio en el tiempo ayuda a retener más.</li></ul>${srcLine(['dunlosky','roediger','mayer'])}</div>
+  <div class="card"><h2>Cómo usarla</h2><ul><li>Recorre la ruta en orden: Nivel 1, 2 y 3. Puedes entrar a cualquier tema cuando quieras.</li><li>Al terminar cada tema, haz sus preguntas. Vuelve al repaso cada día unos minutos.</li><li>Prueba los simuladores moviendo los controles y observa qué cambia.</li><li>Practica en el laboratorio de bolsa con dinero ficticio.</li><li>Teclado: flechas izquierda y derecha cambian de tarjeta.</li></ul>
+  <div class="row"><button type="button" class="pill" data-act="big" aria-pressed="${!!S.big}">Letra grande</button></div></div>
+  <div class="card"><h2>Alcance y límites</h2><p>Este curso es educativo y usa dólares y mercados de Estados Unidos y Europa como ejemplos, sin centrarse en un solo país. No es asesoría financiera, legal ni tributaria. Las cifras de los simuladores son supuestos; el rendimiento pasado no garantiza resultados futuros.</p><p>Las tarjetas más conceptuales apuntan a materiales de referencia de organismos como el FMI, la Reserva Federal y reguladores. Los hechos históricos y definiciones citan la fuente específica. Antes de decidir con tu dinero real, verifica los datos actuales en fuentes oficiales de tu país.</p></div>
+  <div class="card"><h2>Tu progreso</h2><p>Se guarda en este navegador, en este dispositivo.</p><button type="button" class="btn sec" data-act="reset">${armed?'Toca otra vez para borrar todo':'Reiniciar mi progreso'}</button>${armed?'<p class="note">Esta acción borra avance, preguntas de repaso y tu cartera de bolsa. Si te equivocaste, cambia de sección y no se borrará nada.</p>':''}</div>
+  <div class="card"><h2>Diseño</h2><p>La interfaz sigue las diez heurísticas de usabilidad de Nielsen Norman Group: estado siempre visible, control del usuario, mensajes claros y prevención de errores.</p>${srcLine(['nn'])}</div>
+  <div class="card"><h2>Todas las fuentes (${keys.length})</h2><ul class="small">${keys.map(k=>`<li><a href="${SRC[k][1]}" target="_blank" rel="noopener noreferrer">${esc(SRC[k][0])}</a></li>`).join('')}</ul></div>`;
+}
+
+/* ---------- laboratorio de bolsa ---------- */
+const ASSETS=[
+ {k:'AUR',n:'Aurora Energía',t:'Energía',s:.018,b:.9,d:.0003,p:48},
+ {k:'NUB',n:'Nube Software',t:'Tecnología',s:.024,b:1.3,d:.0004,p:120},
+ {k:'PAN',n:'Panadería del Sur',t:'Consumo básico',s:.011,b:.6,d:.0003,p:35},
+ {k:'BAN',n:'Banco Meridiano',t:'Finanzas',s:.016,b:1.1,d:.0003,p:62},
+ {k:'MIN',n:'Minera Cumbre',t:'Materias primas',s:.02,b:1.0,d:.0002,p:27},
+ {k:'IDX',n:'Fondo Índice Mundial',t:'Fondo diversificado',s:.007,b:1,d:.0003,p:100},
+ {k:'BON',n:'Fondo de Bonos',t:'Renta fija',s:.003,b:-.1,d:.00015,p:50}
+];
+const EVENTS=[
+ {t:'El banco central sube las tasas de interés',e:{BAN:.03,NUB:-.03,BON:-.02,IDX:-.01},n:'Tasas más altas encarecen el crédito: los bonos existentes pierden precio y las empresas de crecimiento suelen sufrir. Los bancos pueden cobrar más por prestar.'},
+ {t:'Aumentan los temores de recesión',e:{AUR:-.03,NUB:-.03,PAN:-.01,BAN:-.04,MIN:-.05,IDX:-.03,BON:.015},n:'En el miedo, el dinero huye de las acciones hacia activos seguros. Los bonos suelen subir cuando las acciones caen.'},
+ {t:'Sube el precio de las materias primas',e:{MIN:.06,AUR:.03},n:'Un cambio en un sector golpea a unas empresas más que a otras. Un fondo diversificado amortigua este tipo de choques.'},
+ {t:'Entusiasmo por la tecnología',e:{NUB:.07,IDX:.01},n:'Las subidas por entusiasmo pueden revertirse. Una sola acción sube y baja más que un fondo amplio.'},
+ {t:'Resultados de empresas mejores de lo esperado',e:{PAN:.04,BAN:.03,IDX:.02},n:'El precio sube cuando los resultados superan las expectativas, no cuando son simplemente buenos.'}
+];
+function tInit(){const hist={};ASSETS.forEach(a=>{hist[a.k]=[a.p];});return{seed:Math.floor(Math.random()*1e6)+1,day:0,cash:START,pos:{},hist,news:[],sel:'IDX',qty:1,trades:0,fees:0,msg:''};}
+function tStep(T){
+  T.day++;const r=M.mul(T.seed*7919+T.day),g=()=>M.gauss(r),m=g()*.008;let ev=null;
+  if(r()<.12){ev=EVENTS[Math.floor(r()*EVENTS.length)];T.news.unshift({d:T.day,t:ev.t,n:ev.n});T.news=T.news.slice(0,5);}
+  ASSETS.forEach(a=>{
+    const h=T.hist[a.k],last=h[h.length-1];
+    let ret=a.d+a.b*m+g()*a.s*(a.k==='IDX'?.25:.8);
+    if(ev&&ev.e[a.k])ret+=ev.e[a.k];
+    h.push(Math.max(1,+(last*(1+ret)).toFixed(2)));
+    if(h.length>120)h.shift();
+  });
+}
+const tPrice=(T,k)=>{const h=T.hist[k];return h[h.length-1];};
+const tPrev=(T,k)=>{const h=T.hist[k];return h.length>1?h[h.length-2]:h[0];};
+function spark(h){
+  const w=90,hh=28,mn=Math.min(...h),mx=Math.max(...h),rg=mx-mn||1;
+  const pts=h.map((v,i)=>(h.length<2?0:i/(h.length-1)*w).toFixed(1)+','+(hh-2-(v-mn)/rg*(hh-4)).toFixed(1)).join(' ');
+  const up=h[h.length-1]>=h[0];
+  return `<svg viewBox="0 0 ${w} ${hh}" width="90" height="28" aria-hidden="true"><polyline points="${pts}" fill="none" stroke="${up?'#146c3a':'#b3261e'}" stroke-width="2"/></svg>`;
+}
+function estHTML(){
+  const T=S.T,a=ASSETS.find(x=>x.k===T.sel),p=tPrice(T,a.k),q=Math.max(1,T.qty|0),pos=T.pos[a.k],own=pos?pos.q:0;
+  const buy=q*p*(1+FEE),sell=q*p*(1-FEE),canBuy=buy<=T.cash+1e-9,canSell=q<=own;
+  let why='';
+  if(!canBuy)why+=`No te alcanza el efectivo para comprar ${q}. `;
+  if(!canSell)why+=own?`Solo tienes ${own} para vender. `:'No tienes unidades de este activo para vender. ';
+  return `<div class="stats">${stat('Comprar '+q+' costaría',usd2(buy))}${stat('Vender '+q+' te daría',usd2(sell))}</div>
+  <div class="row"><button type="button" class="btn ok" data-act="buy"${canBuy?'':' disabled'}>Comprar</button><button type="button" class="btn sec" data-act="sell"${canSell?'':' disabled'}>Vender</button></div>
+  ${why?`<p class="note">${esc(why)}</p>`:''}${T.msg?`<p class="fb ok" role="status">${esc(T.msg)}</p>`:''}`;
+}
+function vBolsa(){
+  const T=S.T||(S.T=tInit());
+  let inv=0;ASSETS.forEach(a=>{const p=T.pos[a.k];if(p)inv+=p.q*tPrice(T,a.k);});
+  const tot=T.cash+inv,ret=(tot/START-1)*100,bench=START*tPrice(T,'IDX')/100,br=(bench/START-1)*100;
+  let top=0,topK='';ASSETS.forEach(a=>{const p=T.pos[a.k];if(p){const w=p.q*tPrice(T,a.k)/tot*100;if(w>top){top=w;topK=a.n;}}});
+  const rows=ASSETS.map(a=>{
+    const p=tPrice(T,a.k),pv=tPrev(T,a.k),ch=(p/pv-1)*100,pos=T.pos[a.k];
+    return `<tr><td><b>${esc(a.n)}</b><br><span class="muted small">${esc(a.t)}</span></td><td>${spark(T.hist[a.k])}</td><td class="n">${usd2(p)}<br><span class="${ch>=0?'up':'dn'} small">${ch>=0?'+':''}${nf(ch,2)} %</span></td><td class="n">${pos?pos.q:0}</td><td><button type="button" class="pill" data-act="sel" data-k="${a.k}" aria-pressed="${T.sel===a.k}">${T.sel===a.k?'Elegido':'Elegir'}</button></td></tr>`;
+  }).join('');
+  const sel=ASSETS.find(a=>a.k===T.sel);
+  return `<h1 id="ttl" tabindex="-1">Laboratorio de bolsa</h1><p class="lead">Practica con ${usd(START)} ficticios. Los precios son simulados con números aleatorios y noticias inventadas: sirven para aprender, no predicen mercados reales. Cada operación cobra una comisión de ${pc(FEE*100,1)}.</p>
+  <div class="card"><div class="stats">${stat('Día '+T.day+': valor total',usd2(tot))}${stat('Tu resultado',(ret>=0?'+':'')+pc(ret,2))}${stat('Efectivo',usd2(T.cash))}${stat('Si hubieras solo mantenido el fondo índice',(br>=0?'+':'')+pc(br,2))}</div>
+  ${top>40?`<div class="alert"><b>Alerta de concentración.</b> ${esc(topK)} pesa ${pc(top,0)} de tu cartera. Si le va mal, tu resultado se hunde. Recuerda la tarjeta sobre diversificación.</div>`:''}
+  <div class="row"><button type="button" class="btn ok sm" data-act="adv" data-n="1">Avanzar 1 día</button><button type="button" class="btn sec sm" data-act="adv" data-n="5">5 días</button><button type="button" class="btn sec sm" data-act="adv" data-n="20">20 días</button></div></div>
+  <div class="card"><h2>Mercado</h2><div style="overflow-x:auto"><table class="t"><thead><tr><th>Activo</th><th>Tendencia</th><th class="n">Precio</th><th class="n">Tienes</th><th></th></tr></thead><tbody>${rows}</tbody></table></div></div>
+  <div class="card"><h2>Operar: ${esc(sel.n)}</h2><div class="ord"><label class="ctl"><span>Cantidad de unidades</span><input class="qty" id="qty" type="number" min="1" step="1" value="${Math.max(1,T.qty|0)}" inputmode="numeric"></label></div><div id="est">${estHTML()}</div></div>
+  <div class="card"><h2>Noticias simuladas</h2>${T.news.length?'<ul>'+T.news.map(n=>`<li><b>Día ${n.d}: ${esc(n.t)}.</b> ${esc(n.n)}</li>`).join('')+'</ul>':'<p class="muted">Aún no hay noticias. Avanza algunos días.</p>'}</div>
+  <div class="card"><h2>Preguntas para reflexionar</h2><ul><li>¿Tu cartera subió o bajó más que el fondo índice? ¿Por qué?</li><li>¿Cuántas posiciones distintas tienes? ¿Cuál pesa más?</li><li>¿Qué sentiste cuando algo cayó? ¿Vendiste por miedo?</li></ul>
+  <button type="button" class="btn sec sm" data-act="reset2">${armed?'Toca otra vez para reiniciar':'Reiniciar laboratorio'}</button></div>${srcLine(['ia','jove'])}`;
+}
+
+/* ---------- ruteo ---------- */
+function parse(){
+  const h=(location.hash||'#inicio').slice(1),p=h.split('-');
+  if(p[0]==='t'&&MOD[p[1]]){const m=MOD[p[1]];return{v:'t',m,s:p[2]==='q'?'q':Math.max(0,Math.min(m.cards.length,parseInt(p[2],10)||0))};}
+  return{v:['inicio','repaso','bolsa','glosario','ayuda'].includes(p[0])?p[0]:'inicio'};
+}
+function navHTML(cur){
+  const items=[['inicio','Ruta'],['repaso','Repaso'],['bolsa','Bolsa'],['glosario','Glosario'],['ayuda','Ayuda']],d=dueIds().length;
+  return items.map(([k,l])=>`<a href="#${k}"${cur===k?' aria-current="page"':''}>${l}${k==='repaso'&&d?`<span class="bd" aria-label="${d} pendientes">${d}</span>`:''}</a>`).join('');
+}
+function render(opt){
+  opt=opt||{};
+  const r=parse();let h='',cur=r.v;
+  if(r.v==='t'){
+    cur='inicio';
+    if(r.s==='q')h=vQuiz(r.m);else if(r.s===0)h=vIntro(r.m);else h=vCard(r.m,r.s);
+    if(r.s!=='q'&&QZ&&QZ.mode==='mod')QZ=null;
+  }else if(r.v==='inicio'){h=vHome();}
+  else if(r.v==='repaso'){h=QZ&&QZ.mode==='rev'?quizBody(null):vReview();}
+  else if(r.v==='bolsa')h=vBolsa();
+  else if(r.v==='glosario')h=vGlos();
+  else h=vHelp();
+  const key=location.hash||'#inicio';
+  APP.innerHTML=h;
+  $('#nav').innerHTML=navHTML(cur);
+  $$('.sim[data-sim]').forEach(initSim);
+  if(r.v==='glosario'){const q=$('#gq');q.addEventListener('input',()=>{$('#gl').innerHTML=glList(q.value);});}
+  if(key!==lastKey&&!opt.keep){armed=false;try{window.scrollTo(0,0);}catch(e){}const t=$('#ttl');if(t)t.focus({preventScroll:true});}
+  lastKey=key;
+  if(opt.focus){const f=$(opt.focus);if(f)f.focus({preventScroll:true});}
+}
+
+/* ---------- simuladores ---------- */
+function initSim(el){
+  const d=SIMS[el.dataset.sim],pre=el.dataset.sv?JSON.parse(el.dataset.sv):{},v={};
+  d.ctl.forEach(c=>{v[c.k]=pre[c.k]!==undefined?pre[c.k]:c.v;});
+  el.innerHTML=d.ctl.map(c=>`<label class="ctl"><span>${c.l}<b data-o="${c.k}">${esc(c.f(v[c.k]))}</b></span><input type="range" min="${c.a}" max="${c.b}" step="${c.s}" value="${v[c.k]}" data-k="${c.k}"></label>`).join('')+'<div class="out"></div>';
+  const out=$('.out',el),draw=()=>{out.innerHTML=d.out(v);};
+  el.addEventListener('input',e=>{
+    const k=e.target.dataset.k;if(!k)return;
+    v[k]=parseFloat(e.target.value);
+    const c=d.ctl.find(x=>x.k===k);$('[data-o="'+k+'"]',el).textContent=c.f(v[k]);draw();
+  });
+  draw();
+}
+
+/* ---------- eventos ---------- */
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]');if(!b)return;
+  const a=b.dataset.act;
+  if(a==='tts'){try{const s=window.speechSynthesis;if(s.speaking){s.cancel();return;}const u=new SpeechSynthesisUtterance($('.stage').textContent);u.lang='es-CO';s.speak(u);}catch(x){}}
+  else if(a==='big'){S.big=S.big?0:1;document.body.classList.toggle('big',!!S.big);save();$$('[data-act=big]').forEach(x=>x.setAttribute('aria-pressed',!!S.big));}
+  else if(a==='tl'){tlSel=+b.dataset.i;render({keep:1,focus:'[data-act=tl][data-i="'+tlSel+'"]'});}
+  else if(a==='chk'){S.chk[b.dataset.i]=b.checked;save();}
+  else if(a==='pick'){
+    if(!QZ||QZ.pick!==null)return;
+    const i=+b.dataset.i,it=QZ.items[QZ.i],ok=i===it.c;
+    QZ.pick=i;if(ok)QZ.ok++;else QZ.wrong.push(it.id);
+    lbUpdate(it.id,ok);save();render({keep:1,focus:'#nxt'});
+  }
+  else if(a==='nxt'){
+    if(QZ.i<QZ.items.length-1){QZ.i++;QZ.pick=null;render({keep:1,focus:'#ttl'});}
+    else{QZ.done=true;if(QZ.mode==='mod'){S.done[QZ.modId]=true;S.best[QZ.modId]=Math.max(S.best[QZ.modId]||0,QZ.ok);}save();render({keep:1,focus:'#ttl'});}
+  }
+  else if(a==='retry'){startQuiz(MOD[QZ.modId].quiz.map((q,i)=>Object.assign({},q,{id:QZ.modId+'.'+i,mod:QZ.modId})),'mod',QZ.modId);render({keep:1,focus:'#ttl'});}
+  else if(a==='startrev'){
+    const ids=dueIds().sort(()=>Math.random()-.5).slice(0,10),items=ids.map(itemById).filter(Boolean);
+    if(items.length){startQuiz(items,'rev',null);render({focus:'#ttl'});}
+  }
+  else if(a==='reset'){
+    if(armed){S={done:{},seen:{},best:{},lb:{},big:S.big,T:null,chk:{}};save();QZ=null;armed=false;render({keep:1});}
+    else{armed=true;render({keep:1,focus:'[data-act=reset]'});}
+  }
+  else if(a==='reset2'){
+    if(armed){S.T=tInit();save();armed=false;render({keep:1});}
+    else{armed=true;render({keep:1,focus:'[data-act=reset2]'});}
+  }
+  else if(a==='sel'){S.T.sel=b.dataset.k;S.T.msg='';save();render({keep:1,focus:'[data-act=sel][data-k="'+b.dataset.k+'"]'});}
+  else if(a==='adv'){const n=+b.dataset.n;for(let i=0;i<n;i++)tStep(S.T);S.T.msg='';save();render({keep:1,focus:'[data-act=adv][data-n="'+n+'"]'});}
+  else if(a==='buy'||a==='sell'){
+    const T=S.T,as=ASSETS.find(x=>x.k===T.sel),p=tPrice(T,as.k),q=Math.max(1,T.qty|0),pos=T.pos[as.k]||{q:0,cost:0};
+    if(a==='buy'){
+      const cost=q*p*(1+FEE);if(cost>T.cash+1e-9)return;
+      T.cash-=cost;T.fees+=q*p*FEE;pos.q+=q;pos.cost+=q*p;T.pos[as.k]=pos;T.msg='Compraste '+q+' de '+as.n+' a '+usd2(p)+'.';
+    }else{
+      if(q>pos.q)return;
+      const avg=pos.cost/pos.q;T.cash+=q*p*(1-FEE);T.fees+=q*p*FEE;pos.q-=q;pos.cost-=avg*q;
+      if(pos.q<=0)delete T.pos[as.k];else T.pos[as.k]=pos;
+      T.msg='Vendiste '+q+' de '+as.n+' a '+usd2(p)+'. '+(p>=avg?'Resultado favorable frente a tu precio promedio.':'Vendiste por debajo de tu precio promedio.');
+    }
+    T.trades++;save();render({keep:1,focus:'[data-act=sel][data-k="'+T.sel+'"]'});
+  }
+});
+document.addEventListener('input',e=>{
+  if(e.target.id==='qty'&&S.T){S.T.qty=Math.max(1,parseInt(e.target.value,10)||1);$('#est').innerHTML=estHTML();}
+});
+document.addEventListener('keydown',e=>{
+  if(/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))return;
+  const r=parse();if(r.v!=='t'||r.s==='q'||r.s===0)return;
+  const m=r.m,N=m.cards.length;
+  if(e.key==='ArrowRight')location.hash='#t-'+m.id+'-'+(r.s<N?r.s+1:'q');
+  if(e.key==='ArrowLeft')location.hash='#t-'+m.id+'-'+(r.s-1);
+});
+window.addEventListener('hashchange',()=>render());
+function alEntrar(user,sb){
+  ctx.uid=user.id;ctx.sb=sb||null;ctx.nubeOk=false;
+  S=loadLocal(user.id);QZ=null;
+  document.body.classList.toggle('big',!!S.big);render();
+  if(!sb)return;
+  const uid=user.id;
+  sb.from('economia_docs').select('json').eq('user_id',uid).maybeSingle().then(r=>{
+    if(ctx.uid!==uid||r.error)return;
+    ctx.nubeOk=true;
+    const d=r.data;
+    if(d&&typeof d.json==='string'){
+      try{
+        const c=Object.assign(blank(),JSON.parse(d.json));
+        if((c.ts||0)>(S.ts||0)){S=c;try{localStorage.setItem(KEY(uid),JSON.stringify(S));}catch(x){}document.body.classList.toggle('big',!!S.big);render({keep:1});return;}
+      }catch(x){}
+    }
+    if(S.ts)nube();
+  });
+}
+function alSalir(){clearTimeout(tmr);ctx.uid=null;ctx.sb=null;ctx.nubeOk=false;S=blank();QZ=null;}
+if(window.Suite)Suite.init({app:'economia',gate:true,onUser:alEntrar,onLogout:alSalir});else alEntrar({id:'anon'},null);
+</script>
+</body>
+</html>

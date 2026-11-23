@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Hola Apps · Tus apps, un solo login</title>
-<meta name="description" content="Hola Apps reúne PrecIA, AgendIA, Organic, Hábitos Atómicos, PlatIA, Numérica y Palabritas. Una cuenta abre todas.">
+<meta name="description" content="Hola Apps reúne PrecIA, AgendIA, Organic, Hábitos Atómicos, PlatIA, Numérica, Palabritas y EconomIA. Una cuenta abre todas.">
 <link rel="canonical" href="https://holaibague.co/holaapps/">
 <meta name="theme-color" content="#3D3A86">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -387,7 +387,7 @@ footer a:hover{color:var(--brand);text-decoration:underline}
     <a class="logo" href="#top"><b>HOLA <span>APPS</span></b><small>by Hola Chatbot</small></a>
     <nav aria-label="Apps">
       <a href="/holaapps/precia/">PrecIA</a><a href="/holaapps/agendia/">AgendIA</a><a href="/holaapps/organic/">Organic</a>
-      <a href="/holaapps/habitos/">Hábitos Atómicos</a><a href="/holaapps/platia/">PlatIA</a><a href="/holaapps/numerica/">Numérica</a><a href="/holaapps/palabritas/">Palabritas</a>
+      <a href="/holaapps/habitos/">Hábitos Atómicos</a><a href="/holaapps/platia/">PlatIA</a><a href="/holaapps/numerica/">Numérica</a><a href="/holaapps/palabritas/">Palabritas</a><a href="/holaapps/economia/">EconomIA</a>
     </nav>
     <span class="small">© 2026 Hola Ibagué</span>
   </div>
@@ -440,7 +440,12 @@ var APPS=[
   tagline:"Inglés para niños con memoria asociativa.",
   mini:[["Dog","dogo"],["Cat","catre"],["Horse","Jorge"]],
   desc:"Cada palabra en inglés se une a una palabra ancla en español, una imagen y una mini historia, para que los niños la recuerden jugando.",
-  feats:[["chat","Palabra ancla","Un sonido parecido en español conecta la palabra nueva con algo conocido."],["user","Tres niveles","Peques de 4 a 6 años, medianos de 7 a 9 y grandes de 10 a 12."],["cloud","Avance en tu cuenta","El progreso de cada palabra te sigue entre dispositivos."]]}
+  feats:[["chat","Palabra ancla","Un sonido parecido en español conecta la palabra nueva con algo conocido."],["user","Tres niveles","Peques de 4 a 6 años, medianos de 7 a 9 y grandes de 10 a 12."],["cloud","Avance en tu cuenta","El progreso de cada palabra te sigue entre dispositivos."]]},
+ {id:"economia",name:"EconomIA",icon:"cloud",tag:"Educación",status:"Beta",href:"/holaapps/economia/",
+  tagline:"Economía y finanzas desde cero.",
+  mini:[["Inflación","2,4 %"],["Interés compuesto","x2"],["Diversificar","Riesgo menor"]],
+  desc:"Una ruta por niveles con tarjetas paso a paso, simuladores, repaso espaciado y un laboratorio de bolsa con dinero ficticio.",
+  feats:[["grid","Ruta por niveles","De los conceptos básicos a bolsa, macroeconomía e historia económica."],["check","Repaso con preguntas","Cada módulo cierra con preguntas y explicación de cada respuesta."],["cloud","Avance en tu cuenta","Tu progreso y tu laboratorio de bolsa te siguen entre dispositivos."]]},
 ];
 function toast(t){var e=$("#toast");e.textContent=t;e.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(function(){e.classList.remove("on")},2400)}
 
@@ -687,6 +692,11 @@ var DEMOS={
   F.forEach(function(f,i){var b=document.createElement("button");b.className="hc-chip";b.textContent=f[0];b.onclick=function(){set(i)};fb.appendChild(b)});
   $("#dk").onclick=function(){var p=pv.classList.toggle("dk");this.setAttribute("aria-pressed",p)};
   set(0);
+ },
+ economia:function(box){
+  box.innerHTML='<h4>Interés compuesto</h4><label for="ecp" class="small">Aporte inicial: US$ <b id="ecv">1.000</b></label><input id="ecp" type="range" min="500" max="5000" step="100" value="1000" style="width:100%"><p id="ecr" role="status" style="margin-top:var(--space-3)"></p><p class="small">Supuesto ilustrativo de 7 % anual durante 20 años. No es una promesa de rendimiento.</p>';
+  var r=$("#ecp");function u(){var v=+r.value,t=v*Math.pow(1.07,20);$("#ecv").textContent=v.toLocaleString("es-CO");$("#ecr").innerHTML="En 20 años, US$ "+v.toLocaleString("es-CO")+" crecen a cerca de <b>US$ "+Math.round(t).toLocaleString("es-CO")+"</b>."}
+  r.oninput=u;u();
  },
  palabritas:function(box){
   var P=[["dog","dogo","Imagina un dogo enorme que ladra: dog, dog."],["cat","catre","Un gato duerme en tu catre y ronronea: cat."],["horse","Jorge","Jorge monta un caballo por el parque: horse."]];
