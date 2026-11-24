@@ -339,6 +339,10 @@ textarea.field{border-radius:24px;resize:none;min-height:70px;line-height:1.5}
 @media (prefers-reduced-motion: reduce){*{transition:none !important;animation:none !important}}
 
 .wsrow{display:flex;align-items:center;gap:6px}
+#wsopts{width:200px}
+#wsopts .mi:disabled{opacity:.4;cursor:not-allowed}
+#wsopts .mi:disabled:hover{background:var(--panel);color:inherit}
+#wsopts .mi[data-a=wsdel]:not(:disabled):hover{background:var(--warn);color:var(--on-color)}
 .iconbtn{width:40px;height:40px;border-radius:50%;border:0;background:var(--panel);display:grid;place-items:center;flex:none}
 .iconbtn svg{width:18px;height:18px}
 .iconbtn:hover{background:var(--bar);color:var(--bar-ink)}
@@ -760,9 +764,7 @@ button:active:not(:disabled){transform:scale(.93)}
       </div>
       <div class="wsrow">
         <button class="wsbtn" id="wsbtn" data-a="wsmenu" aria-expanded="false" aria-controls="wsmenu"><span class="label">Workspace</span><b id="wsname"></b><span class="caret"></span></button>
-        <button class="iconbtn" data-a="wsnew" title="Nuevo workspace" aria-label="Nuevo workspace"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
-        <button class="iconbtn" data-a="wsren" title="Renombrar workspace" aria-label="Renombrar workspace"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l1-4L16.500 4.500a2.100 2.100 0 0 1 3 3L8 19z"/><path d="M14.500 6.500l3 3"/></svg></button>
-        <button class="iconbtn del" id="wsdelbtn" data-a="wsdel" title="Eliminar workspace" aria-label="Eliminar workspace"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg></button>
+        <button class="iconbtn" id="wsmorebtn" data-a="wsmore" title="Opciones del workspace" aria-label="Opciones del workspace" aria-haspopup="menu" aria-expanded="false" aria-controls="wsopts"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5.500" r="1.800"/><circle cx="12" cy="12" r="1.800"/><circle cx="12" cy="18.500" r="1.800"/></svg></button>
       </div>
       <div class="sow">
         <label class="sr" for="sow">Nuevo seed</label>
@@ -802,6 +804,7 @@ button:active:not(:disabled){transform:scale(.93)}
   <div class="seg"><button class="ghost" data-a="dock-left" id="btn-dl">Izquierda</button><button class="ghost" data-a="dock-right" id="btn-dr">Derecha</button></div>
 </div>
 <div class="menu" id="wsmenu" role="menu" hidden></div>
+<div class="menu" id="wsopts" role="menu" hidden></div>
 <div class="menu" id="viewmenu" role="menu" hidden></div>
 <div class="menu" id="itemmenu" role="menu" hidden></div>
 <div class="menu" id="xfmenu" role="menu" hidden></div>
@@ -1864,7 +1867,7 @@ function setKind(s,nk,ok){
   if(nk==="semilla")s.mods=s.mods.filter(function(m){return m.t!=="brotes"});else ensureMod(s,"brotes");
   closeDlg();save();renderList();renderDetail(true);toast("Ahora es "+(nk==="semilla"?"una ":"un ")+nm);
 }
-function renderWs(){var w=wsById(S.ui.ws);$("#wsname").textContent=w?w.name:"";$("#wsdelbtn").disabled=S.workspaces.length<2}
+function renderWs(){var w=wsById(S.ui.ws);$("#wsname").textContent=w?w.name:""}
 function renderAll(){renderWs();renderKinds();renderTools();renderList();renderDetail();renderSelbar()}
 function switchWs(id){closeMenu();if(id===S.ui.ws)return;S.ui.ws=id;S.ui.sel=null;sm=false;dmode=false;picked={};save();renderAll()}
 function wsDialog(mode){
@@ -1948,9 +1951,14 @@ function selDelete(){
   if(S.ui.sel&&ids[S.ui.sel])S.ui.sel=null;
   sm=false;dmode=false;picked={};closeDlg();save();renderAll();toast("Eliminado");
 }
-function closeMenu(){var m=$("#menu");m.hidden=true;$("#burger").setAttribute("aria-expanded","false");var w=$("#wsmenu");w.hidden=true;$("#wsbtn").setAttribute("aria-expanded","false");$("#viewmenu").hidden=true;$("#viewbtn").setAttribute("aria-expanded","false");$("#itemmenu").hidden=true;$("#xfmenu").hidden=true;$("#loosemenu").hidden=true;$("#loosebtn").setAttribute("aria-expanded","false");document.querySelectorAll(".chevbtn[aria-expanded=true],.xfbtn[aria-expanded=true],.tkplus[aria-expanded=true],.tkxf[aria-expanded=true],.kbtn[aria-expanded=true]").forEach(function(b){b.setAttribute("aria-expanded","false")})}
+function closeMenu(){var m=$("#menu");m.hidden=true;$("#burger").setAttribute("aria-expanded","false");var w=$("#wsmenu");w.hidden=true;$("#wsbtn").setAttribute("aria-expanded","false");$("#wsopts").hidden=true;$("#wsmorebtn").setAttribute("aria-expanded","false");$("#viewmenu").hidden=true;$("#viewbtn").setAttribute("aria-expanded","false");$("#itemmenu").hidden=true;$("#xfmenu").hidden=true;$("#loosemenu").hidden=true;$("#loosebtn").setAttribute("aria-expanded","false");document.querySelectorAll(".chevbtn[aria-expanded=true],.xfbtn[aria-expanded=true],.tkplus[aria-expanded=true],.tkxf[aria-expanded=true],.kbtn[aria-expanded=true]").forEach(function(b){b.setAttribute("aria-expanded","false")})}
 function placeMenu(m,btn,right){m.hidden=false;var b=btn.getBoundingClientRect(),w=m.offsetWidth,h=m.offsetHeight,vh=window.innerHeight,top=b.bottom+8;if(top+h>vh-8){var up=b.top-h-8;top=up>=8?up:Math.max(8,vh-h-8)}m.style.top=top+"px";m.style.left=Math.max(8,Math.min(window.innerWidth-w-8,right?b.right-w:b.left))+"px"}
 function openMenu(){closeMenu();placeMenu($("#menu"),$("#burger"),true);$("#burger").setAttribute("aria-expanded","true")}
+function openWsOpts(){
+  closeMenu();var m=$("#wsopts"),one=S.workspaces.length<2;
+  m.innerHTML='<button class="mi" role="menuitem" data-a="wsnew">Nuevo workspace</button><button class="mi" role="menuitem" data-a="wsren">Renombrar</button><button class="mi'+(one?' off':'')+'" role="menuitem" data-a="wsdel"'+(one?' disabled title="Necesitas al menos un workspace"':'')+'>Eliminar</button>';
+  placeMenu(m,$("#wsmorebtn"),true);$("#wsmorebtn").setAttribute("aria-expanded","true");
+}
 function openWsMenu(){
   closeMenu();var m=$("#wsmenu");
   m.innerHTML=S.workspaces.map(function(w){return '<button class="mi'+(w.id===S.ui.ws?" on":"")+'" role="menuitem" data-a="wsgo" data-id="'+w.id+'"><span>'+esc(w.name)+'</span><span class="tiny">'+S.seeds.filter(function(x){return x.ws===w.id}).length+'</span></button>'}).join("")+
@@ -1987,7 +1995,7 @@ document.addEventListener("contextmenu",function(e){if(e.target.closest(".row"))
 document.addEventListener("click",function(e){
   if(isMobile()&&S.ui.dockOpenM&&!e.target.closest("#dock")){S.ui.dockOpenM=false;save();setDockClass(true)}
   if(lp.fired&&e.target.closest(".row")){lp.fired=false;e.preventDefault();e.stopPropagation();return}
-  if(!e.target.closest("#menu,#burger,#wsmenu,#wsbtn,#viewmenu,#viewbtn,#itemmenu,.chevbtn,#xfmenu,.xfbtn,.tkplus,.tkxf,.kbtn,#loosemenu,#loosebtn"))closeMenu();
+  if(!e.target.closest("#menu,#burger,#wsmenu,#wsbtn,#wsopts,#wsmorebtn,#viewmenu,#viewbtn,#itemmenu,.chevbtn,#xfmenu,.xfbtn,.tkplus,.tkxf,.kbtn,#loosemenu,#loosebtn"))closeMenu();
   var rowSel=e.target.closest(".row");
   if(sm&&rowSel){var id0=rowSel.dataset.id;if(picked[id0])delete picked[id0];else picked[id0]=true;if(!Object.keys(picked).length)exitSel();else{renderList();renderSelbar();if(picked[id0])popEl('#lists .row[data-id="'+id0+'"] .pick')}return}
   var tool=e.target.closest("[data-tool]");
@@ -2070,6 +2078,7 @@ document.addEventListener("click",function(e){
   }
   if(act==="viewmenu"){if($("#viewmenu").hidden)openViewMenu();else closeMenu();return}
   if(act==="viewgo"){S.ui.filter=a.dataset.k;save();closeMenu();renderList();return}
+  if(act==="wsmore"){if($("#wsopts").hidden)openWsOpts();else closeMenu();return}
   if(act==="wsmenu"){if($("#wsmenu").hidden)openWsMenu();else closeMenu();return}
   if(act==="wsgo"){switchWs(a.dataset.id);return}
   if(act==="wsnew"){closeMenu();wsDialog("new");return}
