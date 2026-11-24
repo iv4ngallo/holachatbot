@@ -86,6 +86,21 @@ h1,h2,h3{font-family:var(--font-d);margin:0;font-weight:700;text-transform:upper
 .burger:hover,.burger[aria-expanded="true"]{background:var(--bar);color:var(--bar-ink)}
 .burger svg{width:20px;height:20px}
 .sow{display:flex;gap:8px}
+.sowbtn{display:flex;flex:none;align-items:stretch;border-radius:999px;overflow:hidden;background:var(--green);color:var(--on-color);transition:background-color .2s}
+.sowbtn[data-k=proyecto]{background:var(--blue)}
+.sowbtn[data-k=ecosistema]{background:var(--orange-bar)}
+.sowbtn button{background:none;border:0;color:inherit;font-family:var(--font-d);text-transform:uppercase;letter-spacing:.08em;font-weight:700;font-size:14px}
+.sowmain{padding:9px 8px 9px 18px}
+.sowcaret{padding:0 12px 0 8px;display:grid;place-items:center;border-left:1.5px solid rgba(255,255,255,.35)!important}
+.sowcaret svg{width:16px;height:16px;transition:transform .2s}
+.sowcaret[aria-expanded=true] svg{transform:rotate(180deg)}
+.sowbtn button:hover{background:rgba(0,0,0,.12)}
+#kindmenu{width:210px}
+#kindmenu .mi{display:flex;align-items:center;gap:10px}
+#kindmenu .mi svg{width:22px;height:22px;flex:none}
+#kindmenu .mi.on{background:var(--panel);color:inherit;outline:2px solid var(--rule);outline-offset:-2px}
+#kindmenu .mi.on:hover{background:var(--blue);color:var(--on-color)}
+#kindmenu .mi:hover .stage{color:inherit}
 .sow input{flex:1;min-width:0;background:var(--panel);border:1.5px solid transparent;border-radius:999px;padding:10px 18px}
 .sow input:focus{border-color:var(--green);outline:none}
 .sow input::placeholder{color:var(--ink2)}
@@ -769,9 +784,11 @@ button:active:not(:disabled){transform:scale(.93)}
       <div class="sow">
         <label class="sr" for="sow">Nuevo seed</label>
         <input id="sow" type="text" placeholder="Siembra una idea y presiona Enter" autocomplete="off">
-        <button class="btn" data-a="sow">Sembrar</button>
+        <div class="sowbtn" id="sowbtn" data-k="semilla">
+          <button class="sowmain" id="sowmain" data-a="sow">Sembrar</button>
+          <button class="sowcaret" id="kindbtn" data-a="kindmenu" aria-label="Tipo de elemento a crear" title="Elegir qué crear" aria-haspopup="menu" aria-expanded="false" aria-controls="kindmenu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+        </div>
       </div>
-      <div class="kinds" id="kinds" role="group" aria-label="Tipo de seed a crear"></div>
       <div class="tools-row">
         <label class="sr" for="q">Buscar</label>
         <input id="q" class="search" type="search" placeholder="Buscar seeds o etiquetas">
@@ -805,6 +822,7 @@ button:active:not(:disabled){transform:scale(.93)}
 </div>
 <div class="menu" id="wsmenu" role="menu" hidden></div>
 <div class="menu" id="wsopts" role="menu" hidden></div>
+<div class="menu" id="kindmenu" role="menu" hidden></div>
 <div class="menu" id="viewmenu" role="menu" hidden></div>
 <div class="menu" id="itemmenu" role="menu" hidden></div>
 <div class="menu" id="xfmenu" role="menu" hidden></div>
@@ -1951,7 +1969,7 @@ function selDelete(){
   if(S.ui.sel&&ids[S.ui.sel])S.ui.sel=null;
   sm=false;dmode=false;picked={};closeDlg();save();renderAll();toast("Eliminado");
 }
-function closeMenu(){var m=$("#menu");m.hidden=true;$("#burger").setAttribute("aria-expanded","false");var w=$("#wsmenu");w.hidden=true;$("#wsbtn").setAttribute("aria-expanded","false");$("#wsopts").hidden=true;$("#wsmorebtn").setAttribute("aria-expanded","false");$("#viewmenu").hidden=true;$("#viewbtn").setAttribute("aria-expanded","false");$("#itemmenu").hidden=true;$("#xfmenu").hidden=true;$("#loosemenu").hidden=true;$("#loosebtn").setAttribute("aria-expanded","false");document.querySelectorAll(".chevbtn[aria-expanded=true],.xfbtn[aria-expanded=true],.tkplus[aria-expanded=true],.tkxf[aria-expanded=true],.kbtn[aria-expanded=true]").forEach(function(b){b.setAttribute("aria-expanded","false")})}
+function closeMenu(){var m=$("#menu");m.hidden=true;$("#burger").setAttribute("aria-expanded","false");var w=$("#wsmenu");w.hidden=true;$("#wsbtn").setAttribute("aria-expanded","false");$("#wsopts").hidden=true;$("#kindmenu").hidden=true;$("#kindbtn").setAttribute("aria-expanded","false");$("#wsmorebtn").setAttribute("aria-expanded","false");$("#viewmenu").hidden=true;$("#viewbtn").setAttribute("aria-expanded","false");$("#itemmenu").hidden=true;$("#xfmenu").hidden=true;$("#loosemenu").hidden=true;$("#loosebtn").setAttribute("aria-expanded","false");document.querySelectorAll(".chevbtn[aria-expanded=true],.xfbtn[aria-expanded=true],.tkplus[aria-expanded=true],.tkxf[aria-expanded=true],.kbtn[aria-expanded=true]").forEach(function(b){b.setAttribute("aria-expanded","false")})}
 function placeMenu(m,btn,right){m.hidden=false;var b=btn.getBoundingClientRect(),w=m.offsetWidth,h=m.offsetHeight,vh=window.innerHeight,top=b.bottom+8;if(top+h>vh-8){var up=b.top-h-8;top=up>=8?up:Math.max(8,vh-h-8)}m.style.top=top+"px";m.style.left=Math.max(8,Math.min(window.innerWidth-w-8,right?b.right-w:b.left))+"px"}
 function openMenu(){closeMenu();placeMenu($("#menu"),$("#burger"),true);$("#burger").setAttribute("aria-expanded","true")}
 function openWsOpts(){
@@ -1995,7 +2013,7 @@ document.addEventListener("contextmenu",function(e){if(e.target.closest(".row"))
 document.addEventListener("click",function(e){
   if(isMobile()&&S.ui.dockOpenM&&!e.target.closest("#dock")){S.ui.dockOpenM=false;save();setDockClass(true)}
   if(lp.fired&&e.target.closest(".row")){lp.fired=false;e.preventDefault();e.stopPropagation();return}
-  if(!e.target.closest("#menu,#burger,#wsmenu,#wsbtn,#wsopts,#wsmorebtn,#viewmenu,#viewbtn,#itemmenu,.chevbtn,#xfmenu,.xfbtn,.tkplus,.tkxf,.kbtn,#loosemenu,#loosebtn"))closeMenu();
+  if(!e.target.closest("#menu,#burger,#wsmenu,#wsbtn,#wsopts,#wsmorebtn,#kindmenu,#kindbtn,#viewmenu,#viewbtn,#itemmenu,.chevbtn,#xfmenu,.xfbtn,.tkplus,.tkxf,.kbtn,#loosemenu,#loosebtn"))closeMenu();
   var rowSel=e.target.closest(".row");
   if(sm&&rowSel){var id0=rowSel.dataset.id;if(picked[id0])delete picked[id0];else picked[id0]=true;if(!Object.keys(picked).length)exitSel();else{renderList();renderSelbar();if(picked[id0])popEl('#lists .row[data-id="'+id0+'"] .pick')}return}
   var tool=e.target.closest("[data-tool]");
@@ -2009,7 +2027,8 @@ document.addEventListener("click",function(e){
   var act=a.dataset.a,s=cur(),m;
   if(act==="done"){e.stopPropagation();var id=a.closest(".row").dataset.id;var x=byId(id),rd=a.getBoundingClientRect();x.done=a.checked;save();renderList();if(S.ui.sel===id)renderDetail(true);if(x.done)party(rd.left+rd.width/2,rd.top+rd.height/2,34,2.6,11);popEl('#rows .row[data-id="'+id+'"] .chk');return}
   if(act==="sow"){sow();return}
-  if(act==="kind"){newKind=a.dataset.k;renderKinds();$("#sow").focus();return}
+  if(act==="kindmenu"){if($("#kindmenu").hidden)openKindMenu();else closeMenu();return}
+  if(act==="kind"){newKind=a.dataset.k;closeMenu();renderKinds();$("#sow").focus();return}
   if(act==="menu"){if($("#menu").hidden)openMenu();else closeMenu();return}
   if(act==="rowtools"){var rr=a.getBoundingClientRect();showMini(a.dataset.id,rr.left+rr.width/2,rr.bottom);return}
   if(act==="grip")return;
@@ -2283,8 +2302,13 @@ document.addEventListener("change",function(e){
 });
 var newKind="semilla";
 function renderKinds(){
-  $("#kinds").innerHTML=STAGES.map(function(x){return '<button class="kind '+x.k+'" data-a="kind" data-k="'+x.k+'" aria-pressed="'+(newKind===x.k)+'">'+gico(x.k)+x.n+'</button>'}).join("");
+  var sb=$("#sowbtn");sb.dataset.k=newKind;$("#sowmain").title="Sembrar "+(newKind==="semilla"?"una idea":"un "+newKind);
   $("#sow").placeholder=newKind==="semilla"?"Siembra una idea y presiona Enter":(newKind==="proyecto"?"Nombre del proyecto (opcional)":"Nombre del ecosistema (opcional)");
+}
+function openKindMenu(){
+  closeMenu();var m=$("#kindmenu");
+  m.innerHTML=STAGES.map(function(x){return '<button class="mi'+(newKind===x.k?" on":"")+'" role="menuitem" data-a="kind" data-k="'+x.k+'"><span class="stage '+x.k+'">'+gico(x.k)+'</span><span>'+x.n+'</span></button>'}).join("");
+  placeMenu(m,$("#kindbtn"),true);$("#kindbtn").setAttribute("aria-expanded","true");
 }
 function sow(){
   var i=$("#sow"),v=i.value.trim();if(!v&&newKind==="semilla"){i.focus();return}
