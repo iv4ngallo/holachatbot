@@ -2312,10 +2312,11 @@ var Sync={db:null,assets:null,uid:null,meta:null,col:null,ready:false,state:"loc
 var SYNCKEY="organic.sync";
 function hsh(s){var h=2166136261;for(var i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return (h>>>0).toString(36)+s.length.toString(36)}
 function okSeg(id){return typeof id==="string"&&/^[A-Za-z0-9_\-.~:@+]{1,190}$/.test(id)&&id!=="."&&id!==".."}
-function metaObj(){return {v:S.v,workspaces:S.workspaces,order:S.seeds.map(function(s){return s.id}),parOn:!!S.ui.parOn,par:(S.ui.par||[]).filter(okSeg)}}
+function metaObj(){return {v:S.v,workspaces:S.workspaces,order:S.seeds.map(function(s){return s.id}),parOn:!!S.ui.parOn,par:(S.ui.par||[]).filter(okSeg),welcomeOff:!!S.ui.welcomeOff}}
 function metaLegacyObj(){return {v:S.v,workspaces:S.workspaces,order:S.seeds.map(function(s){return s.id})}}
+function metaPrevObj(){return {v:S.v,workspaces:S.workspaces,order:S.seeds.map(function(s){return s.id}),parOn:!!S.ui.parOn,par:(S.ui.par||[]).filter(okSeg)}}
 /* En paralelo viaja con la cuenta: aplica lo que llega de la nube */
-function applyPar(m){if(!m||typeof m.parOn==='undefined')return false;var on=!!m.parOn,ids=Array.isArray(m.par)?m.par.filter(okSeg):[];var ch=on!==!!S.ui.parOn||JSON.stringify(ids)!==JSON.stringify(S.ui.par||[]);S.ui.parOn=on;S.ui.par=ids;return ch}
+function applyPar(m){if(m&&typeof m.welcomeOff!=='undefined'){var wo=!!m.welcomeOff;if(wo!==!!S.ui.welcomeOff){S.ui.welcomeOff=wo;welcomeSync()}}if(!m||typeof m.parOn==='undefined')return false;var on=!!m.parOn,ids=Array.isArray(m.par)?m.par.filter(okSeg):[];var ch=on!==!!S.ui.parOn||JSON.stringify(ids)!==JSON.stringify(S.ui.par||[]);S.ui.parOn=on;S.ui.par=ids;return ch}
 function loadBase(){try{var b=JSON.parse(localStorage.getItem(SYNCKEY)||"null");if(b&&b.uid===Sync.uid)return b}catch(e){}return null}
 function saveBase(){
   var b={uid:Sync.uid,meta:Sync.metaJ?hsh(Sync.metaJ):null,seeds:{}};
@@ -2424,8 +2425,8 @@ function reconcile(metaSnap,seedsSnap){
     else if(r)keep[id]=r;
   });
   var mj=rmeta?JSON.stringify(rmeta):null;Sync.metaJ=mj;
-  var lmh=hsh(JSON.stringify(metaObj())),lmhOld=hsh(JSON.stringify(metaLegacyObj()));
-  var localMetaChanged=base.meta&&lmh!==base.meta&&lmhOld!==base.meta&&(!mj||hsh(mj)===base.meta);
+  var lmh=hsh(JSON.stringify(metaObj())),lmhOld=hsh(JSON.stringify(metaLegacyObj())),lmhPrev=hsh(JSON.stringify(metaPrevObj()));
+  var localMetaChanged=base.meta&&lmh!==base.meta&&lmhOld!==base.meta&&lmhPrev!==base.meta&&(!mj||hsh(mj)===base.meta);
   if(rmeta&&!localMetaChanged){S.workspaces=Array.isArray(rmeta.workspaces)?rmeta.workspaces:S.workspaces;S.v=rmeta.v||S.v;applyPar(rmeta)}
   var order=(localMetaChanged||!rmeta)?S.seeds.map(function(s){return s.id}):rmeta.order;
   S.seeds=Object.keys(keep).map(function(id){var l=local[id];if(l&&keep[id]!==l){replaceInPlace(l,keep[id]);return l}return keep[id]});
