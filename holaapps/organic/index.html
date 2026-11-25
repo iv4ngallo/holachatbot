@@ -113,6 +113,9 @@ h1,h2,h3{font-family:var(--font-d);margin:0;font-weight:700;text-transform:upper
 .kind.proyecto[aria-pressed="true"]{background:var(--blue)}
 .kind.ecosistema[aria-pressed="true"]{background:var(--orange-bar)}
 .tools-row{display:flex;gap:8px}
+#searchbtn{width:42px;height:42px}
+#searchbtn svg{width:20px;height:20px}
+#searchbtn.on{background:var(--blue);color:var(--on-color)}
 .search{flex:1;min-width:0;background:var(--panel);border:1.5px solid transparent;border-radius:999px;padding:8px 16px}
 .search:focus{border-color:var(--blue);outline:none}
 .selwrap{position:relative;flex:none}
@@ -775,7 +778,7 @@ button:active:not(:disabled){transform:scale(.93)}
           <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color:var(--green)"><path d="M16 28V14"/><path d="M16 17c-5 0-8-3-8-8 5 0 8 3 8 8z"/><path d="M16 14c0-4 3-7 8-7 0 5-3 8-8 7z"/></svg>
           <h1 class="bar">Organic</h1>
         </div>
-        <button class="burger" id="burger" data-a="menu" aria-label="Menú" aria-expanded="false" aria-controls="menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+        <button class="iconbtn" id="searchbtn" data-a="search" aria-label="Buscar" title="Buscar seeds o etiquetas" aria-haspopup="dialog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.500"/><path d="M16 16l4.500 4.500"/></svg></button>
       </div>
       <div class="wsrow">
         <button class="wsbtn" id="wsbtn" data-a="wsmenu" aria-expanded="false" aria-controls="wsmenu"><span class="label">Workspace</span><b id="wsname"></b><span class="caret"></span></button>
@@ -790,8 +793,7 @@ button:active:not(:disabled){transform:scale(.93)}
         </div>
       </div>
       <div class="tools-row">
-        <label class="sr" for="q">Buscar</label>
-        <input id="q" class="search" type="search" placeholder="Buscar seeds o etiquetas">
+        <span class="sp" style="flex:1"></span>
         <button class="iconbtn" id="welcomebtn" data-a="welcomeopen" hidden aria-label="Mostrar guía de inicio" title="Mostrar guía de inicio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.500 9.500a2.500 2.500 0 1 1 3.500 2.300c-.7.4-1 .9-1 1.700M12 17h.01"/></svg></button>
         <button class="iconbtn" id="loosebtn" data-a="loosemenu" aria-label="Agregar módulo al workspace" title="Agregar módulo al workspace" aria-expanded="false" aria-controls="loosemenu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="5"/><path d="M12 8.500v7M8.500 12h7"/></svg></button>
         <button class="iconbtn filterbtn" id="viewbtn" data-a="viewmenu" aria-label="Filtrar vista" title="Filtrar" aria-expanded="false" aria-controls="viewmenu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16l-6.200 7.200V19l-3.600-2v-4.800z"/></svg></button>
@@ -815,13 +817,8 @@ button:active:not(:disabled){transform:scale(.93)}
   <main class="detail" id="detail" aria-live="polite"></main>
 </div>
 
-<div class="menu" id="menu" role="menu" hidden>
-  <div class="syncst" id="syncst" role="status" data-st="local">Solo en este dispositivo</div>
-  <div class="label">Posición del toolbox</div>
-  <div class="seg"><button class="ghost" data-a="dock-left" id="btn-dl">Izquierda</button><button class="ghost" data-a="dock-right" id="btn-dr">Derecha</button></div>
-</div>
 <div class="menu" id="wsmenu" role="menu" hidden></div>
-<div class="menu" id="wsopts" role="menu" hidden></div>
+<div class="menu" id="wsopts" role="menu" hidden><div class="syncst" id="syncst" role="status" data-st="local">Solo en este dispositivo</div><div id="wsoptsbody" style="display:flex;flex-direction:column;gap:6px"></div></div>
 <div class="menu" id="kindmenu" role="menu" hidden></div>
 <div class="menu" id="viewmenu" role="menu" hidden></div>
 <div class="menu" id="itemmenu" role="menu" hidden></div>
@@ -1013,10 +1010,8 @@ function renderTools(){
     var used=c&&mod(c,t.k),off=c&&t.k==="brotes"&&c.kind==="semilla";
     return '<div class="toolwrap c-'+COL[t.k]+'" style="--i:'+TOOLS.indexOf(t)+'"><button class="tool c-'+COL[t.k]+(used?" used":"")+(off?" off":"")+'" draggable="true" data-tool="'+t.k+'"'+' title="'+(off?"Solo proyectos y ecosistemas":t.n)+'">'+ico(t.k)+'<div><b>'+t.n+'</b><span>'+t.d+'</span></div></button><button class="tool-add" data-a="looseadd" data-k="'+t.k+'" title="Agregar '+t.n.toLowerCase()+' al workspace" aria-label="Agregar '+t.n.toLowerCase()+' al workspace">'+ico("plus")+'</button></div>';
   }).join("");
-  $("#app").classList.toggle("dock-right",S.ui.dock==="right");
+  $("#app").classList.remove("dock-right");
   setDockClass(false);
-  $("#btn-dl").setAttribute("aria-pressed",S.ui.dock==="left");
-  $("#btn-dr").setAttribute("aria-pressed",S.ui.dock==="right");
 }
 
 /* ---------- vistas (dropdown agrupado) ---------- */
@@ -1060,7 +1055,7 @@ function truncW(t,n){
   return t;
 }
 function isFold(id){return !!(S.ui.fold&&S.ui.fold[id])}
-function renderList(){
+function renderList(){var sbt=$("#searchbtn");if(sbt)sbt.classList.toggle("on",!!(S.ui.q||"").trim());
   pruneSel();
   renderView();
   var all=wsSeeds(),PO=!!S.ui.parOn,curPar=false;
@@ -1895,7 +1890,7 @@ function wsDialog(mode){
 }
 function wsSave(mode){
   var i=$("#wsin"),v=i.value.trim();if(!v){i.focus();return}
-  if(mode==="new"){var w={id:"w"+uid(),name:v};S.workspaces.push(w);S.ui.ws=w.id;S.ui.sel=null;S.ui.filter="pendientes";S.ui.q="";$("#q").value="";sm=false;dmode=false;picked={}}else{wsById(S.ui.ws).name=v}
+  if(mode==="new"){var w={id:"w"+uid(),name:v};S.workspaces.push(w);S.ui.ws=w.id;S.ui.sel=null;S.ui.filter="pendientes";S.ui.q="";if($("#q"))$("#q").value="";sm=false;dmode=false;picked={}}else{wsById(S.ui.ws).name=v}
   closeDlg();save();renderAll();toast(mode==="new"?"Workspace creado":"Workspace renombrado");
 }
 function wsDelDialog(){
@@ -1969,12 +1964,11 @@ function selDelete(){
   if(S.ui.sel&&ids[S.ui.sel])S.ui.sel=null;
   sm=false;dmode=false;picked={};closeDlg();save();renderAll();toast("Eliminado");
 }
-function closeMenu(){var m=$("#menu");m.hidden=true;$("#burger").setAttribute("aria-expanded","false");var w=$("#wsmenu");w.hidden=true;$("#wsbtn").setAttribute("aria-expanded","false");$("#wsopts").hidden=true;$("#kindmenu").hidden=true;$("#kindbtn").setAttribute("aria-expanded","false");$("#wsmorebtn").setAttribute("aria-expanded","false");$("#viewmenu").hidden=true;$("#viewbtn").setAttribute("aria-expanded","false");$("#itemmenu").hidden=true;$("#xfmenu").hidden=true;$("#loosemenu").hidden=true;$("#loosebtn").setAttribute("aria-expanded","false");document.querySelectorAll(".chevbtn[aria-expanded=true],.xfbtn[aria-expanded=true],.tkplus[aria-expanded=true],.tkxf[aria-expanded=true],.kbtn[aria-expanded=true]").forEach(function(b){b.setAttribute("aria-expanded","false")})}
+function closeMenu(){var w=$("#wsmenu");w.hidden=true;$("#wsbtn").setAttribute("aria-expanded","false");$("#wsopts").hidden=true;$("#kindmenu").hidden=true;$("#kindbtn").setAttribute("aria-expanded","false");$("#wsmorebtn").setAttribute("aria-expanded","false");$("#viewmenu").hidden=true;$("#viewbtn").setAttribute("aria-expanded","false");$("#itemmenu").hidden=true;$("#xfmenu").hidden=true;$("#loosemenu").hidden=true;$("#loosebtn").setAttribute("aria-expanded","false");document.querySelectorAll(".chevbtn[aria-expanded=true],.xfbtn[aria-expanded=true],.tkplus[aria-expanded=true],.tkxf[aria-expanded=true],.kbtn[aria-expanded=true]").forEach(function(b){b.setAttribute("aria-expanded","false")})}
 function placeMenu(m,btn,right){m.hidden=false;var b=btn.getBoundingClientRect(),w=m.offsetWidth,h=m.offsetHeight,vh=window.innerHeight,top=b.bottom+8;if(top+h>vh-8){var up=b.top-h-8;top=up>=8?up:Math.max(8,vh-h-8)}m.style.top=top+"px";m.style.left=Math.max(8,Math.min(window.innerWidth-w-8,right?b.right-w:b.left))+"px"}
-function openMenu(){closeMenu();placeMenu($("#menu"),$("#burger"),true);$("#burger").setAttribute("aria-expanded","true")}
 function openWsOpts(){
   closeMenu();var m=$("#wsopts"),one=S.workspaces.length<2;
-  m.innerHTML='<button class="mi" role="menuitem" data-a="wsnew">Nuevo workspace</button><button class="mi" role="menuitem" data-a="wsren">Renombrar</button><button class="mi'+(one?' off':'')+'" role="menuitem" data-a="wsdel"'+(one?' disabled title="Necesitas al menos un workspace"':'')+'>Eliminar</button>';
+  $("#wsoptsbody").innerHTML='<button class="mi" role="menuitem" data-a="wsnew">Nuevo workspace</button><button class="mi" role="menuitem" data-a="wsren">Renombrar</button><button class="mi'+(one?' off':'')+'" role="menuitem" data-a="wsdel"'+(one?' disabled title="Necesitas al menos un workspace"':'')+'>Eliminar</button>';
   placeMenu(m,$("#wsmorebtn"),true);$("#wsmorebtn").setAttribute("aria-expanded","true");
 }
 function openWsMenu(){
@@ -2029,7 +2023,8 @@ document.addEventListener("click",function(e){
   if(act==="sow"){sow();return}
   if(act==="kindmenu"){if($("#kindmenu").hidden)openKindMenu();else closeMenu();return}
   if(act==="kind"){newKind=a.dataset.k;closeMenu();renderKinds();$("#sow").focus();return}
-  if(act==="menu"){if($("#menu").hidden)openMenu();else closeMenu();return}
+  if(act==="search"){closeMenu();showDlg('<h2 style="font-size:18px;margin-bottom:10px" class="bar">Buscar</h2><label class="sr" for="q">Buscar</label><input id="q" class="search" type="search" style="width:100%;padding:12px 18px" placeholder="Buscar seeds o etiquetas" autocomplete="off" value="'+esc(S.ui.q||"")+'"><div class="inline" style="justify-content:flex-end;margin-top:14px"><button class="ghost" data-a="qclear">Limpiar</button><button class="btn" data-a="dlgclose">Listo</button></div>');setTimeout(function(){var qi=$("#q");if(qi){qi.focus();qi.select()}},30);return}
+  if(act==="qclear"){S.ui.q="";var qc=$("#q");if(qc){qc.value="";qc.focus()}renderList();return}
   if(act==="rowtools"){var rr=a.getBoundingClientRect();showMini(a.dataset.id,rr.left+rr.width/2,rr.bottom);return}
   if(act==="grip")return;
   if(act==="partoggle"){parToggle();return}
@@ -2113,7 +2108,6 @@ document.addEventListener("click",function(e){
   if(act==="kind-ok"){var ck2=cur();if(ck2)setKind(ck2,a.dataset.k,true);return}
   if(act==="nosug"){var cn2=cur();if(cn2){cn2.nosug=true;save();renderDetail(true)}return}
   if(act==="minitool"){var mid=a.dataset.id,mk=a.dataset.k;closeMini();addModule(mk,mid);return}
-  if(act==="dock-left"||act==="dock-right"){S.ui.dock=act==="dock-left"?"left":"right";save();renderTools();closeMenu();return}
   if(act==="close"){S.ui.sel=null;renderList();renderDetail();return}
   if(act==="open"){open(a.dataset.id);return}
   if(act==="logout"){closeMenu();cerrarSesion();return}
@@ -2245,6 +2239,7 @@ document.addEventListener("click",function(e){
 });
 document.addEventListener("keydown",function(e){
   var t=e.target;
+  if(t&&t.id==="q"&&(e.key==="Enter"||e.key==="Escape")){e.preventDefault();closeDlg();return}
   if((e.key==="ArrowDown"||e.key==="ArrowUp")&&t&&t.closest&&t.closest("#xfmenu")){
     e.preventDefault();var its=[].slice.call($("#xfmenu").querySelectorAll(".mi")),ix=its.indexOf(t.closest(".mi"));
     if(its.length)its[(ix+(e.key==="ArrowDown"?1:-1)+its.length)%its.length].focus();return;
