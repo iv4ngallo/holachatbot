@@ -367,6 +367,10 @@ textarea.field{border-radius:24px;resize:none;min-height:70px;line-height:1.5}
 .iconbtn.del:hover{background:var(--warn);color:#fff}
 .iconbtn:disabled{opacity:.35;cursor:default}
 .iconbtn:disabled:hover{background:var(--panel);color:inherit}
+.listhead .wsrow{flex:1;min-width:0;justify-content:flex-end}
+.listhead .wsbtn .label{display:none}
+.listhead .wsbtn{padding:8px 14px}
+.listhead .wsrow .iconbtn{width:42px;height:42px}
 .wsbtn{flex:1;min-width:0;display:flex;align-items:center;gap:10px;background:var(--panel);border:0;border-radius:999px;padding:8px 16px;text-align:left}
 .wsbtn b{font-family:var(--font-d);text-transform:uppercase;letter-spacing:.06em;font-size:16px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .wsbtn .caret{width:0;height:0;border:5px solid transparent;border-top:6px solid currentColor;margin-top:6px;flex:none}
@@ -778,11 +782,11 @@ button:active:not(:disabled){transform:scale(.93)}
           <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color:var(--green)"><path d="M16 28V14"/><path d="M16 17c-5 0-8-3-8-8 5 0 8 3 8 8z"/><path d="M16 14c0-4 3-7 8-7 0 5-3 8-8 7z"/></svg>
           <h1 class="bar">Organic</h1>
         </div>
+        <div class="wsrow">
+          <button class="wsbtn" id="wsbtn" title="Cambiar de workspace" aria-label="Cambiar de workspace" data-a="wsmenu" aria-expanded="false" aria-controls="wsmenu"><span class="label">Workspace</span><b id="wsname"></b><span class="caret"></span></button>
+          <button class="iconbtn" id="wsmorebtn" data-a="wsmore" title="Opciones del workspace" aria-label="Opciones del workspace" aria-haspopup="menu" aria-expanded="false" aria-controls="wsopts"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5.500" r="1.800"/><circle cx="12" cy="12" r="1.800"/><circle cx="12" cy="18.500" r="1.800"/></svg></button>
+        </div>
         <button class="iconbtn" id="searchbtn" data-a="search" aria-label="Buscar" title="Buscar seeds o etiquetas" aria-haspopup="dialog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.500"/><path d="M16 16l4.500 4.500"/></svg></button>
-      </div>
-      <div class="wsrow">
-        <button class="wsbtn" id="wsbtn" data-a="wsmenu" aria-expanded="false" aria-controls="wsmenu"><span class="label">Workspace</span><b id="wsname"></b><span class="caret"></span></button>
-        <button class="iconbtn" id="wsmorebtn" data-a="wsmore" title="Opciones del workspace" aria-label="Opciones del workspace" aria-haspopup="menu" aria-expanded="false" aria-controls="wsopts"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5.500" r="1.800"/><circle cx="12" cy="12" r="1.800"/><circle cx="12" cy="18.500" r="1.800"/></svg></button>
       </div>
       <div class="sow">
         <label class="sr" for="sow">Nuevo seed</label>
